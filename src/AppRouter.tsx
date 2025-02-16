@@ -1,9 +1,8 @@
-import { core } from '@tauri-apps/api'
 import { Settings } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import Page from './app/dashboard/page'
-import { useAuth } from './context/AuthContext'
+import { useStronghold } from './context/StrongholdContext'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import BuildProject from './pages/BuildProject'
@@ -19,12 +18,47 @@ import UploadTrello from './pages/UploadTrello'
 // subsequent components are loaded within the page window via the Outlet component.
 
 export const AppRouter: React.FC = () => {
-  const { isAuthenticated } = useAuth()
+  const { stronghold, client, isInitialized } = useStronghold() // Get Stronghold instance
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null) // Track authentication state
   const location = useLocation()
+  const navigate = useNavigate() // To navigate after login
+
+  // Check authentication on component mount
+  useEffect(() => {
+    if (!isInitialized || !client) {
+      console.warn('Waiting for Stronghold to initialize...')
+      return
+    }
+    async function checkAuth() {
+      try {
+        console.log('Checking authentication...')
+        const store = client.getStore()
+        const storedUser = await store.get('authenticated') // Retrieve stored username
+
+        if (storedUser) {
+          console.log('User authenticated.')
+          setIsAuthenticated(true)
+        } else {
+          console.log('No user found, redirecting to login.')
+          setIsAuthenticated(false)
+          navigate('/login') // redirect to login page if user not found
+        }
+      } catch (error) {
+        console.error('Failed to check authentication:', error)
+        setIsAuthenticated(false)
+      }
+    }
+
+    checkAuth()
+  }, [client, isInitialized]) // Runs when Stronghold client is ready
 
   // Show loading screen while checking authentication
-  if (isAuthenticated === null) {
-    return <div>Loading...</div>
+  if (isInitialized === null) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Checking authentication...
+      </div>
+    )
   }
 
   return (

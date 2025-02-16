@@ -2,9 +2,7 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": [
-    "main"
-  ],
+  "windows": ["main"],
   "permissions": [
     {
       "identifier": "fs:scope",
@@ -14,6 +12,12 @@
         },
         {
           "path": "$APPDATA/**"
+        },
+        {
+          "path": "$APPDATA/vault.hold"
+        },
+        {
+          "path": "$APPDATA/salt"
         }
       ]
     },
@@ -36,6 +40,14 @@
         },
         {
           "path": "$HOME/**"
+        }
+      ]
+    },
+    {
+      "identifier": "fs:read-all",
+      "allow": [
+        {
+          "path": "$APPDATA/vault.hold"
         }
       ]
     },

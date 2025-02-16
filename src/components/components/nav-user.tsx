@@ -1,5 +1,3 @@
-'use client'
-
 import { Avatar, AvatarFallback, AvatarImage } from '@components/components/ui/avatar'
 import {
   DropdownMenu,
@@ -25,19 +23,17 @@ import {
   Sparkles
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useAuth } from 'src/context/AuthContext'
 
-export function NavUser({
-  user
-}: {
+type Props = {
   user: {
     name: string
-    // email: string
     avatar: string
   }
-}) {
+  onLogout: () => void
+}
+
+export function NavUser({ user, onLogout }: Props) {
   const { isMobile } = useSidebar()
-  const { logout } = useAuth()
 
   return (
     <SidebarMenu>
@@ -102,7 +98,7 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <LogOut />
-              <Link to="#" onClick={logout}>
+              <Link to="#" onClick={onLogout}>
                 Log out
               </Link>
             </DropdownMenuItem>

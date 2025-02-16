@@ -1,6 +1,7 @@
-import { core } from '@tauri-apps/api'
+// import { core } from '@tauri-apps/api'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useStronghold } from 'src/context/StrongholdContext'
 import { z } from 'zod'
 
 const registerSchema = z.object({
@@ -12,33 +13,54 @@ export default function Register() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const navigate = useNavigate() // ✅ Get the navigation function
+  const { stronghold, client } = useStronghold()
+  const navigate = useNavigate() //  Get the navigation function
 
   async function handleRegister() {
+    if (!client) {
+      console.error('Stronghold client is not initialized')
+      setError('Internal error. Please try again.')
+      return
+    }
+    console.log('1. try to validate user input')
     try {
+      // Validate user input before proceeding
       registerSchema.parse({ username, password })
       setError(null)
+      console.log(`Errors: ${error}`)
 
-      // Call Tauri backend (Rust) for user registration
-      const response = await core.invoke('register', { username, password })
-      console.log('Registration successful:', response)
+      const store = client.getStore()
+      const encoder = new TextEncoder()
+      const encodedPassword = encoder.encode(password)
 
-      // If your registration command returns a token, store it.
-      const token = (response as any)?.token || ''
+      //  Check if the username already exists
+      console.log('Checking if user exists')
+      const existingUser = await store.get(username)
+      if (existingUser) {
+        setError('Username already exists. Choose another one.')
+        return
+      }
+      console.log('inserting the user data')
+      //  Store the user data securely
+      await store.insert(username, Array.from(new Uint8Array(encodedPassword)))
 
-      // Use Stronghold secure storage to store the username.
-      await core.invoke('set_secure_value', { key: 'username', value: username })
-      if (token) {
-        await core.invoke('set_secure_value', { key: 'accessToken', value: token })
+      //  Ensure Stronghold saves properly
+      try {
+        await stronghold?.save()
+      } catch (saveError) {
+        console.error('❌ Failed to save Stronghold:', saveError)
+        setError('Could not complete registration. Try again.')
+        return
       }
 
-      // Redirect to the login page.
-      // navigate('/login')
+      console.log('Registration successful:', username)
+      navigate('/login') //  Redirect to login after successful registration
     } catch (err) {
       if (err instanceof z.ZodError) {
         setError(err.errors[0].message)
       } else {
-        setError('Registration failed')
+        console.error('❌ Registration failed:', err)
+        setError('Unexpected error occurred.')
       }
     }
   }
