@@ -1,10 +1,10 @@
 [package]
 name = "app"
 version = "2.0.0"
-description = "A Tauri Solid TypeScript Tailwind Vite App Template"
+description = "An app to streamline ingesting and uploading video content"
 authors = ["AR10"]
 license = "MIT"
-repository = "https://github.com/AR10Dev/tauri-solid-ts-tailwind-vite"
+repository = "https://github.com/twentynineteen/swish-app"
 default-run = "app"
 edition = "2021"
 
@@ -22,10 +22,24 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2.0.2", features = [] }
 
 [dependencies]
-serde_json = "1.0"
-serde = { version = "1.0", features = ["derive"] }
-tauri = { version = "2.0.6", features = [] }
 tauri-plugin-dialog = "2"
+tauri = { version = "2.0.6", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rand = "0.8"
+jsonwebtoken = "9.3.1"
+chrono = "0.4.39"
+dotenv = "0.15.0"
+tauri-plugin-http = "2.3.0"
+tauri-plugin-fs = "2"
+log = "0.4"
+simple_logger = "4.0"
+fs = "0.0.5"
+tauri-plugin-stronghold = "2"
+argon2 = "0.5"
+
+
+
 
 [features]
 default = [ "custom-protocol" ]

@@ -1,9 +1,9 @@
-import React from 'react';
+import React from 'react'
 
-type Props = {};
+type Props = {}
 
 const Settings = (props: Props) => {
-	return <div>Settings</div>;
-};
+  return <div>Settings</div>
+}
 
-export default Settings;
+export default Settings

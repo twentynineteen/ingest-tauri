@@ -1,79 +1,102 @@
-const Login = () => {
-	return (
-		<>
-			<div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-				<div className="sm:mx-auto sm:w-full sm:max-w-sm">
-					<img
-						alt="Your Company"
-						src="https://tailwindui.com/plus-assets/img/logos/mark.svg?color=indigo&shade=600"
-						className="mx-auto h-10 w-auto"
-					/>
-					<h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-						Sign in to your account
-					</h2>
-				</div>
+import { getCookie } from '@components/lib/utils'
+import { core } from '@tauri-apps/api'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from 'src/context/AuthContext'
+import { z } from 'zod'
 
-				<div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-					<form action="#" method="POST" className="space-y-6">
-						<div>
-							<label htmlFor="email" className="block text-sm/6 font-medium text-gray-900">
-								Email address
-							</label>
-							<div className="mt-2">
-								<input
-									id="email"
-									name="email"
-									type="email"
-									required
-									autoComplete="email"
-									className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-								/>
-							</div>
-						</div>
+const loginSchema = z.object({
+  username: z.string().min(3, 'Username must be at least 3 characters'),
+  password: z.string().min(6, 'Password must be at least 6 characters')
+})
 
-						<div>
-							<div className="flex items-center justify-between">
-								<label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
-									Password
-								</label>
-								<div className="text-sm">
-									<a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-										Forgot password?
-									</a>
-								</div>
-							</div>
-							<div className="mt-2">
-								<input
-									id="password"
-									name="password"
-									type="password"
-									required
-									autoComplete="current-password"
-									className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-								/>
-							</div>
-						</div>
+export default function Login() {
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const { login } = useAuth() // Use global login state
+  const navigate = useNavigate() // To navigate after login
 
-						<div>
-							<button
-								type="submit"
-								className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-							>
-								Sign in
-							</button>
-						</div>
-					</form>
+  const handleLogin = async () => {
+    try {
+      // Validate credentials
+      loginSchema.parse({ username, password })
 
-					<p className="mt-10 text-center text-sm/6 text-gray-500">
-						Not a member?{' '}
-						<a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-							Request an account
-						</a>
-					</p>
-				</div>
-			</div>
-		</>
-	);
-};
+      // Call Tauri backend for login
+      const accessToken = await core.invoke<string>('login', { username, password })
 
-export default Login;
+      if (typeof accessToken === 'string') {
+        // Securely store the username and access token using Stronghold
+        await core.invoke('set_secure_value', { key: 'username', value: username })
+        await core.invoke('set_secure_value', { key: 'accessToken', value: accessToken })
+
+        // Update global auth state and redirect.
+        login(accessToken, username)
+        navigate('/') // 🔥 Redirect to home/dashboard
+      } else {
+        setError('Invalid login response.')
+      }
+    } catch (err) {
+      setError('Login failed. Check your credentials.')
+    }
+  }
+
+  // Auto-refresh access token when expired
+  const refreshAccessToken = async () => {
+    const refreshToken = getCookie('refresh_token')
+
+    if (!refreshToken) {
+      console.error('No refresh token found. User must log in again.')
+      return
+    }
+
+    try {
+      const newToken = await core.invoke<string>('refresh_access_token', { refreshToken })
+      if (typeof newToken === 'string') {
+        // Update secure storage with the new access token
+        await core.invoke('set_secure_value', { key: 'accessToken', value: newToken })
+        console.log('Access token refreshed!')
+      } else {
+        console.error('Session expired! Please log in again.')
+      }
+    } catch (error) {
+      console.error('Failed to refresh access token:', error)
+    }
+  }
+
+  // Call refreshAccessToken() whenever token expires
+
+  return (
+    <div className="flex flex-col p-6 max-w-sm mx-auto bg-white shadow-md rounded-xl">
+      <h2 className="text-xl font-semibold mb-4">Login</h2>
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+      <input
+        type="text"
+        placeholder="Username"
+        value={username}
+        onChange={e => setUsername(e.target.value)}
+        className="border p-2 rounded w-full mb-2"
+      />
+      <input
+        type="password"
+        placeholder="Password"
+        value={password}
+        onChange={e => setPassword(e.target.value)}
+        className="border p-2 rounded w-full mb-2"
+      />
+      <button
+        onClick={handleLogin}
+        className="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600"
+      >
+        Login
+      </button>
+      <p className="mt-3">
+        No account? click{' '}
+        <Link to="/register" className="font-bold text-blue-600">
+          here
+        </Link>{' '}
+        to register
+      </p>
+    </div>
+  )
+}
