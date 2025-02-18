@@ -4,27 +4,29 @@ import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { confirm, open } from '@tauri-apps/plugin-dialog'
 import { exists, mkdir, remove, writeFile, writeTextFile } from '@tauri-apps/plugin-fs'
+import { Trash2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-import {
-  checkFullDiskAccessPermissions,
-  requestFullDiskAccessPermissions
-} from 'tauri-plugin-macos-permissions-api'
+
+// import {
+//   checkFullDiskAccessPermissions,
+//   requestFullDiskAccessPermissions
+// } from 'tauri-plugin-macos-permissions-api'
 
 // The BuildProject component is used for uploading footage from camera cards
 // additionally, the folder tree structure is generated as is the Premiere Pro project
 // React dropzone is used to select and map video files from a folder.
 // Footage can be marked with the relevant camera in order to place in the correct folder.
-const handlePermissions = async () => {
-  console.log('checking permissions')
-  const res = await checkFullDiskAccessPermissions()
-  console.log(res)
-}
-const handleSetPermissions = async () => {
-  console.log('checking permissions')
-  const res = await requestFullDiskAccessPermissions()
-  console.log(res)
-}
+// const handlePermissions = async () => {
+//   console.log('checking permissions')
+//   const res = await checkFullDiskAccessPermissions()
+//   console.log(res)
+// }
+// const handleSetPermissions = async () => {
+//   console.log('checking permissions')
+//   const res = await requestFullDiskAccessPermissions()
+//   console.log(res)
+// }
 
 async function moveSelectedFile(srcPath: string, destFolder: string) {
   try {
@@ -201,6 +203,10 @@ const BuildProject: React.FC = () => {
       const unlistenComplete = await listen<string[]>('copy_complete', event => {
         console.log('File Transfer Completed:', event.payload) // Debugging log
         setCompleted(true)
+
+        alert('Project created successfully!')
+        clearFields()
+
         unlistenProgress() // Stop listening when done
         unlistenComplete()
       })
@@ -231,9 +237,6 @@ const BuildProject: React.FC = () => {
       )
 
       console.log('Files copied successfully:', result)
-
-      alert('Project created successfully!')
-      clearFields()
     } catch (error) {
       console.error('Error creating project:', error)
       alert('Error creating project: ' + error)
@@ -243,46 +246,119 @@ const BuildProject: React.FC = () => {
   return (
     <div className="">
       {/* Project Configuration & File Explorer */}
-      <Button onClick={handlePermissions}>Get Permissions </Button>
-      <Button onClick={handleSetPermissions}>Set Permissions </Button>
-      <div className="w-full pl-2 pb-4 border-b mb-4">
+      <div className="w-full pl-4 pb-4 border-b mb-4">
         <h2 className="text-2xl font-semibold">Build a Project</h2>
-        <div className="title flex flex-row gap-4 pt-3 justify-start">
-          <p className="w-[200px]">Project title:</p>
-          <input
-            placeholder="enter title here"
-            value={title}
-            onChange={e => setTitle(e.target.value)}
-            className="w-1/2 h-fit border rounded pl-3 shadow-xl"
-          />
-        </div>
-        <div className="cameras flex flex-row gap-4 pt-3 justify-start">
-          <p className="w-[200px]">Number of cameras: </p>
-          <input
-            type="number"
-            min={1}
-            value={numCameras}
-            onChange={e => setNumCameras(Number(e.target.value))}
-            className="w-1/2 border rounded pl-3 shadow-xl"
-          />
-        </div>
-        <div className="project-menu flex flex-row justify-around pt-4 items-center mt-3">
-          <div className="folder-tree">
+        <div className="gap-20 px-6">
+          <div className="py-4">
+            <label
+              htmlFor="helper-text"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Project title
+            </label>
+            <input
+              id="helper-text"
+              aria-describedby="helper-text-explanation"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Enter title here"
+            />
+            <p
+              id="helper-text-explanation"
+              className="mt-2 text-sm text-gray-500 dark:text-gray-400"
+            >
+              e.g. DBA - IB1234 - J Doe - Introductions 060626
+            </p>
+          </div>
+          <div className="pt-2">
+            <label
+              htmlFor="number-input"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Number of cameras:
+            </label>
+            <input
+              type="number"
+              id="number-input"
+              aria-describedby="helper-text-explanation"
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 font-semibold"
+              placeholder="2"
+              defaultValue={2}
+              required
+            />
+            <p
+              id="helper-text-explanation"
+              className="mt-2 text-sm text-gray-500 dark:text-gray-400"
+            >
+              Default: 2
+            </p>
+          </div>
+          <div className="folder-tree mx-auto mt-6 ">
             {/* Pass an onSelect callback so FolderTree can update the selectedFolder state */}
-            <FolderTree onSelect={setSelectedFolder} />
+            <FolderTree onSelect={setSelectedFolder} selectedFolder={selectedFolder} />
+          </div>
+        </div>
+        <div className="project-menu flex flex-row justify-between items-center mt-8 mx-6 rounded-lg">
+          <div>
+            <div>
+              <button
+                onClick={selectFiles}
+                // className="bg-gray-600 text-white px-4 py-2 rounded-xl shadow-md"
+                className="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
+              >
+                Select Files
+              </button>
+            </div>
           </div>
           <button
             onClick={handleCreateProject}
-            className=" bg-gray-600 text-white px-4 py-2 rounded-xl shadow-xl"
+            className="inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-500 to-pink-500 group-hover:from-purple-500 group-hover:to-pink-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800"
           >
-            Create Project
+            <span className="px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent group-hover:dark:bg-transparent">
+              Create Project
+            </span>
           </button>
           <button
             onClick={clearFields}
-            className="bg-red-600 text-white px-4 py-2 rounded-xl shadow-xl"
+            className="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800"
           >
             Clear All
           </button>
+        </div>
+        <div className="pt-4 justify-center items-center text-center ">
+          <ul className="mx-2 justify-center">
+            {files.map((item, idx) => (
+              <li
+                key={idx}
+                className="my-4 text-sm text-gray-700 flex justify-between items-center"
+              >
+                <span className="px-4 truncate w-[200px] text-start">
+                  {item.file.name}
+                </span>{' '}
+                <span className="nowrap truncate italic w-[300px]">
+                  ({item.file.path}){' '}
+                </span>
+                {/* Display full path */}
+                <div className="flex justify-center px-4 grid-cols-2 gap-4 flex-row items-center">
+                  <select
+                    className="ml-2 border p-1 rounded mb-2"
+                    value={item.camera}
+                    onChange={e => updateFileCamera(idx, Number(e.target.value))}
+                  >
+                    {Array.from({ length: numCameras }, (_, i) => i + 1).map(cam => (
+                      <option key={cam} value={cam}>
+                        Camera {cam}
+                      </option>
+                    ))}
+                  </select>
+                  <button>
+                    <Trash2 />
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
         <div>
           {/* 🔹 Show progress bar */}
@@ -298,70 +374,9 @@ const BuildProject: React.FC = () => {
           )}
 
           {/* 🔹 Show Completion Message */}
-          {completed && <p className="text-green-600">File transfer completed!</p>}
-        </div>
-
-        {/* Drag and Drop Section */}
-        {/* <div
-        className="w-auto h-auto p-8 m-4 border-dashed border-2 border-gray-300 rounded-2xl"
-        {...getRootProps()}
-      >
-        <input {...getInputProps()} />
-        <p className="text-center text-gray-600">Drag & drop footage here</p>
-        <ul>
-          {files.map((item, idx) => (
-            <li
-              key={idx}
-              className="text-sm text-gray-700 flex justify-between items-center"
-            >
-              {item.file.name}
-              <select
-                className="ml-2 border p-1 rounded mb-2"
-                value={item.camera}
-                onChange={e => updateFileCamera(idx, Number(e.target.value))}
-              >
-                {Array.from({ length: numCameras }, (_, i) => i + 1).map(cam => (
-                  <option key={cam} value={cam}>
-                    Camera {cam}
-                  </option>
-                ))}
-              </select>
-            </li>
-          ))}
-        </ul>
-      </div> */}
-        {/* File select Section */}
-        <div>
-          <button
-            onClick={selectFiles}
-            className="bg-gray-600 text-white px-4 py-2 rounded-xl shadow-xl"
-          >
-            Select Files
-          </button>
-
-          <ul className="mx-2">
-            {files.map((item, idx) => (
-              <li
-                key={idx}
-                className="text-sm text-gray-700 flex justify-between items-center"
-              >
-                <span className="px-4">{item.file.name}</span>{' '}
-                <span className="italic">({item.file.path}) </span>
-                {/* Display full path */}
-                <select
-                  className="ml-2 border p-1 rounded mb-2"
-                  value={item.camera}
-                  onChange={e => updateFileCamera(idx, Number(e.target.value))}
-                >
-                  {Array.from({ length: numCameras }, (_, i) => i + 1).map(cam => (
-                    <option key={cam} value={cam}>
-                      Camera {cam}
-                    </option>
-                  ))}
-                </select>
-              </li>
-            ))}
-          </ul>
+          {completed && (
+            <p className="text-green-600 text-center">File transfer completed!</p>
+          )}
         </div>
       </div>
     </div>

@@ -5,12 +5,12 @@ import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-
 // The top level component, Page, acts as the provider for the layout
 // subsequent components are loaded within the page window via the Outlet component.
 
-import {
-  checkFullDiskAccessPermissions,
-  requestFullDiskAccessPermissions
-} from 'tauri-plugin-macos-permissions-api'
+// import {
+//   checkFullDiskAccessPermissions,
+//   requestFullDiskAccessPermissions
+// } from 'tauri-plugin-macos-permissions-api'
 import Page from './app/dashboard/page'
-import { useAuth } from './context/AuthProvider'
+// import { useAuth } from './context/AuthProvider'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import BuildProject from './pages/BuildProject'
@@ -21,16 +21,16 @@ import UploadOtter from './pages/UploadOtter'
 import UploadSprout from './pages/UploadSprout'
 import UploadTrello from './pages/UploadTrello'
 
-async function requestPermissions() {
-  const checked = await checkFullDiskAccessPermissions()
-  if (checked) {
-    console.log('Checked permissions: ', checked)
-  }
-  const granted = await requestFullDiskAccessPermissions()
-  if (!granted) {
-    console.error('Full disk access permission denied.')
-  }
-}
+// async function requestPermissions() {
+//   const checked = await checkFullDiskAccessPermissions()
+//   if (checked) {
+//     console.log('Checked permissions: ', checked)
+//   }
+//   const granted = await requestFullDiskAccessPermissions()
+//   if (!granted) {
+//     console.error('Full disk access permission denied.')
+//   }
+// }
 
 export const AppRouter: React.FC = () => {
   // const { isAuthenticated } = useAuth() // Track authentication state
