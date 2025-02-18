@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useStronghold } from 'src/context/StrongholdContext'
+import { useAuth } from 'src/context/AuthProvider'
 import { z } from 'zod'
 
 const loginSchema = z.object({
@@ -9,74 +9,18 @@ const loginSchema = z.object({
 })
 
 const Login: React.FC = () => {
-  const { stronghold, client } = useStronghold() // Use global login state
+  const { login, isAuthenticated } = useAuth()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate() // To navigate after login
 
   const handleLogin = async () => {
-    if (!client) {
-      console.error('Stronghold client is not initialized')
-      setError('Internal error. Please try again')
-      return
-    }
-
-    try {
-      console.log('Attempting to login...')
-      const store = client.getStore()
-
-      // Timeout for login process (5s)
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Login timeout exceeded!')), 5000)
-      )
-
-      // Fetch stored password with timeout
-      const storedPasswordData = await Promise.race([store.get(username), timeoutPromise])
-
-      // Validate credentials
+    if (username && password) {
       console.log('Validating creds.')
       loginSchema.parse({ username, password })
-
-      if (storedPasswordData) {
-        console.log('Login successful. Storing authentication state..')
-
-        const storedPassword = new TextDecoder().decode(
-          new Uint8Array(storedPasswordData)
-        )
-        if (storedPassword === password) {
-          console.log('login successful')
-
-          await store.insert('authenticated', [1]) // Store authentication flag
-          await store.insert('username', Array.from(new TextEncoder().encode(username)))
-
-          // Timeout for `stronghold.save()`
-          await Promise.race([
-            stronghold?.save(),
-            new Promise<never>((_, reject) =>
-              setTimeout(
-                () => reject(new Error('Stronghold save timeout exceeded!')),
-                5000
-              )
-            )
-          ])
-
-          navigate('/') // Redirect to home/dashboard
-        } else {
-          console.warn('Invalid password')
-          setError('Invalid password.')
-        }
-      } else {
-        console.warn('Username not found')
-        setError('Invalid username.')
-      }
-    } catch (error: any) {
-      console.error('Login error:', error)
-      if (error.message.includes('timeout')) {
-        setError('Login took too long. Please try again.')
-      } else {
-        setError('Login failed. Check your credentials.')
-      }
+      const fakeToken = `token_${username}` // Simulating a token
+      login(fakeToken, username)
     }
   }
 
@@ -111,6 +55,7 @@ const Login: React.FC = () => {
         </Link>{' '}
         to register
       </p>
+      {isAuthenticated ? <p>authenticated!</p> : <p>not authenticated</p>}
     </div>
   )
 }

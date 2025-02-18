@@ -1,8 +1,16 @@
 import { Settings } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+// The AppRouter component switches the display if the user is not logged in
+// The top level component, Page, acts as the provider for the layout
+// subsequent components are loaded within the page window via the Outlet component.
+
+import {
+  checkFullDiskAccessPermissions,
+  requestFullDiskAccessPermissions
+} from 'tauri-plugin-macos-permissions-api'
 import Page from './app/dashboard/page'
-import { useStronghold } from './context/StrongholdContext'
+import { useAuth } from './context/AuthProvider'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import BuildProject from './pages/BuildProject'
@@ -13,67 +21,37 @@ import UploadOtter from './pages/UploadOtter'
 import UploadSprout from './pages/UploadSprout'
 import UploadTrello from './pages/UploadTrello'
 
-// The AppRouter component switches the display if the user is not logged in
-// The top level component, Page, acts as the provider for the layout
-// subsequent components are loaded within the page window via the Outlet component.
+async function requestPermissions() {
+  const checked = await checkFullDiskAccessPermissions()
+  if (checked) {
+    console.log('Checked permissions: ', checked)
+  }
+  const granted = await requestFullDiskAccessPermissions()
+  if (!granted) {
+    console.error('Full disk access permission denied.')
+  }
+}
 
 export const AppRouter: React.FC = () => {
-  const { stronghold, client, isInitialized } = useStronghold() // Get Stronghold instance
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null) // Track authentication state
-  const location = useLocation()
-  const navigate = useNavigate() // To navigate after login
-
-  // Check authentication on component mount
-  useEffect(() => {
-    if (!isInitialized || !client) {
-      console.warn('Waiting for Stronghold to initialize...')
-      return
-    }
-    async function checkAuth() {
-      try {
-        console.log('Checking authentication...')
-        const store = client.getStore()
-        const storedUser = await store.get('authenticated') // Retrieve stored username
-
-        if (storedUser) {
-          console.log('User authenticated.')
-          setIsAuthenticated(true)
-        } else {
-          console.log('No user found, redirecting to login.')
-          setIsAuthenticated(false)
-          navigate('/login') // redirect to login page if user not found
-        }
-      } catch (error) {
-        console.error('Failed to check authentication:', error)
-        setIsAuthenticated(false)
-      }
-    }
-
-    checkAuth()
-  }, [client, isInitialized]) // Runs when Stronghold client is ready
-
-  // Show loading screen while checking authentication
-  if (isInitialized === null) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        Checking authentication...
-      </div>
-    )
-  }
+  // const { isAuthenticated } = useAuth() // Track authentication state
+  const isAuthenticated = true // Track authentication state
+  // requestFullDiskAccessPermissions()
 
   return (
     <Routes>
       {/* Ensure login and register routes are always accessible */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
 
       {/* Protect all other routes */}
       {!isAuthenticated ? (
         <>
-          <Route path="*" element={<Navigate to="/login" state={{ from: location }} />} />
+          {/* <Route path="/" element={<Login />} /> */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          {/* <Route path="*" element={<Navigate to="/login" />} /> */}
         </>
       ) : (
         <>
+          {/* <Route path="*" element={<Navigate to="/" />} /> */}
           <Route path="/" element={<Page />}>
             <Route path="ingest">
               <Route path="history" element={<IngestHistory />} />

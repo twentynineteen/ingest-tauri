@@ -35,8 +35,9 @@ tauri-plugin-fs = "2"
 log = "0.4"
 simple_logger = "4.0"
 fs = "0.0.5"
-tauri-plugin-stronghold = "2"
 argon2 = "0.5"
+tauri-plugin-macos-permissions = "2.0.4"
+
 
 
 
@@ -54,6 +55,3 @@ panic = "abort"         # Strip expensive panic clean-up logic
 codegen-units = 1       # Compile crates one after another so the compiler can optimize better
 lto = true              # Enables link to optimizations
 opt-level = "s"         # Optimize for binary size. Use `3` if you prefer speed.
-
-[profile.dev.package.objc2]
-debug-assertions = false

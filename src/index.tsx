@@ -6,7 +6,6 @@ import './index.css'
 const rootElement = document.getElementById('root')
 
 if (rootElement !== null && rootElement instanceof HTMLElement) {
-  // TypeScript now knows that rootElement is a valid HTMLElement
   ReactDOM.createRoot(rootElement).render(
     <React.StrictMode>
       <App />

@@ -5,7 +5,7 @@
   "identifier": "com.swish-app.dev",
   "build": {
     "beforeDevCommand": "bun run dev",
-    "devUrl": "http://localhost:1420",
+    "devUrl": "http://localhost:1422",
     "beforeBuildCommand": "bun run build",
     "frontendDist": "../dist"
   },
@@ -16,11 +16,13 @@
         "title": "app",
         "width": 800,
         "height": 600,
-        "resizable": true
+        "resizable": true,
+        "devtools": true
       }
     ],
     "security": {
-      "csp": "default-src blob: data: filesystem: ws: wss: http: https: tauri: 'unsafe-eval' 'unsafe-inline' 'self' img-src: 'self'; connect-src ipc: http://ipc.localhost"
+      "csp": null,
+      "capabilities": []
     }
   },
   "plugins": { "dialog": null, "fs": null },

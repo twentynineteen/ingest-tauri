@@ -1,4 +1,4 @@
-import { core } from '@tauri-apps/api'
+import { invoke } from '@tauri-apps/api/core'
 import React, { createContext, useContext, useEffect, useState } from 'react'
 
 interface AuthContextType {
@@ -26,24 +26,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return
         }
 
-        const response = await core.invoke<string>('check_auth', { token })
-        setIsAuthenticated(response.includes('authenticated'))
-        setUsername(storedUsername)
+        // Call Tauri backend
+        const response = await invoke<string>('check_auth', { token })
+        if (response.includes('authenticated')) {
+          setIsAuthenticated(true)
+          setUsername(storedUsername)
+        } else {
+          logout() // Remove invalid token
+        }
       } catch (error) {
         console.error('Auth check failed:', error)
-        setIsAuthenticated(false)
-        setUsername(null)
+        logout()
       }
     }
 
     checkAuth()
   }, [])
 
-  const login = (token: string, username: string) => {
-    localStorage.setItem('access_token', token)
-    localStorage.setItem('username', username) // store username
-    setIsAuthenticated(true) // 🔥 This triggers a UI update
-    setUsername(username)
+  const login = async (token: string, username: string) => {
+    try {
+      await invoke('add_token', { token }) // Add token to backend
+      localStorage.setItem('access_token', token)
+      localStorage.setItem('username', username)
+      setIsAuthenticated(true)
+      setUsername(username)
+    } catch (error) {
+      console.error('Login failed:', error)
+    }
   }
 
   const logout = () => {

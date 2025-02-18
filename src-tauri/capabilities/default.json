@@ -4,20 +4,19 @@
   "description": "Capability for the main window",
   "windows": ["main"],
   "permissions": [
+    "core:default",
+    "macos-permissions:default",
     {
       "identifier": "fs:scope",
       "allow": [
         {
-          "path": "$APPDATA"
+          "path": "$APP/*"
         },
         {
-          "path": "$APPDATA/**"
+          "path": "$HOME/*"
         },
         {
-          "path": "$APPDATA/vault.hold"
-        },
-        {
-          "path": "$APPDATA/salt"
+          "path": "$RESOURCE/*"
         }
       ]
     },
@@ -59,8 +58,11 @@
     "core:menu:default",
     "core:tray:default",
     "dialog:default",
-    "dialog:default",
     "fs:default",
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [{ "path": "$APPDATA/*" }]
+    },
     "fs:allow-app-write-recursive",
     "fs:allow-appcache-write",
     "fs:allow-appcache-write-recursive",
@@ -112,8 +114,6 @@
     "fs:allow-video-write",
     "fs:allow-video-write-recursive",
     "fs:write-all",
-    "fs:write-files",
-    "fs:default",
-    "stronghold:default"
+    "fs:write-files"
   ]
 }
