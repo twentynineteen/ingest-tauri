@@ -9,7 +9,8 @@ use tauri::{command, AppHandle};
 use std::sync::Arc;
 use std::thread;
 mod command;
-use command::generate_premiere_project;
+use command::copy_premiere_project;
+use command::show_confirmation_dialog;
 
 // logging
 // Once enabled, logs will be stored in:
@@ -53,7 +54,7 @@ fn move_files(
 
         for (file_path, camera_number) in files {
             let src_path = Path::new(&file_path);
-            let camera_folder = Path::new(base_dest.as_str()).join(format!("/Footage/Camera {}", camera_number));
+            let camera_folder = Path::new(base_dest.as_str()).join(format!("Footage/Camera {}", camera_number));
 
             // Ensure the Camera folder exists
             if !camera_folder.exists() {
@@ -129,7 +130,7 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_macos_permissions::init())
-        .invoke_handler(tauri::generate_handler![check_auth, add_token, move_files, generate_premiere_project])
+        .invoke_handler(tauri::generate_handler![check_auth, add_token, move_files, copy_premiere_project, show_confirmation_dialog])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");
 }

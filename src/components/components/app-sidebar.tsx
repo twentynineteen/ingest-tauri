@@ -34,7 +34,8 @@ const data = {
         },
         {
           title: 'History',
-          url: '/ingest/history'
+          // url: '/ingest/history'
+          url: '#'
         }
       ]
     },
@@ -44,26 +45,30 @@ const data = {
       icon: HardDriveUpload,
       isActive: false,
       items: [
-        {
-          title: 'Sprout video',
-          url: '/upload/sprout'
-        },
-        {
-          title: 'Posterframe',
-          url: '/upload/posterframe'
-        },
-        {
-          title: 'Trello',
-          url: '/upload/trello'
-        },
-        {
-          title: 'Otter',
-          url: '/upload/otter'
-        },
-        {
-          title: 'Settings',
-          url: '#'
-        }
+        // {
+        //   title: 'Sprout video',
+        //   // url: '/upload/sprout'
+        //   url: '#'
+        // },
+        // {
+        //   title: 'Posterframe',
+        //   // url: '/upload/posterframe'
+        //   url: '#'
+        // },
+        // {
+        //   title: 'Trello',
+        //   // url: '/upload/trello'
+        //   url: '#'
+        // },
+        // {
+        //   title: 'Otter',
+        //   // url: '/upload/otter'
+        //   url: '#'
+        // },
+        // {
+        //   title: 'Settings',
+        //   url: '#'
+        // }
       ]
     },
     {
@@ -74,11 +79,13 @@ const data = {
       items: [
         {
           title: 'General',
-          url: '/settings/general'
+          // url: '/settings/general'
+          url: '#'
         },
         {
           title: 'Connected apps',
-          url: '/settings/connected-apps'
+          // url: '/settings/connected-apps'
+          url: '#'
         }
       ]
     }
@@ -89,7 +96,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { logout, username } = useAuth()
 
   const user = {
-    name: username || 'Guest',
+    name: username || 'Dan',
     avatar: '/filepath/file.jpg'
   }
 

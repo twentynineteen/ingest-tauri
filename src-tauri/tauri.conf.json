@@ -14,11 +14,10 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "app",
-        "width": 800,
-        "height": 600,
-        "resizable": true,
-        "devtools": true
+        "title": "Bucket",
+        "width": 750,
+        "height": 525,
+        "resizable": true
       }
     ],
     "security": {

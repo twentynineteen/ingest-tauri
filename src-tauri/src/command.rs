@@ -1,125 +1,124 @@
-use std::fs::{File, create_dir_all};
-use std::io::Write;
+use std::fs;
+use std::path::PathBuf;
+use tauri::command;
+
+/// Copies a Premiere Pro project template to the specified folder and renames it.
+/// 
+/// # Arguments
+/// * `destination_folder` - The path to the destination folder where the file should be copied.
+/// * `new_title` - The new name for the copied file (without the extension).
+/// 
+/// # Returns
+/// * `Ok(())` if the operation is successful.
+/// * `Err(String)` if an error occurs.
+#[command]
+pub fn copy_premiere_project(destination_folder: String, new_title: String) -> Result<(), String> {
+    // Define the source file path
+    let source_file = PathBuf::from("./assets/Premiere 4K Template 2023.prproj");
+
+    // Check if the source file exists
+    if !source_file.exists() {
+        let error_msg = format!("Error: Source file not found at {:?}", source_file);
+        eprintln!("{}", error_msg); // Log error to the console
+        return Err(error_msg);
+    } else {
+        println!("Source file found: {:?}", source_file); // Log success
+    }
+
+    // Ensure the destination folder exists
+    let destination_path = PathBuf::from(&destination_folder);
+    if !destination_path.exists() {
+        let error_msg = format!("Error: Destination folder does not exist: {}", destination_folder);
+        eprintln!("{}", error_msg);
+        return Err(error_msg);
+    }
+
+    // Create the new file path with the given title
+    let new_file_path = destination_path.join(format!("{}.prproj", new_title));
+
+    // Check if a file with the new name already exists to prevent overwriting
+    if new_file_path.exists() {
+        let error_msg = format!("Error: A file with the name '{}' already exists in the destination folder.", new_file_path.display());
+        eprintln!("{}", error_msg);
+        return Err(error_msg);
+    }
+
+    // Copy the file to the new location
+    match fs::copy(&source_file, &new_file_path) {
+        Ok(_) => {
+            println!("File successfully copied to {:?}", new_file_path); // Log success
+            Ok(())
+        }
+        Err(e) => {
+            let error_msg = format!("Failed to copy file: {}", e);
+            eprintln!("{}", error_msg);
+            Err(error_msg)
+        }
+    }
+}
+
+
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
+use std::process::Command;
 use std::path::Path;
-use quick_xml::Writer;
-use quick_xml::events::{Event, BytesStart, BytesDecl, BytesText};
 
-#[tauri::command]
-pub fn generate_premiere_project(file_path: String, files: Vec<String>) -> Result<String, String> {
-    let path = Path::new(&file_path);
+/// Displays a confirmation dialog with Yes/No options and opens Finder/Explorer if Yes is selected.
+///
+/// # Arguments
+/// * `message` - The message to be displayed in the dialog.
+/// * `title` - The title of the dialog box.
+/// * `destination` - The folder path to open if the user selects "Yes".
+///
+/// # Returns
+/// * `Ok(())` if successful.
+/// * `Err(String)` if an error occurs.
+#[command]
+pub fn show_confirmation_dialog(app: tauri::AppHandle, message: String, title: String, destination: String) -> Result<(), String> {
+    // Display a confirmation dialog with "Yes" and "No" buttons
+    let answer = app.dialog()
+        .message(&message)
+        .title(&title)
+        .buttons(MessageDialogButtons::YesNo)
+        .blocking_show();
 
-    println!("🚀 Creating Premiere Pro 2025 project: {}", file_path);
+    // If the user selects "Yes", open the Finder/File Explorer
+    if answer {
+        open_folder(destination)
+    } else {
+        println!("User selected No, no action taken.");
+        Ok(())
+    }
+}
 
-    // Ensure the parent directory exists
-    if let Some(parent) = path.parent() {
-        println!("📂 Checking project directory: {:?}", parent);
-        if !parent.exists() {
-            println!("❗ Directory missing. Creating...");
-            create_dir_all(parent).map_err(|err| format!("❌ Failed to create directory: {}", err))?;
-            println!("✅ Directory created successfully!");
+/// Opens Finder or File Explorer at the specified destination.
+///
+/// # Arguments
+/// * `destination` - The folder path to open.
+///
+/// # Returns
+/// * `Ok(())` if successful.
+/// * `Err(String)` if an error occurs.
+fn open_folder(destination: String) -> Result<(), String> {
+    let path = Path::new(&destination);
+
+    if !path.exists() {
+        return Err(format!("Error: The destination path does not exist: {}", destination));
+    }
+
+    #[cfg(target_os = "macos")]
+    let result = Command::new("open").arg(&destination).spawn();
+
+    #[cfg(target_os = "windows")]
+    let result = Command::new("explorer").arg(destination).spawn();
+
+    #[cfg(target_os = "linux")]
+    let result = Command::new("xdg-open").arg(destination).spawn();
+
+    match result {
+        Ok(_) => {
+            println!("Opened folder: {}", destination);
+            Ok(())
         }
-    }
-
-    // Start writing XML structure
-    let mut writer = Writer::new(Vec::new());
-
-    // Add XML declaration
-    writer
-        .write_event(Event::Decl(BytesDecl::new("1.0", Some("UTF-8"), Some("yes"))))
-        .unwrap();
-
-    // Root <Project>
-    let mut project = BytesStart::new("Project");
-    project.push_attribute(("Version", "47")); // Premiere 2025 XML version
-    writer.write_event(Event::Start(project.clone())).unwrap();
-
-    // 🔹 MEDIA BIN (to store imported video/audio)
-    writer.write_event(Event::Start(BytesStart::new("MediaBin"))).unwrap();
-
-    for (i, file) in files.iter().enumerate() {
-        let mut clip = BytesStart::new("Clip");
-        clip.push_attribute(("ID", format!("clip-{}", i).as_str()));
-        writer.write_event(Event::Start(clip.clone())).unwrap();
-
-        writer.write_event(Event::Start(BytesStart::new("Name"))).unwrap();
-        writer.write_event(Event::Text(BytesText::new(
-            Path::new(file).file_name().unwrap().to_str().unwrap(),
-        )))
-        .unwrap();
-        writer.write_event(Event::End(BytesStart::new("Name").to_end())).unwrap();
-
-        writer.write_event(Event::Start(BytesStart::new("FilePath"))).unwrap();
-        writer.write_event(Event::Text(BytesText::new(file))).unwrap();
-        writer.write_event(Event::End(BytesStart::new("FilePath").to_end())).unwrap();
-
-        writer.write_event(Event::End(clip.to_end())).unwrap();
-    }
-
-    writer.write_event(Event::End(BytesStart::new("MediaBin").to_end())).unwrap();
-
-    // 🔹 SEQUENCE SETUP
-    let mut sequence = BytesStart::new("Sequence");
-    sequence.push_attribute(("ID", "seq-1"));
-    sequence.push_attribute(("FrameWidth", "3840"));
-    sequence.push_attribute(("FrameHeight", "2160"));
-    sequence.push_attribute(("Timebase", "50"));
-    sequence.push_attribute(("Codec", "ProRes 422"));
-
-    writer.write_event(Event::Start(sequence.clone())).unwrap();
-
-    writer.write_event(Event::Start(BytesStart::new("Tracks"))).unwrap();
-
-    // 🔹 VIDEO TRACKS
-    writer.write_event(Event::Start(BytesStart::new("VideoTracks"))).unwrap();
-
-    for (i, _file) in files.iter().enumerate() {
-        let mut track = BytesStart::new("Track");
-    
-        // FIX: Convert `format!()` output to `&str`
-        track.push_attribute(("ID", format!("video-{}", i).as_str()));
-    
-        writer.write_event(Event::Start(track.clone())).unwrap();
-        writer.write_event(Event::Start(BytesStart::new("ClipRef"))).unwrap();
-        writer.write_event(Event::Text(BytesText::new(&format!("clip-{}", i)))).unwrap();
-        writer.write_event(Event::End(BytesStart::new("ClipRef").to_end())).unwrap();
-        writer.write_event(Event::End(track.to_end())).unwrap();
-    }
-
-    writer.write_event(Event::End(BytesStart::new("VideoTracks").to_end())).unwrap(); // ✅ FIXED
-
-    // 🔹 AUDIO TRACKS
-    writer.write_event(Event::Start(BytesStart::new("AudioTracks"))).unwrap();
-    
-    for (i, _file) in files.iter().enumerate() {
-        let mut track = BytesStart::new("Track");
-    
-        // Convert `format!()` output to `&str` before passing to `push_attribute`
-        track.push_attribute(("ID", format!("audio-{}", i).as_str()));
-    
-        writer.write_event(Event::Start(track.clone())).unwrap();
-        writer.write_event(Event::Start(BytesStart::new("ClipRef"))).unwrap();
-        writer.write_event(Event::Text(BytesText::new(&format!("clip-{}", i)))).unwrap();
-        writer.write_event(Event::End(BytesStart::new("ClipRef").to_end())).unwrap();
-        writer.write_event(Event::End(track.to_end())).unwrap();
-    }
-    
-
-    writer.write_event(Event::End(BytesStart::new("AudioTracks").to_end())).unwrap(); // ✅ FIXED
-
-    writer.write_event(Event::End(BytesStart::new("Tracks").to_end())).unwrap();
-    writer.write_event(Event::End(sequence.to_end())).unwrap();
-
-    // Close <Project>
-    writer.write_event(Event::End(BytesStart::new("Project").to_end())).unwrap();
-
-    // Convert XML data to bytes and write to file
-    let xml_data = writer.into_inner();
-    match File::create(&file_path) {
-        Ok(mut file) => {
-            file.write_all(&xml_data).map_err(|err| format!("Failed to write file: {}", err))?;
-            println!("✅ Premiere Pro project created: {}", file_path);
-            Ok(format!("File saved: {:?}", file_path))
-        }
-        Err(err) => Err(format!("Failed to create file: {}", err)),
+        Err(e) => Err(format!("Failed to open folder: {}", e)),
     }
 }
