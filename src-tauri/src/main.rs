@@ -8,6 +8,8 @@ use std::path::Path;
 use tauri::{command, AppHandle};
 use std::sync::Arc;
 use std::thread;
+mod command;
+use command::generate_premiere_project;
 
 // logging
 // Once enabled, logs will be stored in:
@@ -127,7 +129,7 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_macos_permissions::init())
-        .invoke_handler(tauri::generate_handler![check_auth, add_token, move_files])
+        .invoke_handler(tauri::generate_handler![check_auth, add_token, move_files, generate_premiere_project])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");
 }

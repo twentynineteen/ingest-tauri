@@ -37,6 +37,7 @@ simple_logger = "4.0"
 fs = "0.0.5"
 argon2 = "0.5"
 tauri-plugin-macos-permissions = "2.0.4"
+quick-xml = "0.29"
 
 
 

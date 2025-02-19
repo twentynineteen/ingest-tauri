@@ -46,23 +46,26 @@ const BuildProject: React.FC = () => {
   const [progress, setProgress] = useState(0)
   const [completed, setCompleted] = useState(false)
 
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState('')
+
   // 🔹 Listen for Progress Updates
-  useEffect(() => {
-    const unlistenProgress = listen<number>('copy_progress', event => {
-      console.log('Progress Update:', event.payload) // Debugging log
-      setProgress(event.payload)
-    })
+  // useEffect(() => {
+  //   const unlistenProgress = listen<number>('copy_progress', event => {
+  //     console.log('Progress Update:', event.payload) // Debugging log
+  //     setProgress(event.payload)
+  //   })
 
-    const unlistenComplete = listen<string[]>('copy_complete', event => {
-      console.log('File Transfer Completed:', event.payload) // Debugging log
-      setCompleted(true)
-    })
+  //   const unlistenComplete = listen<string[]>('copy_complete', event => {
+  //     console.log('File Transfer Completed:', event.payload) // Debugging log
+  //     setCompleted(true)
+  //   })
 
-    return () => {
-      unlistenProgress.then(f => f())
-      unlistenComplete.then(f => f())
-    }
-  }, [])
+  //   return () => {
+  //     unlistenProgress.then(f => f())
+  //     unlistenComplete.then(f => f())
+  //   }
+  // }, [])
 
   // Function to let users select files (instead of drag & drop)
   async function selectFiles() {
@@ -235,6 +238,30 @@ const BuildProject: React.FC = () => {
         `${projectFolder}/project_info.json`,
         JSON.stringify(projectData, null, 2)
       )
+
+      // Premiere project logic
+      console.warn(`Parent to: ${projectData.parentFolder}/`)
+      console.warn(
+        `Injecting to: ${projectData.parentFolder}/${projectData.projectTitle}/Projects/${projectData.projectTitle}.prproj`
+      )
+
+      async function createProject() {
+        setLoading(true) // Start progress
+        setMessage('')
+
+        try {
+          const filePath = `${projectData.parentFolder}/${projectData.projectTitle}/Projects/${projectData.projectTitle}.prproj`
+          const result = await invoke('generate_premiere_project', { filePath })
+          console.warn(result)
+          setMessage('Success: ' + result) // Show success message
+        } catch (error) {
+          console.error('Error:', error)
+          setMessage('Error: ' + error) // Show error message
+        } finally {
+          setLoading(false) // STOP the progress
+        }
+      }
+      await createProject()
 
       console.log('Files copied successfully:', result)
     } catch (error) {
