@@ -6,6 +6,10 @@
   "permissions": [
     "core:default",
     "macos-permissions:default",
+    "macos-permissions:allow-check-full-disk-access-permissions",
+    "macos-permissions:allow-check-accessibility-permissions",
+    "macos-permissions:allow-request-full-disk-access-permissions",
+
     {
       "identifier": "fs:scope",
       "allow": [
@@ -52,6 +56,7 @@
     },
     "core:path:default",
     "core:event:default",
+    "core:event:allow-emit",
     "core:window:default",
     "core:app:default",
     "core:resources:default",

@@ -7,33 +7,35 @@ import { exists, mkdir, remove, writeFile, writeTextFile } from '@tauri-apps/plu
 import { Trash2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-
-// import {
-//   checkFullDiskAccessPermissions,
-//   requestFullDiskAccessPermissions
-// } from 'tauri-plugin-macos-permissions-api'
+import {
+  checkFullDiskAccessPermissions,
+  requestFullDiskAccessPermissions
+} from 'tauri-plugin-macos-permissions-api'
 
 // The BuildProject component is used for uploading footage from camera cards
 // additionally, the folder tree structure is generated as is the Premiere Pro project
 // React dropzone is used to select and map video files from a folder.
 // Footage can be marked with the relevant camera in order to place in the correct folder.
-// const handlePermissions = async () => {
-//   console.log('checking permissions')
-//   const res = await checkFullDiskAccessPermissions()
-//   console.log(res)
-// }
-// const handleSetPermissions = async () => {
-//   console.log('checking permissions')
-//   const res = await requestFullDiskAccessPermissions()
-//   console.log(res)
-// }
+const handlePermissions = async () => {
+  console.log('checking permissions')
+  const res = await checkFullDiskAccessPermissions()
+  alert('Permissions: ' + res)
+}
+const handleSetPermissions = async () => {
+  console.log('checking permissions')
+  const res = await requestFullDiskAccessPermissions()
+  console.log(res)
+}
 
 async function moveSelectedFile(srcPath: string, destFolder: string) {
   try {
     const result = await invoke('move_file', { src: srcPath, dest: destFolder })
-    console.log('Success:', result)
+    alert(`Success: ${result}`)
   } catch (error) {
-    console.error('Error:', error)
+    alert(`Error: ${error}`)
+    if (error.message.includes('permission')) {
+      alert('Permission issue: Please ensure the app has full disk access.')
+    }
   }
 }
 
@@ -72,6 +74,7 @@ const BuildProject: React.FC = () => {
     try {
       const selectedFiles = await open({
         multiple: true, // Allow multiple file selection
+        defaultPath: '/Volumes', // Default to volumes to ask for permission
         filters: [
           {
             name: 'Videos',
@@ -251,7 +254,13 @@ const BuildProject: React.FC = () => {
 
         try {
           const filePath = `${projectData.parentFolder}/${projectData.projectTitle}/Projects/${projectData.projectTitle}.prproj`
-          const result = await invoke('generate_premiere_project', { filePath })
+
+          // ✅ Pass the selected video/audio files to the backend function
+          const result = await invoke('generate_premiere_project', {
+            filePath,
+            files: projectData.files.map(file => `${selectedFolder}/${file}`)
+          })
+
           console.warn(result)
           setMessage('Success: ' + result) // Show success message
         } catch (error) {
@@ -261,6 +270,7 @@ const BuildProject: React.FC = () => {
           setLoading(false) // STOP the progress
         }
       }
+
       await createProject()
 
       console.log('Files copied successfully:', result)
@@ -272,6 +282,18 @@ const BuildProject: React.FC = () => {
 
   return (
     <div className="">
+      <button
+        onClick={handlePermissions}
+        className="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
+      >
+        get permission
+      </button>
+      <button
+        onClick={handleSetPermissions}
+        className="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
+      >
+        set permission
+      </button>
       {/* Project Configuration & File Explorer */}
       <div className="w-full pl-4 pb-4 border-b mb-4">
         <h2 className="text-2xl font-semibold">Build a Project</h2>
