@@ -53,7 +53,7 @@ fn move_files(
 
         for (file_path, camera_number) in files {
             let src_path = Path::new(&file_path);
-            let camera_folder = Path::new(base_dest.as_str()).join(format!("Footage/Camera {}", camera_number));
+            let camera_folder = Path::new(base_dest.as_str()).join(format!("/Footage/Camera {}", camera_number));
 
             // Ensure the Camera folder exists
             if !camera_folder.exists() {

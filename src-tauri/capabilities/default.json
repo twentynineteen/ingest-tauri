@@ -20,6 +20,12 @@
           "path": "$HOME/*"
         },
         {
+          "path": "*/**"
+        },
+        {
+          "path": "/Volumes/**"
+        },
+        {
           "path": "$RESOURCE/*"
         }
       ]
@@ -32,6 +38,9 @@
         },
         {
           "path": "$HOME/**"
+        },
+        {
+          "path": "*/**"
         }
       ]
     },
@@ -40,6 +49,9 @@
       "allow": [
         {
           "path": "$APPDATA/*"
+        },
+        {
+          "path": "*/**"
         },
         {
           "path": "$HOME/**"
@@ -66,7 +78,7 @@
     "fs:default",
     {
       "identifier": "fs:allow-exists",
-      "allow": [{ "path": "$APPDATA/*" }]
+      "allow": [{ "path": "$APPDATA/*" }, { "path": "*/**" }]
     },
     "fs:allow-app-write-recursive",
     "fs:allow-appcache-write",
