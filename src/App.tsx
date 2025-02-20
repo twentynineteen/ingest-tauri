@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import AppRouter from './AppRouter'
-import { StrongholdProvider } from './context/StrongholdContext'
+import { AuthProvider } from './context/AuthProvider'
 
 // The app component acts as the main routing generator for the application.
 // AppRouter wraps the app routes to make use of the useLocation method within react-router-dom
@@ -10,11 +10,11 @@ import { StrongholdProvider } from './context/StrongholdContext'
 
 const App: React.FC = () => {
   return (
-    <StrongholdProvider>
+    <AuthProvider>
       <Router>
         <AppRouter />
       </Router>
-    </StrongholdProvider>
+    </AuthProvider>
   )
 }
 

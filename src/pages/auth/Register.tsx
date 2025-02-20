@@ -1,7 +1,5 @@
-// import { core } from '@tauri-apps/api'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useStronghold } from 'src/context/StrongholdContext'
 import { z } from 'zod'
 
 const registerSchema = z.object({
@@ -13,55 +11,35 @@ export default function Register() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const { stronghold, client } = useStronghold()
-  const navigate = useNavigate() //  Get the navigation function
+  const navigate = useNavigate() // Get the navigation function
 
   async function handleRegister() {
-    if (!client) {
-      console.error('Stronghold client is not initialized')
-      setError('Internal error. Please try again.')
+    setError(null) // Clear previous errors
+
+    // Validate user input
+    const result = registerSchema.safeParse({ username, password })
+    if (!result.success) {
+      setError(result.error.errors[0].message) // Show validation error
       return
     }
-    console.log('1. try to validate user input')
+
     try {
-      // Validate user input before proceeding
-      registerSchema.parse({ username, password })
-      setError(null)
-      console.log(`Errors: ${error}`)
-
-      const store = client.getStore()
-      const encoder = new TextEncoder()
-      const encodedPassword = encoder.encode(password)
-
-      //  Check if the username already exists
-      console.log('Checking if user exists')
-      const existingUser = await store.get(username)
+      // Check if user already exists
+      const existingUser = localStorage.getItem(`user_${username}`)
       if (existingUser) {
-        setError('Username already exists. Choose another one.')
-        return
-      }
-      console.log('inserting the user data')
-      //  Store the user data securely
-      await store.insert(username, Array.from(new Uint8Array(encodedPassword)))
-
-      //  Ensure Stronghold saves properly
-      try {
-        await stronghold?.save()
-      } catch (saveError) {
-        console.error('❌ Failed to save Stronghold:', saveError)
-        setError('Could not complete registration. Try again.')
+        setError('Username already taken.')
         return
       }
 
-      console.log('Registration successful:', username)
-      navigate('/login') //  Redirect to login after successful registration
+      // Store user credentials in localStorage (simple approach, not secure)
+      const userData = JSON.stringify({ username, password })
+      localStorage.setItem(`user_${username}`, userData)
+
+      // Redirect to login page after successful registration
+      navigate('/login')
     } catch (err) {
-      if (err instanceof z.ZodError) {
-        setError(err.errors[0].message)
-      } else {
-        console.error('❌ Registration failed:', err)
-        setError('Unexpected error occurred.')
-      }
+      console.error('Registration failed:', err)
+      setError('An error occurred while registering. Please try again.')
     }
   }
 
@@ -90,7 +68,7 @@ export default function Register() {
         Register
       </button>
       <p className="mt-3">
-        Registered? click{' '}
+        Registered? Click{' '}
         <Link to="/login" className="font-bold text-blue-600">
           here
         </Link>{' '}

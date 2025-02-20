@@ -13,12 +13,19 @@ import {
   SidebarProvider,
   SidebarTrigger
 } from '@components/components/ui/sidebar'
+import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
+import { useAuth } from 'src/context/AuthProvider'
 
 // The Page component acts as the main provider of layout for this application
 // Child components are loaded underneath the header, via the Outlet component
 
-export default function Page() {
+export const Page: React.FC = () => {
+  // const [username, setUsername] = useState<string>('')
+  // useEffect(() => {
+  //   setUsername(username)
+  // }, [username])
+  const { username } = useAuth()
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -40,9 +47,10 @@ export default function Page() {
             </Breadcrumb>
           </div>
         </header>
-
         <Outlet />
       </SidebarInset>
     </SidebarProvider>
   )
 }
+
+export default Page

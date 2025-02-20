@@ -4,20 +4,30 @@
   "description": "Capability for the main window",
   "windows": ["main"],
   "permissions": [
+    "core:default",
+    "core:window:allow-start-dragging",
+    "macos-permissions:default",
+    "macos-permissions:allow-check-full-disk-access-permissions",
+    "macos-permissions:allow-check-accessibility-permissions",
+    "macos-permissions:allow-request-full-disk-access-permissions",
+
     {
       "identifier": "fs:scope",
       "allow": [
         {
-          "path": "$APPDATA"
+          "path": "$APP/*"
         },
         {
-          "path": "$APPDATA/**"
+          "path": "$HOME/*"
         },
         {
-          "path": "$APPDATA/vault.hold"
+          "path": "*/**"
         },
         {
-          "path": "$APPDATA/salt"
+          "path": "/Volumes/**"
+        },
+        {
+          "path": "$RESOURCE/*"
         }
       ]
     },
@@ -29,6 +39,9 @@
         },
         {
           "path": "$HOME/**"
+        },
+        {
+          "path": "*/**"
         }
       ]
     },
@@ -37,6 +50,9 @@
       "allow": [
         {
           "path": "$APPDATA/*"
+        },
+        {
+          "path": "*/**"
         },
         {
           "path": "$HOME/**"
@@ -53,15 +69,35 @@
     },
     "core:path:default",
     "core:event:default",
+    "core:event:allow-emit",
     "core:window:default",
     "core:app:default",
     "core:resources:default",
     "core:menu:default",
     "core:tray:default",
     "dialog:default",
-    "dialog:default",
     "fs:default",
-    "fs:allow-app-write-recursive",
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [{ "path": "**" }]
+    },
+    {
+      "identifier": "fs:allow-app-write-recursive",
+      "allow": [{ "path": "**" }]
+    },
+    {
+      "identifier": "fs:allow-data-write",
+      "allow": [{ "path": "**" }]
+    },
+    {
+      "identifier": "fs:allow-data-write-recursive",
+      "allow": [{ "path": "**" }]
+    },
+    {
+      "identifier": "fs:write-all",
+      "allow": [{ "path": "**" }]
+    },
+
     "fs:allow-appcache-write",
     "fs:allow-appcache-write-recursive",
     "fs:allow-appconfig-write",
@@ -79,8 +115,7 @@
     "fs:allow-config-write",
     "fs:allow-config-write-recursive",
     "fs:allow-create",
-    "fs:allow-data-write",
-    "fs:allow-data-write-recursive",
+
     "fs:allow-desktop-write",
     "fs:allow-desktop-write-recursive",
     "fs:allow-document-write",
@@ -111,9 +146,6 @@
     "fs:allow-template-write-recursive",
     "fs:allow-video-write",
     "fs:allow-video-write-recursive",
-    "fs:write-all",
-    "fs:write-files",
-    "fs:default",
-    "stronghold:default"
+    "fs:write-files"
   ]
 }

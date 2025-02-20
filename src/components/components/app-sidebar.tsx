@@ -10,7 +10,7 @@ import {
 } from '@components/components/ui/sidebar'
 import { Clapperboard, HardDriveUpload, Save, Settings } from 'lucide-react'
 import * as React from 'react'
-import { useStronghold } from 'src/context/StrongholdContext'
+import { useAuth } from 'src/context/AuthProvider'
 
 // This is sample data. User data is located just before function return statement
 const data = {
@@ -34,7 +34,8 @@ const data = {
         },
         {
           title: 'History',
-          url: '/ingest/history'
+          // url: '/ingest/history'
+          url: '#'
         }
       ]
     },
@@ -44,26 +45,30 @@ const data = {
       icon: HardDriveUpload,
       isActive: false,
       items: [
-        {
-          title: 'Sprout video',
-          url: '/upload/sprout'
-        },
-        {
-          title: 'Posterframe',
-          url: '/upload/posterframe'
-        },
-        {
-          title: 'Trello',
-          url: '/upload/trello'
-        },
-        {
-          title: 'Otter',
-          url: '/upload/otter'
-        },
-        {
-          title: 'Settings',
-          url: '#'
-        }
+        // {
+        //   title: 'Sprout video',
+        //   // url: '/upload/sprout'
+        //   url: '#'
+        // },
+        // {
+        //   title: 'Posterframe',
+        //   // url: '/upload/posterframe'
+        //   url: '#'
+        // },
+        // {
+        //   title: 'Trello',
+        //   // url: '/upload/trello'
+        //   url: '#'
+        // },
+        // {
+        //   title: 'Otter',
+        //   // url: '/upload/otter'
+        //   url: '#'
+        // },
+        // {
+        //   title: 'Settings',
+        //   url: '#'
+        // }
       ]
     },
     {
@@ -74,11 +79,13 @@ const data = {
       items: [
         {
           title: 'General',
-          url: '/settings/general'
+          // url: '/settings/general'
+          url: '#'
         },
         {
           title: 'Connected apps',
-          url: '/settings/connected-apps'
+          // url: '/settings/connected-apps'
+          url: '#'
         }
       ]
     }
@@ -86,65 +93,10 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { stronghold, client } = useStronghold() // Get Stronghold instance
-  const [username, setUsername] = React.useState<string | null>(null)
-  const [isInitialized, setIsInitialized] = React.useState(false) // track stronghold initialization
-
-  // Fetch username from Stronghold when component mounts
-  React.useEffect(() => {
-    // Ensure Stronghold is initialized before fetching data
-    if (!stronghold || !client) {
-      console.warn('🔄 Waiting for Stronghold to initialize...')
-      return
-    }
-
-    async function fetchUsername() {
-      try {
-        const store = client.getStore()
-        const storedUsernameData = await store.get('username')
-
-        if (storedUsernameData) {
-          const decodedUsername = new TextDecoder().decode(
-            new Uint8Array(storedUsernameData)
-          )
-          setUsername(decodedUsername)
-        } else {
-          console.warn('No username found in Stronghold')
-        }
-        setIsInitialized(true) // Mark Stronghold as initialized
-      } catch (error) {
-        console.error('Failed to retrieve username from Stronghold:', error)
-      }
-    }
-
-    fetchUsername()
-  }, [stronghold, client]) // Runs only when both stronghold and client are ready
-
-  // ✅ Implement Stronghold-based logout
-  async function handleLogout() {
-    if (!client) {
-      console.error('Stronghold client is not initialized')
-      return
-    }
-
-    try {
-      const store = client.getStore()
-      await store.remove('username') // ✅ Remove username from Stronghold
-      await stronghold?.save() // ✅ Save changes to Stronghold
-      setUsername(null) // ✅ Update UI state
-      console.log('✅ User logged out successfully')
-    } catch (error) {
-      console.error('Logout failed:', error)
-    }
-  }
-
-  // Show loading state while Stronghold initializes
-  if (!isInitialized) {
-    return <p className="text-center text-gray-500">🔄 Loading...</p>
-  }
+  const { logout, username } = useAuth()
 
   const user = {
-    name: username || 'Guest',
+    name: username || 'Dan',
     avatar: '/filepath/file.jpg'
   }
 
@@ -157,7 +109,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} onLogout={handleLogout} />
+        <NavUser user={user} onLogout={logout} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
