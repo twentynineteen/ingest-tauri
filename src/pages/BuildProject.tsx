@@ -207,12 +207,17 @@ const BuildProject: React.FC = () => {
       })
 
       // 🔹 Listen for Completion Event
-      const unlistenComplete = await listen<string[]>('copy_complete', event => {
+      const unlistenComplete = await listen<string[]>('copy_complete', async event => {
         console.log('File Transfer Completed:', event.payload) // Debugging log
         setCompleted(true)
 
         // alert('Project created successfully!')
         clearFields()
+        // Wait for Premiere project to be created
+        await createTemplatePremiereProject()
+
+        // Now show the dialog to open the folder
+        await showDialogAndOpenFolder()
 
         unlistenProgress() // Stop listening when done
         unlistenComplete()
@@ -225,7 +230,7 @@ const BuildProject: React.FC = () => {
       })
 
       // Write metadata JSON file
-      const createdBy = 'Dan' // || 'Unknown User' // Change to username when created in local storage
+      const createdBy = 'Nick' // || 'Unknown User' // Change to username when created in local storage
       const now = new Date()
       const formattedDateTime = now.toLocaleString()
 
@@ -259,10 +264,13 @@ const BuildProject: React.FC = () => {
 
         try {
           const filePath = `${projectData.parentFolder}/${projectData.projectTitle}/Projects/`
+          // file located in src-tauri folder
+          const location = './assets/Premiere 4K Template 2025.prproj'
 
           // Pass the selected file path and title to the backend function
           const result = await invoke('copy_premiere_project', {
             destinationFolder: filePath,
+            location,
             newTitle: projectData.projectTitle
           })
 
@@ -288,10 +296,6 @@ const BuildProject: React.FC = () => {
           console.error('Error:', error)
         }
       }
-
-      await createTemplatePremiereProject()
-        .then(() => console.log('Files copied successfully:', result))
-        .then(() => showDialogAndOpenFolder())
 
       //
     } catch (error) {

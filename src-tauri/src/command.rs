@@ -1,6 +1,8 @@
 use std::fs;
 use std::path::PathBuf;
 use tauri::command;
+use std::env;
+use std::io::Write; // For writing bytes to a file
 
 /// Copies a Premiere Pro project template to the specified folder and renames it.
 /// 
@@ -13,49 +15,49 @@ use tauri::command;
 /// * `Err(String)` if an error occurs.
 #[command]
 pub fn copy_premiere_project(destination_folder: String, new_title: String) -> Result<(), String> {
-    // Define the source file path
-    let source_file = PathBuf::from("./assets/Premiere 4K Template 2023.prproj");
-
-    // Check if the source file exists
-    if !source_file.exists() {
-        let error_msg = format!("Error: Source file not found at {:?}", source_file);
-        eprintln!("{}", error_msg); // Log error to the console
-        return Err(error_msg);
-    } else {
-        println!("Source file found: {:?}", source_file); // Log success
+    // Print the current working directory
+    match env::current_dir() {
+        Ok(path) => println!("Current working directory: {}", path.display()),
+        Err(e) => eprintln!("Error getting current directory: {}", e),
     }
 
-    // Ensure the destination folder exists
-    let destination_path = PathBuf::from(&destination_folder);
-    if !destination_path.exists() {
-        let error_msg = format!("Error: Destination folder does not exist: {}", destination_folder);
-        eprintln!("{}", error_msg);
-        return Err(error_msg);
-    }
+    // Include the file from the binary
+    let file_data = include_bytes!("../assets/Premiere 4K Template 2025.prproj");
 
-    // Create the new file path with the given title
-    let new_file_path = destination_path.join(format!("{}.prproj", new_title));
+    // Define the destination path
+    let destination_path = PathBuf::from(destination_folder.clone()).join(format!("{}.prproj", new_title));
 
-    // Check if a file with the new name already exists to prevent overwriting
-    if new_file_path.exists() {
-        let error_msg = format!("Error: A file with the name '{}' already exists in the destination folder.", new_file_path.display());
-        eprintln!("{}", error_msg);
-        return Err(error_msg);
-    }
-
-    // Copy the file to the new location
-    match fs::copy(&source_file, &new_file_path) {
-        Ok(_) => {
-            println!("File successfully copied to {:?}", new_file_path); // Log success
-            Ok(())
-        }
-        Err(e) => {
-            let error_msg = format!("Failed to copy file: {}", e);
+    // Ensure the destination folder exists, create if necessary
+    if !destination_path.parent().unwrap().exists() {
+        println!("Destination folder does not exist. Creating it...");
+        if let Err(e) = fs::create_dir_all(destination_path.parent().unwrap()) {
+            let error_msg = format!("Error creating destination folder '{}': {}", destination_folder, e);
             eprintln!("{}", error_msg);
-            Err(error_msg)
+            return Err(error_msg);
         }
     }
+
+    // Check if the destination file already exists
+    if destination_path.exists() {
+        let error_msg = format!(
+            "Error: A file with the name '{}' already exists in the destination folder.",
+            destination_path.display()
+        );
+        eprintln!("{}", error_msg);
+        return Err(error_msg);
+    }
+
+    // Write the file data to the destination path
+    let mut file = fs::File::create(&destination_path)
+        .map_err(|e| format!("Error creating file: {}", e))?;
+    file.write_all(file_data)
+        .map_err(|e| format!("Error writing file: {}", e))?;
+
+    println!("File successfully copied to {:?}", destination_path);
+    Ok(())
 }
+
+
 
 
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
