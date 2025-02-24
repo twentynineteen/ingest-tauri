@@ -7,7 +7,8 @@ An app to streamline ingest and upload of video files
 -Clone the repository
 -run via terminal:
 
-```npm run tauri build
+```
+npm run tauri build
 
 ```
 
