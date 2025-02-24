@@ -11,7 +11,8 @@ use std::thread;
 mod command;
 use command::copy_premiere_project;
 use command::show_confirmation_dialog;
-use command::get_username;
+use std::env;
+
 
 // logging
 // Once enabled, logs will be stored in:
@@ -22,6 +23,22 @@ use simple_logger::SimpleLogger;
 
 struct AuthState {
     tokens: Mutex<Vec<String>>, // Simple token storage
+}
+
+/// Function to get the current username from the operating system
+///
+/// # Arguments
+/// * 
+///
+/// # Returns
+/// * `Username` if successful.
+/// * `Err(String)` if an error occurs.
+#[command]
+fn get_username() -> String {
+    match env::var("USERNAME").or(env::var("USER")) {
+        Ok(username) => username,
+        Err(_) => "Unknown User".to_string(),
+    }
 }
 
 #[tauri::command]
@@ -131,7 +148,7 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_macos_permissions::init())
-        .invoke_handler(tauri::generate_handler![check_auth, add_token, move_files, copy_premiere_project, show_confirmation_dialog])
+        .invoke_handler(tauri::generate_handler![check_auth, add_token, move_files, copy_premiere_project, show_confirmation_dialog, get_username])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");
 }

@@ -57,9 +57,6 @@ pub fn copy_premiere_project(destination_folder: String, new_title: String) -> R
     Ok(())
 }
 
-
-
-
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 use std::process::Command;
 use std::path::Path;
@@ -126,18 +123,3 @@ fn open_folder(destination: String) -> Result<(), String> {
 }
 
 
-/// Function to get the current username from the operating system
-///
-/// # Arguments
-/// * 
-///
-/// # Returns
-/// * `Username` if successful.
-/// * `Err(String)` if an error occurs.
-#[command]
-fn get_username() -> String {
-    match env::var("USERNAME").or(env::var("USER")) {
-        Ok(username) => username,
-        Err(_) => "Unknown User".to_string(),
-    }
-}

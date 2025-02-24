@@ -1,10 +1,10 @@
 [package]
-name = "app"
-version = "2.0.0"
+name = "Bucket"
+version = "0.2.0"
 description = "An app to streamline ingesting and uploading video content"
-authors = ["AR10"]
+authors = ["Daniel Mills"]
 license = "MIT"
-repository = "https://github.com/twentynineteen/swish-app"
+repository = "https://github.com/twentynineteen/ingest-tauri"
 default-run = "app"
 edition = "2021"
 
