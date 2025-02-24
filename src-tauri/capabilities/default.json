@@ -6,11 +6,15 @@
   "permissions": [
     "core:default",
     "core:window:allow-start-dragging",
+    "updater:allow-download-and-install",
+    "updater:allow-check",
+    "updater:allow-download",
+    "updater:allow-install",
     "macos-permissions:default",
     "macos-permissions:allow-check-full-disk-access-permissions",
     "macos-permissions:allow-check-accessibility-permissions",
     "macos-permissions:allow-request-full-disk-access-permissions",
-
+    "updater:default",
     {
       "identifier": "fs:scope",
       "allow": [

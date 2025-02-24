@@ -1,3 +1,5 @@
+'use client'
+
 import { Avatar, AvatarFallback, AvatarImage } from '@components/components/ui/avatar'
 import {
   DropdownMenu,
@@ -25,9 +27,10 @@ type Props = {
     avatar: string
   }
   onLogout: () => void
+  onUpdateClicked: () => void
 }
 
-export function NavUser({ user, onLogout }: Props) {
+export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
   const { isMobile } = useSidebar()
 
   const [username, setUsername] = useState('')
@@ -89,8 +92,10 @@ export function NavUser({ user, onLogout }: Props) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Bell />
-                Check for updates
+                <Link to="#" onClick={onUpdateClicked}>
+                  <Bell />
+                  Check for updates
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
