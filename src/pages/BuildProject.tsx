@@ -1,4 +1,5 @@
 import FolderTree from '@components/FolderTree'
+import { core } from '@tauri-apps/api'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { confirm, open } from '@tauri-apps/plugin-dialog'
@@ -40,6 +41,20 @@ const BuildProject: React.FC = () => {
 
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+
+  const [username, setUsername] = useState('')
+
+  useEffect(() => {
+    async function fetchUsername() {
+      try {
+        const name = await core.invoke<string>('get_username')
+        setUsername(name)
+      } catch (error) {
+        console.error('Failed to fetch username', error)
+      }
+    }
+    fetchUsername()
+  }, [])
 
   // 🔹 Listen for Progress Updates
   useEffect(() => {
@@ -230,7 +245,7 @@ const BuildProject: React.FC = () => {
       })
 
       // Write metadata JSON file
-      const createdBy = 'Nick' // || 'Unknown User' // Change to username when created in local storage
+      const createdBy = username || 'Unknown User' // Change to username when created in local storage
       const now = new Date()
       const formattedDateTime = now.toLocaleString()
 
