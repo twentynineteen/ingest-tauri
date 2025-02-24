@@ -12,6 +12,7 @@ mod command;
 use command::copy_premiere_project;
 use command::show_confirmation_dialog;
 use std::env;
+use tauri_plugin_updater;
 
 
 // logging
@@ -142,6 +143,11 @@ fn main() {
     info!("Tauri App Started");
 
     tauri::Builder::default()
+        .setup(|app| {
+            #[cfg(desktop)]
+            app.handle().plugin(tauri_plugin_updater::Builder::new().build())?;
+            Ok(())
+        })
         .manage(AuthState {
             tokens: Mutex::new(vec![]),
         })

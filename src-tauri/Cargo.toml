@@ -5,7 +5,7 @@ description = "An app to streamline ingesting and uploading video content"
 authors = ["Daniel Mills"]
 license = "MIT"
 repository = "https://github.com/twentynineteen/ingest-tauri"
-default-run = "app"
+default-run = "Bucket"
 edition = "2021"
 
 [lib]
@@ -38,6 +38,8 @@ fs = "0.0.5"
 argon2 = "0.5"
 tauri-plugin-macos-permissions = "2.0.4"
 quick-xml = "0.29"
+tauri-plugin-updater = "2.5.1"
+tauri-plugin-process = "2.2.0"
 
 
 
@@ -56,6 +58,9 @@ panic = "abort"         # Strip expensive panic clean-up logic
 codegen-units = 1       # Compile crates one after another so the compiler can optimize better
 lto = true              # Enables link to optimizations
 opt-level = "s"         # Optimize for binary size. Use `3` if you prefer speed.
+
+[target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
+tauri-plugin-updater = "2.5.1"
 
 [profile.dev.package.objc2]
 debug-assertions = false

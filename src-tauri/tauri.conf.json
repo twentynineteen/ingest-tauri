@@ -26,8 +26,16 @@
       "capabilities": []
     }
   },
-  "plugins": { "dialog": null, "fs": null },
+  "plugins": {
+    "dialog": null,
+    "fs": null,
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlEMTg1Njc4NjNDQjk2RUQKUldUdGxzdGplRllZbmZMN1ZWM3FXK2ROZ1luZEt2VktaVWRlajAyZGtpc2Y4TnRNS2s5U0VQL24K",
+      "endpoints": ["https://github.com/twentynineteen/ingest-tauri/releases/latest"]
+    }
+  },
   "bundle": {
+    "createUpdaterArtifacts": true,
     "resources": ["assets"],
     "active": true,
     "targets": "all",
