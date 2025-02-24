@@ -14,7 +14,9 @@ import {
   SidebarMenuItem,
   useSidebar
 } from '@components/components/ui/sidebar'
+import { core } from '@tauri-apps/api'
 import { Bell, ChevronsUpDown, LogOut } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 type Props = {
@@ -28,6 +30,20 @@ type Props = {
 export function NavUser({ user, onLogout }: Props) {
   const { isMobile } = useSidebar()
 
+  const [username, setUsername] = useState('')
+
+  useEffect(() => {
+    async function fetchUsername() {
+      try {
+        const name = await core.invoke<string>('get_username')
+        setUsername(name)
+      } catch (error) {
+        console.error('Failed to fetch username', error)
+      }
+    }
+    fetchUsername()
+  }, [])
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -39,7 +55,9 @@ export function NavUser({ user, onLogout }: Props) {
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">NR</AvatarFallback>
+                <AvatarFallback className="rounded-lg">
+                  {username.charAt(0)}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>
@@ -58,7 +76,9 @@ export function NavUser({ user, onLogout }: Props) {
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">NR</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">
+                    {username.charAt(0)}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{user.name}</span>

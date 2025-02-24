@@ -11,6 +11,7 @@ use std::thread;
 mod command;
 use command::copy_premiere_project;
 use command::show_confirmation_dialog;
+use command::get_username;
 
 // logging
 // Once enabled, logs will be stored in:

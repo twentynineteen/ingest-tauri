@@ -124,3 +124,20 @@ fn open_folder(destination: String) -> Result<(), String> {
         Err(e) => Err(format!("Failed to open folder: {}", e)),
     }
 }
+
+
+/// Function to get the current username from the operating system
+///
+/// # Arguments
+/// * 
+///
+/// # Returns
+/// * `Username` if successful.
+/// * `Err(String)` if an error occurs.
+#[command]
+fn get_username() -> String {
+    match env::var("USERNAME").or(env::var("USER")) {
+        Ok(username) => username,
+        Err(_) => "Unknown User".to_string(),
+    }
+}

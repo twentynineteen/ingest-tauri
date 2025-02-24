@@ -8,8 +8,10 @@ import {
   SidebarHeader,
   SidebarRail
 } from '@components/components/ui/sidebar'
+import { core } from '@tauri-apps/api'
 import { Clapperboard, HardDriveUpload, Save, Settings } from 'lucide-react'
 import * as React from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from 'src/context/AuthProvider'
 
 // This is sample data. User data is located just before function return statement
@@ -93,10 +95,24 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { logout, username } = useAuth()
+  const { logout } = useAuth()
+
+  const [username, setUsername] = useState('')
+
+  useEffect(() => {
+    async function fetchUsername() {
+      try {
+        const name = await core.invoke<string>('get_username')
+        setUsername(name)
+      } catch (error) {
+        console.error('Failed to fetch username', error)
+      }
+    }
+    fetchUsername()
+  }, [])
 
   const user = {
-    name: username || 'Nick',
+    name: username || 'Unknown User',
     avatar: '/filepath/file.jpg'
   }
 
