@@ -51,10 +51,14 @@ export const AppRouter: React.FC = () => {
         </>
       ) : (
         <>
-          {/* <Route path="*" element={<Navigate to="/" />} /> */}
+          {/* Default redirect to BuildProject */}
+          <Route path="/" element={<Navigate to="/ingest/build" replace />} />
+
+          {/* <Route path="*" element={<Navigate to="/ingest/build" />} /> */}
           <Route path="/" element={<Page />}>
-            <Route path="ingest">
+            <Route path="ingest" element={<BuildProject />}>
               <Route path="history" element={<IngestHistory />} />
+
               <Route path="build" element={<BuildProject />} />
             </Route>
             <Route path="upload">
