@@ -1,3 +1,4 @@
+import { log } from 'util'
 import { NavMain } from '@components/components/nav-main'
 import { NavUser } from '@components/components/nav-user'
 import { TeamSwitcher } from '@components/components/team-switcher'
@@ -8,10 +9,11 @@ import {
   SidebarHeader,
   SidebarRail
 } from '@components/components/ui/sidebar'
+// import { relaunch } from '@tauri-apps/plugin-process'
+import { useMutation } from '@tanstack/react-query'
 import { core } from '@tauri-apps/api'
 import { invoke } from '@tauri-apps/api/core'
 import { ask, message } from '@tauri-apps/plugin-dialog'
-// import { relaunch } from '@tauri-apps/plugin-process'
 import { check } from '@tauri-apps/plugin-updater'
 import { Clapperboard, HardDriveUpload, Save, Settings } from 'lucide-react'
 import * as React from 'react'
@@ -98,75 +100,85 @@ const data = {
   ]
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { logout } = useAuth()
-  const onUpdateClicked = React.useCallback(async (onUserClick: false) => {
-    const update = await check()
-    if (update === null) {
-      await message('Failed to check for updates.\nPlease try again later.', {
+/**
+ * Custom hook that returns a mutation for checking and applying updates.
+ * The mutation function accepts an object with a boolean property `onUserClick`
+ * to indicate if the update check was initiated by the user.
+ */
+function useUpdateMutation() {
+  // Define the mutation function with an explicit parameter type.
+  const mutationFn = async (variables: { onUserClick: boolean }): Promise<void> => {
+    // Destructure the onUserClick flag from the variables.
+    const { onUserClick } = variables
+    try {
+      // Check for available update
+      const update = await check()
+
+      // If the update check fails, display an error message.
+      if (update === null) {
+        await message('Failed to check for updates.\nPlease try again later.', {
+          title: 'Oh, Richard!',
+          kind: 'error',
+          okLabel: 'OK'
+        })
+
+        return
+      }
+
+      // If an update is available, prompt the user for confirmation.
+      if (update.available) {
+        const userConfirmed = await ask(
+          `Update to ${update.version} is available!\n\nRelease notes: ${update.body}`,
+          {
+            title: 'Update Available',
+            kind: 'info',
+            okLabel: 'Update',
+            cancelLabel: 'Cancel'
+          }
+        )
+        if (userConfirmed) {
+          // Download and install the update.
+          await update.downloadAndInstall()
+          // Restart the application gracefully.
+          await invoke('graceful_restart')
+        }
+      } else if (onUserClick) {
+        // If no update is available and the user manually triggered the check,
+        // inform them that they are on the latest version.
+        await message('You are on the latest version. My Sheridan has updated already!', {
+          title: 'No Update Available',
+          kind: 'info',
+          okLabel: 'OK'
+        })
+      }
+    } catch (error) {
+      console.error('Error! ', error)
+      await message(error.message, {
         title: 'Error',
         kind: 'error',
         okLabel: 'OK'
       })
-      return
-    } else if (update?.available) {
-      const yes = await ask(
-        `Update to ${update.version} is available!\n\nRelease notes: ${update.body}`,
-        {
-          title: 'Update Available',
-          kind: 'info',
-          okLabel: 'Update',
-          cancelLabel: 'Cancel'
-        }
-      )
-      if (yes) {
-        await update.downloadAndInstall()
-        // Restart the app after the update is installed by calling the Tauri command that handles restart for your app
-        // It is good practice to shut down any background processes gracefully before restarting
-        // As an alternative, you could ask the user to restart the app manually
-        await invoke('graceful_restart')
-      }
-    } else if (onUserClick) {
-      await message('You are on the latest version. Stay awesome!', {
-        title: 'No Update Available',
-        kind: 'info',
-        okLabel: 'OK'
-      })
     }
-    // try {
-    //   const update = await check()
-    //   if (update) {
-    //     console.log(
-    //       `found update ${update.version} from ${update.date} with notes ${update.body}`
-    //     )
-    //     let downloaded = 0
-    //     let contentLength = 0
-    //     // alternatively we could also call update.download() and update.install() separately
-    //     await update.downloadAndInstall(event => {
-    //       switch (event.event) {
-    //         case 'Started':
-    //           contentLength = event.data.contentLength
-    //           console.log(`started downloading ${event.data.contentLength} bytes`)
-    //           break
-    //         case 'Progress':
-    //           downloaded += event.data.chunkLength
-    //           console.log(`downloaded ${downloaded} from ${contentLength}`)
-    //           break
-    //         case 'Finished':
-    //           console.log('download finished')
-    //           break
-    //       }
-    //     })
+  }
 
-    //     console.log('update installed')
-    //     await relaunch()
-    //   }
-    // } catch (error) {
-    //   console.error('Update check failed: ', error)
-    // }
-  }, [])
+  // Return the mutation using the new options object format.
+  return useMutation<void, Error, { onUserClick: boolean }>({
+    mutationFn: mutationFn
+  })
+}
 
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [username, setUsername] = useState('')
+  const { logout } = useAuth()
+
+  // Create the update mutation hook instance.
+  const updateMutation = useUpdateMutation()
+
+  // Callback for when the update button is clicked.
+  const onUpdateClicked = React.useCallback(() => {
+    // Set `onUserClick` to true to show feedback when no update is available.
+    updateMutation.mutate({ onUserClick: true })
+  }, [updateMutation])
 
   useEffect(() => {
     async function fetchUsername() {
@@ -194,7 +206,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={user} onLogout={logout} onUpdateClicked={onUpdateClicked} />
+        <NavUser
+          user={user}
+          onLogout={logout}
+          onUpdateClicked={onUpdateClicked}
+          // isLoading={updateMutation.isLoading}
+        />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

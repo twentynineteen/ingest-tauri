@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import AppRouter from './AppRouter'
@@ -8,12 +9,17 @@ import { AuthProvider } from './context/AuthProvider'
 // The top level component, Page, acts as the provider for the layout
 // subsequent components are loaded within the page window via the Outlet component.
 
+// Create a QueryClient instance
+const queryClient = new QueryClient()
+
 const App: React.FC = () => {
   return (
     <AuthProvider>
-      <Router>
-        <AppRouter />
-      </Router>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <AppRouter />
+        </Router>
+      </QueryClientProvider>
     </AuthProvider>
   )
 }
