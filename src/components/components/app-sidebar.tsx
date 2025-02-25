@@ -39,12 +39,12 @@ const data = {
         {
           title: 'Build a project',
           url: '/ingest/build'
-        },
-        {
-          title: 'History',
-          // url: '/ingest/history'
-          url: '#'
         }
+        // {
+        //   title: 'History',
+        //   // url: '/ingest/history'
+        //   url: '#'
+        // }
       ]
     },
     {
@@ -58,11 +58,10 @@ const data = {
         //   // url: '/upload/sprout'
         //   url: '#'
         // },
-        // {
-        //   title: 'Posterframe',
-        //   // url: '/upload/posterframe'
-        //   url: '#'
-        // },
+        {
+          title: 'Posterframe',
+          url: '/upload/posterframe'
+        }
         // {
         //   title: 'Trello',
         //   // url: '/upload/trello'
