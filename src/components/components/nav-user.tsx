@@ -28,6 +28,7 @@ type Props = {
   }
   onLogout: () => void
   onUpdateClicked: () => void
+  // isLoading: boolean
 }
 
 export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
@@ -95,6 +96,7 @@ export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
                 <Link to="#" onClick={onUpdateClicked}>
                   <Bell />
                   Check for updates
+                  {/* {isLoading ? 'Checking for updates...' : 'Check for updates'} */}
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
