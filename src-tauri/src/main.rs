@@ -15,10 +15,11 @@ use std::env;
 use tauri_plugin_updater;
 use std::process::Command;
 
+
 /// This command gracefully restarts the application.
 /// It spawns a new instance of the current executable and then exits.
 #[tauri::command]
-async fn graceful_restart(app_handle: AppHandle) -> Result<(), String> {
+async fn graceful_restart(_app_handle: AppHandle) -> Result<(), String> {
     // Perform any cleanup needed before restarting.
 
     // In debug mode (development), the executable might not be available.
@@ -169,6 +170,32 @@ fn copy_file_with_progress(
     Ok(())
 }
 
+#[tauri::command]
+fn open_folder(path: String) {
+    #[cfg(target_os = "macos")]
+    {
+        Command::new("open")
+            .arg(path)
+            .spawn()
+            .expect("Failed to open folder");
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        Command::new("explorer")
+            .arg(path.replace("/", "\\"))
+            .spawn()
+            .expect("Failed to open folder");
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        Command::new("xdg-open")
+            .arg(path)
+            .spawn()
+            .expect("Failed to open folder");
+    }
+}
 
 
 
@@ -189,7 +216,16 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_macos_permissions::init())
-        .invoke_handler(tauri::generate_handler![graceful_restart, check_auth, add_token, move_files, copy_premiere_project, show_confirmation_dialog, get_username])
+        .invoke_handler(tauri::generate_handler![
+            graceful_restart, 
+            check_auth, 
+            add_token, 
+            move_files, 
+            copy_premiere_project, 
+            show_confirmation_dialog, 
+            get_username,
+            open_folder
+            ])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");
 }
