@@ -13,7 +13,42 @@ use command::copy_premiere_project;
 use command::show_confirmation_dialog;
 use std::env;
 use tauri_plugin_updater;
+use std::process::Command;
 
+/// This command gracefully restarts the application.
+/// It spawns a new instance of the current executable and then exits.
+#[tauri::command]
+async fn graceful_restart(app_handle: AppHandle) -> Result<(), String> {
+    // Perform any cleanup needed before restarting.
+
+    // In debug mode (development), the executable might not be available.
+    // We can simply log and exit or do nothing.
+    if cfg!(debug_assertions) {
+        println!("Graceful restart is not supported in development mode.");
+        return Ok(());
+    }
+
+    // Get the current executable's path.
+    let current_exe = std::env::current_exe().map_err(|e| e.to_string())?;
+    
+    // Check if the executable exists.
+    if !current_exe.exists() {
+        return Err(format!(
+            "Executable not found at: {}",
+            current_exe.display()
+        ));
+    }
+    
+    // Spawn a new instance of the application.
+    Command::new(current_exe)
+        .spawn()
+        .map_err(|e| format!("Failed to spawn new process: {}", e))?;
+    
+    // Optionally, perform any final cleanup here.
+    
+    // Exit the current application.
+    std::process::exit(0);
+}
 
 // logging
 // Once enabled, logs will be stored in:
@@ -154,7 +189,7 @@ fn main() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_macos_permissions::init())
-        .invoke_handler(tauri::generate_handler![check_auth, add_token, move_files, copy_premiere_project, show_confirmation_dialog, get_username])
+        .invoke_handler(tauri::generate_handler![graceful_restart, check_auth, add_token, move_files, copy_premiere_project, show_confirmation_dialog, get_username])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");
 }
