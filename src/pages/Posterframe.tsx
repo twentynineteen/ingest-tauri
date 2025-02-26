@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/core'
-import { appDataDir } from '@tauri-apps/api/path'
+import { appDataDir, fontDir } from '@tauri-apps/api/path'
 import { open } from '@tauri-apps/plugin-dialog'
 import { create, exists, readDir, readFile, writeFile } from '@tauri-apps/plugin-fs'
 import React, { useEffect, useRef, useState } from 'react'
@@ -13,17 +13,23 @@ const Posterframe = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null) // Original path
   const [selectedFileBlob, setSelectedFileBlob] = useState<string | null>(null) // Blob URL
+  const [selectedFontPath, setSelectedFontPath] = useState<string | null>(null) // Blob URL
 
   useEffect(() => {
     console.log('Selected File Path:', selectedFilePath)
+    loadCustomFont()
+    console.log('Selected Font Path:', selectedFontPath)
     console.log('Blob URL:', selectedFileBlob)
     console.log('Save Path:', savePath)
-  }, [selectedFilePath, selectedFileBlob, savePath])
+  }, [selectedFilePath, selectedFileBlob, savePath, selectedFontPath])
 
   const loadCustomFont = async () => {
     try {
-      const fontPath = './assets/Cabrito.otf' // Adjust path if needed
-      const fontData = await readFile(fontPath) // Read font as binary
+      const fontPath = await fontDir() // Adjust path if needed
+      const isFound = await exists(`${fontPath}/Cabrito.otf`)
+      console.log(isFound)
+      setSelectedFontPath(fontPath) // send to console log
+      const fontData = await readFile(`${fontPath}/Cabrito.otf`) // Read font as binary
       const fontBlob = new Blob([new Uint8Array(fontData)], { type: 'font/otf' }) // Create blob
       const fontUrl = URL.createObjectURL(fontBlob) // Convert to URL
 
