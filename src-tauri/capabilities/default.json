@@ -119,7 +119,9 @@
     "fs:allow-config-write",
     "fs:allow-config-write-recursive",
     "fs:allow-create",
-
+    "fs:allow-font-read",
+    "fs:allow-read-text-file",
+    "fs:allow-resource-read-recursive",
     "fs:allow-desktop-write",
     "fs:allow-desktop-write-recursive",
     "fs:allow-document-write",
