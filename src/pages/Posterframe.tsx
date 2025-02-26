@@ -22,7 +22,7 @@ const Posterframe = () => {
 
   const loadCustomFont = async () => {
     try {
-      const fontPath = 'assets/Cabrito.otf' // Adjust path if needed
+      const fontPath = './assets/Cabrito.otf' // Adjust path if needed
       const fontData = await readFile(fontPath) // Read font as binary
       const fontBlob = new Blob([new Uint8Array(fontData)], { type: 'font/otf' }) // Create blob
       const fontUrl = URL.createObjectURL(fontBlob) // Convert to URL

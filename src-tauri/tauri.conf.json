@@ -40,7 +40,7 @@
   },
   "bundle": {
     "createUpdaterArtifacts": true,
-    "resources": ["assets/**/*"],
+    "resources": ["assets/**/*", "src-tauri/assets/**/*", "src-tauri/assets/Cabrito.otf"],
     "active": true,
     "targets": "all",
     "icon": [
