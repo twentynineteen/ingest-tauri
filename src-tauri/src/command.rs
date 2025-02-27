@@ -4,6 +4,12 @@ use tauri::command;
 use std::env;
 use std::io::Write; // For writing bytes to a file
 
+// read premiere project at run time deps
+use std::fs::File;
+use std::io::{Read};
+use std::path::Path;
+
+
 /// Copies a Premiere Pro project template to the specified folder and renames it.
 /// 
 /// # Arguments
@@ -21,8 +27,17 @@ pub fn copy_premiere_project(destination_folder: String, new_title: String) -> R
         Err(e) => eprintln!("Error getting current directory: {}", e),
     }
 
-    // Include the file from the binary
-    let file_data = include_bytes!("../assets/Premiere 4K Template 2025.prproj");
+    // Path to the assets folder (adjust the path as needed)
+    let asset_path = Path::new("assets").join("Premiere 4K Template 2025.prproj");
+
+    // Open the file from the assets folder
+    let mut file = File::open(&asset_path)
+        .map_err(|e| format!("Error opening file '{}': {}", asset_path.display(), e))?;
+
+    // Read the file into a byte vector
+    let mut file_data = Vec::new();
+    file.read_to_end(&mut file_data)
+        .map_err(|e| format!("Error reading file '{}': {}", asset_path.display(), e))?;
 
     // Define the destination path
     let destination_path = PathBuf::from(destination_folder.clone()).join(format!("{}.prproj", new_title));
@@ -50,7 +65,7 @@ pub fn copy_premiere_project(destination_folder: String, new_title: String) -> R
     // Write the file data to the destination path
     let mut file = fs::File::create(&destination_path)
         .map_err(|e| format!("Error creating file: {}", e))?;
-    file.write_all(file_data)
+    file.write_all(&file_data)
         .map_err(|e| format!("Error writing file: {}", e))?;
 
     println!("File successfully copied to {:?}", destination_path);
@@ -59,7 +74,6 @@ pub fn copy_premiere_project(destination_folder: String, new_title: String) -> R
 
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 use std::process::Command;
-use std::path::Path;
 
 /// Displays a confirmation dialog with Yes/No options and opens Finder/Explorer if Yes is selected.
 ///

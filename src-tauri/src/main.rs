@@ -197,8 +197,6 @@ fn open_folder(path: String) {
     }
 }
 
-
-
 fn main() {
     SimpleLogger::new().init().unwrap();
 
@@ -208,6 +206,7 @@ fn main() {
         .setup(|app| {
             #[cfg(desktop)]
             app.handle().plugin(tauri_plugin_updater::Builder::new().build())?;
+
             Ok(())
         })
         .manage(AuthState {

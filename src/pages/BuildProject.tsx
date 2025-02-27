@@ -2,6 +2,7 @@ import FolderTree from '@components/FolderTree'
 import { core } from '@tauri-apps/api'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
+import { resolveResource } from '@tauri-apps/api/path'
 import { confirm, open } from '@tauri-apps/plugin-dialog'
 import { exists, mkdir, remove, writeTextFile } from '@tauri-apps/plugin-fs'
 import { Trash2 } from 'lucide-react'
@@ -280,7 +281,8 @@ const BuildProject: React.FC = () => {
         try {
           const filePath = `${projectData.parentFolder}/${projectData.projectTitle}/Projects/`
           // file located in src-tauri folder
-          const location = './assets/Premiere 4K Template 2025.prproj'
+          // const location = './assets/Premiere 4K Template 2025.prproj'
+          const location = await resolveResource('Premiere 4K Template 2025.prproj')
 
           // Pass the selected file path and title to the backend function
           const result = await invoke('copy_premiere_project', {
