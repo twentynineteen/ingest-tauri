@@ -40,7 +40,7 @@
   },
   "bundle": {
     "createUpdaterArtifacts": true,
-    "resources": ["assets/*"],
+    "resources": { "assets/**/*": "resources/" },
     "active": true,
     "targets": "all",
     "icon": [
