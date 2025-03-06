@@ -107,7 +107,8 @@ const Posterframe = () => {
     const img = new Image()
     img.src = selectedFileBlob
     img.onload = async () => {
-      const scaleFactor = 2 // Increase this for sharper text
+      // const maxWidth = 1280 // Limit width to 1280px
+      const scaleFactor = Math.min(1, 1280 / img.width) // Prevent upscaling // Increase this for sharper text
       // Set canvas dimensions to match the image
       canvas.width = Math.floor(img.width * scaleFactor)
       canvas.height = Math.floor(img.height * scaleFactor)
@@ -157,27 +158,36 @@ const Posterframe = () => {
       const saveFilePath = `${savePath}/${fileName}`
 
       // Convert canvas to JPEG and save
-      canvas.toBlob(
-        async blob => {
-          if (!blob) return
+      const compressAndSaveImage = async (blob: Blob | null, quality = 0.85) => {
+        if (!blob || !(blob instanceof Blob)) return // Check for null and correct type
 
-          const arrayBuffer = await blob.arrayBuffer()
-          const uint8Array = new Uint8Array(arrayBuffer)
+        let arrayBuffer = await blob.arrayBuffer()
+        let uint8Array = new Uint8Array(arrayBuffer)
 
-          try {
-            await writeFile(saveFilePath, uint8Array)
-            alert(`Thumbnail saved at: ${saveFilePath}`)
+        // Check if the file size is above 500KB, and reduce quality if needed
+        while (uint8Array.length > 500 * 1024 && quality > 0.6) {
+          const compressedBlob = await new Promise<Blob | null>(resolve =>
+            canvas.toBlob(blob => resolve(blob), 'image/jpeg', quality)
+          )
+          if (!compressedBlob) break // Prevents trying to access arrayBuffer() on null
+          arrayBuffer = await compressedBlob.arrayBuffer()
+          uint8Array = new Uint8Array(arrayBuffer)
+          quality -= 0.05 // Reduce quality incrementally
+        }
 
-            // Open the renders folder
-            invoke('open_folder', { path: savePath })
-          } catch (error) {
-            console.error('Error saving file:', error)
-            alert(`Failed to save file: ${error.message}`)
-          }
-        },
-        'image/jpeg',
-        0.95
-      )
+        try {
+          await writeFile(saveFilePath, uint8Array)
+          alert(
+            `Thumbnail saved at: ${saveFilePath} (${(uint8Array.length / 1024).toFixed(1)} KB)`
+          )
+          invoke('open_folder', { path: savePath })
+        } catch (error) {
+          console.error('Error saving file:', error)
+          alert(`Failed to save file: ${error.message}`)
+        }
+      }
+
+      canvas.toBlob(blob => compressAndSaveImage(blob, 0.85), 'image/jpeg', 0.95)
     }
   }
 
