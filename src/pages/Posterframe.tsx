@@ -158,7 +158,7 @@ const Posterframe = () => {
       const saveFilePath = `${savePath}/${fileName}`
 
       // Convert canvas to JPEG and save
-      const compressAndSaveImage = async (blob: Blob | null, quality = 0.85) => {
+      const compressAndSaveImage = async (blob: Blob | null, quality = 0.95) => {
         if (!blob || !(blob instanceof Blob)) return // Check for null and correct type
 
         let arrayBuffer = await blob.arrayBuffer()
@@ -187,7 +187,7 @@ const Posterframe = () => {
         }
       }
 
-      canvas.toBlob(blob => compressAndSaveImage(blob, 0.85), 'image/jpeg', 0.95)
+      canvas.toBlob(blob => compressAndSaveImage(blob, 0.95), 'image/jpeg', 0.95)
     }
   }
 
