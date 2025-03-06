@@ -108,7 +108,8 @@ const Posterframe = () => {
     img.src = selectedFileBlob
     img.onload = async () => {
       // const maxWidth = 1280 // Limit width to 1280px
-      const scaleFactor = Math.min(1, 1280 / img.width) // Prevent upscaling // Increase this for sharper text
+      // const scaleFactor = Math.min(1, 1280 / img.width) // Prevent upscaling // Increase this for sharper text
+      const scaleFactor = 1.4 // Increase this for sharper text
       // Set canvas dimensions to match the image
       canvas.width = Math.floor(img.width * scaleFactor)
       canvas.height = Math.floor(img.height * scaleFactor)
@@ -164,6 +165,9 @@ const Posterframe = () => {
         let arrayBuffer = await blob.arrayBuffer()
         let uint8Array = new Uint8Array(arrayBuffer)
 
+        console.log('length: ' + uint8Array.length)
+        console.log('quality: ' + quality)
+
         // Check if the file size is above 500KB, and reduce quality if needed
         while (uint8Array.length > 500 * 1024 && quality > 0.6) {
           const compressedBlob = await new Promise<Blob | null>(resolve =>
@@ -187,7 +191,7 @@ const Posterframe = () => {
         }
       }
 
-      canvas.toBlob(blob => compressAndSaveImage(blob, 0.95), 'image/jpeg', 0.95)
+      canvas.toBlob(blob => compressAndSaveImage(blob, 0.5), 'image/jpeg', 0.65)
     }
   }
 
