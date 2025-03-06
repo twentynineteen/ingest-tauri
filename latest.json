@@ -1,15 +1,15 @@
 {
-  "version": "0.2.9",
-  "notes": "Posterframe text and image quality improvements",
-  "pub_date": "2025-03-06T14:04:23.349Z",
-  "platforms": {
-    "darwin-aarch64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUdGxzdGplRllZbmQ3ZUIrSzNIRWdiejJ3TzRBS2d2Yi9jbUFBTDM1OFhlQWFWUm4rcnQ0WEJGTjVBV0M0ejJ6U0ZHWWJlRkIrdGxkZjNSYnB5akhsTjFLaDIyMy9qMFFJPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzQxMjY5Nzg2CWZpbGU6QnVja2V0LmFwcC50YXIuZ3oKaWs0QWtDRnlLL3NmT3REZmhTbE5VaklkK0RUTHVwWGgvbDB5RHNDMXhIa2ZkQktaWU8rSVFCcmlyUjNidHdYWlNTTzZvT1FTYUJ6MGE2ZytCVTVkQ1E9PQo=",
-      "url": "https://github.com/twentynineteen/ingest-tauri/releases/download/app-v0.2.9/Bucket_aarch64.app.tar.gz"
-    },
-    "darwin-x86_64": {
-      "signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUdGxzdGplRllZbldPckNGS21WTzVycEVDcWRZRmxFNkd4STVZNUJTUjhPQmNKdkt1eHlzM0ZZeWlHR2wyRFFNRDBob2paYVdKWk84anN2VTZKa09yekZrQ2pIUnh3ekF3PQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzQxMjY5ODU5CWZpbGU6QnVja2V0LmFwcC50YXIuZ3oKS3ptVjZzOGMxVlVFbE01Ri8yOHRCZi9Bc2xSY1hUVGdQYVVPVTBmN0lUVUcwMmJoczNSSXcwK0RSMWtpSS9DUDVzNk1OUXRwYmJzVU8zM205NEk0QWc9PQo=",
-      "url": "https://github.com/twentynineteen/ingest-tauri/releases/download/app-v0.2.9/Bucket_x64.app.tar.gz"
-    }
-  }
+	"version": "0.3.0",
+	"notes": "Posterframe text and image quality improvements",
+	"pub_date": "2025-03-06T16:19:38.479Z",
+	"platforms": {
+		"darwin-x86_64": {
+			"signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUdGxzdGplRllZbldSU09kZzVpd2VadEVveUUzUzNpdFJBMEUxWGljQmE4TzM2M3FidmxEbkJrbTBHbFBjT1pxeXZxZnVKWklUdmMveDMvQXRPMlY1S3liUnRYUXJBS0FjPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzQxMjc3OTQ0CWZpbGU6QnVja2V0LmFwcC50YXIuZ3oKOS9YNlAzeTZLRGRDRHl4cXRLZGx5eS9zbWRWdldSTVNidlZoUUx0Rm8rZnVjVVlZbDkvMkZQSXpyRFRnNG0rclBXTTJvZGpGOHVNMUJsQ0VQY0JqRHc9PQo=",
+			"url": "https://github.com/twentynineteen/ingest-tauri/releases/download/app-v0.3.0/Bucket_x64.app.tar.gz"
+		},
+		"darwin-aarch64": {
+			"signature": "dW50cnVzdGVkIGNvbW1lbnQ6IHNpZ25hdHVyZSBmcm9tIHRhdXJpIHNlY3JldCBrZXkKUlVUdGxzdGplRllZbmVCNTdJd1hZZ1BrRXZxVlg3QmZIRWFUbVJqVHZ0N1RtRmdteDdMWVk1VlphZTFXV2ZMNmNBYngxMG1sRkJpNmNUVnhFRXEyZDAzRi95dlRvdFRYamdVPQp0cnVzdGVkIGNvbW1lbnQ6IHRpbWVzdGFtcDoxNzQxMjc3OTc0CWZpbGU6QnVja2V0LmFwcC50YXIuZ3oKZldWbmhEWEhXQ0dEemR2WnVLMFRoSTFoSHZjeXRnSmZRNk54NHo3WFhRaWZFMTVOQmYxSDFLTTNzeUF2dDRkdjlVVGhsQmtkbEd6N1djNVBXRDY0REE9PQo=",
+			"url": "https://github.com/twentynineteen/ingest-tauri/releases/download/app-v0.3.0/Bucket_aarch64.app.tar.gz"
+		}
+	}
 }
