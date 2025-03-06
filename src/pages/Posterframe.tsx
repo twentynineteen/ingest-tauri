@@ -107,22 +107,19 @@ const Posterframe = () => {
     const img = new Image()
     img.src = selectedFileBlob
     img.onload = async () => {
+      const scaleFactor = 2 // Increase this for sharper text
       // Set canvas dimensions to match the image
-      canvas.width = img.width
-      canvas.height = img.height
-
+      canvas.width = Math.floor(img.width * scaleFactor)
+      canvas.height = Math.floor(img.height * scaleFactor)
+      // Normalize coordinate system to use CSS pixels.
+      ctx.scale(scaleFactor, scaleFactor)
       // Draw the background image
-      ctx.drawImage(img, 0, 0, img.width, img.height)
+      ctx.drawImage(img, 0, 0, Math.floor(img.width), Math.floor(img.height))
 
-      // Load the custom font from Tauri's assets folder
-      // const fontPath = (await appDir()) + 'assets/Cabrito.ttf'
+      // Load the custom font from OS fonts folder
       await loadCustomFont()
-      // const fontPath = './assets/Cabrito.otf'
-      // const font = new FontFace('Cabrito', `url(${fontPath})`)
 
-      // await font.load()
-      // document.fonts.add(font)
-      ctx.font = '37px Cabrito'
+      ctx.font = 'normal 37px Cabrito'
 
       // Set text styling
       ctx.fillStyle = 'white'
@@ -130,50 +127,57 @@ const Posterframe = () => {
 
       // Define text position
       const textX = 292
-      const textY = 467
+      const textY = 499 // 467
+
+      // Use Subpixel Anti-Aliasing for Text
+      ctx.imageSmoothingEnabled = true
+      ctx.imageSmoothingQuality = 'high'
 
       // Wrap text (if needed)
       const maxWidth = 365
       const lineHeight = 45
-      const words = videoTitle.split(' ')
-      let line = ''
-      let y = textY
+      const words = videoTitle.split(/\s+/) // Handle multiple spaces correctly
+      let line = '',
+        y = textY
 
-      for (let word of words) {
-        const testLine = line + word + ' '
-        const metrics = ctx.measureText(testLine)
-        if (metrics.width > maxWidth && line.length > 0) {
-          ctx.fillText(line, textX, y)
+      words.forEach((word, index) => {
+        let testLine = line + word + ' '
+        if (ctx.measureText(testLine).width > maxWidth && index > 0) {
+          ctx.fillText(line.trim(), textX, y)
           line = word + ' '
           y += lineHeight
         } else {
           line = testLine
         }
-      }
-      ctx.fillText(line, textX, y)
+      })
+      ctx.fillText(line.trim(), textX, y)
 
       // Generate the file name
       const fileName = `posterframe-${videoTitle.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`
       const saveFilePath = `${savePath}/${fileName}`
 
       // Convert canvas to JPEG and save
-      canvas.toBlob(async blob => {
-        if (!blob) return
+      canvas.toBlob(
+        async blob => {
+          if (!blob) return
 
-        const arrayBuffer = await blob.arrayBuffer()
-        const uint8Array = new Uint8Array(arrayBuffer)
+          const arrayBuffer = await blob.arrayBuffer()
+          const uint8Array = new Uint8Array(arrayBuffer)
 
-        try {
-          await writeFile(saveFilePath, uint8Array)
-          alert(`Thumbnail saved at: ${saveFilePath}`)
+          try {
+            await writeFile(saveFilePath, uint8Array)
+            alert(`Thumbnail saved at: ${saveFilePath}`)
 
-          // Open the renders folder
-          invoke('open_folder', { path: savePath })
-        } catch (error) {
-          console.error('Error saving file:', error)
-          alert(`Failed to save file: ${error.message}`)
-        }
-      }, 'image/jpeg')
+            // Open the renders folder
+            invoke('open_folder', { path: savePath })
+          } catch (error) {
+            console.error('Error saving file:', error)
+            alert(`Failed to save file: ${error.message}`)
+          }
+        },
+        'image/jpeg',
+        0.95
+      )
     }
   }
 
