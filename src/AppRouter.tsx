@@ -1,14 +1,12 @@
-import { Settings } from 'lucide-react'
+// tauri auto updater on app launch
+import { relaunch } from '@tauri-apps/plugin-process'
+import { check } from '@tauri-apps/plugin-updater'
 import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 // The AppRouter component switches the display if the user is not logged in
 // The top level component, Page, acts as the provider for the layout
 // subsequent components are loaded within the page window via the Outlet component.
 
-// import {
-//   checkFullDiskAccessPermissions,
-//   requestFullDiskAccessPermissions
-// } from 'tauri-plugin-macos-permissions-api'
 import Page from './app/dashboard/page'
 // import { useAuth } from './context/AuthProvider'
 import Login from './pages/auth/Login'
@@ -17,25 +15,60 @@ import BuildProject from './pages/BuildProject'
 import ConnectedApps from './pages/ConnectedApps'
 import IngestHistory from './pages/IngestHistory'
 import Posterframe from './pages/Posterframe'
+import Settings from './pages/Settings'
 import UploadOtter from './pages/UploadOtter'
 import UploadSprout from './pages/UploadSprout'
 import UploadTrello from './pages/UploadTrello'
-
-// async function requestPermissions() {
-//   const checked = await checkFullDiskAccessPermissions()
-//   if (checked) {
-//     console.log('Checked permissions: ', checked)
-//   }
-//   const granted = await requestFullDiskAccessPermissions()
-//   if (!granted) {
-//     console.error('Full disk access permission denied.')
-//   }
-// }
+import { loadApiKey } from './utils/storage'
 
 export const AppRouter: React.FC = () => {
-  // const { isAuthenticated } = useAuth() // Track authentication state
   const isAuthenticated = true // Track authentication state
-  // requestFullDiskAccessPermissions()
+  const [apiKey, setApiKey] = useState<string | null>(null)
+
+  useEffect(() => {
+    const updateApp = async () => {
+      // tauri update on page load from v2 docs
+      const update = await check()
+      if (update) {
+        console.log('update: ' + update)
+        console.log(
+          `found update ${update.version} from ${update.date} with notes ${update.body}`
+        )
+        let downloaded = 0
+        let contentLength = 0
+        // alternatively we could also call update.download() and update.install() separately
+        await update.downloadAndInstall(event => {
+          switch (event.event) {
+            case 'Started':
+              contentLength = event.data.contentLength
+              console.log(`started downloading ${event.data.contentLength} bytes`)
+              break
+            case 'Progress':
+              downloaded += event.data.chunkLength
+              console.log(`downloaded ${downloaded} from ${contentLength}`)
+              break
+            case 'Finished':
+              console.log('download finished')
+              break
+          }
+        })
+
+        console.log('update installed')
+        await relaunch()
+      } else {
+        console.log('No update found')
+      }
+    }
+
+    updateApp()
+
+    const fetchApiKey = async () => {
+      const storedKey = await loadApiKey()
+      setApiKey(storedKey)
+    }
+
+    fetchApiKey()
+  }, [])
 
   return (
     <Routes>

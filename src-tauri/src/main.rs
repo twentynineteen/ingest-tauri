@@ -14,6 +14,10 @@ use command::show_confirmation_dialog;
 use std::env;
 use tauri_plugin_updater;
 use std::process::Command;
+mod sprout_upload;
+use sprout_upload::upload_video;
+use sprout_upload::get_folders;
+
 
 
 /// This command gracefully restarts the application.
@@ -216,6 +220,8 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_macos_permissions::init())
         .invoke_handler(tauri::generate_handler![
+            get_folders,
+            upload_video,
             graceful_restart, 
             check_auth, 
             add_token, 

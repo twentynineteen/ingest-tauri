@@ -1,6 +1,6 @@
 [package]
 name = "Bucket"
-version = "0.3.0"
+version = "0.4.0"
 description = "An app to streamline ingesting and uploading video content"
 authors = ["Daniel Mills"]
 license = "MIT"
@@ -42,6 +42,12 @@ tauri-plugin-updater = "2.5.1"
 tauri-plugin-process = "2.2.0"
 tauri-plugin-shell = "2"
 tauri-plugin-opener = "2.2.5"
+reqwest = { version = "0.11", features = ["multipart", "blocking", "json", "stream"] }
+tokio = { version = "1", features = ["full"] }
+tokio-util = "0.7.13"
+futures-util = "0.3.31"
+bytes = "1"
+
 
 
 
