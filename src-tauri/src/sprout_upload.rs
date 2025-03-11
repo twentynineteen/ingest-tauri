@@ -12,11 +12,37 @@ use futures_util::TryStreamExt;
 use bytes::Bytes;
 use std::pin::Pin;
 use std::task::{Context, Poll};
+use serde_json::Value; // Import serde_json for JSON handling
 
 #[command]
-pub fn upload_video(app_handle: AppHandle, file_path: String, api_key: String) {
+pub async fn get_folders(api_key: String, folder_id: Option<String>) -> Result<serde_json::Value, String> {
+    let client = reqwest::Client::new();
+    // Build the URL based on whether a folder_id is provided.
+    let mut url = "https://api.sproutvideo.com/v1/folders".to_string();
+    if let Some(fid) = folder_id {
+        // Assuming the API supports a query parameter like `folder_id`
+        url = format!("{}?folder_id={}", url, fid);
+    }
+    let response = client
+        .get(&url)
+        .header("SproutVideo-Api-Key", api_key)
+        .send()
+        .await
+        .map_err(|e| e.to_string())?;
+        
+    let json: Value = response.json().await.map_err(|e| e.to_string())?;
+    Ok(json)
+}
+
+#[command]
+pub fn upload_video(
+    app_handle: AppHandle, 
+    file_path: String, 
+    api_key: String,
+    folder_id: Option<String>
+) {
     tauri::async_runtime::spawn(async move {
-        match upload_video_task(app_handle, file_path, api_key).await {
+        match upload_video_task(app_handle, file_path, api_key, folder_id).await {
             Ok(_) => println!("Upload successful"),
             Err(err) => println!("Upload failed: {}", err),
         }
@@ -61,7 +87,12 @@ impl<R: AsyncRead + Unpin> AsyncRead for ProgressReader<R> {
 }
 
 // Upload function that streams file data with progress tracking
-async fn upload_video_task(app_handle: AppHandle, file_path: String, api_key: String) -> Result<(), String> {
+async fn upload_video_task(
+        app_handle: AppHandle, 
+        file_path: String, 
+        api_key: String,
+        folder_id: Option<String>
+) -> Result<(), String> {
     // Open the file
     let file = File::open(&file_path).map_err(|e| e.to_string())?;
     let file_size = file.metadata().map_err(|e| e.to_string())?.len();
@@ -113,7 +144,11 @@ async fn upload_video_task(app_handle: AppHandle, file_path: String, api_key: St
         .mime_str("video/mp4")
         .map_err(|e| e.to_string())?;
 
-    let form = multipart::Form::new().part("source_video", part);
+    let mut form = multipart::Form::new().part("source_video", part);
+    // If a folder_id was provided, add it as a text field.
+    if let Some(fid) = folder_id {
+        form = form.text("folder_id", fid);
+    }
 
     println!("Starting upload to SproutVideo...");
 
@@ -127,16 +162,17 @@ async fn upload_video_task(app_handle: AppHandle, file_path: String, api_key: St
         .map_err(|e| e.to_string())?;
 
     let status = response.status();
-    let response_text = response.text().await.unwrap_or_else(|_| "No response body".to_string());
-    println!("Upload Response: {}", response_text);
+    // Parse the response body as JSON.
+    let response_json: Value = response.json().await.map_err(|e| e.to_string())?;
+    println!("Upload Response: {:?}", response_json);
 
 
     if status.is_success() {
         println!("Upload complete!");
-        let _ = app_handle.emit("upload_complete", "Upload successful!");
+        let _ = app_handle.emit("upload_complete", response_json);
         Ok(())
     } else {
-        let error_message = format!("Upload failed: HTTP {} - {}", status, response_text);
+        let error_message = format!("Upload failed: HTTP {} - {:?}", status, response_json);
         let _ = app_handle.emit("upload_error", error_message.clone());
         Err(error_message)
     }

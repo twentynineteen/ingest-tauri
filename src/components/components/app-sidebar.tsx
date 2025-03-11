@@ -86,11 +86,11 @@ const data = {
         {
           title: 'General',
           url: '/settings/general'
-        },
-        {
-          title: 'Connected apps',
-          url: '/settings/connected-apps'
         }
+        // {
+        //   title: 'Connected apps',
+        //   url: '/settings/connected-apps'
+        // }
       ]
     }
   ]

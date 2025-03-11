@@ -1,6 +1,6 @@
 {
   "name": "bucket",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": "Dan Mills",
   "type": "module",
   "scripts": {
