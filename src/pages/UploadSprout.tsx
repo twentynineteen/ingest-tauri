@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom'
 import ExternalLink from 'src/utils/ExternalLink'
 import FormattedDate from 'src/utils/FormattedDate'
 import EmbedCodeInput from '../utils/EmbedCodeInput'
-import { loadApiKey } from '../utils/storage'
+import { loadApiKeys } from '../utils/storage'
 import FolderTreeNavigator from './FolderTreeNavigator'
 
 // Interface representing the JSON response from SproutVideo upload
@@ -109,8 +109,8 @@ const UploadSprout = () => {
   // Load API key when component mounts
   useEffect(() => {
     const fetchApiKey = async () => {
-      const key = await loadApiKey()
-      setApiKey(key)
+      const key = await loadApiKeys()
+      setApiKey(key.sproutVideo)
     }
     fetchApiKey()
   }, [])

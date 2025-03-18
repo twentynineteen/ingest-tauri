@@ -19,7 +19,7 @@ import Settings from './pages/Settings'
 import UploadOtter from './pages/UploadOtter'
 import UploadSprout from './pages/UploadSprout'
 import UploadTrello from './pages/UploadTrello'
-import { loadApiKey } from './utils/storage'
+import { loadApiKeys } from './utils/storage'
 
 export const AppRouter: React.FC = () => {
   const isAuthenticated = true // Track authentication state
@@ -62,12 +62,12 @@ export const AppRouter: React.FC = () => {
 
     updateApp()
 
-    const fetchApiKey = async () => {
-      const storedKey = await loadApiKey()
-      setApiKey(storedKey)
-    }
+    // const fetchApiKey = async () => {
+    //   const storedKey = await loadApiKey()
+    //   setApiKey(storedKey)
+    // }
 
-    fetchApiKey()
+    // fetchApiKey()
   }, [])
 
   return (
