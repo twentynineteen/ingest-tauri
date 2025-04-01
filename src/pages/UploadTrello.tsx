@@ -1,39 +1,70 @@
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@components/components/ui/accordion'
 import { Button } from '@components/components/ui/button'
-import React, { useEffect, useState } from 'react'
-import { loadApiKeys } from 'src/utils/storage'
-import { fetchTrelloCards, TrelloCard } from 'src/utils/TrelloCards'
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle
+} from '@components/components/ui/dialog'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger
+} from '@components/components/ui/tooltip'
+import { openPath } from '@tauri-apps/plugin-opener'
+import { format, parse } from 'date-fns'
+import { ExternalLink } from 'lucide-react'
+import React, { useState } from 'react'
+import { useAppendBreadcrumbs } from 'src/hooks/useAppendBreadcrumbs'
+import { useTrelloBoard } from 'src/hooks/useTrelloBoard'
+import { useTrelloCardDetails } from 'src/hooks/useTrelloCardDetails'
+import { appStore } from 'src/store/useAppStore'
+import { Breadcrumb } from 'src/utils/types'
 
 const UploadTrello = () => {
-  const [apiKey, setApiKey] = useState<string | null>(null)
-  // You'll need a token as well. This might come from storage or be hard-coded for testing.
-  const [token, setToken] = useState<string | null>(null)
-  const [cards, setCards] = useState<TrelloCard[]>([])
+  // Hard coded boardId for 'small projects'
+  const boardId = '55a504d70bed2bd21008dc5a'
+  const [selectedCard, setSelectedCard] = useState<{ id: string; name: string } | null>(
+    null
+  )
 
-  // Load API key when component mounts
-  useEffect(() => {
-    const fetchApiKey = async () => {
-      const key = await loadApiKeys()
-      setApiKey(key.trello)
-      setToken(key.trelloToken)
-    }
-    fetchApiKey()
-  }, [])
-  // Fetch Trello cards once API key and token are available.
-  useEffect(() => {
-    if (apiKey && token) {
-      const fetchCards = async () => {
-        // Board ID for "Small Projects"
-        const boardId = '55a504d70bed2bd21008dc5a'
-        const fetchedCards = await fetchTrelloCards(apiKey, token, boardId)
-        setCards(fetchedCards)
-      }
-      fetchCards()
-    }
-  }, [apiKey, token])
+  // Open in trello via browser
+  const cardUrl = selectedCard ? `https://trello.com/c/${selectedCard.id}` : ''
 
-  const getTrelloCardMembers = (cardId: string) => {
+  const { grouped, isLoading, apiKey, token } = useTrelloBoard(boardId)
 
-  }
+  const breadcrumbs: Breadcrumb = appStore.getState().breadcrumbs
+
+  const {
+    card: cardDetails,
+    members,
+    isLoading: isCardLoading
+  } = useTrelloCardDetails(selectedCard?.id ?? null, apiKey, token)
+
+  const { getBreadcrumbsBlock, applyBreadcrumbsToCard } = useAppendBreadcrumbs(
+    apiKey,
+    token
+  )
+
+  // split description and breadcrumbs into separate accordions
+  const breadcrumbRegex = /```json\n\/\/ BREADCRUMBS\n([\s\S]*?)```/m
+  const rawDescription = cardDetails?.desc ?? ''
+
+  const breadcrumbsMatch = rawDescription.match(breadcrumbRegex)
+  const breadcrumbsData = breadcrumbsMatch ? JSON.parse(breadcrumbsMatch[1]) : null
+
+  const [mainDescription, matchedBreadcrumbs] = rawDescription.split(breadcrumbRegex)
+  const breadcrumbsBlock = rawDescription.match(breadcrumbRegex)?.[0] ?? null
+
+  if (isLoading) return <div>Loading...</div>
 
   return (
     <>
@@ -61,29 +92,196 @@ const UploadTrello = () => {
         <div className="px-4 mx-4">
           <div className="flex flex-col items-start space-y-4 mt-4">
             {/* Display trello cards here */}
-            {cards.length > 0 ? (
-              cards.map(card => (
-                <div
-                  key={card.id}
-                  className="border p-4 w-[450px] rounded-lg hover:bg-slate-50 "
-                >
-                  <h3 className="font-bold pb-2">{card.name}</h3>
-                  <div className="flex flex-row">
-                    <p className="w-2/3 text-sm text-gray-600">{card.desc}</p>
-                    <div className="w-1/3 flex flex-col justify-evenly items-center p-4">
-                    
-                      <Button className="w-full">Join</Button>
-                      <Button className="w-full">Edit</Button>
-                    </div>
+            {Object.entries(grouped).length > 0 ? (
+              <div>
+                {Object.entries(grouped).map(([listName, cards]) => (
+                  <div key={listName}>
+                    <h2 className="text-lg font-semibold mt-4">{listName}</h2>
+                    <ul className="list-disc ml-5">
+                      {cards.map(card => (
+                        <li
+                          key={card.id}
+                          className="hover:bg-gray-200 px-3 py-1 rounded transition-colors cursor-pointer"
+                        >
+                          <span
+                            onClick={() =>
+                              setSelectedCard({ id: card.id, name: card.name })
+                            }
+                          >
+                            {card.name}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             ) : (
               <p>No cards found.</p>
             )}
           </div>
         </div>
       </div>
+      {selectedCard && (
+        <Dialog open={!!selectedCard} onOpenChange={() => setSelectedCard(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{selectedCard?.name}</DialogTitle>
+              <DialogDescription>Card ID: {selectedCard?.id}</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              {isCardLoading ? (
+                <p>Loading card details...</p>
+              ) : (
+                <>
+                  {members && members.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold">Members</h3>
+                      <ul className="list-disc ml-5 text-sm">
+                        {members.map(member => (
+                          <li key={member.id}>{member.fullName}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {cardDetails?.desc && (
+                    <div className="space-y-4">
+                      {breadcrumbsBlock && (
+                        <Accordion type="single" collapsible className="w-full">
+                          <AccordionItem value="description">
+                            <AccordionTrigger className="focus:outline-none focus-visible:outline-none">
+                              Description
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              <div className="max-h-48 overflow-auto rounded border bg-muted p-3 text-sm whitespace-pre-wrap focus:outline-none focus-visible:outline-none">
+                                {mainDescription.trim() || 'No description.'}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                          <AccordionItem value="breadcrumbs">
+                            <AccordionTrigger className="font-semibold">
+                              Breadcrumbs
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              {breadcrumbsData ? (
+                                <div className="space-y-2 text-sm text-muted-foreground">
+                                  {breadcrumbsData.projectTitle && (
+                                    <p>
+                                      <span className="font-medium text-foreground">
+                                        Project Title:
+                                      </span>{' '}
+                                      {breadcrumbsData.projectTitle}
+                                    </p>
+                                  )}
+                                  {breadcrumbsData.createdBy && (
+                                    <p>
+                                      <span className="font-medium text-foreground">
+                                        Created By:
+                                      </span>{' '}
+                                      {breadcrumbsData.createdBy}
+                                    </p>
+                                  )}
+
+                                  {breadcrumbsData.creationDateTime && (
+                                    <p>
+                                      <span className="font-medium text-foreground">
+                                        Created On:
+                                      </span>{' '}
+                                      {format(
+                                        parse(
+                                          breadcrumbsData.creationDateTime,
+                                          'dd/MM/yyyy, HH:mm:ss',
+                                          new Date()
+                                        ),
+                                        'PPPpp'
+                                      )}
+                                    </p>
+                                  )}
+
+                                  {breadcrumbsData.parentFolder && (
+                                    <p>
+                                      <span className="font-medium text-foreground">
+                                        Folder:
+                                      </span>{' '}
+                                      {breadcrumbsData.parentFolder}
+                                    </p>
+                                  )}
+                                  {breadcrumbsData.files && (
+                                    <>
+                                      <p>
+                                        <span className="font-medium text-foreground">
+                                          Files:
+                                        </span>{' '}
+                                        {breadcrumbsData.files.length} file(s)
+                                      </p>
+                                      <ul className="list-disc ml-5">
+                                        {breadcrumbsData.files.map(file => (
+                                          <li key={file.id}>{file.name}</li>
+                                        ))}
+                                      </ul>
+                                    </>
+                                  )}
+                                </div>
+                              ) : (
+                                <p className="text-sm text-muted-foreground">
+                                  No breadcrumbs found.
+                                </p>
+                              )}
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+
+              <div className="pt-4 flex justify-between gap-4 items-center">
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        onClick={async () => {
+                          const block = await getBreadcrumbsBlock(cardDetails ?? null)
+                          if (block && cardDetails) {
+                            await applyBreadcrumbsToCard(cardDetails, block)
+                          }
+                        }}
+                      >
+                        Append Breadcrumbs
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="top"
+                      align="start"
+                      className="max-w-[400px] max-h-[300px] overflow-auto bg-white p-3 border border-gray-300 rounded shadow text-xs font-mono whitespace-pre-wrap text-gray-600"
+                    >
+                      {breadcrumbs
+                        ? JSON.stringify(breadcrumbs, null, 2)
+                        : 'No breadcrumbs selected'}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    if (selectedCard) {
+                      const url = new URL(`https://trello.com/c/${selectedCard.id}`)
+                      await open(url.toString())
+                      console.log('click')
+                    }
+                  }}
+                >
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  Open in Trello
+                </Button>
+                <Button onClick={() => setSelectedCard(null)}>Close</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   )
 }

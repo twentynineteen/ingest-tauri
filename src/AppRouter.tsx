@@ -25,50 +25,47 @@ export const AppRouter: React.FC = () => {
   const isAuthenticated = true // Track authentication state
   const [apiKey, setApiKey] = useState<string | null>(null)
 
-  useEffect(() => {
-    const updateApp = async () => {
-      // tauri update on page load from v2 docs
-      const update = await check()
-      if (update) {
-        console.log('update: ' + update)
-        console.log(
-          `found update ${update.version} from ${update.date} with notes ${update.body}`
-        )
-        let downloaded = 0
-        let contentLength = 0
-        // alternatively we could also call update.download() and update.install() separately
-        await update.downloadAndInstall(event => {
-          switch (event.event) {
-            case 'Started':
-              contentLength = event.data.contentLength
-              console.log(`started downloading ${event.data.contentLength} bytes`)
-              break
-            case 'Progress':
-              downloaded += event.data.chunkLength
-              console.log(`downloaded ${downloaded} from ${contentLength}`)
-              break
-            case 'Finished':
-              console.log('download finished')
-              break
-          }
-        })
+  // useEffect(() => {
+  //   const updateApp = async () => {
+  //     // try to update on load
+  //     try {
+  //       const update = await check()
 
-        console.log('update installed')
-        await relaunch()
-      } else {
-        console.log('No update found')
-      }
-    }
+  //       if (update && 'version' in update) {
+  //         console.log(
+  //           `found update ${update.version} from ${update.date} with notes ${update.body}`
+  //         )
+  //         let downloaded = 0
+  //         let contentLength = 0
+  //         // alternatively we could also call update.download() and update.install() separately
+  //         await update.downloadAndInstall(event => {
+  //           switch (event.event) {
+  //             case 'Started':
+  //               contentLength = event.data.contentLength
+  //               console.log(`started downloading ${event.data.contentLength} bytes`)
+  //               break
+  //             case 'Progress':
+  //               downloaded += event.data.chunkLength
+  //               console.log(`downloaded ${downloaded} from ${contentLength}`)
+  //               break
+  //             case 'Finished':
+  //               console.log('download finished')
+  //               break
+  //           }
+  //         })
 
-    updateApp()
+  //         console.log('update installed')
+  //         await relaunch()
+  //       } else {
+  //         console.log('No update found')
+  //       }
+  //     } catch (error) {
+  //       console.error('Error during update check: ', error)
+  //     }
+  //   }
 
-    // const fetchApiKey = async () => {
-    //   const storedKey = await loadApiKey()
-    //   setApiKey(storedKey)
-    // }
-
-    // fetchApiKey()
-  }, [])
+  //   updateApp()
+  // }, [])
 
   return (
     <Routes>

@@ -1,5 +1,14 @@
 import { appDataDir } from '@tauri-apps/api/path'
 import { exists, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
+import { appStore } from 'src/store/useAppStore'
+
+const sproutVideoApiKey = appStore.getState().sproutVideoApiKey
+const setSproutVideoApiKey = (state: string) =>
+  appStore.getState().setSproutVideoApiKey(state)
+const trelloApiKey = appStore.getState().trelloApiKey
+const setTrelloApiKey = (state: string) => appStore.getState().setTrelloApiKey(state)
+const trelloApiToken = appStore.getState().trelloApiToken
+const setTrelloApiToken = (state: string) => appStore.getState().setTrelloApiToken(state)
 
 // Define an interface for multiple API keys.
 export interface ApiKeys {
@@ -20,6 +29,9 @@ const getFilePath = async () => {
 // Save API keys to a local file as JSON.
 export const saveApiKeys = async (apiKeys: ApiKeys): Promise<void> => {
   try {
+    setSproutVideoApiKey(apiKeys.sproutVideo)
+    setTrelloApiKey(apiKeys.trello)
+    setTrelloApiToken(apiKeys.trelloToken)
     const filePath = await getFilePath()
     const data = JSON.stringify(apiKeys, null, 2) // Pretty-print JSON for readability.
     await writeTextFile(filePath, data)
@@ -34,7 +46,11 @@ export const loadApiKeys = async (): Promise<ApiKeys> => {
     const filePath = await getFilePath()
     if (!(await exists(filePath))) return {} // Return empty object if file doesn't exist.
     const data = await readTextFile(filePath)
-    return JSON.parse(data)
+    const result = JSON.parse(data)
+    setSproutVideoApiKey(result.sproutVideo)
+    setTrelloApiKey(result.trello)
+    setTrelloApiToken(result.trelloToken)
+    return result
   } catch (error) {
     console.error('Error loading API keys:', error)
     return {}

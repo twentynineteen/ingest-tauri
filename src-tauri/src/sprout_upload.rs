@@ -1,21 +1,24 @@
-use reqwest::multipart;
-use reqwest::{Client, Body};
-use std::fs::File;
-use std::path::Path;
-use std::sync::Arc;
-use tokio::sync::Mutex;
-use tokio::io::{AsyncRead, AsyncReadExt, BufReader};
-use tauri::{command, AppHandle};
-use tauri::Emitter;
+use bytes::Bytes;
 use futures_util::stream::unfold;
 use futures_util::TryStreamExt;
-use bytes::Bytes;
+use reqwest::multipart;
+use reqwest::{Body, Client};
+use serde_json::Value;
+use std::fs::File;
+use std::path::Path;
 use std::pin::Pin;
+use std::sync::Arc;
 use std::task::{Context, Poll};
-use serde_json::Value; // Import serde_json for JSON handling
+use tauri::Emitter;
+use tauri::{command, AppHandle};
+use tokio::io::{AsyncRead, AsyncReadExt, BufReader};
+use tokio::sync::Mutex; // Import serde_json for JSON handling
 
 #[command]
-pub async fn get_folders(api_key: String, folder_id: Option<String>) -> Result<serde_json::Value, String> {
+pub async fn get_folders(
+    api_key: String,
+    folder_id: Option<String>,
+) -> Result<serde_json::Value, String> {
     let client = reqwest::Client::new();
     // Build the URL based on whether a folder_id is provided.
     let mut url = "https://api.sproutvideo.com/v1/folders".to_string();
@@ -29,17 +32,17 @@ pub async fn get_folders(api_key: String, folder_id: Option<String>) -> Result<s
         .send()
         .await
         .map_err(|e| e.to_string())?;
-        
+
     let json: Value = response.json().await.map_err(|e| e.to_string())?;
     Ok(json)
 }
 
 #[command]
 pub fn upload_video(
-    app_handle: AppHandle, 
-    file_path: String, 
+    app_handle: AppHandle,
+    file_path: String,
     api_key: String,
-    folder_id: Option<String>
+    folder_id: Option<String>,
 ) {
     tauri::async_runtime::spawn(async move {
         match upload_video_task(app_handle, file_path, api_key, folder_id).await {
@@ -88,10 +91,10 @@ impl<R: AsyncRead + Unpin> AsyncRead for ProgressReader<R> {
 
 // Upload function that streams file data with progress tracking
 async fn upload_video_task(
-        app_handle: AppHandle, 
-        file_path: String, 
-        api_key: String,
-        folder_id: Option<String>
+    app_handle: AppHandle,
+    file_path: String,
+    api_key: String,
+    folder_id: Option<String>,
 ) -> Result<(), String> {
     // Open the file
     let file = File::open(&file_path).map_err(|e| e.to_string())?;
@@ -165,7 +168,6 @@ async fn upload_video_task(
     // Parse the response body as JSON.
     let response_json: Value = response.json().await.map_err(|e| e.to_string())?;
     println!("Upload Response: {:?}", response_json);
-
 
     if status.is_success() {
         println!("Upload complete!");

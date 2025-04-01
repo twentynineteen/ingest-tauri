@@ -17,6 +17,7 @@ const Settings: React.FC = () => {
 
   const handleSaveSproutKey = async () => {
     await saveApiKeys({ ...apiKeys, sproutVideo: apiKeys.sproutVideo })
+
     alert('SproutVideo API Key saved successfully!')
   }
 

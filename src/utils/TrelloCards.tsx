@@ -5,7 +5,40 @@ export interface TrelloCard {
   id: string
   name: string
   desc: string
+  idList: string
   // Add more properties as required by your display needs.
+}
+
+export interface TrelloList {
+  id: string
+  name: string
+}
+
+/**
+ * Fetches all lists on a Trello board.
+ * @param apiKey - Your Trello API key.
+ * @param token - Your Trello token.
+ * @param boardId - The ID of the Trello board.
+ * @returns A promise resolving to an array of TrelloList objects.
+ */
+export async function fetchTrelloLists(
+  apiKey: string,
+  token: string,
+  boardId: string
+): Promise<TrelloList[]> {
+  const url = `https://api.trello.com/1/boards/${boardId}/lists?key=${apiKey}&token=${token}`
+
+  try {
+    const response = await fetch(url)
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    const lists: TrelloList[] = await response.json()
+    return lists
+  } catch (error) {
+    console.error('Error fetching Trello lists:', error)
+    return []
+  }
 }
 
 /**
@@ -34,6 +67,34 @@ export async function fetchTrelloCards(
     console.error('Error fetching Trello cards:', error)
     return []
   }
+}
+
+/**
+ * Groups Trello cards by their list.
+ * @param cards - Array of TrelloCard objects.
+ * @param lists - Array of TrelloList objects.
+ * @returns An object where keys are list names and values are arrays of cards in that list.
+ */
+export function groupCardsByList(
+  cards: TrelloCard[],
+  lists: TrelloList[]
+): Record<string, TrelloCard[]> {
+  const listMap = new Map<string, string>()
+  lists.forEach(list => {
+    listMap.set(list.id, list.name)
+  })
+
+  const grouped: Record<string, TrelloCard[]> = {}
+
+  cards.forEach(card => {
+    const listName = listMap.get(card.idList) || 'Unknown List'
+    if (!grouped[listName]) {
+      grouped[listName] = []
+    }
+    grouped[listName].push(card)
+  })
+
+  return grouped
 }
 
 export interface TrelloMember {
@@ -65,17 +126,4 @@ export function useTrelloCardMembers(cardId: string, apiKey: string, token: stri
   })
 
   return query
-
-  // return useQuery<TrelloMember[], Error>(
-  //   ['useTrelloCardMembers', cardId], // Query key
-  //   async () => {
-  //     const url = `https://api.trello.com/1/cards/${cardId}/members?key=${apiKey}&token=${token}`
-  //     const response = await fetch(url)
-  //     if (!response.ok) {
-  //       throw new Error(`HTTP error! status: ${response.status}`)
-  //     }
-  //     const members: TrelloMember[] = await response.json()
-  //     return members
-  //   }
-  // )
 }
