@@ -53,10 +53,11 @@ const data = {
       icon: HardDriveUpload,
       isActive: false,
       items: [
-        {
-          title: 'Sprout video',
-          url: '/upload/sprout'
-        },
+        // {
+        //   title: 'Sprout video',
+        //   // url: '/upload/sprout'
+        //   url: '#'
+        // },
         {
           title: 'Posterframe',
           url: '/upload/posterframe'
@@ -78,18 +79,20 @@ const data = {
     },
     {
       title: 'Settings',
-      url: '/settings/general',
+      url: '#',
       icon: Settings,
       isActive: false,
       items: [
         {
           title: 'General',
-          url: '/settings/general'
+          // url: '/settings/general'
+          url: '#'
+        },
+        {
+          title: 'Connected apps',
+          // url: '/settings/connected-apps'
+          url: '#'
         }
-        // {
-        //   title: 'Connected apps',
-        //   url: '/settings/connected-apps'
-        // }
       ]
     }
   ]

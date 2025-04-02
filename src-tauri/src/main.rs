@@ -13,10 +13,14 @@ use command::copy_premiere_project;
 use command::show_confirmation_dialog;
 use std::env;
 use std::process::Command;
+<<<<<<< HEAD
 use tauri_plugin_updater;
 mod sprout_upload;
 use sprout_upload::get_folders;
 use sprout_upload::upload_video;
+=======
+
+>>>>>>> release
 
 /// This command gracefully restarts the application.
 /// It spawns a new instance of the current executable and then exits.
@@ -218,6 +222,7 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_macos_permissions::init())
         .invoke_handler(tauri::generate_handler![
+<<<<<<< HEAD
             get_folders,
             upload_video,
             graceful_restart,
@@ -226,6 +231,14 @@ fn main() {
             move_files,
             copy_premiere_project,
             show_confirmation_dialog,
+=======
+            graceful_restart, 
+            check_auth, 
+            add_token, 
+            move_files, 
+            copy_premiere_project, 
+            show_confirmation_dialog, 
+>>>>>>> release
             get_username,
             open_folder
         ])

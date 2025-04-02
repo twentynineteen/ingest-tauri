@@ -1,12 +1,16 @@
 use std::env;
 use std::fs;
-use std::io::Write; // For writing bytes to a file
 use std::path::PathBuf;
 use tauri::command;
+use std::env;
+use std::io::Write; // For writing bytes to a file
 
-use tauri::AppHandle;
-use tauri::Manager;
+// read premiere project at run time deps
+use std::fs::File;
+use std::io::{Read};
+use std::path::Path;
 
+<<<<<<< HEAD
 /// Opens a file located in the resource directory and returns its content as a string.
 ///
 /// # Arguments
@@ -35,6 +39,8 @@ pub fn open_resource_file(handle: AppHandle, relative_file_path: &str) -> Result
     // Read the file contents as bytes.
     fs::read(&file_path).map_err(|e| format!("Error reading file {}: {}", file_path.display(), e))
 }
+=======
+>>>>>>> release
 
 /// Copies a Premiere Pro project template to the specified folder and renames it.
 ///
@@ -46,20 +52,38 @@ pub fn open_resource_file(handle: AppHandle, relative_file_path: &str) -> Result
 /// * `Ok(())` if the operation is successful.
 /// * `Err(String)` if an error occurs.
 #[command]
+<<<<<<< HEAD
 pub fn copy_premiere_project(
     handle: AppHandle,
     destination_folder: String,
     new_title: String,
 ) -> Result<(), String> {
+=======
+pub fn copy_premiere_project(destination_folder: String, new_title: String) -> Result<(), String> {
+>>>>>>> release
     // Print the current working directory
     match env::current_dir() {
         Ok(path) => println!("Current working directory: {}", path.display()),
         Err(e) => eprintln!("Error getting current directory: {}", e),
     }
 
+<<<<<<< HEAD
     // The relative file path must match the location of your bundled file.
     let file_data =
         open_resource_file(handle.clone(), "resources/Premiere 4K Template 2025.prproj")?;
+=======
+    // Path to the assets folder (adjust the path as needed)
+    let asset_path = Path::new("assets").join("Premiere 4K Template 2025.prproj");
+
+    // Open the file from the assets folder
+    let mut file = File::open(&asset_path)
+        .map_err(|e| format!("Error opening file '{}': {}", asset_path.display(), e))?;
+
+    // Read the file into a byte vector
+    let mut file_data = Vec::new();
+    file.read_to_end(&mut file_data)
+        .map_err(|e| format!("Error reading file '{}': {}", asset_path.display(), e))?;
+>>>>>>> release
 
     // Define the destination path
     let destination_path =
@@ -98,9 +122,14 @@ pub fn copy_premiere_project(
     Ok(())
 }
 
+<<<<<<< HEAD
 use std::path::Path;
 use std::process::Command;
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
+=======
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
+use std::process::Command;
+>>>>>>> release
 
 /// Displays a confirmation dialog with Yes/No options and opens Finder/Explorer if Yes is selected.
 ///
@@ -171,3 +200,8 @@ fn open_folder(destination: String) -> Result<(), String> {
         Err(e) => Err(format!("Failed to open folder: {}", e)),
     }
 }
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> release

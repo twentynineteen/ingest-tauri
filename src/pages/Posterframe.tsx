@@ -107,21 +107,22 @@ const Posterframe = () => {
     const img = new Image()
     img.src = selectedFileBlob
     img.onload = async () => {
-      // const maxWidth = 1280 // Limit width to 1280px
-      // const scaleFactor = Math.min(1, 1280 / img.width) // Prevent upscaling // Increase this for sharper text
-      const scaleFactor = 1 // Increase this for sharper text
       // Set canvas dimensions to match the image
-      canvas.width = Math.floor(img.width * scaleFactor)
-      canvas.height = Math.floor(img.height * scaleFactor)
-      // Normalize coordinate system to use CSS pixels.
-      ctx.scale(scaleFactor, scaleFactor)
+      canvas.width = img.width
+      canvas.height = img.height
+
       // Draw the background image
-      ctx.drawImage(img, 0, 0, Math.floor(img.width), Math.floor(img.height))
+      ctx.drawImage(img, 0, 0, img.width, img.height)
 
-      // Load the custom font from OS fonts folder
+      // Load the custom font from Tauri's assets folder
+      // const fontPath = (await appDir()) + 'assets/Cabrito.ttf'
       await loadCustomFont()
+      // const fontPath = './assets/Cabrito.otf'
+      // const font = new FontFace('Cabrito', `url(${fontPath})`)
 
-      ctx.font = 'normal 37px Cabrito'
+      // await font.load()
+      // document.fonts.add(font)
+      ctx.font = '37px Cabrito'
 
       // Set text styling
       ctx.fillStyle = 'white'
@@ -129,69 +130,50 @@ const Posterframe = () => {
 
       // Define text position
       const textX = 292
-      const textY = 499 // 467
-
-      // Use Subpixel Anti-Aliasing for Text
-      ctx.imageSmoothingEnabled = true
-      ctx.imageSmoothingQuality = 'high'
+      const textY = 467
 
       // Wrap text (if needed)
       const maxWidth = 365
       const lineHeight = 45
-      const words = videoTitle.split(/\s+/) // Handle multiple spaces correctly
-      let line = '',
-        y = textY
+      const words = videoTitle.split(' ')
+      let line = ''
+      let y = textY
 
-      words.forEach((word, index) => {
-        let testLine = line + word + ' '
-        if (ctx.measureText(testLine).width > maxWidth && index > 0) {
-          ctx.fillText(line.trim(), textX, y)
+      for (let word of words) {
+        const testLine = line + word + ' '
+        const metrics = ctx.measureText(testLine)
+        if (metrics.width > maxWidth && line.length > 0) {
+          ctx.fillText(line, textX, y)
           line = word + ' '
           y += lineHeight
         } else {
           line = testLine
         }
-      })
-      ctx.fillText(line.trim(), textX, y)
+      }
+      ctx.fillText(line, textX, y)
 
       // Generate the file name
       const fileName = `posterframe-${videoTitle.replace(/[^a-zA-Z0-9]/g, '_')}.jpg`
       const saveFilePath = `${savePath}/${fileName}`
 
       // Convert canvas to JPEG and save
-      const compressAndSaveImage = async (blob: Blob | null, quality = 0.95) => {
-        if (!blob || !(blob instanceof Blob)) return // Check for null and correct type
+      canvas.toBlob(async blob => {
+        if (!blob) return
 
-        let arrayBuffer = await blob.arrayBuffer()
-        let uint8Array = new Uint8Array(arrayBuffer)
-
-        // console.log('length: ' + uint8Array.length)
-        // console.log('quality: ' + quality)
-
-        // Check if the file size is above 500KB, and reduce quality if needed
-        while (uint8Array.length > 500 * 1024 && quality > 0.6) {
-          const compressedBlob = await new Promise<Blob | null>(resolve =>
-            canvas.toBlob(blob => resolve(blob), 'image/jpeg', quality)
-          )
-          if (!compressedBlob) break // Prevents trying to access arrayBuffer() on null
-          arrayBuffer = await compressedBlob.arrayBuffer()
-          uint8Array = new Uint8Array(arrayBuffer)
-          quality -= 0.05 // Reduce quality incrementally
-        }
+        const arrayBuffer = await blob.arrayBuffer()
+        const uint8Array = new Uint8Array(arrayBuffer)
 
         try {
           await writeFile(saveFilePath, uint8Array)
-          alert(
-            `Thumbnail saved at: ${saveFilePath} (${(uint8Array.length / 1024).toFixed(1)} KB)`
-          )
+          alert(`Thumbnail saved at: ${saveFilePath}`)
+
+          // Open the renders folder
           invoke('open_folder', { path: savePath })
         } catch (error) {
           console.error('Error saving file:', error)
           alert(`Failed to save file: ${error.message}`)
         }
-      }
-
-      canvas.toBlob(blob => compressAndSaveImage(blob, 0.5), 'image/jpeg', 0.65)
+      }, 'image/jpeg')
     }
   }
 

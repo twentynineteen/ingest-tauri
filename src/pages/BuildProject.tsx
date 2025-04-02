@@ -237,7 +237,6 @@ const BuildProject: React.FC = () => {
 
         // alert('Project created successfully!')
         clearFields()
-
         // Wait for Premiere project to be created
         await createTemplatePremiereProject()
 
@@ -292,10 +291,9 @@ const BuildProject: React.FC = () => {
 
         try {
           const filePath = `${projectData.parentFolder}/${projectData.projectTitle}/Projects/`
-          // get file from bundled resources folder
-          const location = await resolveResource(
-            'resources/Premiere 4K Template 2025.prproj'
-          )
+          // file located in src-tauri folder
+          // const location = './assets/Premiere 4K Template 2025.prproj'
+          const location = await resolveResource('Premiere 4K Template 2025.prproj')
 
           // Pass the selected file path and title to the backend function
           const result = await invoke('copy_premiere_project', {

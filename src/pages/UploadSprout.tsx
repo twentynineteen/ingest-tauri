@@ -1,7 +1,7 @@
 import { Button } from '@components/components/ui/button'
 import { Progress } from '@components/components/ui/progress'
 import { invoke } from '@tauri-apps/api/core'
-import { listen } from '@tauri-apps/api/event' // Import event listener
+import { listen } from '@tauri-apps/api/event'; // Import event listener
 import { open } from '@tauri-apps/plugin-dialog'
 import { Sprout } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
@@ -12,61 +12,7 @@ import EmbedCodeInput from '../utils/EmbedCodeInput'
 import { loadApiKeys } from '../utils/storage'
 import FolderTreeNavigator from './FolderTreeNavigator'
 
-// Interface representing the JSON response from SproutVideo upload
-export interface SproutUploadResponse {
-  created_at: string
-  updated_at: string
-  height: number
-  width: number
-  description: string
-  id: string
-  plays: number
-  title: string
-  source_video_file_size: number
-  embed_code: string
-  state: string
-  security_token: string
-  progress: number
-  tags: string[]
-  embedded_url: string | null
-  duration: number
-  password: string | null
-  privacy: number
-  requires_signed_embeds: boolean
-  selected_poster_frame_number: number
-  assets: {
-    videos: {
-      '240p': string
-      '360p': string
-      '480p': string
-      '720p': string
-      '1080p': string
-      '2k': string | null
-      '4k': string | null
-      '8k': string | null
-      source: string | null
-    }
-    thumbnails: string[]
-    poster_frames: string[]
-    poster_frame_mp4: string | null
-    timeline_images: string[]
-    hls_manifest: string
-  }
-  download_sd: string | null
-  download_hd: string | null
-  download_source: string | null
-  allowed_domains: string | null
-  allowed_ips: string | null
-  player_social_sharing: string | null
-  player_embed_sharing: string | null
-  require_email: boolean
-  require_name: boolean
-  hide_on_site: boolean
-  folder_id: string | null
-  airplay_support: string | null
-  session_watermarks: string | null
-  direct_file_access: string | null
-}
+type Props = {}
 
 // Define an interface for folder data (adjust fields as needed)
 export interface SproutFolder {
