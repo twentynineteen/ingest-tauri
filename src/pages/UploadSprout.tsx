@@ -1,7 +1,7 @@
 import { Button } from '@components/components/ui/button'
 import { Progress } from '@components/components/ui/progress'
 import { invoke } from '@tauri-apps/api/core'
-import { listen } from '@tauri-apps/api/event'; // Import event listener
+import { listen } from '@tauri-apps/api/event' // Import event listener
 import { open } from '@tauri-apps/plugin-dialog'
 import { Sprout } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
