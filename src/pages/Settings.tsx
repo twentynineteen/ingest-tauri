@@ -1,3 +1,5 @@
+import { Button } from '@components/components/ui/button'
+import { open } from '@tauri-apps/plugin-shell'
 import React, { useEffect, useState } from 'react'
 import ApiKeyInput from 'src/utils/ApiKeyInput'
 import { ApiKeys, loadApiKeys, saveApiKeys } from '../utils/storage'
@@ -15,6 +17,22 @@ const Settings: React.FC = () => {
     fetchApiKeys()
   }, [])
 
+  const handleAuthorizeWithTrello = async () => {
+    if (!apiKeys.trello) {
+      alert('Please enter your Trello API key first.')
+      return
+    }
+
+    const authUrl = `https://trello.com/1/authorize?expiration=never&name=MyApp&scope=read,write&response_type=token&key=${apiKeys.trello}`
+
+    try {
+      await open(authUrl)
+      alert('After authorizing, copy the token from the URL and paste it below.')
+    } catch (err) {
+      console.error('Failed to open Trello authorization URL:', err)
+    }
+  }
+
   const handleSaveSproutKey = async () => {
     await saveApiKeys({ ...apiKeys, sproutVideo: apiKeys.sproutVideo })
 
@@ -26,7 +44,7 @@ const Settings: React.FC = () => {
     alert('Trello API Key saved successfully!')
   }
   const handleSaveTrelloToken = async () => {
-    await saveApiKeys({ ...apiKeys, trello: apiKeys.trelloToken })
+    await saveApiKeys({ ...apiKeys, trelloToken: apiKeys.trelloToken })
     alert('Trello API Token saved successfully!')
   }
 
@@ -52,6 +70,10 @@ const Settings: React.FC = () => {
             setApiKey={(newKey: string) => setApiKeys({ ...apiKeys, trello: newKey })}
             onSave={handleSaveTrelloKey}
           />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">Trello Auth</label>
+          <Button onClick={handleAuthorizeWithTrello}>Authorize with Trello</Button>
         </div>
         <div>
           <label className="block text-sm font-medium mb-2">Trello API Token</label>
