@@ -22,7 +22,7 @@ import {
 import { openPath } from '@tauri-apps/plugin-opener'
 import { format, parse } from 'date-fns'
 import { ExternalLink } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useAppendBreadcrumbs } from 'src/hooks/useAppendBreadcrumbs'
 import { useTrelloBoard } from 'src/hooks/useTrelloBoard'
 import { useTrelloCardDetails } from 'src/hooks/useTrelloCardDetails'
@@ -46,8 +46,25 @@ const UploadTrello = () => {
   const {
     card: cardDetails,
     members,
-    isLoading: isCardLoading
+    isLoading: isCardLoading,
+    refetchCard,
+    refetchMembers
   } = useTrelloCardDetails(selectedCard?.id ?? null, apiKey, token)
+
+  // Refresh card
+  useEffect(() => {
+    if (selectedCard && selectedCard.id && apiKey && token) {
+      refetchCard()
+      refetchMembers()
+    }
+  }, [selectedCard?.id, apiKey, token])
+
+  // gracefully handle setSelectedCard if API fetch fails or returns null
+  useEffect(() => {
+    if (selectedCard && !cardDetails && !isCardLoading) {
+      setSelectedCard(null)
+    }
+  }, [selectedCard, cardDetails, isCardLoading])
 
   const { getBreadcrumbsBlock, applyBreadcrumbsToCard } = useAppendBreadcrumbs(
     apiKey,
@@ -55,16 +72,23 @@ const UploadTrello = () => {
   )
 
   // split description and breadcrumbs into separate accordions
-  const breadcrumbRegex = /```json\n\/\/ BREADCRUMBS\n([\s\S]*?)```/m
   const rawDescription = cardDetails?.desc ?? ''
+  const { mainDescription, breadcrumbsData, breadcrumbsBlock } = useMemo(() => {
+    const breadcrumbRegex = /```json\n\/\/ BREADCRUMBS\n([\s\S]*?)```/m
+    const match = rawDescription.match(breadcrumbRegex)
 
-  const breadcrumbsMatch = rawDescription.match(breadcrumbRegex)
-  const breadcrumbsData = breadcrumbsMatch ? JSON.parse(breadcrumbsMatch[1]) : null
+    const data = match ? JSON.parse(match[1]) : null
+    const main = rawDescription.split(breadcrumbRegex)[0]
+    const block = match?.[0] ?? null
 
-  const [mainDescription, matchedBreadcrumbs] = rawDescription.split(breadcrumbRegex)
-  const breadcrumbsBlock = rawDescription.match(breadcrumbRegex)?.[0] ?? null
+    return {
+      mainDescription: main,
+      breadcrumbsData: data,
+      breadcrumbsBlock: block
+    }
+  }, [rawDescription])
 
-  if (isLoading) return <div>Loading...</div>
+  if (isLoading || isCardLoading) return <div>Loading...</div>
 
   return (
     <>
@@ -145,20 +169,21 @@ const UploadTrello = () => {
                     </div>
                   )}
 
-                  {cardDetails?.desc && (
+                  {cardDetails && (
                     <div className="space-y-4">
-                      {breadcrumbsBlock && (
-                        <Accordion type="single" collapsible className="w-full">
-                          <AccordionItem value="description">
-                            <AccordionTrigger className="focus:outline-none focus-visible:outline-none">
-                              Description
-                            </AccordionTrigger>
-                            <AccordionContent>
-                              <div className="max-h-48 overflow-auto rounded border bg-muted p-3 text-sm whitespace-pre-wrap focus:outline-none focus-visible:outline-none">
-                                {mainDescription.trim() || 'No description.'}
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
+                      <Accordion type="single" collapsible className="w-full">
+                        <AccordionItem value="description">
+                          <AccordionTrigger className="focus:outline-none focus-visible:outline-none">
+                            Description
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <div className="max-h-48 overflow-auto rounded border bg-muted p-3 text-sm whitespace-pre-wrap focus:outline-none focus-visible:outline-none">
+                              {mainDescription.trim() || 'No description.'}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+
+                        {breadcrumbsBlock && (
                           <AccordionItem value="breadcrumbs">
                             <AccordionTrigger className="font-semibold">
                               Breadcrumbs
@@ -182,7 +207,6 @@ const UploadTrello = () => {
                                       {breadcrumbsData.createdBy}
                                     </p>
                                   )}
-
                                   {breadcrumbsData.creationDateTime && (
                                     <p>
                                       <span className="font-medium text-foreground">
@@ -198,7 +222,6 @@ const UploadTrello = () => {
                                       )}
                                     </p>
                                   )}
-
                                   {breadcrumbsData.parentFolder && (
                                     <p>
                                       <span className="font-medium text-foreground">
@@ -230,8 +253,8 @@ const UploadTrello = () => {
                               )}
                             </AccordionContent>
                           </AccordionItem>
-                        </Accordion>
-                      )}
+                        )}
+                      </Accordion>
                     </div>
                   )}
                 </>

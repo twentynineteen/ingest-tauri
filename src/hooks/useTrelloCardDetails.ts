@@ -1,10 +1,12 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, UseQueryResult } from '@tanstack/react-query'
 import { TrelloCard, TrelloMember } from 'src/utils/TrelloCards'
 
 interface CardDetailsResult {
   card: TrelloCard | undefined
   members: TrelloMember[] | undefined
   isLoading: boolean
+  refetchCard: () => Promise<UseQueryResult<TrelloCard, Error>>
+  refetchMembers: () => Promise<UseQueryResult<TrelloMember[], Error>>
 }
 
 export function useTrelloCardDetails(
@@ -39,6 +41,8 @@ export function useTrelloCardDetails(
   return {
     card: cardQuery.data,
     members: membersQuery.data,
-    isLoading: cardQuery.isLoading || membersQuery.isLoading
+    isLoading: cardQuery.isLoading || membersQuery.isLoading,
+    refetchCard: cardQuery.refetch,
+    refetchMembers: membersQuery.refetch
   }
 }

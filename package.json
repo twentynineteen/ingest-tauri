@@ -1,12 +1,12 @@
-bun add v1.0.2 (37edd5a6)
-
-
-error: Unexpected bun
-bun add v1.0.2 (37edd5a6)
-^
-/Users/Dan/Documents/VSCODE/ingest-tauri/package.json:1:1 0
-error: Failed to parse package.json
-uri dev -- --open-devtools",
+{
+  "name": "bucket",
+  "version": "0.4.0",
+  "author": "Dan Mills",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "dev:tauri": "tauri dev -- --open-devtools",
     "build:tauri": "tauri build",
     "preview": "vite preview",
     "prettier": "prettier src -c",
@@ -47,6 +47,7 @@ uri dev -- --open-devtools",
     "@radix-ui/react-tooltip": "^1.1.8",
     "@tanstack/react-query": "^5.66.9",
     "@tauri-apps/cli": "2.2.7",
+    "@tauri-apps/plugin-deep-link": "^2.2.1",
     "@tauri-apps/plugin-dialog": "~2",
     "@tauri-apps/plugin-fs": "^2.2.0",
     "@tauri-apps/plugin-http": "^2.3.0",
