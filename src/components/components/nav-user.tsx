@@ -1,5 +1,3 @@
-'use client'
-
 import { Avatar, AvatarFallback, AvatarImage } from '@components/components/ui/avatar'
 import {
   DropdownMenu,
@@ -17,6 +15,7 @@ import {
   useSidebar
 } from '@components/components/ui/sidebar'
 import { core } from '@tauri-apps/api'
+import { getVersion } from '@tauri-apps/api/app'
 import { Bell, ChevronsUpDown, LogOut } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -35,6 +34,22 @@ export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
   const { isMobile } = useSidebar()
 
   const [username, setUsername] = useState('')
+  const [version, setVersion] = useState<string>('')
+
+  useEffect(() => {
+    // Fetch the version when the component mounts
+    const fetchVersion = async () => {
+      try {
+        // Get the app version using Tauri's API
+        const ver = await getVersion()
+        setVersion(ver)
+      } catch (error) {
+        console.error('Failed to get app version:', error)
+      }
+    }
+
+    fetchVersion()
+  }, [])
 
   useEffect(() => {
     async function fetchUsername() {
@@ -93,11 +108,20 @@ export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Link to="#" onClick={onUpdateClicked}>
-                  <Bell />
-                  Check for updates
-                  {/* {isLoading ? 'Checking for updates...' : 'Check for updates'} */}
-                </Link>
+                Version: {version}
+                {/* {isLoading ? 'Checking for updates...' : 'Check for updates'} */}
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem>
+                <div className="flex items-center space-x-2">
+                  <Link to="#" onClick={onUpdateClicked}>
+                    {/* <Bell size={16} />  */}
+                    Check for updates
+                    {/* {isLoading ? 'Checking for updates...' : 'Check for updates'} */}
+                  </Link>
+                </div>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

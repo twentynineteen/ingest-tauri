@@ -15,6 +15,8 @@
     "macos-permissions:allow-check-accessibility-permissions",
     "macos-permissions:allow-request-full-disk-access-permissions",
     "updater:default",
+    "shell:default",
+    "shell:allow-open",
     {
       "identifier": "fs:scope",
       "allow": [
@@ -83,25 +85,44 @@
     "fs:default",
     {
       "identifier": "fs:allow-exists",
-      "allow": [{ "path": "**" }]
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
     },
     {
       "identifier": "fs:allow-app-write-recursive",
-      "allow": [{ "path": "**" }]
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
     },
     {
       "identifier": "fs:allow-data-write",
-      "allow": [{ "path": "**" }]
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
     },
     {
       "identifier": "fs:allow-data-write-recursive",
-      "allow": [{ "path": "**" }]
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
     },
     {
       "identifier": "fs:write-all",
-      "allow": [{ "path": "**" }]
+      "allow": [
+        {
+          "path": "**"
+        }
+      ]
     },
-
     "fs:allow-appcache-write",
     "fs:allow-appcache-write-recursive",
     "fs:allow-appconfig-write",
@@ -153,6 +174,8 @@
     "fs:allow-video-write",
     "fs:allow-video-write-recursive",
     "fs:write-files",
-    "dialog:allow-open"
+    "dialog:allow-open",
+    "opener:default",
+    "deep-link:default"
   ]
 }

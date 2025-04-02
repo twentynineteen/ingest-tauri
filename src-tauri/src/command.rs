@@ -1,3 +1,4 @@
+use std::env;
 use std::fs;
 use std::path::PathBuf;
 use tauri::command;
@@ -9,24 +10,68 @@ use std::fs::File;
 use std::io::{Read};
 use std::path::Path;
 
+<<<<<<< HEAD
+/// Opens a file located in the resource directory and returns its content as a string.
+///
+/// # Arguments
+/// * `handle` - The Tauri application handle used to resolve the resource directory.
+/// * `relative_file_path` - The relative path (inside the resource directory) to the file.
+///
+/// # Returns
+/// * `Ok(String)` with the file's contents if successful.
+/// * `Err(String)` if an error occurs (for example, if the file doesn't exist or cannot be read).
+#[tauri::command]
+pub fn open_resource_file(handle: AppHandle, relative_file_path: &str) -> Result<Vec<u8>, String> {
+    // Retrieve the resource directory using Tauri's PathResolver.
+    let resource_dir: PathBuf = handle
+        .path()
+        .resource_dir()
+        .or_else(|_| Err("Resource directory not available.".to_string()))?;
+
+    // Construct the full path to the file by joining the resource directory with the relative file path.
+    let file_path = resource_dir.join(relative_file_path);
+
+    // Check if the file exists at the constructed path.
+    if !file_path.exists() {
+        return Err(format!("File not found: {}", file_path.display()));
+    }
+
+    // Read the file contents as bytes.
+    fs::read(&file_path).map_err(|e| format!("Error reading file {}: {}", file_path.display(), e))
+}
+=======
+>>>>>>> release
 
 /// Copies a Premiere Pro project template to the specified folder and renames it.
-/// 
+///
 /// # Arguments
 /// * `destination_folder` - The path to the destination folder where the file should be copied.
 /// * `new_title` - The new name for the copied file (without the extension).
-/// 
+///
 /// # Returns
 /// * `Ok(())` if the operation is successful.
 /// * `Err(String)` if an error occurs.
 #[command]
+<<<<<<< HEAD
+pub fn copy_premiere_project(
+    handle: AppHandle,
+    destination_folder: String,
+    new_title: String,
+) -> Result<(), String> {
+=======
 pub fn copy_premiere_project(destination_folder: String, new_title: String) -> Result<(), String> {
+>>>>>>> release
     // Print the current working directory
     match env::current_dir() {
         Ok(path) => println!("Current working directory: {}", path.display()),
         Err(e) => eprintln!("Error getting current directory: {}", e),
     }
 
+<<<<<<< HEAD
+    // The relative file path must match the location of your bundled file.
+    let file_data =
+        open_resource_file(handle.clone(), "resources/Premiere 4K Template 2025.prproj")?;
+=======
     // Path to the assets folder (adjust the path as needed)
     let asset_path = Path::new("assets").join("Premiere 4K Template 2025.prproj");
 
@@ -38,15 +83,20 @@ pub fn copy_premiere_project(destination_folder: String, new_title: String) -> R
     let mut file_data = Vec::new();
     file.read_to_end(&mut file_data)
         .map_err(|e| format!("Error reading file '{}': {}", asset_path.display(), e))?;
+>>>>>>> release
 
     // Define the destination path
-    let destination_path = PathBuf::from(destination_folder.clone()).join(format!("{}.prproj", new_title));
+    let destination_path =
+        PathBuf::from(destination_folder.clone()).join(format!("{}.prproj", new_title));
 
     // Ensure the destination folder exists, create if necessary
     if !destination_path.parent().unwrap().exists() {
         println!("Destination folder does not exist. Creating it...");
         if let Err(e) = fs::create_dir_all(destination_path.parent().unwrap()) {
-            let error_msg = format!("Error creating destination folder '{}': {}", destination_folder, e);
+            let error_msg = format!(
+                "Error creating destination folder '{}': {}",
+                destination_folder, e
+            );
             eprintln!("{}", error_msg);
             return Err(error_msg);
         }
@@ -63,8 +113,8 @@ pub fn copy_premiere_project(destination_folder: String, new_title: String) -> R
     }
 
     // Write the file data to the destination path
-    let mut file = fs::File::create(&destination_path)
-        .map_err(|e| format!("Error creating file: {}", e))?;
+    let mut file =
+        fs::File::create(&destination_path).map_err(|e| format!("Error creating file: {}", e))?;
     file.write_all(&file_data)
         .map_err(|e| format!("Error writing file: {}", e))?;
 
@@ -72,8 +122,14 @@ pub fn copy_premiere_project(destination_folder: String, new_title: String) -> R
     Ok(())
 }
 
+<<<<<<< HEAD
+use std::path::Path;
+use std::process::Command;
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
+=======
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 use std::process::Command;
+>>>>>>> release
 
 /// Displays a confirmation dialog with Yes/No options and opens Finder/Explorer if Yes is selected.
 ///
@@ -86,9 +142,15 @@ use std::process::Command;
 /// * `Ok(())` if successful.
 /// * `Err(String)` if an error occurs.
 #[command]
-pub fn show_confirmation_dialog(app: tauri::AppHandle, message: String, title: String, destination: String) -> Result<(), String> {
+pub fn show_confirmation_dialog(
+    app: tauri::AppHandle,
+    message: String,
+    title: String,
+    destination: String,
+) -> Result<(), String> {
     // Display a confirmation dialog with "Yes" and "No" buttons
-    let answer = app.dialog()
+    let answer = app
+        .dialog()
         .message(&message)
         .title(&title)
         .buttons(MessageDialogButtons::YesNo)
@@ -115,7 +177,10 @@ fn open_folder(destination: String) -> Result<(), String> {
     let path = Path::new(&destination);
 
     if !path.exists() {
-        return Err(format!("Error: The destination path does not exist: {}", destination));
+        return Err(format!(
+            "Error: The destination path does not exist: {}",
+            destination
+        ));
     }
 
     #[cfg(target_os = "macos")]
@@ -135,5 +200,8 @@ fn open_folder(destination: String) -> Result<(), String> {
         Err(e) => Err(format!("Failed to open folder: {}", e)),
     }
 }
+<<<<<<< HEAD
+=======
 
 
+>>>>>>> release

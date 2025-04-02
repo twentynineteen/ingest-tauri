@@ -8,6 +8,8 @@ import { exists, mkdir, remove, writeTextFile } from '@tauri-apps/plugin-fs'
 import { Trash2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
+import { appStore } from 'src/store/useAppStore'
+import { Breadcrumb } from 'src/utils/types'
 
 // import {
 //   checkFullDiskAccessPermissions,
@@ -44,6 +46,8 @@ const BuildProject: React.FC = () => {
   const [message, setMessage] = useState('')
 
   const [username, setUsername] = useState('')
+  // Zustand global state
+  const breadcrumbs = appStore.getState().breadcrumbs
 
   useEffect(() => {
     async function fetchUsername() {
@@ -84,7 +88,11 @@ const BuildProject: React.FC = () => {
         filters: [
           {
             name: 'Videos',
-            extensions: ['braw', 'mp4', 'mov']
+            extensions: ['braw', 'mp4', 'mov', 'mxf']
+          },
+          {
+            name: 'Images',
+            extensions: ['jpeg', 'jpg', 'png', 'gif']
           }
         ]
       })
@@ -250,7 +258,7 @@ const BuildProject: React.FC = () => {
       const now = new Date()
       const formattedDateTime = now.toLocaleString()
 
-      const projectData = {
+      const projectData: Breadcrumb = {
         projectTitle: title.trim(),
         numberOfCameras: numCameras,
         // files: files.map(item => item.file.name),
@@ -262,6 +270,9 @@ const BuildProject: React.FC = () => {
         createdBy,
         creationDateTime: formattedDateTime
       }
+
+      // Pass project data to global state for access
+      appStore.getState().setBreadcrumbs(projectData)
 
       await writeTextFile(
         `${projectFolder}/breadcrumbs.json`,

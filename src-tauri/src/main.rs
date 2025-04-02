@@ -1,20 +1,26 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-use tauri::Emitter;
-use tauri::State;
-use std::sync::Mutex;
 use std::fs::{self, File};
 use std::io::{BufReader, BufWriter, Read, Write};
 use std::path::Path;
-use tauri::{command, AppHandle};
 use std::sync::Arc;
+use std::sync::Mutex;
 use std::thread;
+use tauri::Emitter;
+use tauri::State;
+use tauri::{command, AppHandle};
 mod command;
 use command::copy_premiere_project;
 use command::show_confirmation_dialog;
 use std::env;
-use tauri_plugin_updater;
 use std::process::Command;
+<<<<<<< HEAD
+use tauri_plugin_updater;
+mod sprout_upload;
+use sprout_upload::get_folders;
+use sprout_upload::upload_video;
+=======
 
+>>>>>>> release
 
 /// This command gracefully restarts the application.
 /// It spawns a new instance of the current executable and then exits.
@@ -31,7 +37,7 @@ async fn graceful_restart(_app_handle: AppHandle) -> Result<(), String> {
 
     // Get the current executable's path.
     let current_exe = std::env::current_exe().map_err(|e| e.to_string())?;
-    
+
     // Check if the executable exists.
     if !current_exe.exists() {
         return Err(format!(
@@ -39,14 +45,14 @@ async fn graceful_restart(_app_handle: AppHandle) -> Result<(), String> {
             current_exe.display()
         ));
     }
-    
+
     // Spawn a new instance of the application.
     Command::new(current_exe)
         .spawn()
         .map_err(|e| format!("Failed to spawn new process: {}", e))?;
-    
+
     // Optionally, perform any final cleanup here.
-    
+
     // Exit the current application.
     std::process::exit(0);
 }
@@ -55,7 +61,7 @@ async fn graceful_restart(_app_handle: AppHandle) -> Result<(), String> {
 // Once enabled, logs will be stored in:
 // Linux/macOS: ~/.local/share/<your-app>/log.txt
 // Windows: C:\\Users\\<YourName>\\AppData\\Roaming\\<your-app>\\log.txt
-use log::{ info };
+use log::info;
 use simple_logger::SimpleLogger;
 
 struct AuthState {
@@ -65,7 +71,7 @@ struct AuthState {
 /// Function to get the current username from the operating system
 ///
 /// # Arguments
-/// * 
+/// *
 ///
 /// # Returns
 /// * `Username` if successful.
@@ -96,9 +102,9 @@ fn add_token(token: String, state: State<AuthState>) {
 
 #[command]
 fn move_files(
-    files: Vec<(String, u32)>, 
-    base_dest: String, 
-    app_handle: AppHandle
+    files: Vec<(String, u32)>,
+    base_dest: String,
+    app_handle: AppHandle,
 ) -> Result<(), String> {
     let app_handle = Arc::new(app_handle); // Allow sharing across threads
     let base_dest = Arc::new(base_dest); // Shared reference
@@ -109,7 +115,8 @@ fn move_files(
 
         for (file_path, camera_number) in files {
             let src_path = Path::new(&file_path);
-            let camera_folder = Path::new(base_dest.as_str()).join(format!("Footage/Camera {}", camera_number));
+            let camera_folder =
+                Path::new(base_dest.as_str()).join(format!("Footage/Camera {}", camera_number));
 
             // Ensure the Camera folder exists
             if !camera_folder.exists() {
@@ -138,11 +145,7 @@ fn move_files(
 }
 
 // File Copy with Progress Tracking (No UI Freezing)
-fn copy_file_with_progress(
-    src: &Path, 
-    dest: &Path, 
-    app_handle: &AppHandle
-) -> std::io::Result<()> {
+fn copy_file_with_progress(src: &Path, dest: &Path, app_handle: &AppHandle) -> std::io::Result<()> {
     let src_file = File::open(src)?;
     let dest_file = File::create(dest)?;
     let metadata = src.metadata()?;
@@ -166,7 +169,7 @@ fn copy_file_with_progress(
         let _ = app_handle.emit("copy_progress", progress);
     }
 
-    writer.flush()?; 
+    writer.flush()?;
     Ok(())
 }
 
@@ -203,9 +206,11 @@ fn main() {
     info!("Tauri App Started");
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             #[cfg(desktop)]
-            app.handle().plugin(tauri_plugin_updater::Builder::new().build())?;
+            app.handle()
+                .plugin(tauri_plugin_updater::Builder::new().build())?;
 
             Ok(())
         })
@@ -213,18 +218,30 @@ fn main() {
             tokens: Mutex::new(vec![]),
         })
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_macos_permissions::init())
         .invoke_handler(tauri::generate_handler![
+<<<<<<< HEAD
+            get_folders,
+            upload_video,
+            graceful_restart,
+            check_auth,
+            add_token,
+            move_files,
+            copy_premiere_project,
+            show_confirmation_dialog,
+=======
             graceful_restart, 
             check_auth, 
             add_token, 
             move_files, 
             copy_premiere_project, 
             show_confirmation_dialog, 
+>>>>>>> release
             get_username,
             open_folder
-            ])
+        ])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");
 }

@@ -61,12 +61,11 @@ const data = {
         {
           title: 'Posterframe',
           url: '/upload/posterframe'
+        },
+        {
+          title: 'Trello',
+          url: '/upload/trello'
         }
-        // {
-        //   title: 'Trello',
-        //   // url: '/upload/trello'
-        //   url: '#'
-        // },
         // {
         //   title: 'Otter',
         //   // url: '/upload/otter'
