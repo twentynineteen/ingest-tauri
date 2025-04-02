@@ -2,9 +2,7 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
   "description": "Capability for the main window",
-  "windows": [
-    "main"
-  ],
+  "windows": ["main"],
   "permissions": [
     "core:default",
     "core:window:allow-start-dragging",
@@ -17,9 +15,8 @@
     "macos-permissions:allow-check-accessibility-permissions",
     "macos-permissions:allow-request-full-disk-access-permissions",
     "updater:default",
-    "opener:allow-open-url",
-    "opener:allow-default-urls",
-    "opener:allow-open-path",
+    "shell:default",
+    "shell:allow-open",
     {
       "identifier": "fs:scope",
       "allow": [

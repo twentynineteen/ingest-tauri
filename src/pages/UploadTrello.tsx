@@ -19,7 +19,7 @@ import {
   TooltipProvider,
   TooltipTrigger
 } from '@components/components/ui/tooltip'
-import { openPath } from '@tauri-apps/plugin-opener'
+import { open } from '@tauri-apps/plugin-shell'
 import { format, parse } from 'date-fns'
 import { ExternalLink } from 'lucide-react'
 import React, { useEffect, useMemo, useState } from 'react'
