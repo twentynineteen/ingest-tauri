@@ -6,6 +6,7 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { Sprout } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useBreadcrumb } from 'src/hooks/useBreadcrumb'
 import ExternalLink from 'src/utils/ExternalLink'
 import FormattedDate from 'src/utils/FormattedDate'
 import { SproutFolder, SproutUploadResponse } from 'src/utils/types'
@@ -30,6 +31,12 @@ const UploadSprout = () => {
   const [thumbnailLoaded, setThumbnailLoaded] = useState(false) // New state
   // State to force image refresh – we update this value every 60 seconds
   const [refreshTimestamp, setRefreshTimestamp] = useState<number>(Date.now())
+
+  // Page label - shadcn breadcrumb component
+  useBreadcrumb([
+    { label: 'Upload content', href: '/upload/sprout' },
+    { label: 'Sprout video' }
+  ])
 
   useEffect(() => {
     // This effect will trigger a refresh of the image every 60 seconds after an upload response is available.
