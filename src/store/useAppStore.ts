@@ -11,6 +11,8 @@ interface AppState {
   setSproutVideoApiKey: (sproutKey: string) => void
   breadcrumbs: Breadcrumb
   setBreadcrumbs: (breadcrumb: Breadcrumb) => void
+  defaultBackgroundFolder: string | null
+  setDefaultBackgroundFolder: (path: string | null) => void
 }
 
 // Create the Zustand store
@@ -22,7 +24,9 @@ export const useAppStore = create<AppState>(set => ({
   sproutVideoApiKey: '',
   setSproutVideoApiKey: sproutKey => set({ sproutVideoApiKey: sproutKey }),
   breadcrumbs: {},
-  setBreadcrumbs: breadcrumb => set({ breadcrumbs: breadcrumb })
+  setBreadcrumbs: breadcrumb => set({ breadcrumbs: breadcrumb }),
+  defaultBackgroundFolder: null,
+  setDefaultBackgroundFolder: path => set({ defaultBackgroundFolder: path })
 }))
 
 export const appStore = useAppStore
