@@ -3,6 +3,7 @@ import { appDataDir, fontDir } from '@tauri-apps/api/path'
 import { open } from '@tauri-apps/plugin-dialog'
 import { create, exists, readDir, readFile, writeFile } from '@tauri-apps/plugin-fs'
 import React, { useEffect, useRef, useState } from 'react'
+import { useBreadcrumb } from 'src/hooks/useBreadcrumb'
 
 const Posterframe = () => {
   // State variables
@@ -14,6 +15,12 @@ const Posterframe = () => {
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null) // Original path
   const [selectedFileBlob, setSelectedFileBlob] = useState<string | null>(null) // Blob URL
   const [selectedFontPath, setSelectedFontPath] = useState<string | null>(null) // Blob URL
+
+  // Page label - shadcn breadcrumb component
+  useBreadcrumb([
+    { label: 'Upload content', href: '/upload/posterframe' },
+    { label: 'Posterframe' }
+  ])
 
   useEffect(() => {
     console.log('Selected File Path:', selectedFilePath)

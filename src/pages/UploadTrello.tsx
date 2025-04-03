@@ -24,6 +24,7 @@ import { format, parse } from 'date-fns'
 import { ExternalLink } from 'lucide-react'
 import React, { useEffect, useMemo, useState } from 'react'
 import { useAppendBreadcrumbs } from 'src/hooks/useAppendBreadcrumbs'
+import { useBreadcrumb } from 'src/hooks/useBreadcrumb'
 import { useTrelloBoard } from 'src/hooks/useTrelloBoard'
 import { useTrelloCardDetails } from 'src/hooks/useTrelloCardDetails'
 import { appStore } from 'src/store/useAppStore'
@@ -35,6 +36,12 @@ const UploadTrello = () => {
   const [selectedCard, setSelectedCard] = useState<{ id: string; name: string } | null>(
     null
   )
+
+  // Page label - shadcn breadcrumb component
+  useBreadcrumb([
+    { label: 'Upload content', href: '/upload/trello' },
+    { label: 'Trello' }
+  ])
 
   // Open in trello via browser
   const cardUrl = selectedCard ? `https://trello.com/c/${selectedCard.id}` : ''

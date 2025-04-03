@@ -13,19 +13,17 @@ import {
   SidebarProvider,
   SidebarTrigger
 } from '@components/components/ui/sidebar'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { useAuth } from 'src/context/AuthProvider'
+import { useBreadcrumbStore } from 'src/store/useBreadcrumbStore'
 
 // The Page component acts as the main provider of layout for this application
 // Child components are loaded underneath the header, via the Outlet component
 
 export const Page: React.FC = () => {
-  // const [username, setUsername] = useState<string>('')
-  // useEffect(() => {
-  //   setUsername(username)
-  // }, [username])
   const { username } = useAuth()
+  const { breadcrumbs } = useBreadcrumbStore()
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -36,13 +34,18 @@ export const Page: React.FC = () => {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <Breadcrumb>
               <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="/ingest/build">Ingest footage</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Build a project</BreadcrumbPage>
-                </BreadcrumbItem>
+                {breadcrumbs.map((crumb, index) => (
+                  <React.Fragment key={index}>
+                    <BreadcrumbItem>
+                      {crumb.href ? (
+                        <BreadcrumbLink href={crumb.href}>{crumb.label}</BreadcrumbLink>
+                      ) : (
+                        <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                      )}
+                    </BreadcrumbItem>
+                    {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+                  </React.Fragment>
+                ))}
               </BreadcrumbList>
             </Breadcrumb>
           </div>

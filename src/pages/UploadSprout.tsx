@@ -8,18 +8,10 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ExternalLink from 'src/utils/ExternalLink'
 import FormattedDate from 'src/utils/FormattedDate'
+import { SproutFolder, SproutUploadResponse } from 'src/utils/types'
 import EmbedCodeInput from '../utils/EmbedCodeInput'
 import { loadApiKeys } from '../utils/storage'
 import FolderTreeNavigator from './FolderTreeNavigator'
-
-type Props = {}
-
-// Define an interface for folder data (adjust fields as needed)
-export interface SproutFolder {
-  id: string
-  name: string
-  parent_id: string | null // Null means a root folder
-}
 
 interface GetFoldersResponse {
   folders: SproutFolder[]
@@ -61,23 +53,24 @@ const UploadSprout = () => {
     fetchApiKey()
   }, [])
 
-  useEffect(() => {
-    async function fetchRootFolders() {
-      try {
-        // Pass no parent_id to get the root folders.
-        const result = await invoke<GetFoldersResponse>('get_folders', {
-          apiKey,
-          parent_id: null
-        })
-        setRootFolders(result.folders)
-      } catch (error) {
-        console.error('Error fetching root folders:', error)
-      }
-    }
-    if (apiKey) {
-      fetchRootFolders()
-    }
-  }, [apiKey])
+  // Currently unused video navigator
+  // useEffect(() => {
+  //   async function fetchRootFolders() {
+  //     try {
+  //       // Pass no parent_id to get the root folders.
+  //       const result = await invoke<GetFoldersResponse>('get_folders', {
+  //         apiKey,
+  //         parent_id: null
+  //       })
+  //       setRootFolders(result.folders)
+  //     } catch (error) {
+  //       console.error('Error fetching root folders:', error)
+  //     }
+  //   }
+  //   if (apiKey) {
+  //     fetchRootFolders()
+  //   }
+  // }, [apiKey])
 
   // Listen for upload progress events
   useEffect(() => {

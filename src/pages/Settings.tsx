@@ -1,12 +1,16 @@
 import { Button } from '@components/components/ui/button'
 import { open } from '@tauri-apps/plugin-shell'
 import React, { useEffect, useState } from 'react'
+import { useBreadcrumb } from 'src/hooks/useBreadcrumb'
 import ApiKeyInput from 'src/utils/ApiKeyInput'
 import { ApiKeys, loadApiKeys, saveApiKeys } from '../utils/storage'
 
 const Settings: React.FC = () => {
   // State to hold multiple API keys.
   const [apiKeys, setApiKeys] = useState<ApiKeys>({})
+
+  // Page label - shadcn breadcrumb component
+  useBreadcrumb([{ label: 'Settings', href: '/settings/general' }, { label: 'General' }])
 
   // Load API keys when component mounts.
   useEffect(() => {

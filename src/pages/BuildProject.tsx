@@ -8,30 +8,14 @@ import { exists, mkdir, remove, writeTextFile } from '@tauri-apps/plugin-fs'
 import { Trash2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
+import { useBreadcrumb } from 'src/hooks/useBreadcrumb'
 import { appStore } from 'src/store/useAppStore'
 import { Breadcrumb } from 'src/utils/types'
-
-// import {
-//   checkFullDiskAccessPermissions,
-//   requestFullDiskAccessPermissions
-// } from 'tauri-plugin-macos-permissions-api'
 
 // The BuildProject component is used for uploading footage from camera cards
 // additionally, the folder tree structure is generated as is the Premiere Pro project
 // React dropzone is used to select and map video files from a folder.
 // Footage can be marked with the relevant camera in order to place in the correct folder.
-
-// not used in this component
-// const handlePermissions = async () => {
-//   console.log('checking permissions')
-//   const res = await checkFullDiskAccessPermissions()
-//   alert('Permissions: ' + res)
-// }
-// const handleSetPermissions = async () => {
-//   console.log('checking permissions')
-//   const res = await requestFullDiskAccessPermissions()
-//   console.log(res)
-// }
 
 const BuildProject: React.FC = () => {
   const [title, setTitle] = useState('')
@@ -48,6 +32,12 @@ const BuildProject: React.FC = () => {
   const [username, setUsername] = useState('')
   // Zustand global state
   const breadcrumbs = appStore.getState().breadcrumbs
+
+  // Page label - shadcn breadcrumb component
+  useBreadcrumb([
+    { label: 'Ingest footage', href: '/ingest/build' },
+    { label: 'Build a project' }
+  ])
 
   useEffect(() => {
     async function fetchUsername() {
