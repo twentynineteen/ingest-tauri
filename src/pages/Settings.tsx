@@ -1,7 +1,9 @@
 import { Button } from '@components/components/ui/button'
+import { open as openPath } from '@tauri-apps/plugin-dialog'
 import { open } from '@tauri-apps/plugin-shell'
 import React, { useEffect, useState } from 'react'
 import { useBreadcrumb } from 'src/hooks/useBreadcrumb'
+import { useAppStore } from 'src/store/useAppStore'
 import ApiKeyInput from 'src/utils/ApiKeyInput'
 import { ApiKeys, loadApiKeys, saveApiKeys } from '../utils/storage'
 
@@ -20,6 +22,28 @@ const Settings: React.FC = () => {
     }
     fetchApiKeys()
   }, [])
+
+  // Add default folder input and store in zustand app store
+  const defaultBackgroundFolder = useAppStore(state => state.defaultBackgroundFolder)
+  const setDefaultBackgroundFolder = useAppStore(
+    state => state.setDefaultBackgroundFolder
+  )
+
+  const handleSelectDefaultBackgroundFolder = async () => {
+    const folder = await openPath({
+      directory: true,
+      multiple: false
+    })
+    if (typeof folder === 'string') {
+      setDefaultBackgroundFolder(folder)
+      setApiKeys(prev => ({ ...prev, defaultBackgroundFolder: folder }))
+    }
+  }
+
+  const handleSaveDefaultBackground = async () => {
+    await saveApiKeys({ ...apiKeys, defaultBackgroundFolder })
+    alert('Default background folder saved!')
+  }
 
   const handleAuthorizeWithTrello = async () => {
     if (!apiKeys.trello) {
@@ -88,6 +112,30 @@ const Settings: React.FC = () => {
             }
             onSave={handleSaveTrelloToken}
           />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Default Background Folder
+          </label>
+          <div className="flex gap-2 items-center">
+            <Button
+              onClick={handleSelectDefaultBackgroundFolder}
+              className="px-3 py-1 border rounded"
+            >
+              Choose Folder
+            </Button>
+            <Button
+              onClick={handleSaveDefaultBackground}
+              className="px-3 py-1 border rounded"
+            >
+              Save
+            </Button>
+          </div>
+          {defaultBackgroundFolder && (
+            <p className="text-sm mt-1 text-muted-foreground">
+              {defaultBackgroundFolder}
+            </p>
+          )}
         </div>
       </div>
     </div>
