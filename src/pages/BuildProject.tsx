@@ -5,12 +5,12 @@ import { listen } from '@tauri-apps/api/event'
 import { resolveResource } from '@tauri-apps/api/path'
 import { confirm, open } from '@tauri-apps/plugin-dialog'
 import { exists, mkdir, remove, writeTextFile } from '@tauri-apps/plugin-fs'
+import { useBreadcrumb } from 'hooks/useBreadcrumb'
 import { Trash2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { useBreadcrumb } from 'src/hooks/useBreadcrumb'
-import { appStore } from 'src/store/useAppStore'
-import { Breadcrumb } from 'src/utils/types'
+import { appStore } from 'store/useAppStore'
+import { Breadcrumb } from 'utils/types'
 
 // The BuildProject component is used for uploading footage from camera cards
 // additionally, the folder tree structure is generated as is the Premiere Pro project
@@ -378,7 +378,8 @@ const BuildProject: React.FC = () => {
                 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
                 dark:focus:ring-blue-500 dark:focus:border-blue-500 font-semibold"
                 placeholder="2"
-                defaultValue={2}
+                value={numCameras}
+                onChange={e => setNumCameras(Number(e.target.value))}
                 required
               />
               <p

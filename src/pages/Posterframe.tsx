@@ -1,11 +1,11 @@
 import { invoke } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
 import { readDir, readFile, writeFile } from '@tauri-apps/plugin-fs'
+import { useBreadcrumb } from 'hooks/useBreadcrumb'
+import { usePosterframeCanvas } from 'hooks/usePosterframeCanvas'
 import React, { useEffect, useRef, useState } from 'react'
-import { useBreadcrumb } from 'src/hooks/useBreadcrumb'
-import { usePosterframeCanvas } from 'src/hooks/usePosterframeCanvas'
-import { useAppStore } from 'src/store/useAppStore'
-import { debounce } from 'src/utils/debounce'
+import { useAppStore } from 'store/useAppStore'
+import { debounce } from 'utils/debounce'
 
 const Posterframe = () => {
   const [videoTitle, setVideoTitle] = useState('')

@@ -1,19 +1,26 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { loadApiKeys } from 'src/utils/storage'
+import { loadApiKeys } from 'utils/storage'
 import {
   fetchTrelloCards,
   fetchTrelloLists,
   groupCardsByList,
   TrelloCard,
   TrelloList
-} from 'src/utils/TrelloCards'
+} from 'utils/TrelloCards'
+
+interface TrelloBoardData {
+  grouped: Record<string, TrelloCard[]>
+  isLoading: boolean
+  apiKey: string | null
+  token: string | null
+}
 
 /**
  * Custom hook to fetch Trello cards and lists for a board,
  * then group the cards by their list.
  */
-export function useTrelloBoard(boardId: string) {
+export function useTrelloBoard(boardId: string): TrelloBoardData {
   const [apiKey, setApiKey] = useState<string | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [grouped, setGrouped] = useState<Record<string, TrelloCard[]>>({})
