@@ -15,10 +15,10 @@ import { core } from '@tauri-apps/api'
 import { invoke } from '@tauri-apps/api/core'
 import { ask, message } from '@tauri-apps/plugin-dialog'
 import { check } from '@tauri-apps/plugin-updater'
+import { useAuth } from 'context/AuthProvider'
 import { Clapperboard, HardDriveUpload, Save, Settings } from 'lucide-react'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
-import { useAuth } from 'src/context/AuthProvider'
 
 // This is sample data. User data is located just before function return statement
 const data = {

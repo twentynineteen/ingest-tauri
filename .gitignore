@@ -145,3 +145,15 @@ dist
 
 # vscode debugger
 .vscode
+
+# LLM Docs
+LLM/
+
+# Testing features
+.babel.rc
+.continueignore
+babel.config.js
+jest.config.js
+jest.setup.ts
+src/__mocks__/
+src/__tests__/

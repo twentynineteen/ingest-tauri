@@ -1,0 +1,19 @@
+// src/__tests__/example.test.tsx
+import { render } from '@testing-library/react'
+import React from 'react'
+import App from '../../../App'
+
+it('renders without crashing', () => {
+  const div = document.createElement('div') // Create a new div element for the container
+
+  // Append the custom container to body
+  document.body.appendChild(div)
+
+  // Render the App component within the created container
+  const { unmount } = render(<App />, { container: div })
+
+  // Perform tests or assertions here...
+
+  // Clean up after test by removing the container from body and freeing up memory
+  unmount()
+})

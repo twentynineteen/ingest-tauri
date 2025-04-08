@@ -1,4 +1,4 @@
-import { Breadcrumb } from 'src/utils/types'
+import { Breadcrumb, SproutUploadResponse } from 'utils/types'
 import { create } from 'zustand'
 
 // Global state definition
@@ -13,6 +13,8 @@ interface AppState {
   setBreadcrumbs: (breadcrumb: Breadcrumb) => void
   defaultBackgroundFolder: string | null
   setDefaultBackgroundFolder: (path: string | null) => void
+  latestSproutUpload: SproutUploadResponse | {}
+  setLatestSproutUpload: (upload: SproutUploadResponse) => void
 }
 
 // Create the Zustand store
@@ -26,7 +28,9 @@ export const useAppStore = create<AppState>(set => ({
   breadcrumbs: {},
   setBreadcrumbs: breadcrumb => set({ breadcrumbs: breadcrumb }),
   defaultBackgroundFolder: null,
-  setDefaultBackgroundFolder: path => set({ defaultBackgroundFolder: path })
+  setDefaultBackgroundFolder: path => set({ defaultBackgroundFolder: path }),
+  latestSproutUpload: {},
+  setLatestSproutUpload: upload => set({ latestSproutUpload: upload })
 }))
 
 export const appStore = useAppStore

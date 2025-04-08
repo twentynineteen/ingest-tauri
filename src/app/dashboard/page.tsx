@@ -13,10 +13,10 @@ import {
   SidebarProvider,
   SidebarTrigger
 } from '@components/components/ui/sidebar'
+import { useAuth } from 'context/AuthProvider'
 import React, { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
-import { useAuth } from 'src/context/AuthProvider'
-import { useBreadcrumbStore } from 'src/store/useBreadcrumbStore'
+import { useBreadcrumbStore } from 'store/useBreadcrumbStore'
 
 // The Page component acts as the main provider of layout for this application
 // Child components are loaded underneath the header, via the Outlet component

@@ -1,38 +1,34 @@
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger
-} from '@components/components/ui/accordion'
 import { Button } from '@components/components/ui/button'
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle
 } from '@components/components/ui/dialog'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger
-} from '@components/components/ui/tooltip'
 import { open } from '@tauri-apps/plugin-shell'
-import { format, parse } from 'date-fns'
+import {
+  useAppendBreadcrumbs,
+  useAppendVideoInfo,
+  useBreadcrumb,
+  useParsedTrelloDescription,
+  useTrelloBoard,
+  useTrelloCardDetails,
+  useVideoInfoBlock
+} from 'hooks'
 import { ExternalLink } from 'lucide-react'
-import React, { useEffect, useMemo, useState } from 'react'
-import { useAppendBreadcrumbs } from 'src/hooks/useAppendBreadcrumbs'
-import { useBreadcrumb } from 'src/hooks/useBreadcrumb'
-import { useTrelloBoard } from 'src/hooks/useTrelloBoard'
-import { useTrelloCardDetails } from 'src/hooks/useTrelloCardDetails'
-import { appStore } from 'src/store/useAppStore'
-import { Breadcrumb } from 'src/utils/types'
+import React, { useEffect, useState } from 'react'
+import { appStore } from 'store/useAppStore'
+import CardDetailsAccordion from 'utils/trello/CardDetailsAccordion'
+import TooltipPreview from 'utils/trello/TooltipPreview'
+import TrelloCardList from 'utils/trello/TrelloCardList'
+import VideoInfoTooltip from 'utils/trello/VideoInfoTooltip'
+import { Breadcrumb, SproutUploadResponse } from 'utils/types'
 
 const UploadTrello = () => {
-  // Hard coded boardId for 'small projects'
+  // Hard-coded boardId for 'small projects'
   const boardId = '55a504d70bed2bd21008dc5a'
+
   const [selectedCard, setSelectedCard] = useState<{ id: string; name: string } | null>(
     null
   )
@@ -43,22 +39,18 @@ const UploadTrello = () => {
     { label: 'Trello' }
   ])
 
-  // Open in trello via browser
-  const cardUrl = selectedCard ? `https://trello.com/c/${selectedCard.id}` : ''
-
-  const { grouped, isLoading, apiKey, token } = useTrelloBoard(boardId)
+  const { grouped, isLoading: isBoardLoading, apiKey, token } = useTrelloBoard(boardId)
 
   const breadcrumbs: Breadcrumb = appStore.getState().breadcrumbs
 
   const {
-    card: cardDetails,
+    card: selectedCardDetails,
     members,
     isLoading: isCardLoading,
     refetchCard,
     refetchMembers
   } = useTrelloCardDetails(selectedCard?.id ?? null, apiKey, token)
 
-  // Refresh card
   useEffect(() => {
     if (selectedCard && selectedCard.id && apiKey && token) {
       refetchCard()
@@ -66,41 +58,93 @@ const UploadTrello = () => {
     }
   }, [selectedCard?.id, apiKey, token])
 
-  // gracefully handle setSelectedCard if API fetch fails or returns null
   useEffect(() => {
-    if (selectedCard && !cardDetails && !isCardLoading) {
+    if (selectedCard && !selectedCardDetails && !isCardLoading) {
       setSelectedCard(null)
     }
-  }, [selectedCard, cardDetails, isCardLoading])
+  }, [selectedCard, selectedCardDetails, isCardLoading])
 
   const { getBreadcrumbsBlock, applyBreadcrumbsToCard } = useAppendBreadcrumbs(
     apiKey,
     token
   )
+  const { applyVideoInfoToCard } = useAppendVideoInfo(apiKey, token)
 
-  // split description and breadcrumbs into separate accordions
-  const rawDescription = cardDetails?.desc ?? ''
-  const { mainDescription, breadcrumbsData, breadcrumbsBlock } = useMemo(() => {
-    const breadcrumbRegex = /```json\n\/\/ BREADCRUMBS\n([\s\S]*?)```/m
-    const match = rawDescription.match(breadcrumbRegex)
+  const state = appStore.getState()
+  let uploadedVideo: SproutUploadResponse | null = null
 
-    const data = match ? JSON.parse(match[1]) : null
-    const main = rawDescription.split(breadcrumbRegex)[0]
-    const block = match?.[0] ?? null
-
-    return {
-      mainDescription: main,
-      breadcrumbsData: data,
-      breadcrumbsBlock: block
+  if (state?.latestSproutUpload) {
+    // Provide default values for missing properties
+    const defaultResponse: SproutUploadResponse = {
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      height: 0,
+      width: 0,
+      description: '', // Ensure this is provided with a default value if not present in state.latestSproutUpload
+      id: '',
+      plays: 0,
+      title: '',
+      source_video_file_size: 0,
+      embed_code: '',
+      state: 'default_state', // Replace with the actual default state value
+      security_token: '', // Provide a default or appropriate value
+      progress: 0, // Default progress value
+      tags: [], // Empty array if no tags are provided
+      embedded_url: null, // Null as a default value
+      duration: 0,
+      password: null, // Null as a default value
+      privacy: 0, // Default privacy value
+      requires_signed_embeds: false, // Default boolean value
+      selected_poster_frame_number: 0, // Default frame number
+      assets: {
+        videos: {
+          '240p': '',
+          '360p': '',
+          '480p': '',
+          '720p': '',
+          '1080p': '',
+          '2k': null,
+          '4k': null,
+          '8k': null,
+          source: null
+        },
+        thumbnails: [],
+        poster_frames: [],
+        poster_frame_mp4: null,
+        timeline_images: [],
+        hls_manifest: ''
+      },
+      download_sd: null,
+      download_hd: null,
+      download_source: null,
+      allowed_domains: null,
+      allowed_ips: null,
+      player_social_sharing: null,
+      player_embed_sharing: null,
+      require_email: false,
+      require_name: false,
+      hide_on_site: false,
+      folder_id: null,
+      airplay_support: null,
+      session_watermarks: null,
+      direct_file_access: null
     }
-  }, [rawDescription])
 
-  if (isLoading || isCardLoading) return <div>Loading...</div>
+    // Merge the default response with state.latestSproutUpload to ensure all properties are covered
+    uploadedVideo = { ...defaultResponse, ...state.latestSproutUpload }
+  }
+
+  const rawDescription = selectedCardDetails?.desc ?? ''
+  const { videoInfoData, videoInfoBlock } = useVideoInfoBlock(rawDescription)
+  const { mainDescription, breadcrumbsData, breadcrumbsBlock } =
+    useParsedTrelloDescription(rawDescription)
+
+  if (isBoardLoading || isCardLoading) return <div>Loading...</div>
 
   return (
     <>
       <div className="w-full pb-4 border-b mb-4">
-        <h2 className="px-4 text-2xl font-semibold flex flex-row items-center gap-4">
+        <h2 className="px-4 text-2xl font-semibold flex items-center gap-4">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="1em"
@@ -121,44 +165,15 @@ const UploadTrello = () => {
           Trello: Small Projects
         </h2>
         <div className="px-4 mx-4">
-          <div className="flex flex-col items-start space-y-4 mt-4">
-            {/* Display trello cards here */}
-            {Object.entries(grouped).length > 0 ? (
-              <div>
-                {Object.entries(grouped).map(([listName, cards]) => (
-                  <div key={listName}>
-                    <h2 className="text-lg font-semibold mt-4">{listName}</h2>
-                    <ul className="list-disc ml-5">
-                      {cards.map(card => (
-                        <li
-                          key={card.id}
-                          className="hover:bg-gray-200 px-3 py-1 rounded transition-colors cursor-pointer"
-                        >
-                          <span
-                            onClick={() =>
-                              setSelectedCard({ id: card.id, name: card.name })
-                            }
-                          >
-                            {card.name}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p>No cards found.</p>
-            )}
-          </div>
+          <TrelloCardList grouped={grouped} onSelect={setSelectedCard} />
         </div>
       </div>
       {selectedCard && (
         <Dialog open={!!selectedCard} onOpenChange={() => setSelectedCard(null)}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{selectedCard?.name}</DialogTitle>
-              <DialogDescription>Card ID: {selectedCard?.id}</DialogDescription>
+              <DialogTitle>{selectedCard.name}</DialogTitle>
+              <DialogDescription>Card ID: {selectedCard.id}</DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               {isCardLoading ? (
@@ -175,131 +190,47 @@ const UploadTrello = () => {
                       </ul>
                     </div>
                   )}
-
-                  {cardDetails && (
+                  {selectedCardDetails && (
                     <div className="space-y-4">
-                      <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="description">
-                          <AccordionTrigger className="focus:outline-none focus-visible:outline-none">
-                            Description
-                          </AccordionTrigger>
-                          <AccordionContent>
-                            <div className="max-h-48 overflow-auto rounded border bg-muted p-3 text-sm whitespace-pre-wrap focus:outline-none focus-visible:outline-none">
-                              {mainDescription.trim() || 'No description.'}
-                            </div>
-                          </AccordionContent>
-                        </AccordionItem>
-
-                        {breadcrumbsBlock && (
-                          <AccordionItem value="breadcrumbs">
-                            <AccordionTrigger className="font-semibold">
-                              Breadcrumbs
-                            </AccordionTrigger>
-                            <AccordionContent>
-                              {breadcrumbsData ? (
-                                <div className="space-y-2 text-sm text-muted-foreground">
-                                  {breadcrumbsData.projectTitle && (
-                                    <p>
-                                      <span className="font-medium text-foreground">
-                                        Project Title:
-                                      </span>{' '}
-                                      {breadcrumbsData.projectTitle}
-                                    </p>
-                                  )}
-                                  {breadcrumbsData.createdBy && (
-                                    <p>
-                                      <span className="font-medium text-foreground">
-                                        Created By:
-                                      </span>{' '}
-                                      {breadcrumbsData.createdBy}
-                                    </p>
-                                  )}
-                                  {breadcrumbsData.creationDateTime && (
-                                    <p>
-                                      <span className="font-medium text-foreground">
-                                        Created On:
-                                      </span>{' '}
-                                      {format(
-                                        parse(
-                                          breadcrumbsData.creationDateTime,
-                                          'dd/MM/yyyy, HH:mm:ss',
-                                          new Date()
-                                        ),
-                                        'PPPpp'
-                                      )}
-                                    </p>
-                                  )}
-                                  {breadcrumbsData.parentFolder && (
-                                    <p>
-                                      <span className="font-medium text-foreground">
-                                        Folder:
-                                      </span>{' '}
-                                      {breadcrumbsData.parentFolder}
-                                    </p>
-                                  )}
-                                  {breadcrumbsData.files && (
-                                    <>
-                                      <p>
-                                        <span className="font-medium text-foreground">
-                                          Files:
-                                        </span>{' '}
-                                        {breadcrumbsData.files.length} file(s)
-                                      </p>
-                                      <ul className="list-disc ml-5">
-                                        {breadcrumbsData.files.map(file => (
-                                          <li key={file.id}>{file.name}</li>
-                                        ))}
-                                      </ul>
-                                    </>
-                                  )}
-                                </div>
-                              ) : (
-                                <p className="text-sm text-muted-foreground">
-                                  No breadcrumbs found.
-                                </p>
-                              )}
-                            </AccordionContent>
-                          </AccordionItem>
-                        )}
-                      </Accordion>
+                      <CardDetailsAccordion
+                        description={mainDescription}
+                        breadcrumbsData={breadcrumbsData}
+                        breadcrumbsBlock={breadcrumbsBlock}
+                        videoInfoBlock={videoInfoBlock}
+                        videoInfoData={videoInfoData}
+                      />
                     </div>
                   )}
                 </>
               )}
-
               <div className="pt-4 flex justify-between gap-4 items-center">
-                <TooltipProvider delayDuration={200}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        onClick={async () => {
-                          const block = await getBreadcrumbsBlock(cardDetails ?? null)
-                          if (block && cardDetails) {
-                            await applyBreadcrumbsToCard(cardDetails, block)
-                          }
-                        }}
-                      >
-                        Append Breadcrumbs
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent
-                      side="top"
-                      align="start"
-                      className="max-w-[400px] max-h-[300px] overflow-auto bg-white p-3 border border-gray-300 rounded shadow text-xs font-mono whitespace-pre-wrap text-gray-600"
+                <TooltipPreview
+                  trigger={
+                    <Button
+                      onClick={async () => {
+                        const block = await getBreadcrumbsBlock(
+                          selectedCardDetails ?? null
+                        )
+                        if (block && selectedCardDetails) {
+                          await applyBreadcrumbsToCard(selectedCardDetails, block)
+                        }
+                      }}
                     >
-                      {breadcrumbs
-                        ? JSON.stringify(breadcrumbs, null, 2)
-                        : 'No breadcrumbs selected'}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+                      Append Breadcrumbs
+                    </Button>
+                  }
+                  content={
+                    breadcrumbs
+                      ? JSON.stringify(breadcrumbs, null, 2)
+                      : 'No breadcrumbs selected'
+                  }
+                />
                 <Button
                   variant="outline"
                   onClick={async () => {
                     if (selectedCard) {
                       const url = new URL(`https://trello.com/c/${selectedCard.id}`)
                       await open(url.toString())
-                      console.log('click')
                     }
                   }}
                 >
@@ -308,6 +239,31 @@ const UploadTrello = () => {
                 </Button>
                 <Button onClick={() => setSelectedCard(null)}>Close</Button>
               </div>
+              {uploadedVideo && (
+                <div className="pt-4">
+                  <TooltipPreview
+                    trigger={
+                      <Button
+                        disabled={!uploadedVideo}
+                        onClick={async () => {
+                          if (selectedCardDetails && uploadedVideo) {
+                            await applyVideoInfoToCard(selectedCardDetails, uploadedVideo)
+                          }
+                        }}
+                      >
+                        Append Video Info
+                      </Button>
+                    }
+                    content={
+                      uploadedVideo ? (
+                        <VideoInfoTooltip video={uploadedVideo} />
+                      ) : (
+                        'No uploaded video found.'
+                      )
+                    }
+                  />
+                </div>
+              )}
             </div>
           </DialogContent>
         </Dialog>

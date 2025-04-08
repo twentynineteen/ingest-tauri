@@ -3,13 +3,14 @@ import { Progress } from '@components/components/ui/progress'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event' // Import event listener
 import { open } from '@tauri-apps/plugin-dialog'
+import { useBreadcrumb } from 'hooks/useBreadcrumb'
 import { Sprout } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useBreadcrumb } from 'src/hooks/useBreadcrumb'
-import ExternalLink from 'src/utils/ExternalLink'
-import FormattedDate from 'src/utils/FormattedDate'
-import { SproutFolder, SproutUploadResponse } from 'src/utils/types'
+import { appStore } from 'store/useAppStore'
+import ExternalLink from 'utils/ExternalLink'
+import FormattedDate from 'utils/FormattedDate'
+import { SproutFolder, SproutUploadResponse } from 'utils/types'
 import EmbedCodeInput from '../utils/EmbedCodeInput'
 import { loadApiKeys } from '../utils/storage'
 import FolderTreeNavigator from './FolderTreeNavigator'
@@ -168,6 +169,7 @@ const UploadSprout = () => {
 
       // Update the state with the final response from the backend upload
       setResponse(finalResponse)
+      appStore.getState().setLatestSproutUpload(finalResponse)
       console.log('Upload completed with response:', finalResponse)
     } catch (error) {
       // Log and display any error encountered during the upload process

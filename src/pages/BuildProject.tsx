@@ -5,12 +5,20 @@ import { listen } from '@tauri-apps/api/event'
 import { resolveResource } from '@tauri-apps/api/path'
 import { confirm, open } from '@tauri-apps/plugin-dialog'
 import { exists, mkdir, remove, writeTextFile } from '@tauri-apps/plugin-fs'
+import { useBreadcrumb } from 'hooks/useBreadcrumb'
 import { Trash2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { useBreadcrumb } from 'src/hooks/useBreadcrumb'
-import { appStore } from 'src/store/useAppStore'
-import { Breadcrumb } from 'src/utils/types'
+import { appStore } from 'store/useAppStore'
+import { Breadcrumb } from 'utils/types'
+
+interface FootageFile {
+  file: {
+    path: string
+    name: string
+  }
+  camera: number
+}
 
 // The BuildProject component is used for uploading footage from camera cards
 // additionally, the folder tree structure is generated as is the Premiere Pro project
@@ -20,7 +28,7 @@ import { Breadcrumb } from 'src/utils/types'
 const BuildProject: React.FC = () => {
   const [title, setTitle] = useState('')
   const [numCameras, setNumCameras] = useState(2)
-  const [files, setFiles] = useState<{ file: File; camera: number }[]>([])
+  const [files, setFiles] = useState<FootageFile[]>([])
   const [selectedFolder, setSelectedFolder] = useState<string>('')
 
   const [progress, setProgress] = useState(0)
@@ -39,9 +47,11 @@ const BuildProject: React.FC = () => {
     { label: 'Build a project' }
   ])
 
+  // useEffect hook to fetch the username when the component mounts
   useEffect(() => {
     async function fetchUsername() {
       try {
+        // Invoke the 'get_username' command and store the result in the 'name' variable
         const name = await core.invoke<string>('get_username')
         setUsername(name)
       } catch (error) {
@@ -70,9 +80,9 @@ const BuildProject: React.FC = () => {
   }, [])
 
   // Function to let users select files (instead of drag & drop)
-  async function selectFiles() {
+  const selectFiles = async () => {
     try {
-      const selectedFiles = await open({
+      const selectedPaths = await open({
         multiple: true, // Allow multiple file selection
         defaultPath: '/Volumes', // Default to volumes to ask for permission
         filters: [
@@ -87,26 +97,16 @@ const BuildProject: React.FC = () => {
         ]
       })
 
-      if (Array.isArray(selectedFiles)) {
-        // Map the selected files into our expected structure
-        const newFiles = selectedFiles.map(filePath => ({
-          file: { path: filePath, name: filePath.split('/').pop() || 'unknown' }, // Ensure filename is extracted
-          camera: 1
-        }))
+      if (!selectedPaths) return
 
-        setFiles(prevFiles => [...prevFiles, ...newFiles])
-      } else if (selectedFiles) {
-        setFiles(prevFiles => [
-          ...prevFiles,
-          {
-            file: {
-              path: selectedFiles,
-              name: selectedFiles.split('/').pop() || 'unknown'
-            },
-            camera: 1
-          }
-        ])
-      }
+      const newFiles = (
+        Array.isArray(selectedPaths) ? selectedPaths : [selectedPaths]
+      ).map(filePath => ({
+        file: { path: filePath, name: filePath.split('/').pop() || 'unknown' }, // Ensure filename is extracted
+        camera: 1
+      }))
+
+      setFiles(prevFiles => [...prevFiles, ...newFiles])
     } catch (error) {
       console.error('Error selecting files:', error)
     }
@@ -120,14 +120,23 @@ const BuildProject: React.FC = () => {
     setSelectedFolder('')
   }
 
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: { 'video/*': ['.braw'] },
+  // Logic to handle files from the drag and drop window
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: {
+      'video/*': []
+    },
     onDrop: acceptedFiles => {
-      const newFiles = acceptedFiles.map(file => ({ file, camera: 1 }))
+      const newFiles = acceptedFiles.map(file => ({
+        file: {
+          name: file.name,
+          path: file.path ?? file.name // fallback for non-Tauri environments
+        },
+        camera: 1
+      }))
       setFiles(prevFiles => [...prevFiles, ...newFiles])
     }
   })
-  // Logic to handle files from the drag and drop window
+
   // Camera data is mapped to the corresponding file
   React.useEffect(() => {
     setFiles(prevFiles =>
@@ -283,7 +292,9 @@ const BuildProject: React.FC = () => {
           const filePath = `${projectData.parentFolder}/${projectData.projectTitle}/Projects/`
           // file located in src-tauri folder
           // const location = './assets/Premiere 4K Template 2025.prproj'
-          const location = await resolveResource('Premiere 4K Template 2025.prproj')
+          const location = await resolveResource(
+            'resources/Premiere 4K Template 2025.prproj'
+          )
 
           // Pass the selected file path and title to the backend function
           const result = await invoke('copy_premiere_project', {
@@ -361,6 +372,7 @@ const BuildProject: React.FC = () => {
                 e.g. DBA - IB1234 - J Doe - Introductions 060626
               </p>
             </div>
+
             <div className="camera-input">
               <label
                 htmlFor="number-input"
@@ -378,7 +390,8 @@ const BuildProject: React.FC = () => {
                 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
                 dark:focus:ring-blue-500 dark:focus:border-blue-500 font-semibold"
                 placeholder="2"
-                defaultValue={2}
+                value={numCameras}
+                onChange={e => setNumCameras(Number(e.target.value))}
                 required
               />
               <p
@@ -389,12 +402,25 @@ const BuildProject: React.FC = () => {
               </p>
             </div>
           </div>
+          {/* <div
+            {...getRootProps()}
+            className={`dropzone-area bg-gray-50 p-4 rounded-lg border mt-4 pb-20 transition-all ${
+              isDragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+            }`}
+          >
+            <input {...getInputProps()} />
+            <p className="text-sm text-gray-500">
+              {files.length > 0
+                ? `${files.length} file(s) added`
+                : 'Drag & drop video files here, or click to select files'}
+            </p>
+          </div> */}
           <div className="folder-tree mx-auto mt-6 ">
             {/* Pass an onSelect callback so FolderTree can update the selectedFolder state */}
             <FolderTree onSelect={setSelectedFolder} selectedFolder={selectedFolder} />
           </div>
         </div>
-        <div className="project-menu flex flex-row justify-evenly items-center mt-8 mx-6 rounded-lg">
+        <div className="project-menu flex flex-row justify-around items-center mt-8 mx-6 rounded-lg">
           <div className="select-files">
             <button
               onClick={selectFiles}
@@ -475,6 +501,7 @@ const BuildProject: React.FC = () => {
             ))}
           </ul>
         </div>
+
         <div>
           {/* 🔹 Show progress bar */}
           {progress > 0 && !completed && (

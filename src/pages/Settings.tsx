@@ -1,10 +1,10 @@
 import { Button } from '@components/components/ui/button'
 import { open as openPath } from '@tauri-apps/plugin-dialog'
 import { open } from '@tauri-apps/plugin-shell'
+import { useBreadcrumb } from 'hooks/useBreadcrumb'
 import React, { useEffect, useState } from 'react'
-import { useBreadcrumb } from 'src/hooks/useBreadcrumb'
-import { useAppStore } from 'src/store/useAppStore'
-import ApiKeyInput from 'src/utils/ApiKeyInput'
+import { useAppStore } from 'store/useAppStore'
+import ApiKeyInput from 'utils/ApiKeyInput'
 import { ApiKeys, loadApiKeys, saveApiKeys } from '../utils/storage'
 
 const Settings: React.FC = () => {

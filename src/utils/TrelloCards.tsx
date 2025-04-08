@@ -127,3 +127,33 @@ export function useTrelloCardMembers(cardId: string, apiKey: string, token: stri
 
   return query
 }
+
+/**
+ * Updates a Trello card with the provided fields.
+ *
+ * @param cardId - The ID of the Trello card to update.
+ * @param updates - Fields to update (name and/or desc).
+ * @param apiKey - Your Trello API key.
+ * @param token - Your Trello authentication token.
+ */
+export async function updateCard(
+  cardId: string,
+  updates: Partial<{ name: string; desc: string }>,
+  apiKey: string,
+  token: string
+): Promise<void> {
+  const url = `https://api.trello.com/1/cards/${cardId}?key=${apiKey}&token=${token}`
+
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(updates)
+  })
+
+  if (!response.ok) {
+    const error = await response.text()
+    throw new Error(`Failed to update Trello card: ${error}`)
+  }
+}

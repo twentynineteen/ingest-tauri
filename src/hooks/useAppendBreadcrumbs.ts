@@ -1,20 +1,34 @@
-// src/hooks/useAppendBreadcrumbs.ts
 import { useQueryClient } from '@tanstack/react-query'
 import { ask, confirm, open } from '@tauri-apps/plugin-dialog'
 import { readTextFile } from '@tauri-apps/plugin-fs'
-import { useAppStore } from 'src/store/useAppStore'
-import { TrelloCard } from 'src/utils/TrelloCards'
+import { useAppStore } from 'store/useAppStore'
+import { TrelloCard } from 'utils/TrelloCards'
+import { StoreApi } from 'zustand'
 
-export function useAppendBreadcrumbs(apiKey: string | null, token: string | null) {
+interface BreadcrumbState {
+  breadcrumbs: Record<string, any>[]
+}
+
+export function useAppendBreadcrumbs(
+  apiKey: string | null,
+  token: string | null
+): {
+  getBreadcrumbsBlock: (card: TrelloCard | null) => Promise<string | null>
+  applyBreadcrumbsToCard: (card: TrelloCard, breadcrumbsBlock: string) => Promise<void>
+} {
   const queryClient = useQueryClient()
 
-  const getBreadcrumbsBlock = async (card: TrelloCard | null): Promise<string | null> => {
+  // Ensure `useAppStore` returns a type compatible with StoreApi<BreadcrumbState>
+  const appStore: StoreApi<BreadcrumbState> =
+    useAppStore() as unknown as StoreApi<BreadcrumbState>
+
+  async function getBreadcrumbsBlock(card: TrelloCard | null): Promise<string | null> {
     if (!card || !apiKey || !token) return null
 
     try {
-      const breadcrumbs = useAppStore.getState().breadcrumbs
+      const breadcrumbs: Record<string, any>[] = appStore.getState().breadcrumbs
 
-      const useCurrent = await ask(
+      const useCurrent: boolean = await ask(
         'Use current in-app breadcrumbs? Click "No" to load from a JSON file.',
         {
           title: 'Choose Breadcrumb Source',
@@ -23,24 +37,23 @@ export function useAppendBreadcrumbs(apiKey: string | null, token: string | null
         }
       )
 
-      let finalBreadcrumbs = breadcrumbs
+      let finalBreadcrumbs: Record<string, any>[] = breadcrumbs
 
       if (!useCurrent) {
         const selectedFile = await open({
           multiple: false,
           filters: [{ name: 'JSON Files', extensions: ['json'] }]
         })
-
         if (typeof selectedFile === 'string') {
-          const fileContents = await readTextFile(selectedFile)
-          finalBreadcrumbs = JSON.parse(fileContents)
+          const fileContents: string = await readTextFile(selectedFile)
+          finalBreadcrumbs = JSON.parse(fileContents) as Record<string, any>[]
         } else {
           return null // User canceled file selection
         }
       }
 
       const breadcrumbMarker = '```json\n// BREADCRUMBS'
-      const breadcrumbsBlock = `${breadcrumbMarker}\n${JSON.stringify(finalBreadcrumbs, null, 2)}\n\`\`\``
+      const breadcrumbsBlock: string = `${breadcrumbMarker}\n${JSON.stringify(finalBreadcrumbs, null, 2)}\n\`\`\``
 
       return breadcrumbsBlock
     } catch (err) {
@@ -49,7 +62,10 @@ export function useAppendBreadcrumbs(apiKey: string | null, token: string | null
     }
   }
 
-  const applyBreadcrumbsToCard = async (card: TrelloCard, breadcrumbsBlock: string) => {
+  async function applyBreadcrumbsToCard(
+    card: TrelloCard,
+    breadcrumbsBlock: string
+  ): Promise<void> {
     const currentDesc = card.desc ?? ''
     const regex = /```json\n\/\/ BREADCRUMBS[\s\S]*?```/g
     const hasBreadcrumbs = regex.test(currentDesc)
@@ -57,7 +73,7 @@ export function useAppendBreadcrumbs(apiKey: string | null, token: string | null
     let updatedDesc = currentDesc
 
     if (hasBreadcrumbs) {
-      const shouldReplace = await confirm(
+      const shouldReplace: boolean = await confirm(
         'This card already contains breadcrumbs. Replace them?',
         {
           title: 'Replace Breadcrumbs',
