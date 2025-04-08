@@ -1,9 +1,8 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { ask, confirm, open } from '@tauri-apps/plugin-dialog'
 import { readTextFile } from '@tauri-apps/plugin-fs'
-import { useAppStore } from 'store/useAppStore'
+import { appStore } from 'store/useAppStore'
 import { TrelloCard } from 'utils/TrelloCards'
-import { StoreApi } from 'zustand'
 
 interface BreadcrumbState {
   breadcrumbs: Record<string, any>[]
@@ -18,15 +17,11 @@ export function useAppendBreadcrumbs(
 } {
   const queryClient = useQueryClient()
 
-  // Ensure `useAppStore` returns a type compatible with StoreApi<BreadcrumbState>
-  const appStore: StoreApi<BreadcrumbState> =
-    useAppStore() as unknown as StoreApi<BreadcrumbState>
-
   async function getBreadcrumbsBlock(card: TrelloCard | null): Promise<string | null> {
     if (!card || !apiKey || !token) return null
 
     try {
-      const breadcrumbs: Record<string, any>[] = appStore.getState().breadcrumbs
+      const breadcrumbs = appStore.getState().breadcrumbs
 
       const useCurrent: boolean = await ask(
         'Use current in-app breadcrumbs? Click "No" to load from a JSON file.',
@@ -37,7 +32,7 @@ export function useAppendBreadcrumbs(
         }
       )
 
-      let finalBreadcrumbs: Record<string, any>[] = breadcrumbs
+      let finalBreadcrumbs = breadcrumbs
 
       if (!useCurrent) {
         const selectedFile = await open({
@@ -46,7 +41,7 @@ export function useAppendBreadcrumbs(
         })
         if (typeof selectedFile === 'string') {
           const fileContents: string = await readTextFile(selectedFile)
-          finalBreadcrumbs = JSON.parse(fileContents) as Record<string, any>[]
+          finalBreadcrumbs = JSON.parse(fileContents)
         } else {
           return null // User canceled file selection
         }
