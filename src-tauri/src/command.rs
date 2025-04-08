@@ -17,7 +17,10 @@ use tauri::Manager;
 /// * `Ok(String)` with the file's contents if successful.
 /// * `Err(String)` if an error occurs (for example, if the file doesn't exist or cannot be read).
 #[tauri::command]
-pub fn open_resource_file(handle: AppHandle, relative_file_path: &str) -> Result<Vec<u8>, String> {
+pub fn open_resource_file(
+        handle: AppHandle, 
+        relative_file_path: &str
+    ) -> Result<Vec<u8>, String> {
     // Retrieve the resource directory using Tauri's PathResolver.
     let resource_dir: PathBuf = handle
         .path()
@@ -61,6 +64,7 @@ pub fn copy_premiere_project(
     let file_data =
         open_resource_file(handle.clone(), "resources/Premiere 4K Template 2025.prproj")?;
 
+        
     // Define the destination path
     let destination_path =
         PathBuf::from(destination_folder.clone()).join(format!("{}.prproj", new_title));

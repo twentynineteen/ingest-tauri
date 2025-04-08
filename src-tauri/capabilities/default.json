@@ -33,7 +33,7 @@
           "path": "/Volumes/**"
         },
         {
-          "path": "$RESOURCE/*"
+          "path": "$RESOURCE/**/*"
         }
       ]
     },
@@ -48,6 +48,9 @@
         },
         {
           "path": "*/**"
+        },
+        {
+          "path": "$RESOURCE/**/*"
         }
       ]
     },
@@ -62,6 +65,9 @@
         },
         {
           "path": "$HOME/**"
+        },
+        {
+          "path": "$RESOURCE/**/*"
         }
       ]
     },
@@ -70,6 +76,9 @@
       "allow": [
         {
           "path": "$APPDATA/vault.hold"
+        },
+        {
+          "path": "$RESOURCE/**/*"
         }
       ]
     },
