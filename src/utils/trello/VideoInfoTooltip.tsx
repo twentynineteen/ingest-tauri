@@ -1,7 +1,5 @@
-// src/components/uploadTrello/VideoInfoTooltip.tsx
-
 import React from 'react'
-import { SproutUploadResponse } from 'src/utils/types'
+import { SproutUploadResponse } from 'utils/types'
 
 interface Props {
   video: SproutUploadResponse

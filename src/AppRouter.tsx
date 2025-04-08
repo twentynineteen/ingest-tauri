@@ -8,10 +8,9 @@ import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-
 // subsequent components are loaded within the page window via the Outlet component.
 
 import Page from './app/dashboard/page'
-// import { useAuth } from './context/AuthProvider'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
-import BuildProject from './pages/BuildProject'
+import BuildProject from './pages/BuildProject/BuildProject'
 import ConnectedApps from './pages/ConnectedApps'
 import IngestHistory from './pages/IngestHistory'
 import Posterframe from './pages/Posterframe'
@@ -27,36 +26,42 @@ export const AppRouter: React.FC = () => {
 
   useEffect(() => {
     const updateApp = async () => {
-      // tauri update on page load from v2 docs
-      const update = await check()
-      if (update) {
-        console.log('update: ' + update)
-        console.log(
-          `found update ${update.version} from ${update.date} with notes ${update.body}`
-        )
-        let downloaded = 0
-        let contentLength = 0
-        // alternatively we could also call update.download() and update.install() separately
-        await update.downloadAndInstall(event => {
-          switch (event.event) {
-            case 'Started':
-              contentLength = event.data.contentLength
-              console.log(`started downloading ${event.data.contentLength} bytes`)
-              break
-            case 'Progress':
-              downloaded += event.data.chunkLength
-              console.log(`downloaded ${downloaded} from ${contentLength}`)
-              break
-            case 'Finished':
-              console.log('download finished')
-              break
-          }
-        })
+      if (import.meta.env.DEV) return // Skip updates in dev mode
 
-        console.log('update installed')
-        await relaunch()
-      } else {
-        console.log('No update found')
+      try {
+        const update = await check()
+        console.log('Update check result:', update)
+
+        // Only proceed if an actual update is returned
+        if (update?.version) {
+          console.log(`Found update: ${update.version}`)
+
+          let downloaded = 0
+          let contentLength = 0
+
+          await update.downloadAndInstall(event => {
+            switch (event.event) {
+              case 'Started':
+                contentLength = event.data.contentLength
+                console.log(`Started downloading ${event.data.contentLength} bytes`)
+                break
+              case 'Progress':
+                downloaded += event.data.chunkLength
+                console.log(`Downloaded ${downloaded} from ${contentLength}`)
+                break
+              case 'Finished':
+                console.log('Download finished')
+                break
+            }
+          })
+
+          console.log('Update installed')
+          await relaunch()
+        } else {
+          console.log('No update available')
+        }
+      } catch (err) {
+        console.error('Updater error:', err)
       }
     }
 

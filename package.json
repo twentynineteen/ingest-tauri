@@ -1,6 +1,6 @@
 {
   "name": "bucket",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "author": "Dan Mills",
   "type": "module",
   "scripts": {
@@ -78,9 +78,6 @@
     "date-fns": "^4.1.0",
     "jest-environment-jsdom": "^29.7.0",
     "lucide-react": "^0.475.0",
-    "praisonai": "^1.0.19",
-    "punycode": "^2.3.1",
-    "punycode.js": "^2.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.3.5",

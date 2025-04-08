@@ -16,7 +16,7 @@ const FileList: React.FC<Props> = ({ files }) => (
     </p>
     <ul className="list-disc ml-5">
       {files.map(file => (
-        <li key={file.id}>{file.name}</li>
+        <li key={file.name}>{file.name}</li>
       ))}
     </ul>
   </>
