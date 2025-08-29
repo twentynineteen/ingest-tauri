@@ -160,3 +160,21 @@ src/__tests__/
 
 # MCP Tools
 .serena
+
+# macOS system files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor temporary files
+*~
+.#*
+.*.swp
+.*.swo
+
+# Claude Code task tracking
+camera-count-fixes.md
