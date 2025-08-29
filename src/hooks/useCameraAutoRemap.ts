@@ -14,11 +14,17 @@ export function useCameraAutoRemap(
   setFiles: (updated: FootageFile[]) => void
 ) {
   useEffect(() => {
+    if (files.length === 0) return
+
+    const hasInvalidCameras = files.some(file => file.camera > numCameras || file.camera < 1)
+    
+    if (!hasInvalidCameras) return
+
     const remapped = files.map(file => ({
       ...file,
-      camera: file.camera > numCameras ? 1 : file.camera
+      camera: (file.camera > numCameras || file.camera < 1) ? 1 : file.camera
     }))
 
     setFiles(remapped)
-  }, [numCameras])
+  }, [files, numCameras, setFiles])
 }

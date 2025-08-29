@@ -55,6 +55,12 @@ const BuildProject: React.FC = () => {
 
   // Logic to mark a given file with the camera number
   const updateFileCamera = (index: number, camera: number) => {
+    // Validate camera number is within valid range
+    if (camera < 1 || camera > numCameras) {
+      console.warn(`Invalid camera number ${camera}. Must be between 1 and ${numCameras}`)
+      return
+    }
+
     const updatedFiles = files.map((item, idx) =>
       idx === index ? { ...item, camera } : item
     )

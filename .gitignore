@@ -157,3 +157,6 @@ jest.config.js
 jest.setup.ts
 src/__mocks__/
 src/__tests__/
+
+# MCP Tools
+.serena
