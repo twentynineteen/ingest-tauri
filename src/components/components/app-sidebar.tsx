@@ -111,16 +111,9 @@ function useUpdateMutation() {
 
       // If the update check fails, display an error message.
       if (update === null) {
-        // await message('Failed to check for updates.\nPlease try again later.', {
-        //   title: 'Oh, Richard!',
-        //   kind: 'error',
-        //   okLabel: 'OK'
-        // })
-        // / If no update is available and the user manually triggered the check,
-        // inform them that they are on the latest version.
-        await message('You are on the latest version. My Sheridan has updated already!', {
-          title: 'No Update Available',
-          kind: 'info',
+        await message('Failed to check for updates. Please check your internet connection and try again.', {
+          title: 'Update Check Failed',
+          kind: 'error',
           okLabel: 'OK'
         })
 
@@ -128,7 +121,7 @@ function useUpdateMutation() {
       }
 
       // If an update is available, prompt the user for confirmation.
-      if (update.available) {
+      if (update?.version) {
         const userConfirmed = await ask(
           `Update to ${update.version} is available!\n\nRelease notes: ${update.body}`,
           {
