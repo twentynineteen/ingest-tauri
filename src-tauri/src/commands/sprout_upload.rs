@@ -9,10 +9,11 @@ use std::path::Path;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
+use std::time::Duration;
 use tauri::Emitter;
 use tauri::{command, AppHandle};
 use tokio::io::{AsyncRead, AsyncReadExt, BufReader};
-use tokio::sync::Mutex; // Import serde_json for JSON handling
+use tokio::sync::Mutex;
 
 #[command]
 pub async fn get_folders(
@@ -75,13 +76,23 @@ impl<R: AsyncRead + Unpin> AsyncRead for ProgressReader<R> {
             let post_filled = buf.filled().len();
             let bytes_read = post_filled - pre_filled;
             if bytes_read > 0 {
-                // Use try_lock() to avoid blocking the async runtime.
-                if let Ok(mut progress_guard) = self.progress.try_lock() {
-                    *progress_guard += bytes_read as u64;
-                    let percentage = (*progress_guard as f64 / self.total_size as f64) * 100.0;
-                    println!("Upload progress: {:.2}%", percentage);
-                    // Emit progress; if the lock wasn't available, we'll just skip this update.
-                    let _ = self.app_handle.emit("upload_progress", percentage as u32);
+                // Use try_lock but with better error handling
+                match self.progress.try_lock() {
+                    Ok(mut progress_guard) => {
+                        *progress_guard += bytes_read as u64;
+                        let percentage = (*progress_guard as f64 / self.total_size as f64) * 100.0;
+                        println!("Upload progress: {:.2}%", percentage);
+                        
+                        // Emit progress event to frontend
+                        if let Err(e) = self.app_handle.emit("upload_progress", percentage as u32) {
+                            eprintln!("Failed to emit progress event: {}", e);
+                        }
+                    }
+                    Err(_) => {
+                        // Progress update skipped due to lock contention
+                        // This is acceptable for progress reporting - we'll catch up on the next read
+                        eprintln!("Progress update skipped due to lock contention");
+                    }
                 }
             }
         }
@@ -120,13 +131,18 @@ async fn upload_video_task(
         .unwrap_or("uploaded_video.mp4")
         .to_string();
 
-    let client = Client::new();
+    // Configure client with appropriate timeouts for large file uploads
+    let client = Client::builder()
+        .timeout(Duration::from_secs(45 * 60)) // 45 minute timeout for large files
+        .connect_timeout(Duration::from_secs(30)) // 30 second connection timeout
+        .build()
+        .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
 
     // Wrap the progress_reader into a request body.
     // Body::from_reader() is not available, so we use wrap_stream() with an adapter.
     // Here we convert the ProgressReader into a stream of byte vectors.
     let stream = unfold(progress_reader, |mut reader| async {
-        let mut buf = vec![0u8; 8192];
+        let mut buf = vec![0u8; 65536]; // Increased buffer size to 64KB for better performance
         match reader.read(&mut buf).await {
             Ok(0) => None,
             Ok(n) => {

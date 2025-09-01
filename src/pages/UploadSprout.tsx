@@ -1,23 +1,17 @@
 import { Button } from '@components/components/ui/button'
 import { Progress } from '@components/components/ui/progress'
 import { invoke } from '@tauri-apps/api/core'
-import { listen } from '@tauri-apps/api/event' // Import event listener
+import { listen } from '@tauri-apps/api/event'
 import { open } from '@tauri-apps/plugin-dialog'
 import { useBreadcrumb } from 'hooks/useBreadcrumb'
 import { Sprout } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { appStore } from 'store/useAppStore'
 import ExternalLink from 'utils/ExternalLink'
 import FormattedDate from 'utils/FormattedDate'
-import { SproutFolder, SproutUploadResponse } from 'utils/types'
+import { SproutUploadResponse } from 'utils/types'
 import EmbedCodeInput from '../utils/EmbedCodeInput'
 import { loadApiKeys } from '../utils/storage'
-import FolderTreeNavigator from './FolderTreeNavigator'
-
-interface GetFoldersResponse {
-  folders: SproutFolder[]
-}
 
 const UploadSprout = () => {
   const [selectedFile, setSelectedFile] = useState<string | null>(null)
@@ -27,9 +21,8 @@ const UploadSprout = () => {
   const [message, setMessage] = useState<string | null>(null)
   const [response, setResponse] = useState<SproutUploadResponse | null>(null)
 
-  const [selectedFolder, setSelectedFolder] = useState<string | null>(null)
-  const [rootFolders, setRootFolders] = useState<SproutFolder[]>([])
-  const [thumbnailLoaded, setThumbnailLoaded] = useState(false) // New state
+  const [selectedFolder] = useState<string | null>(null)
+  const [thumbnailLoaded, setThumbnailLoaded] = useState(false)
   // State to force image refresh – we update this value every 60 seconds
   const [refreshTimestamp, setRefreshTimestamp] = useState<number>(Date.now())
 
@@ -138,31 +131,57 @@ const UploadSprout = () => {
     setResponse(null)
 
     try {
-      // Create a promise that will wait for either the upload_complete or upload_error event
+      // Create a promise with timeout that will wait for either upload_complete or upload_error event
       const finalResponse = await new Promise<SproutUploadResponse>((resolve, reject) => {
+        let completeUnlisten: Promise<() => void> | null = null
+        let errorUnlisten: Promise<() => void> | null = null
+        let timeoutId: NodeJS.Timeout | null = null
+        
+        const cleanup = async () => {
+          if (timeoutId) clearTimeout(timeoutId)
+          if (completeUnlisten) {
+            try {
+              const unsub = await completeUnlisten
+              unsub()
+            } catch (e) {
+              console.warn('Failed to unsubscribe from upload_complete:', e)
+            }
+          }
+          if (errorUnlisten) {
+            try {
+              const unsub = await errorUnlisten
+              unsub()
+            } catch (e) {
+              console.warn('Failed to unsubscribe from upload_error:', e)
+            }
+          }
+        }
+
+        // Set up 45-minute timeout for large file uploads
+        timeoutId = setTimeout(async () => {
+          await cleanup()
+          reject('Upload timed out after 45 minutes. Please try again or check your network connection.')
+        }, 45 * 60 * 1000) // 45 minutes
+
         // Listen for the upload_complete event and resolve with its payload
-        const completeUnlisten = listen('upload_complete', event => {
-          // Resolve the promise with the response from the backend
+        completeUnlisten = listen('upload_complete', async event => {
+          await cleanup()
           resolve(event.payload as SproutUploadResponse)
-          // Unsubscribe from this event once it's received
-          completeUnlisten.then(unsub => unsub())
         })
 
         // Listen for the upload_error event and reject with its payload
-        const errorUnlisten = listen('upload_error', event => {
+        errorUnlisten = listen('upload_error', async event => {
+          await cleanup()
           reject(event.payload)
-          // Unsubscribe from this event once it's received
-          errorUnlisten.then(unsub => unsub())
         })
 
-        // Invoke the Rust backend command to start the upload.
-        // Any error thrown here will be caught by the catch block below.
+        // Invoke the Rust backend command to start the upload
         invoke('upload_video', {
           filePath: selectedFile,
           apiKey: apiKey,
           folderId: selectedFolder
-        }).catch(error => {
-          // If invoke itself fails, reject the promise
+        }).catch(async error => {
+          await cleanup()
           reject(error)
         })
       })
@@ -174,7 +193,23 @@ const UploadSprout = () => {
     } catch (error) {
       // Log and display any error encountered during the upload process
       console.error('Upload error:', error)
-      alert(`Upload failed: ${error}`)
+      
+      // Provide more specific error messages based on error type
+      let errorMessage = 'Upload failed: '
+      if (typeof error === 'string') {
+        if (error.includes('timed out')) {
+          errorMessage += 'The upload timed out. This can happen with very large files or slow network connections. Please try again.'
+        } else if (error.includes('network') || error.includes('connection')) {
+          errorMessage += 'Network connection error. Please check your internet connection and try again.'
+        } else {
+          errorMessage += error
+        }
+      } else {
+        errorMessage += String(error)
+      }
+      
+      setMessage(errorMessage)
+      alert(errorMessage)
     } finally {
       // Regardless of success or failure, mark the upload as finished
       setUploading(false)
