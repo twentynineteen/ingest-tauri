@@ -1,63 +1,71 @@
 # Bucket
 
-An app to streamline ingest and upload of video files
+A desktop video editing workflow application that streamlines video ingest, project creation, and integrates with professional video production tools.
 
-## Getting Started
+## Overview
 
-- Clone the repository
-- run via terminal:
+Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScript) designed to streamline video editing workflows for professionals. It simplifies video file ingest, automates project creation, and seamlessly integrates with industry-standard tools like Adobe Premiere, Trello, and Sprout Video.
 
-```
-npm run tauri build
+## Key Features
 
-```
-
-- Open DMG file created in '/target/build/dmg' and copy app to 'Applications' folder
-
-## Description
-
-Bucket is a powerful application designed to simplify the process of ingesting and uploading video files. It provides an intuitive interface for users to manage their video uploads efficiently, ensuring that videos are processed and stored seamlessly.
-
-## Features
-
-- **Streamlined Ingest**: Easily upload multiple video files at once.
-- **User-Friendly Interface**: Intuitive design for a smooth user experience.
-- **Efficient Processing**: Fast processing of video files with minimal resource usage.
-- **Secure Storage**: Ensures that your videos are securely stored and accessible.
+- **Multi-Camera Project Setup**: Organize footage by camera assignment for multi-camera shoots
+- **Adobe Premiere Integration**: Automatically generate project templates and folder structures
+- **Progress Tracking**: Real-time progress bars for file operations and project creation
+- **External Tool Integration**: 
+  - **Trello**: Project management and card updates
+  - **Sprout Video**: Video hosting with custom posterframe generation
+- **Secure User Management**: Login/registration with encrypted data storage
+- **Cross-Platform**: Available for Windows, macOS, and Linux
 
 ## Installation
 
-To install Bucket, follow these steps:
+### Prerequisites
+- Node.js (npm)
+- Rust (for development)
+
+### Quick Start
 
 1. Clone the repository:
-
    ```bash
-   git clone https://github.com/your-repo/bucket.git
-   cd bucket
+   git clone https://github.com/twentynineteen/ingest-tauri.git
+   cd ingest-tauri
    ```
 
 2. Install dependencies:
-
    ```bash
    npm install
    ```
 
 3. Build the application:
-
    ```bash
-   npm run tauri build
+   npm run build:tauri
    ```
 
-4. Open the DMG file created in `/target/build/dmg` and copy the app to your `Applications` folder.
+4. On macOS, open the DMG file in `/target/build/dmg` and copy the app to your Applications folder.
 
-## Usage
+### Development Setup
 
-Once installed, you can use Bucket by launching the application from your Applications folder. Follow these steps:
+To run in development mode:
+```bash
+npm run dev:tauri
+```
 
-1. Open Bucket.
-2. Click on "Upload" to select video files for ingestion.
-3. Monitor the progress of file uploads in the status bar.
-4. Once completed, your videos will be securely stored and accessible.
+## How It Works
+
+1. **Select Video Files**: Choose footage files from your file system
+2. **Assign Cameras**: Organize files by camera number for multi-camera projects
+3. **Configure Project**: Set project title and output folder location
+4. **Create Project**: Generate organized folder structure with Adobe Premiere integration
+5. **Track Progress**: Monitor file operations with real-time progress updates
+6. **Integrate & Upload**: Connect with Trello for project management or Sprout Video for hosting
+
+## Tech Stack
+
+- **Frontend**: React 18 + TypeScript + TailwindCSS
+- **Backend**: Tauri 2.0 (Rust)
+- **UI Components**: Radix UI + Lucide icons
+- **State Management**: Zustand + TanStack React Query
+- **Build Tool**: Vite
 
 ## License
 
