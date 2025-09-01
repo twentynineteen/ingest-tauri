@@ -1,11 +1,10 @@
 use std::env;
 use std::fs;
 use std::io::Write; // For writing bytes to a file
-use std::path::PathBuf;
-use tauri::command;
-
-use tauri::AppHandle;
-use tauri::Manager;
+use std::path::{Path, PathBuf};
+use std::process::Command;
+use tauri::{command, AppHandle, Manager};
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 
 /// Opens a file located in the resource directory and returns its content as a string.
 ///
@@ -102,10 +101,6 @@ pub fn copy_premiere_project(
     Ok(())
 }
 
-use std::path::Path;
-use std::process::Command;
-use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
-
 /// Displays a confirmation dialog with Yes/No options and opens Finder/Explorer if Yes is selected.
 ///
 /// # Arguments
@@ -133,7 +128,7 @@ pub fn show_confirmation_dialog(
 
     // If the user selects "Yes", open the Finder/File Explorer
     if answer {
-        open_folder(destination)
+        open_folder_internal(destination)
     } else {
         println!("User selected No, no action taken.");
         Ok(())
@@ -148,7 +143,7 @@ pub fn show_confirmation_dialog(
 /// # Returns
 /// * `Ok(())` if successful.
 /// * `Err(String)` if an error occurs.
-fn open_folder(destination: String) -> Result<(), String> {
+fn open_folder_internal(destination: String) -> Result<(), String> {
     let path = Path::new(&destination);
 
     if !path.exists() {
