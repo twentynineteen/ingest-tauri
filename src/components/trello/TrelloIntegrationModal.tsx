@@ -6,16 +6,12 @@ import {
   DialogHeader,
   DialogTitle
 } from '@components/ui/dialog'
-import {
-  useAppendBreadcrumbs,
-  useTrelloBoard,
-  useTrelloCardDetails
-} from 'hooks'
+import { open } from '@tauri-apps/plugin-shell'
+import { useAppendBreadcrumbs, useTrelloBoard, useTrelloCardDetails } from 'hooks'
 import { ExternalLink } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { appStore } from 'store/useAppStore'
 import TrelloCardList from '../../utils/trello/TrelloCardList'
-import { open } from '@tauri-apps/plugin-shell'
 
 interface TrelloIntegrationModalProps {
   isOpen: boolean
@@ -28,7 +24,7 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
 }) => {
   // Hard-coded boardId for 'small projects' (same as UploadTrello)
   const boardId = '55a504d70bed2bd21008dc5a'
-  
+
   const [selectedCard, setSelectedCard] = useState<{ id: string; name: string } | null>(
     null
   )
@@ -71,7 +67,7 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
       if (block && selectedCardDetails) {
         await applyBreadcrumbsToCard(selectedCardDetails, block)
         setUpdateMessage('Successfully linked project to Trello card!')
-        
+
         // Auto-close modal after successful update
         setTimeout(() => {
           onClose()
@@ -132,11 +128,13 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
             </div>
 
             {updateMessage && (
-              <div className={`p-3 rounded-md ${
-                updateMessage.includes('Success') 
-                  ? 'bg-green-100 text-green-800 border border-green-200' 
-                  : 'bg-red-100 text-red-800 border border-red-200'
-              }`}>
+              <div
+                className={`p-3 rounded-md ${
+                  updateMessage.includes('Success')
+                    ? 'bg-green-100 text-green-800 border border-green-200'
+                    : 'bg-red-100 text-red-800 border border-red-200'
+                }`}
+              >
                 {updateMessage}
               </div>
             )}
@@ -149,7 +147,7 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
               >
                 ← Back to Cards
               </Button>
-              
+
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -164,7 +162,7 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
                   <ExternalLink className="mr-2 h-4 w-4" />
                   Open in Trello
                 </Button>
-                
+
                 <Button
                   onClick={handleAppendBreadcrumbs}
                   disabled={isUpdating || !selectedCardDetails}

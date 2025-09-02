@@ -28,8 +28,8 @@ const BuildProject: React.FC = () => {
   const [progress, setProgress] = useState(0)
   const [completed, setCompleted] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  
+  const [, setMessage] = useState('')
+
   // Trello integration state
   const [showTrelloModal, setShowTrelloModal] = useState(false)
 
@@ -133,20 +133,18 @@ const BuildProject: React.FC = () => {
         <div>
           {/* 🔹 Show progress bar */}
           <ProgressBar progress={progress} completed={completed} />
-          
+
           {/* 🔹 Post-completion actions - shown after project completion */}
           {completed && !loading && (
             <div className="pt-4 text-center space-y-3">
               <div className="flex justify-center gap-4">
-                <TrelloIntegrationButton 
-                  onClick={() => setShowTrelloModal(true)}
-                />
+                <TrelloIntegrationButton onClick={() => setShowTrelloModal(true)} />
               </div>
             </div>
           )}
         </div>
       </div>
-      
+
       {/* Trello Integration Modal */}
       <TrelloIntegrationModal
         isOpen={showTrelloModal}
