@@ -2,7 +2,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger
-} from '@components/components/ui/accordion'
+} from '@components/ui/accordion'
 import { format, parse } from 'date-fns'
 import React from 'react'
 import FileList from './FileList'

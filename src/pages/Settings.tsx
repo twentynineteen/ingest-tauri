@@ -1,4 +1,4 @@
-import { Button } from '@components/components/ui/button'
+import { Button } from '@components/ui/button'
 import { open as openPath } from '@tauri-apps/plugin-dialog'
 import { open } from '@tauri-apps/plugin-shell'
 import { useBreadcrumb } from 'hooks/useBreadcrumb'

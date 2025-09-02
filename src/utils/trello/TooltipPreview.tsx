@@ -3,7 +3,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger
-} from '@components/components/ui/tooltip'
+} from '@components/ui/tooltip'
 import React from 'react'
 
 interface TooltipPreviewProps {

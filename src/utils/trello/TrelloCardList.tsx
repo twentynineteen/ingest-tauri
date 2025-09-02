@@ -1,7 +1,7 @@
 // src/components/uploadTrello/TrelloCardList.tsx
 
 import React from 'react'
-import { TrelloCard } from 'src/utils/TrelloCards'
+import { TrelloCard } from '../TrelloCards'
 
 interface TrelloCardListProps {
   grouped: Record<string, TrelloCard[]>

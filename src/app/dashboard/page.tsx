@@ -1,4 +1,4 @@
-import { AppSidebar } from '@components/components/app-sidebar'
+import { AppSidebar } from '@components/app-sidebar'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -6,13 +6,9 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator
-} from '@components/components/ui/breadcrumb'
-import { Separator } from '@components/components/ui/separator'
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger
-} from '@components/components/ui/sidebar'
+} from '@components/ui/breadcrumb'
+import { Separator } from '@components/ui/separator'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@components/ui/sidebar'
 import { useAuth } from 'context/AuthProvider'
 import React, { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'

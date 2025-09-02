@@ -1,4 +1,4 @@
-import { Accordion } from '@components/components/ui/accordion'
+import { Accordion } from '@components/ui/accordion'
 import { VideoInfoData } from 'hooks/useVideoInfoBlock'
 import React from 'react'
 import BreadcrumbsAccordionItem from './BreadcrumbsAccordionItem'

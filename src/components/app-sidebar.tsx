@@ -1,14 +1,14 @@
 import { log } from 'util'
-import { NavMain } from '@components/components/nav-main'
-import { NavUser } from '@components/components/nav-user'
-import { TeamSwitcher } from '@components/components/team-switcher'
+import { NavMain } from '@components/nav-main'
+import { NavUser } from '@components/nav-user'
+import { TeamSwitcher } from '@components/team-switcher'
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail
-} from '@components/components/ui/sidebar'
+} from '@components/ui/sidebar'
 // import { relaunch } from '@tauri-apps/plugin-process'
 import { useMutation } from '@tanstack/react-query'
 import { core } from '@tauri-apps/api'
@@ -111,11 +111,14 @@ function useUpdateMutation() {
 
       // If the update check fails, display an error message.
       if (update === null) {
-        await message('Failed to check for updates. Please check your internet connection and try again.', {
-          title: 'Update Check Failed',
-          kind: 'error',
-          okLabel: 'OK'
-        })
+        await message(
+          'Failed to check for updates. Please check your internet connection and try again.',
+          {
+            title: 'Update Check Failed',
+            kind: 'error',
+            okLabel: 'OK'
+          }
+        )
 
         return
       }

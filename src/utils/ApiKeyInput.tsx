@@ -1,5 +1,5 @@
-import { Button } from '@components/components/ui/button'
-import { Input } from '@components/components/ui/input' // Adjust this import if your Input component is located elsewhere.
+import { Button } from '@components/ui/button'
+import { Input } from '@components/ui/input' // Adjust this import if your Input component is located elsewhere.
 import React, { useState } from 'react'
 
 type Props = {

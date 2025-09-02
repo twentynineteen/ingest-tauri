@@ -19,7 +19,6 @@ interface CreateProjectParams {
   setCompleted: (value: boolean) => void
   setMessage: (value: string) => void
   setLoading: (value: boolean) => void
-  clearFields: () => void
 }
 
 export function useCreateProject() {
@@ -32,8 +31,7 @@ export function useCreateProject() {
     setProgress,
     setCompleted,
     setMessage,
-    setLoading,
-    clearFields
+    setLoading
   }: CreateProjectParams) => {
     if (!selectedFolder) {
       alert('Please select a destination folder.')
@@ -90,7 +88,6 @@ export function useCreateProject() {
 
       const unlistenComplete = await listen<string[]>('copy_complete', async () => {
         setCompleted(true)
-        clearFields()
         await createTemplatePremiereProject()
         await showDialogAndOpenFolder()
 
