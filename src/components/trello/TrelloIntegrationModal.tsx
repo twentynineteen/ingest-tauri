@@ -14,7 +14,7 @@ import {
 import { ExternalLink } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
 import { appStore } from 'store/useAppStore'
-import TrelloCardList from 'utils/trello/TrelloCardList'
+import TrelloCardList from '../../utils/trello/TrelloCardList'
 import { open } from '@tauri-apps/plugin-shell'
 
 interface TrelloIntegrationModalProps {
