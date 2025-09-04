@@ -1,77 +1,42 @@
 import { invoke } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
-import { readDir, readFile, writeFile } from '@tauri-apps/plugin-fs'
+import { writeFile } from '@tauri-apps/plugin-fs'
+import { useAutoFileSelection } from 'hooks/useAutoFileSelection'
+import { useBackgroundFolder } from 'hooks/useBackgroundFolder'
 import { useBreadcrumb } from 'hooks/useBreadcrumb'
+import { useFileSelection } from 'hooks/useFileSelection'
+import { usePosterframeAutoRedraw } from 'hooks/usePosterframeAutoRedraw'
 import { usePosterframeCanvas } from 'hooks/usePosterframeCanvas'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useAppStore } from 'store/useAppStore'
-import { debounce } from 'utils/debounce'
+import { useZoomPan } from 'hooks/useZoomPan'
+import React, { useRef, useState } from 'react'
 
 const Posterframe = () => {
   const [videoTitle, setVideoTitle] = useState('')
-  const [backgroundFiles, setBackgroundFiles] = useState<string[]>([])
-  const [selectedFileBlob, setSelectedFileBlob] = useState<string | null>(null)
-  const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null)
-  const [backgroundFolder, setBackgroundFolder] = useState<string | null>(null)
   const [savePath, setSavePath] = useState<string | null>(null)
-  const [zoomLevel, setZoomLevel] = useState(1)
 
-  const defaultFolder = useAppStore(state => state.defaultBackgroundFolder)
+  const { files: backgroundFiles, currentFolder, loadFolder, defaultFolder } = useBackgroundFolder()
+  const { selectedFilePath, selectedFileBlob, selectFile } = useFileSelection()
   const { canvasRef, draw } = usePosterframeCanvas()
-  const debouncedDraw = useRef(debounce(draw, 300)).current
+  const { zoomLevel, pan, setZoomLevel, setPan } = useZoomPan()
 
   useBreadcrumb([
     { label: 'Upload content', href: '/upload/posterframe' },
     { label: 'Posterframe' }
   ])
 
-  // Load default background folder
-  useEffect(() => {
-    if (defaultFolder) {
-      loadBackgroundFromFolder(defaultFolder)
-    }
-  }, [defaultFolder, loadBackgroundFromFolder])
+  // Auto-redraw canvas when image or title changes
+  usePosterframeAutoRedraw({
+    draw,
+    imageUrl: selectedFileBlob,
+    title: videoTitle
+  })
 
-  // Redraw when image or title changes
-  useEffect(() => {
-    if (selectedFileBlob) {
-      debouncedDraw(selectedFileBlob, videoTitle)
-    }
-  }, [selectedFileBlob, videoTitle, debouncedDraw])
-
-  const handleFileSelection = useCallback(async (filePath: string) => {
-    const file = await readFile(filePath)
-    const blob = new Blob([new Uint8Array(file)], { type: 'image/jpeg' })
-    const blobUrl = URL.createObjectURL(blob)
-
-    setSelectedFilePath(filePath)
-    setSelectedFileBlob(blobUrl)
-  }, [])
-
-  const loadBackgroundFromFolder = useCallback(
-    async (folderPath: string) => {
-      const files = await readDir(folderPath)
-      const jpgs = files
-        .filter(f => f.name?.endsWith('.jpg'))
-        .map(f => `${folderPath}/${f.name}`)
-        .sort((a, b) => a.localeCompare(b))
-
-      setBackgroundFolder(folderPath)
-      setBackgroundFiles(jpgs)
-
-      if (jpgs.length > 0) {
-        handleFileSelection(jpgs[0])
-      }
-    },
-    [handleFileSelection]
-  )
-
-  // load first image in background folder on load
-  useEffect(() => {
-    if (backgroundFiles.length > 0 && !selectedFilePath) {
-      handleFileSelection(backgroundFiles[0])
-    }
-  }, [backgroundFiles, selectedFilePath, handleFileSelection])
+  // Auto-select first file when background files load
+  useAutoFileSelection({
+    files: backgroundFiles,
+    selectedFilePath,
+    selectFile
+  })
 
   const chooseSavePath = async () => {
     const folder = await open({ directory: true, multiple: false })
@@ -107,7 +72,6 @@ const Posterframe = () => {
   // Canvas zoom and drag logic
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [isDragging, setIsDragging] = useState(false)
-  const [pan, setPan] = useState({ x: 0, y: 0 })
   const startCoords = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
 
   const startDragging = (e: React.MouseEvent) => {
@@ -127,12 +91,6 @@ const Posterframe = () => {
     setIsDragging(false)
   }
 
-  //reset pan when zoom level is reset
-  useEffect(() => {
-    if (zoomLevel === 1) {
-      setPan({ x: 0, y: 0 })
-    }
-  }, [zoomLevel])
 
   return (
     <div className="w-full pb-4 border-b mb-4">
@@ -143,7 +101,7 @@ const Posterframe = () => {
             <button
               onClick={() =>
                 open({ directory: true }).then(
-                  path => typeof path === 'string' && loadBackgroundFromFolder(path)
+                  path => typeof path === 'string' && loadFolder(path)
                 )
               }
               className="text-white bg-gray-700 hover:bg-gray-800 rounded-lg px-4 py-2 text-sm"
@@ -157,8 +115,7 @@ const Posterframe = () => {
                 value={selectedFilePath || ''}
                 onChange={e => {
                   const path = e.target.value
-                  setSelectedFilePath(path)
-                  handleFileSelection(path)
+                  selectFile(path)
                 }}
               >
                 {backgroundFiles.map(file => (
@@ -169,10 +126,10 @@ const Posterframe = () => {
               </select>
             )}
 
-            {defaultFolder && backgroundFolder !== defaultFolder && (
+            {defaultFolder && currentFolder !== defaultFolder && (
               <button
                 className="text-blue-600 text-sm hover:underline"
-                onClick={() => loadBackgroundFromFolder(defaultFolder)}
+                onClick={() => loadFolder(defaultFolder)}
               >
                 Use Default Background
               </button>
