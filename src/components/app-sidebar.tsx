@@ -1,4 +1,3 @@
-import { log } from 'util'
 import { NavMain } from '@components/nav-main'
 import { NavUser } from '@components/nav-user'
 import { TeamSwitcher } from '@components/team-switcher'
@@ -9,16 +8,11 @@ import {
   SidebarHeader,
   SidebarRail
 } from '@components/ui/sidebar'
-// import { relaunch } from '@tauri-apps/plugin-process'
-import { useMutation } from '@tanstack/react-query'
-import { core } from '@tauri-apps/api'
-import { invoke } from '@tauri-apps/api/core'
-import { ask, message } from '@tauri-apps/plugin-dialog'
-import { check } from '@tauri-apps/plugin-updater'
-import { useAuth } from 'context/AuthProvider'
+import { useAuth } from 'hooks/useAuth'
+import { useUpdateMutation } from 'hooks/useUpdateMutation'
+import { useUsername } from 'hooks/useUsername'
 import { Clapperboard, HardDriveUpload, Save, Settings } from 'lucide-react'
 import * as React from 'react'
-import { useEffect, useState } from 'react'
 
 // This is sample data. User data is located just before function return statement
 const data = {
@@ -95,79 +89,9 @@ const data = {
   ]
 }
 
-/**
- * Custom hook that returns a mutation for checking and applying updates.
- * The mutation function accepts an object with a boolean property `onUserClick`
- * to indicate if the update check was initiated by the user.
- */
-function useUpdateMutation() {
-  // Define the mutation function with an explicit parameter type.
-  const mutationFn = async (variables: { onUserClick: boolean }): Promise<void> => {
-    // Destructure the onUserClick flag from the variables.
-    const { onUserClick } = variables
-    try {
-      // Check for available update
-      const update = await check()
-
-      // If the update check fails, display an error message.
-      if (update === null) {
-        await message(
-          'Failed to check for updates. Please check your internet connection and try again.',
-          {
-            title: 'Update Check Failed',
-            kind: 'error',
-            okLabel: 'OK'
-          }
-        )
-
-        return
-      }
-
-      // If an update is available, prompt the user for confirmation.
-      if (update?.version) {
-        const userConfirmed = await ask(
-          `Update to ${update.version} is available!\n\nRelease notes: ${update.body}`,
-          {
-            title: 'Update Available',
-            kind: 'info',
-            okLabel: 'Update',
-            cancelLabel: 'Cancel'
-          }
-        )
-        if (userConfirmed) {
-          // Download and install the update.
-          await update.downloadAndInstall()
-          // Restart the application gracefully.
-          await invoke('graceful_restart')
-        }
-      } else if (onUserClick) {
-        // If no update is available and the user manually triggered the check,
-        // inform them that they are on the latest version.
-        await message('You are on the latest version. My Sheridan has updated already!', {
-          title: 'No Update Available',
-          kind: 'info',
-          okLabel: 'OK'
-        })
-      }
-    } catch (error) {
-      console.error('Error! ', error)
-      await message(error.message, {
-        title: 'Error',
-        kind: 'error',
-        okLabel: 'OK'
-      })
-    }
-  }
-
-  // Return the mutation using the new options object format.
-  return useMutation<void, Error, { onUserClick: boolean }>({
-    mutationFn: mutationFn
-  })
-}
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [username, setUsername] = useState('')
   const { logout } = useAuth()
+  const { data: username } = useUsername()
 
   // Create the update mutation hook instance.
   const updateMutation = useUpdateMutation()
@@ -177,18 +101,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     // Set `onUserClick` to true to show feedback when no update is available.
     updateMutation.mutate({ onUserClick: true })
   }, [updateMutation])
-
-  useEffect(() => {
-    async function fetchUsername() {
-      try {
-        const name = await core.invoke<string>('get_username')
-        setUsername(name)
-      } catch (error) {
-        console.error('Failed to fetch username', error)
-      }
-    }
-    fetchUsername()
-  }, [])
 
   const user = {
     name: username || 'Unknown User',

@@ -10,7 +10,6 @@ import { open } from '@tauri-apps/plugin-shell'
 import { useAppendBreadcrumbs, useTrelloBoard, useTrelloCardDetails } from 'hooks'
 import { ExternalLink } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
-import { appStore } from 'store/useAppStore'
 import TrelloCardList from '../../utils/trello/TrelloCardList'
 
 interface TrelloIntegrationModalProps {
@@ -48,13 +47,13 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
     if (selectedCard && selectedCard.id && apiKey && token) {
       refetchCard()
     }
-  }, [selectedCard?.id, apiKey, token])
+  }, [selectedCard, apiKey, token, refetchCard])
 
   useEffect(() => {
     if (selectedCard && !selectedCardDetails && !isCardLoading) {
       setSelectedCard(null)
     }
-  }, [selectedCard, selectedCardDetails, isCardLoading])
+  }, [selectedCard, selectedCardDetails, isCardLoading, setSelectedCard])
 
   const handleAppendBreadcrumbs = async () => {
     if (!selectedCardDetails) return

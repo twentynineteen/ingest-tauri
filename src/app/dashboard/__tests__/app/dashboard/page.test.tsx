@@ -3,10 +3,12 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import Page from '../../../page'
 
-// Explicitly require the external mock file to avoid JSX parsing issues
-jest.mock('@components/components/ui/sidebar', () =>
-  require('../../../../../__mocks__/sidebarMock')
-)
+// Mock the sidebar component
+jest.mock('@components/components/ui/sidebar', () => ({
+  AppSidebar: () => <div>AppSidebar</div>,
+  SidebarProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  SidebarInset: ({ children }: { children: React.ReactNode }) => <div>{children}</div>
+}))
 
 // Mock the breadcrumb store before tests run
 jest.mock('../../../../../store/useBreadcrumbStore.ts', () => ({

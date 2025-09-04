@@ -14,13 +14,13 @@ const queryClient = new QueryClient()
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
         <Router>
           <AppRouter />
         </Router>
-      </QueryClientProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   )
 }
 

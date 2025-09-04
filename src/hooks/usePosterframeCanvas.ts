@@ -1,4 +1,4 @@
-import type { Font, Glyph } from 'opentype.js'
+import type { Font } from 'opentype.js'
 import { useCallback, useRef } from 'react'
 import { loadFont } from 'utils/loadFont'
 

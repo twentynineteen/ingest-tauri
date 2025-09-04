@@ -56,7 +56,7 @@ const UploadTrello = () => {
       refetchCard()
       refetchMembers()
     }
-  }, [selectedCard?.id, apiKey, token])
+  }, [selectedCard?.id, apiKey, token, refetchCard, refetchMembers, selectedCard])
 
   useEffect(() => {
     if (selectedCard && !selectedCardDetails && !isCardLoading) {

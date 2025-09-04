@@ -1,21 +1,18 @@
+import { useQuery } from '@tanstack/react-query'
 import { core } from '@tauri-apps/api'
-import { useEffect, useState } from 'react'
 
+/**
+ * Custom hook that fetches the current user's username using TanStack React Query.
+ * Provides caching, error handling, and loading states out of the box.
+ */
 export function useUsername() {
-  const [username, setUsername] = useState('')
-
-  useEffect(() => {
-    const fetchUsername = async () => {
-      try {
-        const name = await core.invoke<string>('get_username')
-        setUsername(name)
-      } catch (error) {
-        console.error('Failed to fetch username', error)
-      }
-    }
-
-    fetchUsername()
-  }, [])
-
-  return username
+  return useQuery({
+    queryKey: ['username'],
+    queryFn: async () => {
+      const name = await core.invoke<string>('get_username')
+      return name
+    },
+    staleTime: 1000 * 60 * 5, // Consider data fresh for 5 minutes
+    retry: 2 // Retry failed requests twice
+  })
 }

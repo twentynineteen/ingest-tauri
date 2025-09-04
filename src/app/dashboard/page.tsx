@@ -9,8 +9,7 @@ import {
 } from '@components/ui/breadcrumb'
 import { Separator } from '@components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@components/ui/sidebar'
-import { useAuth } from 'context/AuthProvider'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { useBreadcrumbStore } from 'store/useBreadcrumbStore'
 
@@ -18,7 +17,6 @@ import { useBreadcrumbStore } from 'store/useBreadcrumbStore'
 // Child components are loaded underneath the header, via the Outlet component
 
 export const Page: React.FC = () => {
-  const { username } = useAuth()
   const { breadcrumbs } = useBreadcrumbStore()
   return (
     <SidebarProvider>

@@ -2,12 +2,9 @@ import { appDataDir } from '@tauri-apps/api/path'
 import { exists, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
 import { appStore } from 'store/useAppStore'
 
-const sproutVideoApiKey = appStore.getState().sproutVideoApiKey
 const setSproutVideoApiKey = (state: string) =>
   appStore.getState().setSproutVideoApiKey(state)
-const trelloApiKey = appStore.getState().trelloApiKey
 const setTrelloApiKey = (state: string) => appStore.getState().setTrelloApiKey(state)
-const trelloApiToken = appStore.getState().trelloApiToken
 const setTrelloApiToken = (state: string) => appStore.getState().setTrelloApiToken(state)
 
 // Define an interface for multiple API keys.
@@ -22,7 +19,6 @@ export interface ApiKeys {
 const API_KEYS_FILE = 'api_keys.json' // New file for storing API keys as JSON
 
 // default background folder state
-const defaultBackgroundFolder = appStore.getState().defaultBackgroundFolder
 const setDefaultBackgroundFolder = (path: string) =>
   appStore.getState().setDefaultBackgroundFolder(path)
 

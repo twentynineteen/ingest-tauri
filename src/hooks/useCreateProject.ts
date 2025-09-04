@@ -60,6 +60,9 @@ export function useCreateProject() {
       await remove(projectFolder, { recursive: true })
     }
 
+    let unlistenProgress: (() => void) | null = null
+    let unlistenComplete: (() => void) | null = null
+
     try {
       await mkdir(projectFolder, { recursive: true })
 
@@ -82,17 +85,14 @@ export function useCreateProject() {
         camera
       ])
 
-      const unlistenProgress = await listen<number>('copy_progress', event => {
+      unlistenProgress = await listen<number>('copy_progress', event => {
         setProgress(event.payload)
       })
 
-      const unlistenComplete = await listen<string[]>('copy_complete', async () => {
+      unlistenComplete = await listen<string[]>('copy_complete', async () => {
         setCompleted(true)
         await createTemplatePremiereProject()
         await showDialogAndOpenFolder()
-
-        unlistenProgress()
-        unlistenComplete()
       })
 
       await invoke('move_files', {
@@ -160,6 +160,9 @@ export function useCreateProject() {
       console.error('Error creating project:', error)
       alert('Error creating project: ' + error)
     } finally {
+      if (unlistenProgress) unlistenProgress()
+      if (unlistenComplete) unlistenComplete()
+      
       setTimeout(() => {
         setCompleted(false)
         setProgress(0)

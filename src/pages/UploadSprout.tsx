@@ -262,6 +262,12 @@ const UploadSprout = () => {
               >
                 {uploading ? 'Uploading...' : 'Upload Video'}
               </Button>
+
+              {message && (
+                <div className="mt-4 p-3 rounded-md bg-red-100 text-red-800 border border-red-200">
+                  {message}
+                </div>
+              )}
             </div>
           </div>
         </div>

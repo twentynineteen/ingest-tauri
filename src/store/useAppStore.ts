@@ -13,8 +13,8 @@ interface AppState {
   setBreadcrumbs: (breadcrumb: Breadcrumb) => void
   defaultBackgroundFolder: string | null
   setDefaultBackgroundFolder: (path: string | null) => void
-  latestSproutUpload: SproutUploadResponse | {}
-  setLatestSproutUpload: (upload: SproutUploadResponse) => void
+  latestSproutUpload: SproutUploadResponse | null
+  setLatestSproutUpload: (upload: SproutUploadResponse | null) => void
 }
 
 // Create the Zustand store
@@ -29,7 +29,7 @@ export const useAppStore = create<AppState>(set => ({
   setBreadcrumbs: breadcrumb => set({ breadcrumbs: breadcrumb }),
   defaultBackgroundFolder: null,
   setDefaultBackgroundFolder: path => set({ defaultBackgroundFolder: path }),
-  latestSproutUpload: {},
+  latestSproutUpload: null,
   setLatestSproutUpload: upload => set({ latestSproutUpload: upload })
 }))
 
