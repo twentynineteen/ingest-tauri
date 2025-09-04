@@ -9,7 +9,7 @@ import {
   SidebarRail
 } from '@components/ui/sidebar'
 import { useAuth } from 'hooks/useAuth'
-import { useUpdateMutation } from 'hooks/useUpdateMutation'
+import { useUpdateManager } from 'hooks/useUpdateManager'
 import { useUsername } from 'hooks/useUsername'
 import { Clapperboard, HardDriveUpload, Save, Settings } from 'lucide-react'
 import * as React from 'react'
@@ -93,14 +93,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { logout } = useAuth()
   const { data: username } = useUsername()
 
-  // Create the update mutation hook instance.
-  const updateMutation = useUpdateMutation()
+  // Create the update manager hook instance.
+  const updateManager = useUpdateManager()
 
   // Callback for when the update button is clicked.
   const onUpdateClicked = React.useCallback(() => {
     // Set `onUserClick` to true to show feedback when no update is available.
-    updateMutation.mutate({ onUserClick: true })
-  }, [updateMutation])
+    updateManager.mutate({ onUserClick: true })
+  }, [updateManager])
 
   const user = {
     name: username || 'Unknown User',
@@ -120,7 +120,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           user={user}
           onLogout={logout}
           onUpdateClicked={onUpdateClicked}
-          // isLoading={updateMutation.isLoading}
+          // isLoading={updateManager.isPending}
         />
       </SidebarFooter>
       <SidebarRail />
