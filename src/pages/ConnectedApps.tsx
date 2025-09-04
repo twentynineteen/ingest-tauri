@@ -1,8 +1,6 @@
 import React from 'react'
 
-type Props = {}
-
-const ConnectedApps = (props: Props) => {
+const ConnectedApps: React.FC = () => {
   return <div>ConnectedApps</div>
 }
 

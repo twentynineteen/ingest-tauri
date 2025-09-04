@@ -1,8 +1,6 @@
 import React from 'react'
 
-type Props = {}
-
-const UploadOtter = (props: Props) => {
+const UploadOtter: React.FC = () => {
   return <div>UploadOtter</div>
 }
 

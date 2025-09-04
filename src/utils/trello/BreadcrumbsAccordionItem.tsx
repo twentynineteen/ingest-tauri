@@ -2,14 +2,15 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger
-} from '@components/components/ui/accordion'
+} from '@components/ui/accordion'
 import { format, parse } from 'date-fns'
 import React from 'react'
+import { Breadcrumb } from 'utils/types'
 import FileList from './FileList'
 import KeyValueRow from './KeyValueRow'
 
 interface Props {
-  data: any
+  data: Breadcrumb
 }
 
 const BreadcrumbsAccordionItem: React.FC<Props> = ({ data }) => {

@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@components/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,16 +7,12 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
-} from '@components/components/ui/dropdown-menu'
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar
-} from '@components/components/ui/sidebar'
+} from '@components/ui/dropdown-menu'
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@components/ui/sidebar'
+import { useSidebar } from '@components/ui/use-sidebar'
 import { core } from '@tauri-apps/api'
 import { getVersion } from '@tauri-apps/api/app'
-import { Bell, ChevronsUpDown, LogOut } from 'lucide-react'
+import { ChevronsUpDown, LogOut } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 

@@ -1,8 +1,6 @@
 import React from 'react'
 
-type Props = {}
-
-const IngestHistory = (props: Props) => {
+const IngestHistory: React.FC = () => {
   return <div>IngestHistory</div>
 }
 

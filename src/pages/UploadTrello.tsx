@@ -1,11 +1,11 @@
-import { Button } from '@components/components/ui/button'
+import { Button } from '@components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle
-} from '@components/components/ui/dialog'
+} from '@components/ui/dialog'
 import { open } from '@tauri-apps/plugin-shell'
 import {
   useAppendBreadcrumbs,
@@ -56,7 +56,7 @@ const UploadTrello = () => {
       refetchCard()
       refetchMembers()
     }
-  }, [selectedCard?.id, apiKey, token])
+  }, [selectedCard?.id, apiKey, token, refetchCard, refetchMembers, selectedCard])
 
   useEffect(() => {
     if (selectedCard && !selectedCardDetails && !isCardLoading) {

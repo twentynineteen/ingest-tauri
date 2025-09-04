@@ -4,10 +4,6 @@ import { readTextFile } from '@tauri-apps/plugin-fs'
 import { appStore } from 'store/useAppStore'
 import { TrelloCard } from 'utils/TrelloCards'
 
-interface BreadcrumbState {
-  breadcrumbs: Record<string, any>[]
-}
-
 export function useAppendBreadcrumbs(
   apiKey: string | null,
   token: string | null

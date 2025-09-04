@@ -8,6 +8,8 @@ import {
 } from 'hooks'
 import { FootageFile } from 'hooks/useCameraAutoRemap'
 import React, { useState } from 'react'
+import TrelloIntegrationButton from '../../components/trello/TrelloIntegrationButton'
+import TrelloIntegrationModal from '../../components/trello/TrelloIntegrationModal'
 import FolderSelector from './FolderSelector'
 import ProgressBar from './ProgressBar'
 import ProjectActions from './ProjectActions'
@@ -26,7 +28,10 @@ const BuildProject: React.FC = () => {
   const [progress, setProgress] = useState(0)
   const [completed, setCompleted] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
+  const [, setMessage] = useState('')
+
+  // Trello integration state
+  const [showTrelloModal, setShowTrelloModal] = useState(false)
 
   // Page label - shadcn breadcrumb component
   useBreadcrumb([
@@ -51,6 +56,9 @@ const BuildProject: React.FC = () => {
     setNumCameras(2)
     setFiles([])
     setSelectedFolder('')
+    setProgress(0)
+    setCompleted(false)
+    setMessage('')
   }
 
   // Logic to mark a given file with the camera number
@@ -88,8 +96,7 @@ const BuildProject: React.FC = () => {
       setProgress,
       setCompleted,
       setMessage,
-      setLoading,
-      clearFields
+      setLoading
     })
   }
 
@@ -126,8 +133,23 @@ const BuildProject: React.FC = () => {
         <div>
           {/* 🔹 Show progress bar */}
           <ProgressBar progress={progress} completed={completed} />
+
+          {/* 🔹 Post-completion actions - shown after project completion */}
+          {completed && !loading && (
+            <div className="pt-4 text-center space-y-3">
+              <div className="flex justify-center gap-4">
+                <TrelloIntegrationButton onClick={() => setShowTrelloModal(true)} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Trello Integration Modal */}
+      <TrelloIntegrationModal
+        isOpen={showTrelloModal}
+        onClose={() => setShowTrelloModal(false)}
+      />
     </div>
   )
 }

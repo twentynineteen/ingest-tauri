@@ -1,13 +1,14 @@
-import { Accordion } from '@components/components/ui/accordion'
+import { Accordion } from '@components/ui/accordion'
 import { VideoInfoData } from 'hooks/useVideoInfoBlock'
 import React from 'react'
+import { Breadcrumb } from 'utils/types'
 import BreadcrumbsAccordionItem from './BreadcrumbsAccordionItem'
 import DescriptionAccordionItem from './DescriptionAccordionItem'
 import VideoInfoAccordionItem from './VideoInfoAccordionItem'
 
 interface Props {
   description: string
-  breadcrumbsData?: any
+  breadcrumbsData?: Breadcrumb
   breadcrumbsBlock?: string
   videoInfoBlock?: string
   videoInfoData?: VideoInfoData | null

@@ -3,7 +3,7 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { readDir, readFile, writeFile } from '@tauri-apps/plugin-fs'
 import { useBreadcrumb } from 'hooks/useBreadcrumb'
 import { usePosterframeCanvas } from 'hooks/usePosterframeCanvas'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useAppStore } from 'store/useAppStore'
 import { debounce } from 'utils/debounce'
 
@@ -30,45 +30,48 @@ const Posterframe = () => {
     if (defaultFolder) {
       loadBackgroundFromFolder(defaultFolder)
     }
-  }, [defaultFolder])
+  }, [defaultFolder, loadBackgroundFromFolder])
 
   // Redraw when image or title changes
   useEffect(() => {
     if (selectedFileBlob) {
       debouncedDraw(selectedFileBlob, videoTitle)
     }
-  }, [selectedFileBlob, videoTitle])
+  }, [selectedFileBlob, videoTitle, debouncedDraw])
 
-  const loadBackgroundFromFolder = async (folderPath: string) => {
-    const files = await readDir(folderPath)
-    const jpgs = files
-      .filter(f => f.name?.endsWith('.jpg'))
-      .map(f => `${folderPath}/${f.name}`)
-      .sort((a, b) => a.localeCompare(b))
-
-    setBackgroundFolder(folderPath)
-    setBackgroundFiles(jpgs)
-
-    if (jpgs.length > 0) {
-      handleFileSelection(jpgs[0])
-    }
-  }
-
-  const handleFileSelection = async (filePath: string) => {
+  const handleFileSelection = useCallback(async (filePath: string) => {
     const file = await readFile(filePath)
     const blob = new Blob([new Uint8Array(file)], { type: 'image/jpeg' })
     const blobUrl = URL.createObjectURL(blob)
 
     setSelectedFilePath(filePath)
     setSelectedFileBlob(blobUrl)
-  }
+  }, [])
+
+  const loadBackgroundFromFolder = useCallback(
+    async (folderPath: string) => {
+      const files = await readDir(folderPath)
+      const jpgs = files
+        .filter(f => f.name?.endsWith('.jpg'))
+        .map(f => `${folderPath}/${f.name}`)
+        .sort((a, b) => a.localeCompare(b))
+
+      setBackgroundFolder(folderPath)
+      setBackgroundFiles(jpgs)
+
+      if (jpgs.length > 0) {
+        handleFileSelection(jpgs[0])
+      }
+    },
+    [handleFileSelection]
+  )
 
   // load first image in background folder on load
   useEffect(() => {
     if (backgroundFiles.length > 0 && !selectedFilePath) {
       handleFileSelection(backgroundFiles[0])
     }
-  }, [backgroundFiles])
+  }, [backgroundFiles, selectedFilePath, handleFileSelection])
 
   const chooseSavePath = async () => {
     const folder = await open({ directory: true, multiple: false })

@@ -1,4 +1,4 @@
-import { useAuth } from 'context/AuthProvider'
+import { useAuth } from 'hooks/useAuth'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
@@ -16,11 +16,21 @@ const Login: React.FC = () => {
   const navigate = useNavigate() // To navigate after login
 
   const handleLogin = async () => {
-    if (username && password) {
+    setError(null) // Clear previous errors
+
+    if (!username || !password) {
+      setError('Please enter both username and password')
+      return
+    }
+
+    try {
       console.log('Validating creds.')
       loginSchema.parse({ username, password })
       const fakeToken = `token_${username}` // Simulating a token
-      login(fakeToken, username)
+      await login(fakeToken, username)
+      navigate('/') // Navigate to home after successful login
+    } catch {
+      setError('Invalid username or password format')
     }
   }
 

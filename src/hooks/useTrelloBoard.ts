@@ -5,8 +5,7 @@ import {
   fetchTrelloCards,
   fetchTrelloLists,
   groupCardsByList,
-  TrelloCard,
-  TrelloList
+  TrelloCard
 } from 'utils/TrelloCards'
 
 interface TrelloBoardData {

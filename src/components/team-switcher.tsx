@@ -6,13 +6,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger
-} from '@components/components/ui/dropdown-menu'
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar
-} from '@components/components/ui/sidebar'
+} from '@components/ui/dropdown-menu'
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@components/ui/sidebar'
+import { useSidebar } from '@components/ui/use-sidebar'
 import { ChevronsUpDown, Plus } from 'lucide-react'
 import * as React from 'react'
 

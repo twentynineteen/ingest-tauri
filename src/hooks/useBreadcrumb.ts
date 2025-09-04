@@ -1,10 +1,14 @@
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useBreadcrumbStore } from 'store/useBreadcrumbStore'
 
 export const useBreadcrumb = (items: { label: string; href?: string }[]) => {
   const setBreadcrumbs = useBreadcrumbStore(state => state.setBreadcrumbs)
 
-  useEffect(() => {
+  const updateBreadcrumbs = useCallback(() => {
     setBreadcrumbs(items)
-  }, [JSON.stringify(items)]) // Re-run only if breadcrumb content changes
+  }, [setBreadcrumbs, items])
+
+  useEffect(() => {
+    updateBreadcrumbs()
+  }, [updateBreadcrumbs])
 }

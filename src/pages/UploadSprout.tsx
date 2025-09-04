@@ -1,5 +1,5 @@
-import { Button } from '@components/components/ui/button'
-import { Progress } from '@components/components/ui/progress'
+import { Button } from '@components/ui/button'
+import { Progress } from '@components/ui/progress'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { open } from '@tauri-apps/plugin-dialog'
@@ -136,7 +136,7 @@ const UploadSprout = () => {
         let completeUnlisten: Promise<() => void> | null = null
         let errorUnlisten: Promise<() => void> | null = null
         let timeoutId: NodeJS.Timeout | null = null
-        
+
         const cleanup = async () => {
           if (timeoutId) clearTimeout(timeoutId)
           if (completeUnlisten) {
@@ -158,10 +158,15 @@ const UploadSprout = () => {
         }
 
         // Set up 45-minute timeout for large file uploads
-        timeoutId = setTimeout(async () => {
-          await cleanup()
-          reject('Upload timed out after 45 minutes. Please try again or check your network connection.')
-        }, 45 * 60 * 1000) // 45 minutes
+        timeoutId = setTimeout(
+          async () => {
+            await cleanup()
+            reject(
+              'Upload timed out after 45 minutes. Please try again or check your network connection.'
+            )
+          },
+          45 * 60 * 1000
+        ) // 45 minutes
 
         // Listen for the upload_complete event and resolve with its payload
         completeUnlisten = listen('upload_complete', async event => {
@@ -193,21 +198,23 @@ const UploadSprout = () => {
     } catch (error) {
       // Log and display any error encountered during the upload process
       console.error('Upload error:', error)
-      
+
       // Provide more specific error messages based on error type
       let errorMessage = 'Upload failed: '
       if (typeof error === 'string') {
         if (error.includes('timed out')) {
-          errorMessage += 'The upload timed out. This can happen with very large files or slow network connections. Please try again.'
+          errorMessage +=
+            'The upload timed out. This can happen with very large files or slow network connections. Please try again.'
         } else if (error.includes('network') || error.includes('connection')) {
-          errorMessage += 'Network connection error. Please check your internet connection and try again.'
+          errorMessage +=
+            'Network connection error. Please check your internet connection and try again.'
         } else {
           errorMessage += error
         }
       } else {
         errorMessage += String(error)
       }
-      
+
       setMessage(errorMessage)
       alert(errorMessage)
     } finally {
@@ -255,6 +262,12 @@ const UploadSprout = () => {
               >
                 {uploading ? 'Uploading...' : 'Upload Video'}
               </Button>
+
+              {message && (
+                <div className="mt-4 p-3 rounded-md bg-red-100 text-red-800 border border-red-200">
+                  {message}
+                </div>
+              )}
             </div>
           </div>
         </div>

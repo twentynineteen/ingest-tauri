@@ -6,17 +6,24 @@ export function useCopyProgress(
   setCompleted: (val: boolean) => void
 ) {
   useEffect(() => {
-    const unlistenProgress = listen<number>('copy_progress', event => {
-      setProgress(event.payload)
-    })
+    let unlistenProgress: (() => void) | null = null
+    let unlistenComplete: (() => void) | null = null
 
-    const unlistenComplete = listen<string[]>('copy_complete', event => {
-      setCompleted(true)
-    })
+    const setupListeners = async () => {
+      unlistenProgress = await listen<number>('copy_progress', event => {
+        setProgress(event.payload)
+      })
+
+      unlistenComplete = await listen<string[]>('copy_complete', () => {
+        setCompleted(true)
+      })
+    }
+
+    setupListeners()
 
     return () => {
-      unlistenProgress.then(fn => fn())
-      unlistenComplete.then(fn => fn())
+      if (unlistenProgress) unlistenProgress()
+      if (unlistenComplete) unlistenComplete()
     }
   }, [setProgress, setCompleted])
 }

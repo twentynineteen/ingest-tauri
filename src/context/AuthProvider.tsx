@@ -1,55 +1,22 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
-import React, { createContext, useContext, useEffect, useState } from 'react'
-
-interface AuthContextType {
-  isAuthenticated: boolean
-  username: string | null
-  login: (token: string, username: string) => void
-  logout: () => void
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+import React from 'react'
+import { useAuthCheck } from '../hooks/useAuthCheck'
+import { AuthContext } from './AuthContext'
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
-  const [username, setUsername] = useState<string | null>(null)
+  const queryClient = useQueryClient()
+  const { data: authData } = useAuthCheck()
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const token = localStorage.getItem('access_token')
-        const storedUsername = localStorage.getItem('username')
-
-        if (!token || !storedUsername) {
-          setIsAuthenticated(false)
-          setUsername(null)
-          return
-        }
-
-        // Call Tauri backend
-        const response = await invoke<string>('check_auth', { token })
-        if (response.includes('authenticated')) {
-          setIsAuthenticated(true)
-          setUsername(storedUsername)
-        } else {
-          logout() // Remove invalid token
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error)
-        logout()
-      }
-    }
-
-    checkAuth()
-  }, [])
+  const isAuthenticated = authData?.isAuthenticated ?? false
+  const username = authData?.username ?? null
 
   const login = async (token: string, username: string) => {
     try {
       await invoke('add_token', { token }) // Add token to backend
       localStorage.setItem('access_token', token)
       localStorage.setItem('username', username)
-      setIsAuthenticated(true)
-      setUsername(username)
+      queryClient.invalidateQueries({ queryKey: ['authCheck'] })
     } catch (error) {
       console.error('Login failed:', error)
     }
@@ -58,8 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     localStorage.removeItem('access_token')
     localStorage.removeItem('username')
-    setIsAuthenticated(false)
-    setUsername(null)
+    queryClient.invalidateQueries({ queryKey: ['authCheck'] })
   }
 
   return (
@@ -67,12 +33,4 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       {children}
     </AuthContext.Provider>
   )
-}
-
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
-  return context
 }
