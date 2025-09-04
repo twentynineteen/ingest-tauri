@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { readFile } from '@tauri-apps/plugin-fs'
 import { useCallback, useState } from 'react'
 
@@ -10,34 +10,55 @@ interface FileSelectionData {
   clearSelection: () => void
 }
 
+// Separate hook for managing blob URLs with proper cleanup
+function useBlobUrl(filePath: string | null) {
+  const queryClient = useQueryClient()
+  
+  return useQuery({
+    queryKey: ['fileBlob', filePath],
+    queryFn: async () => {
+      if (!filePath) return null
+      
+      const file = await readFile(filePath)
+      const blob = new Blob([new Uint8Array(file)], { type: 'image/jpeg' })
+      return URL.createObjectURL(blob)
+    },
+    enabled: !!filePath,
+    gcTime: 0,
+    staleTime: 0,
+    // Cleanup previous blob URL when query updates
+    onSuccess: (data, variables) => {
+      const queryKey = ['fileBlob', filePath]
+      const previousData = queryClient.getQueryData<string>(queryKey)
+      if (previousData && previousData !== data) {
+        URL.revokeObjectURL(previousData)
+      }
+    }
+  })
+}
+
 export function useFileSelection(): FileSelectionData {
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null)
+  const queryClient = useQueryClient()
 
   const {
     data: selectedFileBlob,
     isLoading
-  } = useQuery({
-    queryKey: ['fileBlob', selectedFilePath],
-    queryFn: async () => {
-      if (!selectedFilePath) return null
-      
-      const file = await readFile(selectedFilePath)
-      const blob = new Blob([new Uint8Array(file)], { type: 'image/jpeg' })
-      return URL.createObjectURL(blob)
-    },
-    enabled: !!selectedFilePath
-  })
+  } = useBlobUrl(selectedFilePath)
 
   const selectFile = useCallback((filePath: string) => {
     setSelectedFilePath(filePath)
   }, [])
 
   const clearSelection = useCallback(() => {
+    // Clean up current blob URL before clearing
     if (selectedFileBlob) {
       URL.revokeObjectURL(selectedFileBlob)
     }
+    // Clear the query cache for this path
+    queryClient.removeQueries({ queryKey: ['fileBlob', selectedFilePath] })
     setSelectedFilePath(null)
-  }, [selectedFileBlob])
+  }, [selectedFileBlob, selectedFilePath, queryClient])
 
   return {
     selectedFilePath,
