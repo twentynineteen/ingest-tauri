@@ -1,30 +1,23 @@
 import { Button } from '@components/ui/button'
 import { Progress } from '@components/ui/progress'
-import { invoke } from '@tauri-apps/api/core'
-import { listen } from '@tauri-apps/api/event'
-import { open } from '@tauri-apps/plugin-dialog'
+import { useSproutVideoApiKey } from 'hooks/useApiKeys'
 import { useBreadcrumb } from 'hooks/useBreadcrumb'
+import { useFileUpload } from 'hooks/useFileUpload'
+import { useImageRefresh } from 'hooks/useImageRefresh'
+import { useUploadEvents } from 'hooks/useUploadEvents'
 import { Sprout } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-import { appStore } from 'store/useAppStore'
+import React from 'react'
 import ExternalLink from 'utils/ExternalLink'
 import FormattedDate from 'utils/FormattedDate'
-import { SproutUploadResponse } from 'utils/types'
 import EmbedCodeInput from '../utils/EmbedCodeInput'
-import { loadApiKeys } from '../utils/storage'
 
 const UploadSprout = () => {
-  const [selectedFile, setSelectedFile] = useState<string | null>(null)
-  const [apiKey, setApiKey] = useState<string | null>(null)
-  const [uploading, setUploading] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [message, setMessage] = useState<string | null>(null)
-  const [response, setResponse] = useState<SproutUploadResponse | null>(null)
-
-  const [selectedFolder] = useState<string | null>(null)
-  const [thumbnailLoaded, setThumbnailLoaded] = useState(false)
-  // State to force image refresh – we update this value every 60 seconds
-  const [refreshTimestamp, setRefreshTimestamp] = useState<number>(Date.now())
+  // Custom hooks
+  const { apiKey, isLoading: apiKeyLoading } = useSproutVideoApiKey()
+  const { progress, uploading, message, setProgress, setMessage } = useUploadEvents()
+  const { selectedFile, response, selectFile, uploadFile } = useFileUpload()
+  const { thumbnailLoaded, refreshTimestamp, setThumbnailLoaded } =
+    useImageRefresh(response)
 
   // Page label - shadcn breadcrumb component
   useBreadcrumb([
@@ -32,195 +25,12 @@ const UploadSprout = () => {
     { label: 'Sprout video' }
   ])
 
-  useEffect(() => {
-    // This effect will trigger a refresh of the image every 60 seconds after an upload response is available.
-    if (response) {
-      const timer = setTimeout(() => {
-        // Update refreshTimestamp to force re-rendering of the image.
-        setRefreshTimestamp(Date.now())
-        // Optionally, reset the thumbnailLoaded flag to show a loading placeholder again.
-        setThumbnailLoaded(false)
-      }, 30000) // 30,000ms = 30 seconds
-      return () => clearTimeout(timer)
-    }
-  }, [response])
-
-  // Load API key when component mounts
-  useEffect(() => {
-    const fetchApiKey = async () => {
-      const key = await loadApiKeys()
-      setApiKey(key.sproutVideo)
-    }
-    fetchApiKey()
-  }, [])
-
-  // Currently unused video navigator
-  // useEffect(() => {
-  //   async function fetchRootFolders() {
-  //     try {
-  //       // Pass no parent_id to get the root folders.
-  //       const result = await invoke<GetFoldersResponse>('get_folders', {
-  //         apiKey,
-  //         parent_id: null
-  //       })
-  //       setRootFolders(result.folders)
-  //     } catch (error) {
-  //       console.error('Error fetching root folders:', error)
-  //     }
-  //   }
-  //   if (apiKey) {
-  //     fetchRootFolders()
-  //   }
-  // }, [apiKey])
-
-  // Listen for upload progress events
-  useEffect(() => {
-    console.log('Setting up event listeners...')
-
-    const unlistenProgress = listen('upload_progress', event => {
-      // console.log('Received progress event:', event.payload) // Log event data
-      setProgress(event.payload as number)
-    })
-
-    const unlistenComplete = listen('upload_complete', event => {
-      // console.log('Received upload complete event:', event.payload) // Log event data
-      setMessage(event.payload as string)
-      setUploading(false)
-    })
-
-    const unlistenError = listen('upload_error', event => {
-      // console.log('Received upload error event:', event.payload) // Log event data
-      setMessage(event.payload as string)
-      setUploading(false)
-    })
-
-    return () => {
-      unlistenProgress.then(unsub => unsub())
-      unlistenComplete.then(unsub => unsub())
-      unlistenError.then(unsub => unsub())
-    }
-  }, [])
-
-  // Handle file selection
-  const selectFile = async () => {
-    const file = await open({
-      multiple: false,
-      filters: [{ name: 'Videos', extensions: ['mp4', 'mov', 'avi'] }]
-    })
-    if (typeof file === 'string') {
-      setSelectedFile(file)
-    }
-  }
-
-  // Call Rust backend to upload file
-  const uploadFile = async () => {
-    // Validate file selection and API key
-    if (!selectedFile) {
-      alert('Please select a video file.')
-      return
-    }
-    if (!apiKey) {
-      alert('API key is missing. Please set it in the settings.')
-      return
-    }
-
-    // Reset state for new upload
-    setUploading(true)
+  // Handle upload with API key
+  const handleUpload = () => {
+    // Reset progress and message before starting upload
     setProgress(0)
     setMessage(null)
-    setResponse(null)
-
-    try {
-      // Create a promise with timeout that will wait for either upload_complete or upload_error event
-      const finalResponse = await new Promise<SproutUploadResponse>((resolve, reject) => {
-        let completeUnlisten: Promise<() => void> | null = null
-        let errorUnlisten: Promise<() => void> | null = null
-        let timeoutId: NodeJS.Timeout | null = null
-
-        const cleanup = async () => {
-          if (timeoutId) clearTimeout(timeoutId)
-          if (completeUnlisten) {
-            try {
-              const unsub = await completeUnlisten
-              unsub()
-            } catch (e) {
-              console.warn('Failed to unsubscribe from upload_complete:', e)
-            }
-          }
-          if (errorUnlisten) {
-            try {
-              const unsub = await errorUnlisten
-              unsub()
-            } catch (e) {
-              console.warn('Failed to unsubscribe from upload_error:', e)
-            }
-          }
-        }
-
-        // Set up 45-minute timeout for large file uploads
-        timeoutId = setTimeout(
-          async () => {
-            await cleanup()
-            reject(
-              'Upload timed out after 45 minutes. Please try again or check your network connection.'
-            )
-          },
-          45 * 60 * 1000
-        ) // 45 minutes
-
-        // Listen for the upload_complete event and resolve with its payload
-        completeUnlisten = listen('upload_complete', async event => {
-          await cleanup()
-          resolve(event.payload as SproutUploadResponse)
-        })
-
-        // Listen for the upload_error event and reject with its payload
-        errorUnlisten = listen('upload_error', async event => {
-          await cleanup()
-          reject(event.payload)
-        })
-
-        // Invoke the Rust backend command to start the upload
-        invoke('upload_video', {
-          filePath: selectedFile,
-          apiKey: apiKey,
-          folderId: selectedFolder
-        }).catch(async error => {
-          await cleanup()
-          reject(error)
-        })
-      })
-
-      // Update the state with the final response from the backend upload
-      setResponse(finalResponse)
-      appStore.getState().setLatestSproutUpload(finalResponse)
-      console.log('Upload completed with response:', finalResponse)
-    } catch (error) {
-      // Log and display any error encountered during the upload process
-      console.error('Upload error:', error)
-
-      // Provide more specific error messages based on error type
-      let errorMessage = 'Upload failed: '
-      if (typeof error === 'string') {
-        if (error.includes('timed out')) {
-          errorMessage +=
-            'The upload timed out. This can happen with very large files or slow network connections. Please try again.'
-        } else if (error.includes('network') || error.includes('connection')) {
-          errorMessage +=
-            'Network connection error. Please check your internet connection and try again.'
-        } else {
-          errorMessage += error
-        }
-      } else {
-        errorMessage += String(error)
-      }
-
-      setMessage(errorMessage)
-      alert(errorMessage)
-    } finally {
-      // Regardless of success or failure, mark the upload as finished
-      setUploading(false)
-    }
+    uploadFile(apiKey)
   }
 
   return (
@@ -256,11 +66,15 @@ const UploadSprout = () => {
                 </div>
               )}
               <Button
-                onClick={uploadFile}
+                onClick={handleUpload}
                 className="w-full mt-4"
-                disabled={!selectedFile || !apiKey || uploading}
+                disabled={!selectedFile || !apiKey || uploading || apiKeyLoading}
               >
-                {uploading ? 'Uploading...' : 'Upload Video'}
+                {uploading
+                  ? 'Uploading...'
+                  : apiKeyLoading
+                    ? 'Loading...'
+                    : 'Upload Video'}
               </Button>
 
               {message && (

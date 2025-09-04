@@ -1,0 +1,23 @@
+import { useQuery } from '@tanstack/react-query'
+import { loadApiKeys, ApiKeys } from '../utils/storage'
+
+export const useApiKeys = () => {
+  return useQuery<ApiKeys>({
+    queryKey: ['apiKeys'],
+    queryFn: loadApiKeys,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes (renamed from cacheTime in v5)
+    retry: 2,
+    refetchOnWindowFocus: false
+  })
+}
+
+export const useSproutVideoApiKey = () => {
+  const { data: apiKeys, isLoading, error } = useApiKeys()
+  
+  return {
+    apiKey: apiKeys?.sproutVideo || null,
+    isLoading,
+    error
+  }
+}
