@@ -157,22 +157,24 @@ export function convertGitHubReleaseToTauriResponse(
   const manifest = convertGitHubReleaseToTauriManifest(release)
 
   if (!manifest) {
+    const assetNames = release.assets.map(a => a.name)
     console.error('Failed to generate update manifest from release:', {
       releaseName: release.name,
       tagName: release.tag_name,
       isDraft: release.draft,
       isPrerelease: release.prerelease,
       assetCount: release.assets.length,
-      assetNames: release.assets.map(a => a.name)
+      assetNames
     })
     return null
   }
 
   if (!manifest.platforms[platformKey]) {
+    const allAssets = release.assets.map(a => a.name)
     console.error('No platform found for key:', {
       requestedPlatform: platformKey,
       availablePlatforms: Object.keys(manifest.platforms),
-      allAssets: release.assets.map(a => a.name)
+      allAssets
     })
     return null
   }
