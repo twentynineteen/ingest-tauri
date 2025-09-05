@@ -6,10 +6,12 @@ import {
   DialogHeader,
   DialogTitle
 } from '@components/ui/dialog'
+import { Input } from '@components/ui/input'
 import { open } from '@tauri-apps/plugin-shell'
-import { useAppendBreadcrumbs, useTrelloBoard, useTrelloCardDetails } from 'hooks'
-import { ExternalLink } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { useAppendBreadcrumbs, useFuzzySearch, useTrelloBoard, useTrelloCardDetails } from 'hooks'
+import { ExternalLink, Search } from 'lucide-react'
+import React, { useEffect, useMemo, useState } from 'react'
+import { TrelloCard } from '../../utils/TrelloCards'
 import TrelloCardList from '../../utils/trello/TrelloCardList'
 
 interface TrelloIntegrationModalProps {
@@ -31,6 +33,41 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
   const [updateMessage, setUpdateMessage] = useState<string | null>(null)
 
   const { grouped, isLoading: isBoardLoading, apiKey, token } = useTrelloBoard(boardId)
+
+  // Flatten all cards for search
+  const allCards = useMemo(() => {
+    const cards: TrelloCard[] = []
+    Object.values(grouped).forEach(cardList => {
+      cards.push(...cardList)
+    })
+    return cards
+  }, [grouped])
+
+  // Use fuzzy search hook
+  const { searchTerm, setSearchTerm, results: filteredCards } = useFuzzySearch(allCards, {
+    keys: ['name', 'desc'],
+    threshold: 0.4
+  })
+
+  // Re-group filtered cards by list
+  const filteredGrouped = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return grouped
+    }
+    
+    const result: Record<string, TrelloCard[]> = {}
+    filteredCards.forEach(card => {
+      Object.entries(grouped).forEach(([listName, cards]) => {
+        if (cards.some(c => c.id === card.id)) {
+          if (!result[listName]) {
+            result[listName] = []
+          }
+          result[listName].push(card)
+        }
+      })
+    })
+    return result
+  }, [searchTerm, filteredCards, grouped])
 
   const {
     card: selectedCardDetails,
@@ -66,13 +103,6 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
       if (block && selectedCardDetails) {
         await applyBreadcrumbsToCard(selectedCardDetails, block)
         setUpdateMessage('Successfully linked project to Trello card!')
-
-        // Auto-close modal after successful update
-        setTimeout(() => {
-          onClose()
-          setSelectedCard(null)
-          setUpdateMessage(null)
-        }, 2000)
       } else {
         setUpdateMessage('Failed to generate breadcrumbs block')
       }
@@ -116,8 +146,25 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
         </DialogHeader>
 
         {!selectedCard ? (
-          <div className="max-h-96 overflow-y-auto">
-            <TrelloCardList grouped={grouped} onSelect={setSelectedCard} />
+          <div className="space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Input
+                placeholder="Search cards by name or description..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="max-h-80 overflow-y-auto">
+              {Object.keys(filteredGrouped).length > 0 ? (
+                <TrelloCardList grouped={filteredGrouped} onSelect={setSelectedCard} />
+              ) : (
+                <p className="text-center text-gray-500 py-8">
+                  {searchTerm.trim() ? 'No cards found matching your search.' : 'No cards available.'}
+                </p>
+              )}
+            </div>
           </div>
         ) : (
           <div className="space-y-4">

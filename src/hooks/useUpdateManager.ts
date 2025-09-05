@@ -3,14 +3,10 @@
  */
 
 import { useMutation } from '@tanstack/react-query'
-import { invoke } from '@tauri-apps/api/core'
 import { ask, message } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { 
-  convertGitHubReleaseToTauriResponse, 
-  getCurrentPlatformKey,
-  fetchSignatureContent 
-} from '../utils/updateManifest'
+import { check } from '@tauri-apps/plugin-updater'
+import { relaunch } from '@tauri-apps/plugin-process'
 import { useVersionCheck } from './useVersionCheck'
 
 interface UpdateManagerOptions {
@@ -25,6 +21,18 @@ export function useUpdateManager() {
 
   const mutationFn = async (options: UpdateManagerOptions): Promise<void> => {
     const { onUserClick } = options
+
+    // Skip updates in dev mode
+    if (import.meta.env.DEV) {
+      if (onUserClick) {
+        await message('Updates are disabled in development mode.', {
+          title: 'Development Mode',
+          kind: 'info',
+          okLabel: 'OK'
+        })
+      }
+      return
+    }
 
     try {
       // Check for updates using GitHub API
@@ -57,7 +65,7 @@ export function useUpdateManager() {
         )
 
         if (userConfirmed) {
-          await performUpdate(versionData.latestVersion)
+          await performUpdate()
         }
       } else if (onUserClick) {
         // Show current version info when no update is available
@@ -86,99 +94,94 @@ export function useUpdateManager() {
 }
 
 /**
- * Perform the actual update download and installation
+ * Perform the actual update download and installation using Tauri's built-in updater
  */
-async function performUpdate(targetVersion: string): Promise<void> {
+async function performUpdate(): Promise<void> {
   try {
-    // Fetch the GitHub release data
-    const response = await fetch(
-      'https://api.github.com/repos/twentynineteen/ingest-tauri/releases/latest'
-    )
+    console.log('Checking for updates using Tauri updater...')
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch release data: ${response.statusText}`)
-    }
-
-    const releaseData = await response.json()
-    const platformKey = getCurrentPlatformKey()
+    // Use Tauri's built-in check() function
+    const update = await check()
     
-    // Convert GitHub release to Tauri format
-    const tauriUpdate = convertGitHubReleaseToTauriResponse(releaseData, platformKey)
-    
-    if (!tauriUpdate) {
-      throw new Error(`No compatible update found for platform: ${platformKey}`)
-    }
+    if (update) {
+      console.log('Update found:', {
+        version: update.version,
+        date: update.date,
+        body: update.body
+      })
 
-    // Fetch signature content if it's a URL
-    if (tauriUpdate.signature.startsWith('http')) {
-      tauriUpdate.signature = await fetchSignatureContent(tauriUpdate.signature)
-    }
+      // Show download progress
+      await message('Update download started. Please wait...', {
+        title: 'Downloading Update',
+        kind: 'info',
+        okLabel: 'OK'
+      })
 
-    // Create a custom update object that mimics Tauri's Update interface
-    const customUpdate = {
-      version: tauriUpdate.version,
-      notes: tauriUpdate.notes,
-      pub_date: tauriUpdate.pub_date,
-      downloadAndInstall: async () => {
-        // Show download progress
-        await message('Update download started. Please wait...', {
-          title: 'Downloading Update',
-          kind: 'info',
-          okLabel: 'OK'
-        })
+      // Use Tauri's built-in downloadAndInstall
+      await update.downloadAndInstall(event => {
+        console.log('Update progress:', event)
+        // Could add progress UI here if needed
+      })
 
-        // Use Tauri's built-in download functionality if available
-        // Otherwise, redirect to manual download
-        try {
-          // Attempt to use invoke for custom download command
-          await invoke('download_and_install_update', {
-            url: tauriUpdate.url,
-            signature: tauriUpdate.signature,
-            version: tauriUpdate.version
-          })
-        } catch (invokeError) {
-          // Fallback to manual download
-          throw new Error('Automatic installation not available')
-        }
-      }
-    }
+      console.log('Update installed successfully')
 
-    // Attempt installation
-    try {
-      await customUpdate.downloadAndInstall()
-      await invoke('graceful_restart')
-    } catch (installError) {
-      // Offer manual download as fallback
-      const manualUpdate = await ask(
-        `Automatic installation failed. Would you like to download the update manually?\\n\\nError: ${installError.message}`,
+      // Ask user if they want to restart now or later
+      const restartNow = await ask(
+        'Update installed successfully! The app needs to restart to apply the changes.\n\nRestart now?',
         {
-          title: 'Installation Failed',
-          kind: 'warning',
-          okLabel: 'Download Manually',
-          cancelLabel: 'Cancel'
+          title: 'Update Complete',
+          kind: 'info',
+          okLabel: 'Restart Now',
+          cancelLabel: 'Restart Later'
         }
       )
 
-      if (manualUpdate) {
-        await openUrl('https://github.com/twentynineteen/ingest-tauri/releases/latest')
+      if (restartNow) {
+        console.log('User chose to restart now')
+        try {
+          await relaunch()
+        } catch (restartError) {
+          console.error('Failed to restart automatically:', restartError)
+          await message(
+            'Automatic restart failed. Please close and reopen the app to complete the update.',
+            {
+              title: 'Manual Restart Required',
+              kind: 'warning',
+              okLabel: 'OK'
+            }
+          )
+        }
+      } else {
+        console.log('User chose to restart later')
+        await message(
+          'Update installed! Please restart the app when convenient to apply the changes.',
+          {
+            title: 'Restart When Ready',
+            kind: 'info',
+            okLabel: 'OK'
+          }
+        )
       }
+      
+    } else {
+      throw new Error('No update available from Tauri updater')
     }
 
   } catch (error) {
-    console.error('Update performance error:', error)
+    console.error('Tauri updater error:', error)
     
-    // Final fallback - manual download
-    const fallbackDownload = await ask(
-      `Update preparation failed. Would you like to download manually?\\n\\nError: ${error.message}`,
+    // Offer manual download as fallback
+    const manualUpdate = await ask(
+      `Automatic update failed. Would you like to download the update manually?\\n\\nError: ${error.message || error}`,
       {
         title: 'Update Failed',
-        kind: 'error',
+        kind: 'warning', 
         okLabel: 'Download Manually',
         cancelLabel: 'Cancel'
       }
     )
 
-    if (fallbackDownload) {
+    if (manualUpdate) {
       await openUrl('https://github.com/twentynineteen/ingest-tauri/releases/latest')
     }
   }

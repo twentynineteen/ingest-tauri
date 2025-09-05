@@ -162,11 +162,6 @@ export function useCreateProject() {
     } finally {
       if (unlistenProgress) unlistenProgress()
       if (unlistenComplete) unlistenComplete()
-      
-      setTimeout(() => {
-        setCompleted(false)
-        setProgress(0)
-      }, 6660)
     }
   }
 

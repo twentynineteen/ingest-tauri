@@ -6,32 +6,35 @@ import {
   DialogHeader,
   DialogTitle
 } from '@components/ui/dialog'
+import { Input } from '@components/ui/input'
 import { open } from '@tauri-apps/plugin-shell'
 import {
   useAppendBreadcrumbs,
   useAppendVideoInfo,
   useBreadcrumb,
+  useFuzzySearch,
   useParsedTrelloDescription,
   useTrelloBoard,
   useTrelloCardDetails,
   useVideoInfoBlock
 } from 'hooks'
-import { ExternalLink } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { ExternalLink, Search } from 'lucide-react'
+import React, { useMemo, useState } from 'react'
 import { appStore } from 'store/useAppStore'
 import CardDetailsAccordion from 'utils/trello/CardDetailsAccordion'
 import TooltipPreview from 'utils/trello/TooltipPreview'
 import TrelloCardList from 'utils/trello/TrelloCardList'
 import VideoInfoTooltip from 'utils/trello/VideoInfoTooltip'
+import { TrelloCard } from 'utils/TrelloCards'
 import { Breadcrumb, SproutUploadResponse } from 'utils/types'
+import { useCardDetailsSync, useCardValidation } from './UploadTrello/UploadTrelloHooks'
+import { SelectedCard, createDefaultSproutUploadResponse } from './UploadTrello/UploadTrelloTypes'
 
 const UploadTrello = () => {
   // Hard-coded boardId for 'small projects'
   const boardId = '55a504d70bed2bd21008dc5a'
 
-  const [selectedCard, setSelectedCard] = useState<{ id: string; name: string } | null>(
-    null
-  )
+  const [selectedCard, setSelectedCard] = useState<SelectedCard | null>(null)
 
   // Page label - shadcn breadcrumb component
   useBreadcrumb([
@@ -40,6 +43,45 @@ const UploadTrello = () => {
   ])
 
   const { grouped, isLoading: isBoardLoading, apiKey, token } = useTrelloBoard(boardId)
+
+  // Flatten all cards for search
+  const allCards = useMemo(() => {
+    const cards: TrelloCard[] = []
+    Object.values(grouped).forEach(cardList => {
+      cards.push(...cardList)
+    })
+    return cards
+  }, [grouped])
+
+  // Use fuzzy search hook
+  const {
+    searchTerm,
+    setSearchTerm,
+    results: filteredCards
+  } = useFuzzySearch(allCards, {
+    keys: ['name', 'desc'],
+    threshold: 0.4
+  })
+
+  // Re-group filtered cards by list
+  const filteredGrouped = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return grouped
+    }
+
+    const result: Record<string, TrelloCard[]> = {}
+    filteredCards.forEach(card => {
+      Object.entries(grouped).forEach(([listName, cards]) => {
+        if (cards.some(c => c.id === card.id)) {
+          if (!result[listName]) {
+            result[listName] = []
+          }
+          result[listName].push(card)
+        }
+      })
+    })
+    return result
+  }, [searchTerm, filteredCards, grouped])
 
   const breadcrumbs: Breadcrumb = appStore.getState().breadcrumbs
 
@@ -51,18 +93,9 @@ const UploadTrello = () => {
     refetchMembers
   } = useTrelloCardDetails(selectedCard?.id ?? null, apiKey, token)
 
-  useEffect(() => {
-    if (selectedCard && selectedCard.id && apiKey && token) {
-      refetchCard()
-      refetchMembers()
-    }
-  }, [selectedCard?.id, apiKey, token, refetchCard, refetchMembers, selectedCard])
-
-  useEffect(() => {
-    if (selectedCard && !selectedCardDetails && !isCardLoading) {
-      setSelectedCard(null)
-    }
-  }, [selectedCard, selectedCardDetails, isCardLoading])
+  useCardDetailsSync(selectedCard, apiKey, token, refetchCard, refetchMembers)
+  
+  useCardValidation(selectedCard, selectedCardDetails, isCardLoading, () => setSelectedCard(null))
 
   const { getBreadcrumbsBlock, applyBreadcrumbsToCard } = useAppendBreadcrumbs(
     apiKey,
@@ -74,64 +107,7 @@ const UploadTrello = () => {
   let uploadedVideo: SproutUploadResponse | null = null
 
   if (state?.latestSproutUpload) {
-    // Provide default values for missing properties
-    const defaultResponse: SproutUploadResponse = {
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      height: 0,
-      width: 0,
-      description: '', // Ensure this is provided with a default value if not present in state.latestSproutUpload
-      id: '',
-      plays: 0,
-      title: '',
-      source_video_file_size: 0,
-      embed_code: '',
-      state: 'default_state', // Replace with the actual default state value
-      security_token: '', // Provide a default or appropriate value
-      progress: 0, // Default progress value
-      tags: [], // Empty array if no tags are provided
-      embedded_url: null, // Null as a default value
-      duration: 0,
-      password: null, // Null as a default value
-      privacy: 0, // Default privacy value
-      requires_signed_embeds: false, // Default boolean value
-      selected_poster_frame_number: 0, // Default frame number
-      assets: {
-        videos: {
-          '240p': '',
-          '360p': '',
-          '480p': '',
-          '720p': '',
-          '1080p': '',
-          '2k': null,
-          '4k': null,
-          '8k': null,
-          source: null
-        },
-        thumbnails: [],
-        poster_frames: [],
-        poster_frame_mp4: null,
-        timeline_images: [],
-        hls_manifest: ''
-      },
-      download_sd: null,
-      download_hd: null,
-      download_source: null,
-      allowed_domains: null,
-      allowed_ips: null,
-      player_social_sharing: null,
-      player_embed_sharing: null,
-      require_email: false,
-      require_name: false,
-      hide_on_site: false,
-      folder_id: null,
-      airplay_support: null,
-      session_watermarks: null,
-      direct_file_access: null
-    }
-
-    // Merge the default response with state.latestSproutUpload to ensure all properties are covered
-    uploadedVideo = { ...defaultResponse, ...state.latestSproutUpload }
+    uploadedVideo = { ...createDefaultSproutUploadResponse(), ...state.latestSproutUpload }
   }
 
   const rawDescription = selectedCardDetails?.desc ?? ''
@@ -164,8 +140,27 @@ const UploadTrello = () => {
           </svg>
           Trello: Small Projects
         </h2>
-        <div className="px-4 mx-4">
-          <TrelloCardList grouped={grouped} onSelect={setSelectedCard} />
+        <div className="px-4 mx-4 mt-4 space-y-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Input
+              placeholder="Search cards by name or description..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <div>
+            {Object.keys(filteredGrouped).length > 0 ? (
+              <TrelloCardList grouped={filteredGrouped} onSelect={setSelectedCard} />
+            ) : (
+              <p className="text-center text-gray-500 py-8">
+                {searchTerm.trim()
+                  ? 'No cards found matching your search.'
+                  : 'No cards available.'}
+              </p>
+            )}
+          </div>
         </div>
       </div>
       {selectedCard && (
