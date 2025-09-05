@@ -24,7 +24,12 @@ const BreadcrumbsAccordionItem: React.FC<Props> = ({ data }) => {
           {data.projectTitle && (
             <KeyValueRow label="Project Title" value={data.projectTitle} />
           )}
-          {data.createdBy && <KeyValueRow label="Created By" value={data.createdBy} />}
+          {data.createdBy && (
+            <KeyValueRow 
+              label="Created By" 
+              value={typeof data.createdBy === 'string' ? data.createdBy : data.createdBy?.data || 'Unknown User'} 
+            />
+          )}
           {data.creationDateTime && (
             <KeyValueRow
               label="Created On"

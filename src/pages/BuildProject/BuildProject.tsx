@@ -92,7 +92,7 @@ const BuildProject: React.FC = () => {
       files,
       selectedFolder,
       numCameras,
-      username,
+      username: username.data || 'Unknown User',
       setProgress,
       setCompleted,
       setMessage,

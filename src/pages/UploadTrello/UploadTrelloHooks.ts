@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { TrelloCard } from 'utils/TrelloCards'
 import { SelectedCard } from './UploadTrelloTypes'
 
 export const useCardDetailsSync = (
@@ -23,7 +24,7 @@ export const useCardDetailsSync = (
 
 export const useCardValidation = (
   selectedCard: SelectedCard | null,
-  selectedCardDetails: any,
+  selectedCardDetails: TrelloCard | undefined,
   isCardLoading: boolean,
   onCardReset: () => void
 ) => {
