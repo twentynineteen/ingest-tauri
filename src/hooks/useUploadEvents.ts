@@ -68,7 +68,7 @@ export const useUploadEvents = (): UseUploadEventsReturn => {
           if (unlistenError) unlistenError()
         } catch (error) {
           // Silently handle cleanup errors to avoid console spam
-          console.debug('Event listener cleanup completed with minor issues:', error)
+          console.debug('Event listener cleanup encountered errors:', error)
         }
       }, 0)
     }
