@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 import { ask, message } from '@tauri-apps/plugin-dialog'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { check } from '@tauri-apps/plugin-updater'
 import { useVersionCheck } from './useVersionCheck'
 
@@ -47,17 +48,35 @@ export function useUpdateMutation() {
         )
 
         if (userConfirmed) {
-          // Use Tauri's updater to download and install
-          const update = await check()
-          if (update?.version) {
-            await update.downloadAndInstall()
-            await invoke('graceful_restart')
-          } else {
-            await message('Update download failed. Please try again later.', {
-              title: 'Update Failed',
-              kind: 'error',
-              okLabel: 'OK'
-            })
+          try {
+            // Use Tauri's updater to download and install
+            const update = await check()
+            if (update) {
+              await update.downloadAndInstall()
+              await invoke('graceful_restart')
+            } else {
+              await message('No update manifest found. Please try again later.', {
+                title: 'Update Failed',
+                kind: 'error',
+                okLabel: 'OK'
+              })
+            }
+          } catch (updateError) {
+            console.error('Tauri updater error:', updateError)
+            // Fallback: provide manual download link
+            const manualUpdate = await ask(
+              `Automatic update failed. Would you like to download the update manually?\\n\\nError: ${updateError.message || 'Unknown error'}`,
+              {
+                title: 'Update Error',
+                kind: 'warning',
+                okLabel: 'Download Manually',
+                cancelLabel: 'Cancel'
+              }
+            )
+            
+            if (manualUpdate) {
+              await openUrl('https://github.com/twentynineteen/ingest-tauri/releases/latest')
+            }
           }
         }
       } else if (onUserClick) {

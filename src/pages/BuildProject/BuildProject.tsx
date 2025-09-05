@@ -136,9 +136,17 @@ const BuildProject: React.FC = () => {
 
           {/* 🔹 Post-completion actions - shown after project completion */}
           {completed && !loading && (
-            <div className="pt-4 text-center space-y-3">
-              <div className="flex justify-center gap-4">
-                <TrelloIntegrationButton onClick={() => setShowTrelloModal(true)} />
+            <div className="pt-6 text-center space-y-4 animate-fadeIn">
+              <div className="mx-4 p-6 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl shadow-sm">
+                <h3 className="text-lg font-semibold text-green-800 mb-2">
+                  Project Created Successfully! 🎉
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Link your project to a Trello card to keep track of your workflow
+                </p>
+                <div className="flex justify-center">
+                  <TrelloIntegrationButton onClick={() => setShowTrelloModal(true)} />
+                </div>
               </div>
             </div>
           )}

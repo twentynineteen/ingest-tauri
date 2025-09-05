@@ -12,28 +12,18 @@ interface FileSelectionData {
 
 // Separate hook for managing blob URLs with proper cleanup
 function useBlobUrl(filePath: string | null) {
-  const queryClient = useQueryClient()
-  
   return useQuery({
     queryKey: ['fileBlob', filePath],
-    queryFn: async () => {
+    queryFn: async (): Promise<string | null> => {
       if (!filePath) return null
-      
+
       const file = await readFile(filePath)
       const blob = new Blob([new Uint8Array(file)], { type: 'image/jpeg' })
       return URL.createObjectURL(blob)
     },
     enabled: !!filePath,
     gcTime: 0,
-    staleTime: 0,
-    // Cleanup previous blob URL when query updates
-    onSuccess: (data, variables) => {
-      const queryKey = ['fileBlob', filePath]
-      const previousData = queryClient.getQueryData<string>(queryKey)
-      if (previousData && previousData !== data) {
-        URL.revokeObjectURL(previousData)
-      }
-    }
+    staleTime: 0
   })
 }
 
@@ -41,10 +31,7 @@ export function useFileSelection(): FileSelectionData {
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null)
   const queryClient = useQueryClient()
 
-  const {
-    data: selectedFileBlob,
-    isLoading
-  } = useBlobUrl(selectedFilePath)
+  const { data: selectedFileBlob, isLoading } = useBlobUrl(selectedFilePath)
 
   const selectFile = useCallback((filePath: string) => {
     setSelectedFilePath(filePath)
@@ -62,7 +49,7 @@ export function useFileSelection(): FileSelectionData {
 
   return {
     selectedFilePath,
-    selectedFileBlob: selectedFileBlob || null,
+    selectedFileBlob: selectedFileBlob ?? null,
     isLoading,
     selectFile,
     clearSelection
