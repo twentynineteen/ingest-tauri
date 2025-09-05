@@ -154,7 +154,7 @@ export function convertGitHubReleaseToTauriResponse(
   release: GitHubRelease,
   platformKey: string
 ): TauriUpdateResponse | null {
-  const manifest = convertGitHubReleaseToTauriManifest(release, platformKey)
+  const manifest = convertGitHubReleaseToTauriManifest(release)
 
   if (!manifest) {
     console.error('Failed to generate update manifest from release:', {
