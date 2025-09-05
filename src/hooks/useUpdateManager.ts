@@ -172,7 +172,7 @@ async function performUpdate(): Promise<void> {
     
     // Offer manual download as fallback
     const manualUpdate = await ask(
-      `Automatic update failed. Would you like to download the update manually?\\n\\nError: ${error.message || error}`,
+      `Automatic update failed. Would you like to download the update manually?\\n\\nError: ${error?.message || String(error)}`,
       {
         title: 'Update Failed',
         kind: 'warning', 
