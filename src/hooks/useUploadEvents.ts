@@ -1,5 +1,8 @@
 import { listen } from '@tauri-apps/api/event'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { createQueryOptions } from '../lib/query-utils'
+import { queryKeys } from '../lib/query-keys'
 
 interface UseUploadEventsReturn {
   progress: number
@@ -11,16 +14,68 @@ interface UseUploadEventsReturn {
 }
 
 export const useUploadEvents = (): UseUploadEventsReturn => {
-  const [progress, setProgress] = useState(0)
-  const [uploading, setUploading] = useState(false)
-  const [message, setMessage] = useState<string | null>(null)
+  const queryClient = useQueryClient()
   const listenersSetup = useRef(false)
+
+  // Use React Query to manage upload state with real-time updates
+  const { data: uploadState } = useQuery({
+    ...createQueryOptions(
+      queryKeys.upload.events(),
+      async () => ({
+        progress: 0,
+        uploading: false,
+        message: null as string | null
+      }),
+      'REALTIME',
+      {
+        staleTime: 0, // Always fresh for real-time updates
+        gcTime: 1 * 60 * 1000, // Keep cached for 1 minute
+        refetchInterval: false, // Don't auto-refetch, use event updates
+      }
+    )
+  })
+
+  const progress = uploadState?.progress ?? 0
+  const uploading = uploadState?.uploading ?? false
+  const message = uploadState?.message ?? null
+
+  // Helper to update upload state via React Query
+  const updateUploadState = useCallback((updates: Partial<{
+    progress: number
+    uploading: boolean
+    message: string | null
+  }>) => {
+    queryClient.setQueryData(queryKeys.upload.events(), (old: {
+      progress: number
+      uploading: boolean
+      message: string | null
+    } | undefined) => ({
+      progress: 0,
+      uploading: false,
+      message: null,
+      ...old,
+      ...updates
+    }))
+  }, [queryClient])
+
+  // Memoized setters to maintain API compatibility
+  const setProgress = useCallback((newProgress: number) => {
+    updateUploadState({ progress: newProgress })
+  }, [updateUploadState])
+
+  const setUploading = useCallback((newUploading: boolean) => {
+    updateUploadState({ uploading: newUploading })
+  }, [updateUploadState])
+
+  const setMessage = useCallback((newMessage: string | null) => {
+    updateUploadState({ message: newMessage })
+  }, [updateUploadState])
 
   useEffect(() => {
     // Prevent double setup in StrictMode
     if (listenersSetup.current) return
 
-    console.log('Setting up event listeners...')
+    console.log('Setting up upload event listeners with React Query integration...')
     listenersSetup.current = true
 
     let unlistenProgress: (() => void) | null = null
@@ -32,25 +87,37 @@ export const useUploadEvents = (): UseUploadEventsReturn => {
       try {
         unlistenProgress = await listen('upload_progress', event => {
           if (isMounted) {
-            setProgress(event.payload as number)
+            const progressValue = event.payload as number
+            updateUploadState({ progress: progressValue })
           }
         })
 
         unlistenComplete = await listen('upload_complete', event => {
           if (isMounted) {
-            setMessage(event.payload as string)
-            setUploading(false)
+            const messageValue = event.payload as string
+            updateUploadState({ 
+              message: messageValue, 
+              uploading: false,
+              progress: 100
+            })
           }
         })
 
         unlistenError = await listen('upload_error', event => {
           if (isMounted) {
-            setMessage(event.payload as string)
-            setUploading(false)
+            const errorMessage = event.payload as string
+            updateUploadState({ 
+              message: errorMessage, 
+              uploading: false
+            })
           }
         })
       } catch (error) {
-        console.error('Failed to setup event listeners:', error)
+        console.error('Failed to setup upload event listeners:', error)
+        updateUploadState({ 
+          message: 'Failed to setup event listeners', 
+          uploading: false 
+        })
       }
     }
 
@@ -72,7 +139,7 @@ export const useUploadEvents = (): UseUploadEventsReturn => {
         }
       }, 0)
     }
-  }, [])
+  }, [updateUploadState])
 
   return {
     progress,

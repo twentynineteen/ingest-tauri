@@ -1,6 +1,6 @@
 import type { UseQueryOptions, UseMutationOptions } from '@tanstack/react-query'
 
-export type QueryKey = [domain: string, action: string, ...identifiers: (string | number)[]]
+export type QueryKey = readonly [domain: string, action: string, ...identifiers: readonly (string | number)[]] | readonly (string | number)[]
 
 export interface QueryConfiguration {
   queryKey: QueryKey
@@ -37,7 +37,7 @@ export interface ProgressState {
 }
 
 export interface QueryError {
-  type: 'network' | 'server' | 'validation' | 'timeout'
+  type: 'network' | 'server' | 'validation' | 'timeout' | 'authentication' | 'system' | 'unknown'
   message: string
   code?: number
   retryable: boolean
@@ -133,17 +133,39 @@ export function getRetryDelay(attempt: number, strategy: keyof typeof retryStrat
   return config.delay(attempt)
 }
 
+/**
+ * Infer error type from error message for better type safety
+ */
+export function inferErrorType(errorInfo: string): QueryError['type'] {
+  const lowerError = errorInfo.toLowerCase()
+  
+  if (lowerError.includes('network') || lowerError.includes('connection')) return 'network'
+  if (lowerError.includes('timeout')) return 'timeout'
+  if (lowerError.includes('auth') || lowerError.includes('unauthorized')) return 'authentication'
+  if (lowerError.includes('system') || lowerError.includes('app version')) return 'system'
+  if (lowerError.includes('validation') || lowerError.includes('invalid')) return 'validation'
+  if (lowerError.includes('server') || lowerError.includes('internal')) return 'server'
+  
+  return 'unknown'
+}
+
 export function createQueryError(
-  type: QueryError['type'],
   message: string,
+  typeOrInfo?: QueryError['type'] | string,
   code?: number,
   context?: Record<string, unknown>
 ): QueryError {
+  // If typeOrInfo is a recognized error type, use it directly
+  const validTypes = ['network', 'server', 'validation', 'timeout', 'authentication', 'system', 'unknown']
+  const type = validTypes.includes(typeOrInfo as string) 
+    ? (typeOrInfo as QueryError['type'])
+    : inferErrorType(typeOrInfo || message)
+
   return {
     type,
     message,
     code,
-    retryable: type === 'network' || type === 'server',
+    retryable: type === 'network' || type === 'server' || type === 'timeout',
     context,
   }
 }

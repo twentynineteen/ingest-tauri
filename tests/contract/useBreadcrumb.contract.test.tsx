@@ -1,5 +1,5 @@
 import { renderHook } from '@testing-library/react'
-import { renderWithQueryClient, testHookContract, type HookTestContract } from '../utils/query-test-utils.tsx'
+import { renderWithQueryClient, testHookContract, type HookTestContract } from '../utils/query-test-utils.ts'
 import { queryKeys } from '../../src/lib/query-keys'
 
 // This test defines the contract for migrating useBreadcrumb from useEffect to React Query
@@ -69,7 +69,7 @@ describe('useBreadcrumb Contract Tests', () => {
   describe('Current vs Expected Behavior', () => {
     it('CURRENT: uses useEffect to update breadcrumb store', () => {
       // This test documents the current behavior that will be replaced
-      const mockSetBreadcrumbs = jest.fn()
+      const mockSetBreadcrumbs = vi.fn()
       const items = [
         { label: 'Projects', href: '/projects' },
         { label: 'Test Project', href: '/projects/test-project' },

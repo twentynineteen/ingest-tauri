@@ -2,26 +2,64 @@ import { Button } from '@components/ui/button'
 import { open as openPath } from '@tauri-apps/plugin-dialog'
 import { open } from '@tauri-apps/plugin-shell'
 import { useBreadcrumb } from 'hooks/useBreadcrumb'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAppStore } from 'store/useAppStore'
 import ApiKeyInput from 'utils/ApiKeyInput'
 import { ApiKeys, loadApiKeys, saveApiKeys } from '../utils/storage'
+import { createQueryOptions, createQueryError, shouldRetry } from '../lib/query-utils'
+import { queryKeys } from '../lib/query-keys'
 
 const Settings: React.FC = () => {
-  // State to hold multiple API keys.
-  const [apiKeys, setApiKeys] = useState<ApiKeys>({})
+  const queryClient = useQueryClient()
+  
+  // Local state for form inputs (separate from cached data)
+  const [localApiKeys, setLocalApiKeys] = useState<Partial<ApiKeys>>({})
 
   // Page label - shadcn breadcrumb component
   useBreadcrumb([{ label: 'Settings', href: '/settings/general' }, { label: 'General' }])
 
-  // Load API keys when component mounts.
-  useEffect(() => {
-    const fetchApiKeys = async () => {
-      const keys = await loadApiKeys()
-      setApiKeys(keys)
+  // Use React Query to load API keys
+  const { data: apiKeys = {} } = useQuery({
+    ...createQueryOptions(
+      queryKeys.settings.apiKeys(),
+      async () => {
+        try {
+          return await loadApiKeys()
+        } catch (error) {
+          throw createQueryError(
+            `Failed to load API keys: ${error}`,
+            'SETTINGS_LOAD'
+          )
+        }
+      },
+      'DYNAMIC',
+      {
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        gcTime: 10 * 60 * 1000, // Keep cached for 10 minutes
+        retry: (failureCount, error) => shouldRetry(error, failureCount, 'settings')
+      }
+    )
+  })
+
+  // Mutation for saving API keys
+  const saveApiKeysMutation = useMutation({
+    mutationFn: async (newApiKeys: Partial<ApiKeys>) => {
+      try {
+        await saveApiKeys({ ...apiKeys, ...newApiKeys })
+        return { ...apiKeys, ...newApiKeys }
+      } catch (error) {
+        throw createQueryError(
+          `Failed to save API keys: ${error}`,
+          'SETTINGS_SAVE'
+        )
+      }
+    },
+    onSuccess: (updatedKeys) => {
+      // Update the cache with the new keys
+      queryClient.setQueryData(queryKeys.settings.apiKeys(), updatedKeys)
     }
-    fetchApiKeys()
-  }, [])
+  })
 
   // Add default folder input and store in zustand app store
   const defaultBackgroundFolder = useAppStore(state => state.defaultBackgroundFolder)
@@ -36,22 +74,26 @@ const Settings: React.FC = () => {
     })
     if (typeof folder === 'string') {
       setDefaultBackgroundFolder(folder)
-      setApiKeys(prev => ({ ...prev, defaultBackgroundFolder: folder }))
     }
   }
 
   const handleSaveDefaultBackground = async () => {
-    await saveApiKeys({ ...apiKeys, defaultBackgroundFolder })
-    alert('Default background folder saved!')
+    try {
+      await saveApiKeysMutation.mutateAsync({ defaultBackgroundFolder })
+      alert('Default background folder saved!')
+    } catch (error) {
+      alert('Failed to save default background folder')
+      console.error('Save error:', error)
+    }
   }
 
   const handleAuthorizeWithTrello = async () => {
-    if (!apiKeys.trello) {
+    if (!localApiKeys.trello) {
       alert('Please enter your Trello API key first.')
       return
     }
 
-    const authUrl = `https://trello.com/1/authorize?expiration=never&name=MyApp&scope=read,write&response_type=token&key=${apiKeys.trello}`
+    const authUrl = `https://trello.com/1/authorize?expiration=never&name=MyApp&scope=read,write&response_type=token&key=${localApiKeys.trello}`
 
     try {
       await open(authUrl)
@@ -61,19 +103,41 @@ const Settings: React.FC = () => {
     }
   }
 
-  const handleSaveSproutKey = async () => {
-    await saveApiKeys({ ...apiKeys, sproutVideo: apiKeys.sproutVideo })
+  // Update local state when cached data changes
+  React.useEffect(() => {
+    if (apiKeys && Object.keys(apiKeys).length > 0) {
+      setLocalApiKeys(apiKeys)
+    }
+  }, [apiKeys])
 
-    alert('SproutVideo API Key saved successfully!')
+  const handleSaveSproutKey = async () => {
+    try {
+      await saveApiKeysMutation.mutateAsync({ sproutVideo: localApiKeys.sproutVideo })
+      alert('SproutVideo API Key saved successfully!')
+    } catch (error) {
+      alert('Failed to save SproutVideo API Key')
+      console.error('Save error:', error)
+    }
   }
 
   const handleSaveTrelloKey = async () => {
-    await saveApiKeys({ ...apiKeys, trello: apiKeys.trello })
-    alert('Trello API Key saved successfully!')
+    try {
+      await saveApiKeysMutation.mutateAsync({ trello: localApiKeys.trello })
+      alert('Trello API Key saved successfully!')
+    } catch (error) {
+      alert('Failed to save Trello API Key')
+      console.error('Save error:', error)
+    }
   }
+
   const handleSaveTrelloToken = async () => {
-    await saveApiKeys({ ...apiKeys, trelloToken: apiKeys.trelloToken })
-    alert('Trello API Token saved successfully!')
+    try {
+      await saveApiKeysMutation.mutateAsync({ trelloToken: localApiKeys.trelloToken })
+      alert('Trello API Token saved successfully!')
+    } catch (error) {
+      alert('Failed to save Trello API Token')
+      console.error('Save error:', error)
+    }
   }
 
   return (
@@ -84,9 +148,9 @@ const Settings: React.FC = () => {
         <div>
           <label className="block text-sm font-medium mb-2">SproutVideo API Key</label>
           <ApiKeyInput
-            apiKey={apiKeys.sproutVideo || ''}
+            apiKey={localApiKeys.sproutVideo || ''}
             setApiKey={(newKey: string) =>
-              setApiKeys({ ...apiKeys, sproutVideo: newKey })
+              setLocalApiKeys({ ...localApiKeys, sproutVideo: newKey })
             }
             onSave={handleSaveSproutKey}
           />
@@ -94,8 +158,8 @@ const Settings: React.FC = () => {
         <div>
           <label className="block text-sm font-medium mb-2">Trello API Key</label>
           <ApiKeyInput
-            apiKey={apiKeys.trello || ''}
-            setApiKey={(newKey: string) => setApiKeys({ ...apiKeys, trello: newKey })}
+            apiKey={localApiKeys.trello || ''}
+            setApiKey={(newKey: string) => setLocalApiKeys({ ...localApiKeys, trello: newKey })}
             onSave={handleSaveTrelloKey}
           />
         </div>
@@ -106,9 +170,9 @@ const Settings: React.FC = () => {
         <div>
           <label className="block text-sm font-medium mb-2">Trello API Token</label>
           <ApiKeyInput
-            apiKey={apiKeys.trelloToken || ''}
+            apiKey={localApiKeys.trelloToken || ''}
             setApiKey={(newKey: string) =>
-              setApiKeys({ ...apiKeys, trelloToken: newKey })
+              setLocalApiKeys({ ...localApiKeys, trelloToken: newKey })
             }
             onSave={handleSaveTrelloToken}
           />

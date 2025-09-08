@@ -18,7 +18,7 @@ export const queryKeys = {
     selection: (projectId: string | number) => ['files', 'selection', projectId] as const,
     tree: (path?: string) => ['files', 'tree', path || 'root'] as const,
     progress: (operationId: string) => ['files', 'progress', operationId] as const,
-    autoSelection: (criteria: Record<string, unknown>) => ['files', 'auto-selection', criteria] as const,
+    autoSelection: (criteria: Record<string, unknown>) => ['files', 'auto-selection', JSON.stringify(criteria)] as const,
   },
 
   // Trello domain
@@ -48,6 +48,15 @@ export const queryKeys = {
     configuration: () => ['settings', 'configuration'] as const,
     theme: () => ['settings', 'theme'] as const,
     integrations: () => ['settings', 'integrations'] as const,
+    apiKeys: () => ['settings', 'api-keys'] as const,
+  },
+
+  // Sprout domain
+  sprout: {
+    all: ['sprout'] as const,
+    folders: (apiKey: string, parentId: string | null) => ['sprout', 'folders', apiKey, parentId || 'root'] as const,
+    videos: (apiKey: string) => ['sprout', 'videos', apiKey] as const,
+    video: (apiKey: string, videoId: string) => ['sprout', 'video', apiKey, videoId] as const,
   },
 
   // Upload domain

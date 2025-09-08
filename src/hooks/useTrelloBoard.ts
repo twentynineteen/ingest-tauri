@@ -7,6 +7,8 @@ import {
   groupCardsByList,
   TrelloCard
 } from 'utils/TrelloCards'
+import { createQueryOptions, createQueryError, shouldRetry } from '../lib/query-utils'
+import { queryKeys } from '../lib/query-keys'
 
 interface TrelloBoardData {
   grouped: Record<string, TrelloCard[]>
@@ -20,55 +22,84 @@ interface TrelloBoardData {
  * then group the cards by their list.
  */
 export function useTrelloBoard(boardId: string): TrelloBoardData {
-  const [apiKey, setApiKey] = useState<string | null>(null)
-  const [token, setToken] = useState<string | null>(null)
   const [grouped, setGrouped] = useState<Record<string, TrelloCard[]>>({})
 
-  // Load credentials once
-  useEffect(() => {
-    const fetchKeys = async () => {
-      const keys = await loadApiKeys()
-      setApiKey(keys.trello)
-      setToken(keys.trelloToken)
-    }
-    fetchKeys()
-  }, [])
-
-  // Fetch cards
-  const { data: cards } = useQuery({
-    queryKey: ['trello-cards', boardId],
-    queryFn: () => {
-      if (!apiKey || !token) throw new Error('API key or token missing')
-      return fetchTrelloCards(apiKey, token, boardId)
-    },
-    enabled: !!apiKey && !!token
+  // Use centralized API key management
+  const { data: credentials, isLoading: credentialsLoading } = useQuery({
+    ...createQueryOptions(
+      queryKeys.user.authentication(),
+      loadApiKeys,
+      'STATIC',
+      {
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        gcTime: 10 * 60 * 1000, // 10 minutes
+        retry: 2,
+        refetchOnWindowFocus: false
+      }
+    )
   })
 
-  // Fetch lists
-  const { data: lists } = useQuery({
-    queryKey: ['trello-lists', boardId],
-    queryFn: () => {
-      if (!apiKey || !token) throw new Error('API key or token missing')
-      return fetchTrelloLists(apiKey, token, boardId)
-    },
-    enabled: !!apiKey && !!token
+  const apiKey = credentials?.trello || null
+  const token = credentials?.trelloToken || null
+
+  // Fetch cards with proper error handling
+  const { data: cards, isLoading: cardsLoading } = useQuery({
+    ...createQueryOptions(
+      queryKeys.trello.cards(boardId),
+      async () => {
+        if (!apiKey || !token) throw createQueryError('API key or token missing', 'AUTHENTICATION')
+        return fetchTrelloCards(apiKey, token, boardId)
+      },
+      'DYNAMIC',
+      {
+        enabled: !!apiKey && !!token && !credentialsLoading,
+        staleTime: 2 * 60 * 1000, // 2 minutes
+        retry: (failureCount, error) => shouldRetry(error, failureCount, 'external')
+      }
+    )
   })
 
-  // Group cards once both are available
+  // Fetch lists with proper error handling
+  const { data: lists, isLoading: listsLoading } = useQuery({
+    ...createQueryOptions(
+      queryKeys.trello.lists(boardId),
+      async () => {
+        if (!apiKey || !token) throw createQueryError('API key or token missing', 'AUTHENTICATION')
+        return fetchTrelloLists(apiKey, token, boardId)
+      },
+      'DYNAMIC',
+      {
+        enabled: !!apiKey && !!token && !credentialsLoading,
+        staleTime: 2 * 60 * 1000, // 2 minutes
+        retry: (failureCount, error) => shouldRetry(error, failureCount, 'external')
+      }
+    )
+  })
+
+  // Use React Query's computed state pattern instead of useEffect
+  const isDataReady = cards && lists && !cardsLoading && !listsLoading
+  const isLoading = credentialsLoading || cardsLoading || listsLoading
+
+  // Group cards when data changes
   useEffect(() => {
-    if (cards && lists) {
+    if (isDataReady) {
       try {
         const groupedCards = groupCardsByList(cards, lists)
         setGrouped(groupedCards)
       } catch (error) {
         console.error('Error grouping Trello cards:', error)
+        // Reset to empty state on error
+        setGrouped({})
       }
+    } else {
+      // Clear grouped data when dependencies are loading/missing
+      setGrouped({})
     }
-  }, [cards, lists])
+  }, [cards, lists, isDataReady])
 
   return {
     grouped,
-    isLoading: !cards || !lists,
+    isLoading,
     apiKey,
     token
   }

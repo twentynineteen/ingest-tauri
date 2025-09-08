@@ -1,5 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { debounce } from 'utils/debounce'
+import { createQueryOptions, createQueryError, shouldRetry } from '../lib/query-utils'
+import { queryKeys } from '../lib/query-keys'
 
 interface AutoRedrawProps {
   draw: (imageUrl: string, title: string) => Promise<void>
@@ -14,15 +17,76 @@ export function usePosterframeAutoRedraw({
   title, 
   debounceMs = 300 
 }: AutoRedrawProps) {
-  const debouncedDrawRef = useRef(debounce(draw, debounceMs))
+  
+  // Create stable keys for the drawing operation
+  const drawKey = useMemo(() => 
+    imageUrl && title.trim() ? 
+      `${imageUrl}-${title.trim()}` : 
+      null, 
+    [imageUrl, title]
+  )
 
+  // Use React Query to manage the debounced drawing operation
+  const { refetch: triggerRedraw } = useQuery({
+    ...createQueryOptions(
+      queryKeys.images.posterframe.autoRedraw(drawKey || 'pending'),
+      async () => {
+        if (!imageUrl || !title.trim()) return null
+        
+        try {
+          await draw(imageUrl, title)
+          return { 
+            imageUrl, 
+            title, 
+            drawnAt: new Date().toISOString() 
+          }
+        } catch (error) {
+          throw createQueryError(
+            `Failed to draw posterframe: ${error}`,
+            'DRAW_OPERATION'
+          )
+        }
+      },
+      'STATIC', // Use static profile for draw operations
+      {
+        enabled: false, // Only run when manually triggered
+        staleTime: 5 * 60 * 1000, // 5 minutes - don't redraw same content too often
+        gcTime: 10 * 60 * 1000, // Keep cached for 10 minutes
+        retry: (failureCount, error) => shouldRetry(error, failureCount, 'canvas')
+      }
+    )
+  })
+
+  // Create debounced trigger function using React Query's refetch
+  const debouncedTriggerRef = useRef(
+    debounce(() => {
+      if (drawKey) {
+        triggerRedraw()
+      }
+    }, debounceMs)
+  )
+
+  // Update debounce timing when it changes
   useEffect(() => {
-    debouncedDrawRef.current = debounce(draw, debounceMs)
-  }, [draw, debounceMs])
+    debouncedTriggerRef.current = debounce(() => {
+      if (drawKey) {
+        triggerRedraw()
+      }
+    }, debounceMs)
+  }, [debounceMs, triggerRedraw, drawKey])
 
+  // Trigger debounced redraw when dependencies change
   useEffect(() => {
     if (imageUrl && title.trim()) {
-      debouncedDrawRef.current(imageUrl, title)
+      debouncedTriggerRef.current()
+    } else {
+      // Cancel pending draws if inputs become invalid
+      debouncedTriggerRef.current.cancel?.()
+    }
+
+    // Cleanup on unmount
+    return () => {
+      debouncedTriggerRef.current.cancel?.()
     }
   }, [imageUrl, title])
 }

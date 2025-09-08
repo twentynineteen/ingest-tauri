@@ -1,5 +1,5 @@
 import { open } from '@tauri-apps/plugin-dialog'
-import React, { useEffect } from 'react'
+import React from 'react'
 
 type Props = {
   onSelect: (folderPath: string) => void
@@ -10,11 +10,8 @@ type Props = {
 // to select a folder path to move footage and build folders
 
 const FolderTree: React.FC<Props> = ({ onSelect, selectedFolder }) => {
-  const [folderPath, setFolderPath] = React.useState<string>('')
-
-  useEffect(() => {
-    setFolderPath(selectedFolder)
-  }, [selectedFolder])
+  // Use selectedFolder directly from props instead of syncing to local state
+  // This eliminates the need for useEffect and makes the component simpler
 
   const openFolderPicker = async () => {
     try {
@@ -23,10 +20,9 @@ const FolderTree: React.FC<Props> = ({ onSelect, selectedFolder }) => {
       })
 
       if (result) {
-        const selectedFolder = result as string // Ensure that `result` is a string path.
-        setFolderPath(selectedFolder)
+        const newSelectedFolder = result as string // Ensure that `result` is a string path.
         // Notify the parent component of the new folder path.
-        onSelect(selectedFolder)
+        onSelect(newSelectedFolder)
       }
     } catch (error) {
       console.error('Error selecting folder:', error)
@@ -41,8 +37,8 @@ const FolderTree: React.FC<Props> = ({ onSelect, selectedFolder }) => {
       >
         Select Destination
       </button>
-      {folderPath ? (
-        <p className="text-sm text-gray-700 mt-2">Destination: {folderPath}</p>
+      {selectedFolder ? (
+        <p className="text-sm text-gray-700 mt-2">Destination: {selectedFolder}</p>
       ) : (
         <p className="text-sm text-gray-700 mt-2"></p>
       )}

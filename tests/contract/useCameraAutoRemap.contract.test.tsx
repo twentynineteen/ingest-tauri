@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react'
-import { renderWithQueryClient, testHookContract, type HookTestContract } from '../utils/query-test-utils.tsx'
+import { renderWithQueryClient, testHookContract, type HookTestContract } from '../utils/query-test-utils.ts'
 import { queryKeys } from '../../src/lib/query-keys'
 
 describe('useCameraAutoRemap Contract Tests', () => {
@@ -96,8 +96,8 @@ describe('useCameraAutoRemap Contract Tests', () => {
   describe('Current vs Expected Behavior', () => {
     it('CURRENT: uses useEffect for camera auto-mapping logic', () => {
       // Current implementation might use useEffect with dependency array
-      const mockApplyMapping = jest.fn()
-      const mockSetSuggestions = jest.fn()
+      const mockApplyMapping = vi.fn()
+      const mockSetSuggestions = vi.fn()
       
       const projectId = 'project123'
       const files = [

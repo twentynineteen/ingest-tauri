@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react'
-import { renderWithQueryClient, testHookContract, type HookTestContract } from '../utils/query-test-utils.tsx'
+import { renderWithQueryClient, testHookContract, type HookTestContract } from '../utils/query-test-utils.ts'
 import { queryKeys } from '../../src/lib/query-keys'
 
 describe('useUploadEvents Contract Tests', () => {
@@ -122,8 +122,8 @@ describe('useUploadEvents Contract Tests', () => {
   describe('Current vs Expected Behavior', () => {
     it('CURRENT: uses Tauri event listeners with useEffect', () => {
       // Current implementation uses direct Tauri event listeners
-      const mockListen = jest.fn().mockResolvedValue(() => {})
-      const mockUnlisten = jest.fn()
+      const mockListen = vi.fn().mockResolvedValue(() => {})
+      const mockUnlisten = vi.fn()
       
       // Mock Tauri listen function
       const listeners = {

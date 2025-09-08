@@ -1,4 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { createQueryOptions } from '../lib/query-utils'
+import { queryKeys } from '../lib/query-keys'
 
 export interface FootageFile {
   file: {
@@ -13,20 +16,49 @@ export function useCameraAutoRemap(
   numCameras: number,
   setFiles: (updated: FootageFile[]) => void
 ) {
-  useEffect(() => {
-    if (files.length === 0) return
+  // Create a unique query key based on files and camera count for memoization
+  const filesHash = useMemo(() => 
+    JSON.stringify(files.map(f => ({ path: f.file.path, camera: f.camera }))),
+    [files]
+  )
 
-    const hasInvalidCameras = files.some(
-      file => file.camera > numCameras || file.camera < 1
+  // Use React Query to compute and cache the remapped files
+  const { data: remappedFiles } = useQuery({
+    ...createQueryOptions(
+      queryKeys.camera.autoRemap(`${filesHash}-${numCameras}`),
+      async () => {
+        if (files.length === 0) return files
+
+        const hasInvalidCameras = files.some(
+          file => file.camera > numCameras || file.camera < 1
+        )
+
+        if (!hasInvalidCameras) return files
+
+        // Return remapped files with invalid cameras set to 1
+        return files.map(file => ({
+          ...file,
+          camera: file.camera > numCameras || file.camera < 1 ? 1 : file.camera
+        }))
+      },
+      'STATIC', // Use static profile for computed values
+      {
+        staleTime: Infinity, // Never stale - only updates when inputs change
+        gcTime: 5 * 60 * 1000, // Keep cached for 5 minutes
+      }
     )
+  })
 
-    if (!hasInvalidCameras) return
-
-    const remapped = files.map(file => ({
-      ...file,
-      camera: file.camera > numCameras || file.camera < 1 ? 1 : file.camera
-    }))
-
-    setFiles(remapped)
-  }, [files, numCameras, setFiles])
+  // Apply remapped files when they change
+  useEffect(() => {
+    if (remappedFiles && remappedFiles !== files) {
+      const needsUpdate = remappedFiles.some((file, index) => 
+        !files[index] || file.camera !== files[index].camera
+      )
+      
+      if (needsUpdate) {
+        setFiles(remappedFiles)
+      }
+    }
+  }, [remappedFiles, files, setFiles])
 }

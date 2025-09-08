@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from '@testing-library/react'
-import { renderWithQueryClient, testHookContract, type HookTestContract } from '../utils/query-test-utils.tsx'
+import { renderWithQueryClient, testHookContract, type HookTestContract } from '../utils/query-test-utils.ts'
 import { queryKeys } from '../../src/lib/query-keys'
 
 describe('useImageRefresh Contract Tests', () => {
@@ -71,10 +71,10 @@ describe('useImageRefresh Contract Tests', () => {
   describe('Current vs Expected Behavior', () => {
     it('CURRENT: uses setTimeout for periodic refresh', () => {
       // Current implementation uses setTimeout + useEffect
-      jest.useFakeTimers()
+      vi.useFakeTimers()
       
-      const mockSetRefreshTimestamp = jest.fn()
-      const mockSetThumbnailLoaded = jest.fn()
+      const mockSetRefreshTimestamp = vi.fn()
+      const mockSetThumbnailLoaded = vi.fn()
       
       // Simulate current hook behavior
       const response = mockSproutResponse
@@ -88,13 +88,13 @@ describe('useImageRefresh Contract Tests', () => {
       }
       
       // Fast-forward 30 seconds
-      jest.advanceTimersByTime(30000)
+      vi.advanceTimersByTime(30000)
       
       expect(mockSetRefreshTimestamp).toHaveBeenCalled()
       expect(mockSetThumbnailLoaded).toHaveBeenCalledWith(false)
       
       if (timerId) clearTimeout(timerId)
-      jest.useRealTimers()
+      vi.useRealTimers()
     })
 
     it('EXPECTED: should use React Query with refetch interval', () => {
