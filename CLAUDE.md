@@ -60,7 +60,7 @@ src-tauri/
 - **Components**: Functional with React.FC typing, PascalCase files
 - **Hooks**: Prefix with `use`, custom hooks in `/hooks`  
 - **State**: Zustand stores (suffix with `Store`) over Context API
-- **Data Fetching**: TanStack React Query over useEffect
+- **Data Fetching**: TanStack React Query over useEffect (see migration guide in specs/002-update-legacy-code/)
 - **Path Aliases**: `@components/*` → `src/components/*`
 
 ### Formatting (Auto-configured)

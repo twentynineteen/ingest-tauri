@@ -1,13 +1,17 @@
-import '@testing-library/jest-dom/extend-expect'
+import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import React from 'react'
 import Page from '../../../page'
 
-// Mock the sidebar component
-jest.mock('@components/components/ui/sidebar', () => ({
-  AppSidebar: () => <div>AppSidebar</div>,
+// Mock the sidebar components
+jest.mock('@components/ui/sidebar', () => ({
   SidebarProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  SidebarInset: ({ children }: { children: React.ReactNode }) => <div>{children}</div>
+  SidebarInset: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  SidebarTrigger: () => <div>SidebarTrigger</div>
+}))
+
+jest.mock('@components/app-sidebar', () => ({
+  AppSidebar: () => <div>AppSidebar</div>
 }))
 
 // Mock the breadcrumb store before tests run

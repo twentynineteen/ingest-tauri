@@ -17,7 +17,7 @@ const Posterframe = () => {
   const { files: backgroundFiles, currentFolder, loadFolder, defaultFolder } = useBackgroundFolder()
   const { selectedFilePath, selectedFileBlob, selectFile } = useFileSelection()
   const { canvasRef, draw } = usePosterframeCanvas()
-  const { zoomLevel, pan, setZoomLevel, setPan } = useZoomPan()
+  const { zoomLevel, pan, setZoomLevel, setPan } = useZoomPan('posterframe-canvas')
 
   useBreadcrumb([
     { label: 'Upload content', href: '/upload/posterframe' },
@@ -35,7 +35,8 @@ const Posterframe = () => {
   useAutoFileSelection({
     files: backgroundFiles,
     selectedFilePath,
-    selectFile
+    selectFile,
+    criteria: { preferImage: true } // Prefer images for posterframe
   })
 
   const chooseSavePath = async () => {
