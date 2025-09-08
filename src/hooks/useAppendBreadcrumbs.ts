@@ -91,6 +91,22 @@ export function useAppendBreadcrumbs(
       throw new Error(`Failed to update card: ${response.statusText}`)
     }
 
+    // Add a comment to the card indicating breadcrumbs were linked
+    const commentResponse = await fetch(
+      `https://api.trello.com/1/cards/${card.id}/actions/comments?key=${apiKey}&token=${token}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          text: 'Linked this card to the project and left some breadcrumbs...' 
+        })
+      }
+    )
+
+    if (!commentResponse.ok) {
+      console.warn(`Failed to add comment: ${commentResponse.statusText}`)
+    }
+
     await queryClient.invalidateQueries({ queryKey: ['trello-card', card.id] })
   }
 

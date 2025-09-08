@@ -23,7 +23,7 @@ export interface Breadcrumb {
   numberOfCameras?: number
   files?: FootageData[]
   parentFolder?: string
-  createdBy?: string
+  createdBy?: string | { data?: string; [key: string]: any }
   creationDateTime?: string
 }
 
