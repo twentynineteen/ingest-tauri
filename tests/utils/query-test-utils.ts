@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, RenderOptions, RenderResult } from '@testing-library/react'
 import { ReactElement, ReactNode } from 'react'
@@ -44,11 +45,7 @@ interface QueryWrapperProps {
 }
 
 function QueryWrapper({ children, queryClient }: QueryWrapperProps) {
-  return (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
-  )
+  return React.createElement(QueryClientProvider, { client: queryClient }, children)
 }
 
 export interface RenderWithQueryClientOptions extends Omit<RenderOptions, 'wrapper'> {
@@ -70,11 +67,8 @@ export function renderWithQueryClient(
     })
   }
 
-  const wrapper = ({ children }: { children: ReactNode }) => (
-    <QueryWrapper queryClient={queryClient}>
-      {children}
-    </QueryWrapper>
-  )
+  const wrapper = ({ children }: { children: ReactNode }) =>
+    React.createElement(QueryWrapper, { queryClient }, children)
 
   return {
     ...render(ui, { wrapper, ...renderOptions }),

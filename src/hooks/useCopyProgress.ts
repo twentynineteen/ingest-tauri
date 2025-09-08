@@ -46,7 +46,7 @@ export function useCopyProgress({
       'REALTIME',
       {
         staleTime: 0, // Always fresh for real-time updates
-        cacheTime: 2 * 60 * 1000, // Keep in cache for 2 minutes
+        gcTime: 2 * 60 * 1000, // Keep in cache for 2 minutes
         refetchInterval: false, // No polling, event-driven
         refetchOnWindowFocus: false,
       }

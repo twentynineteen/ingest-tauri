@@ -53,10 +53,8 @@ export const useImageRefresh = (response: SproutUploadResponse | null): UseImage
         refetchInterval: 30000, // 30 seconds
         refetchIntervalInBackground: false,
         refetchOnWindowFocus: true,
-        onSuccess: () => {
-          // Reset thumbnail loaded state on refresh to show loading placeholder
-          setThumbnailLoaded(false)
-        },
+        // Note: onSuccess is deprecated in newer React Query versions
+        // Consider using useEffect to watch for data changes instead
       }
     )
   )

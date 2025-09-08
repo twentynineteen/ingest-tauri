@@ -32,7 +32,7 @@ export function useZoomPan(containerId: string = 'default', initialZoom = 1): Zo
       'STATIC', // Long cache time for UI state
       {
         staleTime: Infinity, // UI state doesn't go stale
-        cacheTime: 10 * 60 * 1000, // 10 minutes cache
+        gcTime: 10 * 60 * 1000, // 10 minutes cache
         refetchOnWindowFocus: false,
         refetchOnMount: false,
         refetchOnReconnect: false,

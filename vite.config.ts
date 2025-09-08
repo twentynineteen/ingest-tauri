@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import process from 'node:process'
 import react from '@vitejs/plugin-react'
 import autoprefixer from 'autoprefixer'
@@ -9,7 +10,14 @@ const host = process.env.TAURI_DEV_HOST
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), tsconfigPaths()],
+  plugins: [
+    react({
+      include: '**/*.{jsx,tsx}',
+      jsxImportSource: 'react',
+      fastRefresh: process.env.NODE_ENV !== 'test'
+    }), 
+    tsconfigPaths()
+  ],
   css: {
     postcss: {
       plugins: [tailwindcss, autoprefixer]
@@ -52,5 +60,29 @@ export default defineConfig({
     cssMinify: !process.env.TAURI_DEBUG ? 'lightningcss' : false,
     // produce sourcemaps for debug builds
     sourcemap: !!process.env.TAURI_DEBUG
+  },
+  // Vitest configuration
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./tests/setup/vitest-setup.ts'],
+    include: ['tests/**/*.{test,spec}.{ts,tsx}'],
+    server: {
+      deps: {
+        inline: ['@vitejs/plugin-react']
+      }
+    },
+    coverage: {
+      reporter: ['text', 'json', 'html'],
+      exclude: [
+        'node_modules/',
+        'tests/setup/',
+        'src-tauri/',
+        'dist/',
+        'build/',
+        '*.config.*',
+        'scripts/'
+      ]
+    }
   }
 })

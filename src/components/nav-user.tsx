@@ -13,8 +13,10 @@ import { useSidebar } from '@components/ui/use-sidebar'
 import { core } from '@tauri-apps/api'
 import { getVersion } from '@tauri-apps/api/app'
 import { ChevronsUpDown, LogOut } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
+import { createQueryOptions, createQueryError, shouldRetry } from '../lib/query-utils'
+import { queryKeys } from '../lib/query-keys'
 
 type Props = {
   user: {
@@ -29,35 +31,51 @@ type Props = {
 export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
   const { isMobile } = useSidebar()
 
-  const [username, setUsername] = useState('')
-  const [version, setVersion] = useState<string>('')
-
-  useEffect(() => {
-    // Fetch the version when the component mounts
-    const fetchVersion = async () => {
-      try {
-        // Get the app version using Tauri's API
-        const ver = await getVersion()
-        setVersion(ver)
-      } catch (error) {
-        console.error('Failed to get app version:', error)
+  // Use React Query for app version fetching
+  const { data: version } = useQuery({
+    ...createQueryOptions(
+      queryKeys.user.profile(),
+      async () => {
+        try {
+          return await getVersion()
+        } catch (error) {
+          throw createQueryError(
+            `Failed to get app version: ${error}`,
+            'SYSTEM_INFO'
+          )
+        }
+      },
+      'STATIC',
+      {
+        staleTime: 10 * 60 * 1000, // 10 minutes - version doesn't change often
+        gcTime: 30 * 60 * 1000, // Keep cached for 30 minutes
+        retry: (failureCount, error) => shouldRetry(error, failureCount, 'system')
       }
-    }
+    )
+  })
 
-    fetchVersion()
-  }, [])
-
-  useEffect(() => {
-    async function fetchUsername() {
-      try {
-        const name = await core.invoke<string>('get_username')
-        setUsername(name)
-      } catch (error) {
-        console.error('Failed to fetch username', error)
+  // Use React Query for username fetching
+  const { data: username } = useQuery({
+    ...createQueryOptions(
+      queryKeys.user.authentication(),
+      async () => {
+        try {
+          return await core.invoke<string>('get_username')
+        } catch (error) {
+          throw createQueryError(
+            `Failed to fetch username: ${error}`,
+            'AUTHENTICATION'
+          )
+        }
+      },
+      'STATIC',
+      {
+        staleTime: 5 * 60 * 1000, // 5 minutes - username rarely changes
+        gcTime: 15 * 60 * 1000, // Keep cached for 15 minutes
+        retry: (failureCount, error) => shouldRetry(error, failureCount, 'auth')
       }
-    }
-    fetchUsername()
-  }, [])
+    )
+  })
 
   return (
     <SidebarMenu>
@@ -71,7 +89,7 @@ export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-lg">
-                  {username.charAt(0)}
+                  {username?.charAt(0) || user.name.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -92,7 +110,7 @@ export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback className="rounded-lg">
-                    {username.charAt(0)}
+                    {username?.charAt(0) || user.name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -104,7 +122,7 @@ export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                Version: {version}
+                Version: {version || 'Loading...'}
                 {/* {isLoading ? 'Checking for updates...' : 'Check for updates'} */}
               </DropdownMenuItem>
             </DropdownMenuGroup>
