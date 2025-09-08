@@ -23,7 +23,7 @@ export function useUpdateManager() {
     const { onUserClick } = options
 
     // Skip updates in dev mode
-    if (import.meta.env.DEV) {
+    if (process.env.NODE_ENV === 'development') {
       if (onUserClick) {
         await message('Updates are disabled in development mode.', {
           title: 'Development Mode',

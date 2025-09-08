@@ -24,7 +24,7 @@ export const AppRouter: React.FC = () => {
 
   useEffect(() => {
     const updateApp = async () => {
-      if (import.meta.env.DEV) return // Skip updates in dev mode
+      if (process.env.NODE_ENV === 'development') return // Skip updates in dev mode
 
       try {
         const update = await check()

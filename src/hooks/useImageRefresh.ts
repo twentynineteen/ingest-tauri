@@ -1,33 +1,76 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { SproutUploadResponse } from '../utils/types'
+import { queryKeys } from '../lib/query-keys'
+import { createQueryOptions } from '../lib/query-utils'
 
 interface UseImageRefreshReturn {
   thumbnailLoaded: boolean
   refreshTimestamp: number
   setThumbnailLoaded: (loaded: boolean) => void
+  isRefetching: boolean
+  lastRefresh?: string
+}
+
+interface ImageRefreshData {
+  id: string
+  url: string
+  lastModified: string
+  thumbnailLoaded: boolean
 }
 
 export const useImageRefresh = (response: SproutUploadResponse | null): UseImageRefreshReturn => {
   const [thumbnailLoaded, setThumbnailLoaded] = useState(false)
-  const [refreshTimestamp, setRefreshTimestamp] = useState<number>(Date.now())
 
-  useEffect(() => {
-    // This effect will trigger a refresh of the image every 30 seconds after an upload response is available.
-    if (response) {
-      const timer = setTimeout(() => {
-        // Update refreshTimestamp to force re-rendering of the image.
-        setRefreshTimestamp(Date.now())
-        // Reset the thumbnailLoaded flag to show a loading placeholder again.
-        setThumbnailLoaded(false)
-      }, 30000) // 30,000ms = 30 seconds
-      
-      return () => clearTimeout(timer)
-    }
-  }, [response])
+  // Only create query if response is available
+  const videoId = response?.id
+  const queryKey = videoId ? queryKeys.images.refresh(videoId) : null
+
+  const { data, isRefetching } = useQuery(
+    createQueryOptions(
+      queryKey || ['images', 'refresh', 'disabled'],
+      async (): Promise<ImageRefreshData> => {
+        if (!response) {
+          throw new Error('No video response available')
+        }
+
+        // Generate a fresh URL with timestamp to force image refresh
+        const timestamp = Date.now()
+        const refreshUrl = response.assets.thumbnails[0] 
+          ? `${response.assets.thumbnails[0]}?t=${timestamp}`
+          : `${response.embedded_url}/thumbnail.jpg?t=${timestamp}`
+
+        return {
+          id: response.id,
+          url: refreshUrl,
+          lastModified: new Date().toISOString(),
+          thumbnailLoaded: false,
+        }
+      },
+      'REALTIME', // 30-second staleTime with auto-refetch
+      {
+        enabled: !!response && !!videoId,
+        refetchInterval: 30000, // 30 seconds
+        refetchIntervalInBackground: false,
+        refetchOnWindowFocus: true,
+        onSuccess: () => {
+          // Reset thumbnail loaded state on refresh to show loading placeholder
+          setThumbnailLoaded(false)
+        },
+      }
+    )
+  )
+
+  // Calculate refresh timestamp from data or fallback to current time
+  const refreshTimestamp = data?.lastModified 
+    ? new Date(data.lastModified).getTime()
+    : Date.now()
 
   return {
     thumbnailLoaded,
     refreshTimestamp,
-    setThumbnailLoaded
+    setThumbnailLoaded,
+    isRefetching,
+    lastRefresh: data?.lastModified,
   }
 }
