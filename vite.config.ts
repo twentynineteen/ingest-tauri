@@ -2,7 +2,7 @@
 import process from 'node:process'
 import react from '@vitejs/plugin-react'
 import autoprefixer from 'autoprefixer'
-import tailwindcss from 'tailwindcss'
+import tailwindcss from '@tailwindcss/postcss'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
@@ -67,6 +67,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./tests/setup/vitest-setup.ts'],
     include: ['tests/**/*.{test,spec}.{ts,tsx}'],
+    testTimeout: 15000, // 15 seconds timeout for all tests
+    hookTimeout: 15000, // 15 seconds timeout for hooks
     server: {
       deps: {
         inline: ['@vitejs/plugin-react']

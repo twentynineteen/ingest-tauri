@@ -1,21 +1,22 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
+import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import Page from '../../../page'
 
 // Mock the sidebar components
-jest.mock('@components/ui/sidebar', () => ({
+vi.mock('@components/ui/sidebar', () => ({
   SidebarProvider: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   SidebarInset: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   SidebarTrigger: () => <div>SidebarTrigger</div>
 }))
 
-jest.mock('@components/app-sidebar', () => ({
+vi.mock('@components/app-sidebar', () => ({
   AppSidebar: () => <div>AppSidebar</div>
 }))
 
 // Mock the breadcrumb store before tests run
-jest.mock('../../../../../store/useBreadcrumbStore.ts', () => ({
+vi.mock('../../../../../store/useBreadcrumbStore.ts', () => ({
   useBreadcrumbStore: () => ({
     breadcrumbs: [
       { href: '/', label: 'Home' },

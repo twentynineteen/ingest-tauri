@@ -1,6 +1,6 @@
 [package]
 name = "Bucket"
-version = "0.8.0"
+version = "0.8.1"
 description = "An app to streamline ingesting and uploading video content"
 authors = ["Daniel Mills"]
 license = "MIT"
@@ -19,12 +19,12 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "2.0.2", features = [] }
+tauri-build = { version = "2.0", features = [] }
 
 
 [dependencies]
-tauri-plugin-dialog = "2"
-tauri = { version = "2.0.6", features = ["macos-private-api"] }
+tauri-plugin-dialog = "2.4.0"
+tauri = { version = "2.8.2", features = ["macos-private-api"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 rand = "0.8"
@@ -32,23 +32,24 @@ jsonwebtoken = "9.3.1"
 chrono = "0.4.39"
 dotenv = "0.15.0"
 tauri-plugin-http = "2.3.0"
-tauri-plugin-fs = "2"
+tauri-plugin-fs = "2.4.2"
 log = "0.4"
 simple_logger = "4.0"
 fs = "0.0.5"
 argon2 = "0.5"
 tauri-plugin-macos-permissions = "2.0.4"
 quick-xml = "0.29"
-tauri-plugin-updater = "2.5.1"
-tauri-plugin-process = "2.2.0"
-tauri-plugin-shell = "2"
-tauri-plugin-opener = "2"
+tauri-plugin-updater = "2.9.0"
+tauri-plugin-process = "2.3.0"
+tauri-plugin-shell = "2.3.1"
+tauri-plugin-opener = "2.5.0"
 reqwest = { version = "0.11", features = ["multipart", "blocking", "json", "stream"] }
 tokio = { version = "1", features = ["full"] }
 tokio-util = "0.7.13"
 futures-util = "0.3.31"
 bytes = "1"
-tauri-plugin-deep-link = "2.0.0"
+tauri-plugin-deep-link = "2.4.3"
+base64ct = "1.6.0"
 
 
 
@@ -69,7 +70,7 @@ lto = true              # Enables link to optimizations
 opt-level = "s"         # Optimize for binary size. Use `3` if you prefer speed.
 
 [target.'cfg(any(target_os = "macos", windows, target_os = "linux"))'.dependencies]
-tauri-plugin-updater = "2.5.1"
+tauri-plugin-updater = "2.9.0"
 
 [profile.dev.package.objc2]
 debug-assertions = false

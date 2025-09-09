@@ -1,5 +1,5 @@
-// Simple test to verify Jest configuration
-describe('Simple Jest Test', () => {
+// Simple test to verify Vitest configuration
+describe('Simple Vitest Test', () => {
   it('should work with basic assertions', () => {
     expect(1 + 1).toBe(2)
   })

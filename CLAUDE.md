@@ -25,7 +25,50 @@ npm run build              # Build frontend only
 ```bash
 npm run eslint:fix         # Fix linting issues automatically
 npm run prettier:fix       # Format code automatically  
-npm run test               # Run Jest test suite
+npm run test               # Run Vitest test suite (migrating from Jest)
+```
+
+### Dependency Management
+```bash
+bun install                # Primary package manager for development
+bun update                 # Update dependencies to latest versions
+npm audit                  # Security vulnerability scanning
+bunx depcheck              # Detect unused dependencies
+```
+
+### Advanced Package Update Workflow
+```bash
+# Comprehensive package update workflow
+./scripts/quickstart-validation.sh    # Validate complete workflow
+./scripts/security-audit.sh          # Run security audit with reporting
+./scripts/validate-lock-sync.sh       # Ensure npm/bun lock file sync
+
+# Individual service operations
+npx npm-check-updates                 # Check for available updates
+npx npm-check-updates -u             # Update all dependencies to latest
+```
+
+### Package Update Services (New in v0.8.1)
+The project now includes a comprehensive package update workflow with:
+- **Security-first updates**: Automatic vulnerability resolution
+- **Breaking change detection**: AI-powered analysis of update impacts  
+- **Dual package manager support**: Automatic npm/bun synchronization
+- **Progress tracking**: Real-time feedback during updates
+- **Rollback mechanism**: Safe recovery from failed updates
+- **Tauri compatibility validation**: Ensures plugin compatibility
+
+```typescript
+// Usage example for package update workflow
+import { PackageUpdateWorkflow } from './src/services/PackageUpdateWorkflow'
+import { ProgressTracker } from './src/services/ProgressTracker'
+import { UserFeedbackService } from './src/services/UserFeedbackService'
+
+const workflow = new PackageUpdateWorkflow()
+const result = await workflow.executeWorkflow({
+  autoResolveVulnerabilities: true,
+  createRollbackPoint: true,
+  updateStrategy: 'moderate'
+})
 ```
 
 ## Architecture
@@ -35,7 +78,7 @@ npm run test               # Run Jest test suite
 - **Backend**: Tauri 2.0 (Rust) with extensive plugin ecosystem
 - **UI**: TailwindCSS + Radix UI components + Lucide icons
 - **State**: Zustand stores + TanStack React Query (preferred over useEffect)
-- **Testing**: Jest + Testing Library
+- **Testing**: Vitest + Testing Library (migrating from Jest)
 
 ### Project Structure
 ```
@@ -90,6 +133,6 @@ All file operations go through Tauri backend with progress tracking. Key pattern
 ## Development Notes
 
 - **Main Branch**: `release` (use for PRs)
-- **Package Manager**: npm (compatible with Bun via bun.lockb)
+- **Package Manager**: Bun (primary) + npm (audit compatibility, maintains dual lock files)
 - **Platform**: Cross-platform desktop app, primary development on macOS
 - **Security**: Uses argon2 for password hashing, JWT for auth, Tauri stronghold for secure storage
