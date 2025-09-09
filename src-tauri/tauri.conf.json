@@ -55,6 +55,7 @@
       "icons/icon.ico"
     ],
     "macOS": {
+      "minimumSystemVersion": "10.13",
       "dmg": {
         "background": "./images/bucket-installer-bg.png",
         "appPosition": {
