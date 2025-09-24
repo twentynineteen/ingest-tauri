@@ -12,31 +12,31 @@ function formatBreadcrumbsForHumans(breadcrumbs: Breadcrumb): string {
   ]
 
   if (breadcrumbs.projectTitle) {
-    lines.push(`Project: ${breadcrumbs.projectTitle}`)
+    lines.push(`**Project:** ${breadcrumbs.projectTitle}`)
   }
 
   if (breadcrumbs.numberOfCameras) {
-    lines.push(`Cameras: ${breadcrumbs.numberOfCameras} cameras`)
+    lines.push(`**Cameras:** ${breadcrumbs.numberOfCameras} cameras`)
   }
 
   if (breadcrumbs.parentFolder) {
-    lines.push(`Location: ${breadcrumbs.parentFolder}`)
+    lines.push(`**Location:** ${breadcrumbs.parentFolder}`)
   }
 
   if (breadcrumbs.createdBy) {
     const creator = typeof breadcrumbs.createdBy === 'string' 
       ? breadcrumbs.createdBy 
       : breadcrumbs.createdBy?.data || 'Unknown User'
-    lines.push(`Created by: ${creator}`)
+    lines.push(`**Created by:** ${creator}`)
   }
 
   if (breadcrumbs.creationDateTime) {
-    lines.push(`Created: ${breadcrumbs.creationDateTime}`)
+    lines.push(`**Created:** ${breadcrumbs.creationDateTime}`)
   }
 
   if (breadcrumbs.files && breadcrumbs.files.length > 0) {
     const totalFiles = breadcrumbs.files.length
-    lines.push(`Files: ${totalFiles} footage files total`)
+    lines.push(`**Files:** ${totalFiles} footage files total`)
 
     // Group files by camera
     const filesByCamera: Record<number, number> = {}
@@ -112,16 +112,19 @@ export function useAppendBreadcrumbs(
   ): Promise<void> {
     const currentDesc = card.desc ?? ''
     
-    // Check for both new dual-format and legacy JSON-only breadcrumbs
-    const newFormatRegex = /PROJECT DETAILS\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[\s\S]*?```json\n\/\/ BREADCRUMBS[\s\S]*?```/g
-    const legacyFormatRegex = /```json\n\/\/ BREADCRUMBS[\s\S]*?```/g
+    // Define regex patterns (without global flag for testing, with global flag for replacement)
+    const newFormatPattern = /PROJECT DETAILS\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[\s\S]*?```json\n\/\/ BREADCRUMBS[\s\S]*?```/
+    const legacyFormatPattern = /```json\n\/\/ BREADCRUMBS[\s\S]*?```/
     
-    const hasNewFormatBreadcrumbs = newFormatRegex.test(currentDesc)
-    const hasLegacyFormatBreadcrumbs = legacyFormatRegex.test(currentDesc) && !hasNewFormatBreadcrumbs
+    // Check for existing breadcrumbs
+    const hasNewFormatBreadcrumbs = newFormatPattern.test(currentDesc)
+    const hasLegacyFormatBreadcrumbs = legacyFormatPattern.test(currentDesc) && !hasNewFormatBreadcrumbs
     const hasBreadcrumbs = hasNewFormatBreadcrumbs || hasLegacyFormatBreadcrumbs
     
-    // Use the appropriate regex for replacement
-    const regex = hasNewFormatBreadcrumbs ? newFormatRegex : legacyFormatRegex
+    // Create global regex for replacement
+    const replacementRegex = hasNewFormatBreadcrumbs 
+      ? new RegExp(newFormatPattern.source, 'g')
+      : new RegExp(legacyFormatPattern.source, 'g')
 
     let updatedDesc = currentDesc
 
@@ -138,7 +141,7 @@ export function useAppendBreadcrumbs(
         }
       )
       if (!shouldReplace) return
-      updatedDesc = currentDesc.replace(regex, breadcrumbsBlock)
+      updatedDesc = currentDesc.replace(replacementRegex, breadcrumbsBlock)
     } else {
       updatedDesc = `${currentDesc}\n\n${breadcrumbsBlock}`
     }

@@ -32,6 +32,9 @@ const BuildProject: React.FC = () => {
 
   // Trello integration state
   const [showTrelloModal, setShowTrelloModal] = useState(false)
+  
+  // Track if title was sanitized to show warning
+  const [titleSanitized, setTitleSanitized] = useState(false)
 
   // Page label - shadcn breadcrumb component
   useBreadcrumb([
@@ -49,6 +52,20 @@ const BuildProject: React.FC = () => {
 
   useCameraAutoRemap(files, numCameras, setFiles)
 
+  // Sanitize title to prevent folder creation from forward slashes and other OS-unsafe characters
+  const sanitizeTitle = (input: string): string => {
+    // Only replace OS-unsafe characters, preserve spaces as-is
+    return input.replace(/[/\\:*?"<>|]/g, '-')
+  }
+
+  // Handle title change with sanitization
+  const handleTitleChange = (newTitle: string) => {
+    const sanitized = sanitizeTitle(newTitle)
+    const wasSanitized = sanitized !== newTitle
+    setTitle(sanitized)
+    setTitleSanitized(wasSanitized)
+  }
+
   const handleSelectFiles = async () => {
     const newFiles = await selectFiles()
     setFiles(prev => [...prev, ...newFiles])
@@ -63,6 +80,7 @@ const BuildProject: React.FC = () => {
     setProgress(0)
     setCompleted(false)
     setMessage('')
+    setTitleSanitized(false)
   }
 
   // Logic to mark a given file with the camera number
@@ -112,9 +130,10 @@ const BuildProject: React.FC = () => {
         <div className="px-4 mx-4">
           <ProjectInputs
             title={title}
-            onTitleChange={setTitle}
+            onTitleChange={handleTitleChange}
             numCameras={numCameras}
             onNumCamerasChange={setNumCameras}
+            showSanitizationWarning={titleSanitized}
           />
 
           <FolderSelector selectedFolder={selectedFolder} onSelect={setSelectedFolder} />
