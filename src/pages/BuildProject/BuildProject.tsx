@@ -25,8 +25,6 @@ const BuildProject: React.FC = () => {
   const [files, setFiles] = useState<FootageFile[]>([])
   const [selectedFolder, setSelectedFolder] = useState<string>('')
 
-  const [progress, setProgress] = useState(0)
-  const [completed, setCompleted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [, setMessage] = useState('')
 
@@ -44,10 +42,8 @@ const BuildProject: React.FC = () => {
 
   const username = useUsername()
 
-  const { progress: copyProgress, completed: copyCompleted } = useCopyProgress({
-    operationId: 'build-project',
-    onProgress: setProgress,
-    onComplete: setCompleted
+  const { progress, completed } = useCopyProgress({
+    operationId: 'build-project'
   })
 
   useCameraAutoRemap(files, numCameras, setFiles)
@@ -77,8 +73,6 @@ const BuildProject: React.FC = () => {
     setNumCameras(2)
     setFiles([])
     setSelectedFolder('')
-    setProgress(0)
-    setCompleted(false)
     setMessage('')
     setTitleSanitized(false)
   }
@@ -115,8 +109,6 @@ const BuildProject: React.FC = () => {
       selectedFolder,
       numCameras,
       username: username.data || 'Unknown User',
-      setProgress,
-      setCompleted,
       setMessage,
       setLoading
     })
