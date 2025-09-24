@@ -60,7 +60,6 @@ export function useCreateProject() {
       await remove(projectFolder, { recursive: true })
     }
 
-    let unlistenProgress: (() => void) | null = null
     let unlistenComplete: (() => void) | null = null
 
     try {
@@ -84,10 +83,6 @@ export function useCreateProject() {
         file.path,
         camera
       ])
-
-      unlistenProgress = await listen<number>('copy_progress', event => {
-        setProgress(event.payload)
-      })
 
       unlistenComplete = await listen<string[]>('copy_complete', async () => {
         setCompleted(true)
@@ -160,7 +155,6 @@ export function useCreateProject() {
       console.error('Error creating project:', error)
       alert('Error creating project: ' + error)
     } finally {
-      if (unlistenProgress) unlistenProgress()
       if (unlistenComplete) unlistenComplete()
     }
   }
