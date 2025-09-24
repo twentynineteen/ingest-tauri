@@ -301,7 +301,7 @@ export class ProgressTracker {
   /**
    * Export progress data for analysis
    */
-  public exportProgressData(): any {
+  public exportProgressData(): Record<string, unknown> {
     return {
       startTime: this.startTime,
       currentProgress: this.currentProgress,

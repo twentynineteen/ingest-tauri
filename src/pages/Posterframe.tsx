@@ -137,7 +137,7 @@ const Posterframe = () => {
             )}
           </div>
 
-          <div className="mt-6 text-center">
+          <div className="mt-4 text-center">
             <h3 className="font-medium mb-2 text-sm text-muted-foreground">
               Live Preview
             </h3>

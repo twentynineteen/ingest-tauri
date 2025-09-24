@@ -282,7 +282,7 @@ export class UserFeedbackService {
   /**
    * Show workflow completion summary
    */
-  public showCompletionSummary(workflowResult: any): void {
+  public showCompletionSummary(workflowResult: Record<string, unknown>): void {
     console.log('\n' + '='.repeat(60))
     console.log('PACKAGE UPDATE WORKFLOW COMPLETED')
     console.log('='.repeat(60))
@@ -305,7 +305,7 @@ export class UserFeedbackService {
     
     if (workflowResult.errors.length > 0) {
       console.log(`\nErrors (${workflowResult.errors.length}):`)
-      workflowResult.errors.forEach((error: any, index: number) => {
+      workflowResult.errors.forEach((error: Record<string, unknown>, index: number) => {
         console.log(`  ${index + 1}. ${error.phase}: ${error.error.message}`)
       })
     }

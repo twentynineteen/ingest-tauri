@@ -31,13 +31,14 @@ export async function fetchTrelloLists(
   try {
     const response = await fetch(url)
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      const errorText = await response.text()
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
     }
     const lists: TrelloList[] = await response.json()
     return lists
   } catch (error) {
     console.error('Error fetching Trello lists:', error)
-    return []
+    throw error
   }
 }
 
@@ -58,14 +59,15 @@ export async function fetchTrelloCards(
   try {
     const response = await fetch(url)
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      const errorText = await response.text()
+      throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`)
     }
     // Parse and return the cards as an array of TrelloCard objects.
     const cards: TrelloCard[] = await response.json()
     return cards
   } catch (error) {
     console.error('Error fetching Trello cards:', error)
-    return []
+    throw error
   }
 }
 

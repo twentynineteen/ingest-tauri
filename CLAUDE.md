@@ -36,39 +36,11 @@ npm audit                  # Security vulnerability scanning
 bunx depcheck              # Detect unused dependencies
 ```
 
-### Advanced Package Update Workflow
+### Package Updates
 ```bash
-# Comprehensive package update workflow
-./scripts/quickstart-validation.sh    # Validate complete workflow
-./scripts/security-audit.sh          # Run security audit with reporting
-./scripts/validate-lock-sync.sh       # Ensure npm/bun lock file sync
-
-# Individual service operations
+# Basic package update commands
 npx npm-check-updates                 # Check for available updates
 npx npm-check-updates -u             # Update all dependencies to latest
-```
-
-### Package Update Services (New in v0.8.1)
-The project now includes a comprehensive package update workflow with:
-- **Security-first updates**: Automatic vulnerability resolution
-- **Breaking change detection**: AI-powered analysis of update impacts  
-- **Dual package manager support**: Automatic npm/bun synchronization
-- **Progress tracking**: Real-time feedback during updates
-- **Rollback mechanism**: Safe recovery from failed updates
-- **Tauri compatibility validation**: Ensures plugin compatibility
-
-```typescript
-// Usage example for package update workflow
-import { PackageUpdateWorkflow } from './src/services/PackageUpdateWorkflow'
-import { ProgressTracker } from './src/services/ProgressTracker'
-import { UserFeedbackService } from './src/services/UserFeedbackService'
-
-const workflow = new PackageUpdateWorkflow()
-const result = await workflow.executeWorkflow({
-  autoResolveVulnerabilities: true,
-  createRollbackPoint: true,
-  updateStrategy: 'moderate'
-})
 ```
 
 ## Architecture
