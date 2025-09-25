@@ -36,7 +36,7 @@ export function useTrelloBoard(boardId: string): TrelloBoardData {
   const token = credentials?.trelloToken || null
 
   // Fetch cards with proper error handling
-  const { data: cards, isLoading: cardsLoading, error: cardsError } = useQuery({
+  const { data: cards, isLoading: cardsLoading } = useQuery({
     ...createQueryOptions(
       queryKeys.trello.cards(boardId),
       async () => {
@@ -53,7 +53,7 @@ export function useTrelloBoard(boardId: string): TrelloBoardData {
   })
 
   // Fetch lists with proper error handling
-  const { data: lists, isLoading: listsLoading, error: listsError } = useQuery({
+  const { data: lists, isLoading: listsLoading } = useQuery({
     ...createQueryOptions(
       queryKeys.trello.lists(boardId),
       async () => {

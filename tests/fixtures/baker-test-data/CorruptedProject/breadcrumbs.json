@@ -1,0 +1,5 @@
+{
+  "invalid": "json structure",
+  "missing": "required fields"
+  // this is invalid JSON due to comments
+}

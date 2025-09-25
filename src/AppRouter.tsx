@@ -10,6 +10,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import Page from './app/dashboard/page'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
+import Baker from './pages/Baker/Baker'
 import BuildProject from './pages/BuildProject/BuildProject'
 import ConnectedApps from './pages/ConnectedApps'
 import IngestHistory from './pages/IngestHistory'
@@ -85,10 +86,10 @@ export const AppRouter: React.FC = () => {
 
           {/* <Route path="*" element={<Navigate to="/ingest/build" />} /> */}
           <Route path="/" element={<Page />}>
-            <Route path="ingest" element={<BuildProject />}>
+            <Route path="ingest">
               <Route path="history" element={<IngestHistory />} />
-
               <Route path="build" element={<BuildProject />} />
+              <Route path="baker" element={<Baker />} />
             </Route>
             <Route path="upload">
               <Route path="sprout" element={<UploadSprout />} />

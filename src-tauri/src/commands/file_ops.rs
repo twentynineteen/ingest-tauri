@@ -3,7 +3,7 @@ use std::path::Path;
 use std::sync::Arc;
 use std::thread;
 use tauri::{command, AppHandle, Emitter};
-use crate::utils::file_copy::{copy_file_with_progress, copy_file_with_overall_progress};
+use crate::utils::file_copy::copy_file_with_overall_progress;
 
 #[command]
 pub fn move_files(
