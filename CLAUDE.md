@@ -97,6 +97,12 @@ All file operations go through Tauri backend with progress tracking. Key pattern
 3. **Project Creation**: Generate folder structure + Adobe Premiere integration
 4. **Progress Tracking**: Real-time progress during file operations
 
+### Baker Workflow (NEW - Branch: 003-a-new-feature)
+1. **Drive Selection**: Choose root directory for scanning
+2. **Structure Validation**: Identify BuildProject-compatible folders (Footage/, Graphics/, Renders/, Projects/, Scripts/)
+3. **Breadcrumbs Management**: Update existing or create missing breadcrumbs.json files
+4. **Batch Operations**: Apply changes to multiple project folders with progress tracking
+
 ### External Integrations
 - **Adobe Premiere**: Project template generation
 - **Trello**: Project management card updates
