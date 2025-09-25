@@ -30,7 +30,7 @@ const BuildProject: React.FC = () => {
 
   // Trello integration state
   const [showTrelloModal, setShowTrelloModal] = useState(false)
-  
+
   // Track if title was sanitized to show warning
   const [titleSanitized, setTitleSanitized] = useState(false)
 
@@ -45,6 +45,8 @@ const BuildProject: React.FC = () => {
   const { progress, completed } = useCopyProgress({
     operationId: 'build-project'
   })
+  
+  console.log('BuildProject render - progress:', progress, 'completed:', completed)
 
   useCameraAutoRemap(files, numCameras, setFiles)
 
@@ -103,6 +105,9 @@ const BuildProject: React.FC = () => {
   const { createProject } = useCreateProject()
 
   const handleCreateProject = () => {
+    console.log('Create Project clicked!')
+    console.log('Parameters:', { title, files: files.length, selectedFolder, numCameras })
+
     createProject({
       title,
       files,
@@ -146,8 +151,10 @@ const BuildProject: React.FC = () => {
         </div>
 
         <div>
-          {/* 🔹 Show progress bar */}
-          <ProgressBar progress={progress} completed={completed} />
+          <div className="progress mx-4">
+            {/* 🔹 Show progress bar */}
+            <ProgressBar progress={progress} completed={completed} />
+          </div>
 
           {/* 🔹 Post-completion actions - shown after project completion */}
           {completed && !loading && (

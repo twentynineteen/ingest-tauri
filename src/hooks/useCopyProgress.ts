@@ -1,8 +1,11 @@
 import { listen } from '@tauri-apps/api/event'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useRef } from 'react'
-import { queryKeys } from '../lib/query-keys'
-import { createQueryOptions, ProgressState } from '../lib/query-utils'
+import { useEffect, useRef, useState } from 'react'
+
+interface ProgressState {
+  total: number
+  completed: number
+  percentage: number
+}
 
 interface CopyProgressState extends ProgressState {
   status: 'idle' | 'copying' | 'completed' | 'error'
@@ -28,39 +31,21 @@ export function useCopyProgress({
   onProgress,
   onComplete
 }: UseCopyProgressOptions): UseCopyProgressReturn {
-  const queryClient = useQueryClient()
-  const queryKey = queryKeys.files.progress(operationId)
+  console.log('useCopyProgress hook called with operationId:', operationId)
+  
   const listenersSetup = useRef(false)
-
-  const { data } = useQuery(
-    createQueryOptions(
-      queryKey,
-      async (): Promise<CopyProgressState> => {
-        return {
-          total: 100,
-          completed: 0,
-          percentage: 0,
-          status: 'idle',
-        }
-      },
-      'REALTIME',
-      {
-        staleTime: 0, // Always fresh for real-time updates
-        gcTime: 2 * 60 * 1000, // Keep in cache for 2 minutes
-        refetchInterval: false, // No polling, event-driven
-        refetchOnWindowFocus: false,
-      }
-    )
-  )
-
-  const currentState = data || { 
-    total: 100, 
-    completed: 0, 
-    percentage: 0, 
-    status: 'idle' as const 
-  }
+  const [currentState, setCurrentState] = useState<CopyProgressState>({
+    total: 100,
+    completed: 0,
+    percentage: 0,
+    status: 'idle',
+  })
+  
+  console.log('useCopyProgress initial state:', currentState)
 
   useEffect(() => {
+    console.log('useCopyProgress useEffect running, listenersSetup.current:', listenersSetup.current)
+    
     if (listenersSetup.current) return
     listenersSetup.current = true
 
@@ -69,11 +54,14 @@ export function useCopyProgress({
     let isMounted = true
 
     const setupListeners = async () => {
+      console.log('Setting up copy progress listeners...')
       try {
         unlistenProgress = await listen<number>('copy_progress', event => {
           if (!isMounted) return
 
           const progressValue = event.payload
+          console.log('Received copy_progress event:', progressValue)
+          
           const newState: CopyProgressState = {
             total: 100,
             completed: progressValue,
@@ -81,7 +69,8 @@ export function useCopyProgress({
             status: progressValue >= 100 ? 'completed' : 'copying',
           }
 
-          queryClient.setQueryData(queryKey, newState)
+          setCurrentState(newState)
+          console.log('Updated state:', newState)
           
           // Call legacy callbacks for backward compatibility
           if (onProgress) {
@@ -96,6 +85,8 @@ export function useCopyProgress({
         unlistenComplete = await listen<string[]>('copy_complete', () => {
           if (!isMounted) return
 
+          console.log('Received copy_complete event')
+          
           const completedState: CopyProgressState = {
             total: 100,
             completed: 100,
@@ -103,7 +94,7 @@ export function useCopyProgress({
             status: 'completed',
           }
 
-          queryClient.setQueryData(queryKey, completedState)
+          setCurrentState(completedState)
           
           if (onComplete) {
             onComplete(true)
@@ -120,7 +111,7 @@ export function useCopyProgress({
           error: error instanceof Error ? error.message : 'Unknown error',
         }
         
-        queryClient.setQueryData(queryKey, errorState)
+        setCurrentState(errorState)
       }
     }
 
@@ -139,15 +130,22 @@ export function useCopyProgress({
         }
       }, 0)
     }
-  }, [queryClient, queryKey, onProgress, onComplete])
+  }, [onProgress, onComplete])
 
-  return {
+  const returnValue = {
     progress: currentState.percentage,
     completed: currentState.status === 'completed',
     status: currentState.status,
     error: currentState.error,
     isActive: currentState.status === 'copying',
   }
+  
+  // Only log when there's actual progress or state change to avoid spam
+  if (currentState.status !== 'idle' || currentState.percentage > 0) {
+    console.log('useCopyProgress returning:', returnValue)
+  }
+  
+  return returnValue
 }
 
 // Legacy function for backward compatibility
