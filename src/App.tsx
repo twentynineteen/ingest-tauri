@@ -3,11 +3,11 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import AppRouter from './AppRouter'
-import { AuthProvider } from './context/AuthProvider'
 import { QueryErrorBoundary } from './components/ErrorBoundary'
-import { initializeCacheService } from './services/cache-invalidation'
-import { initializePrefetchManager } from './lib/prefetch-strategies'
+import { AuthProvider } from './context/AuthProvider'
 import { initializePerformanceMonitor } from './lib/performance-monitor'
+import { initializePrefetchManager } from './lib/prefetch-strategies'
+import { initializeCacheService } from './services/cache-invalidation'
 
 // The app component acts as the main routing generator for the application.
 // AppRouter wraps the app routes to make use of the useLocation method within react-router-dom
@@ -29,7 +29,7 @@ const queryClient = new QueryClient({
         return failureCount < 3
       },
       // Retry delay with exponential backoff
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
       // Refetch on window focus for critical data
       refetchOnWindowFocus: false, // Disabled by default, hooks can override this
       // Background refetch interval for important data
@@ -45,7 +45,7 @@ const queryClient = new QueryClient({
         return failureCount < 2 // Fewer retries for mutations
       },
       // Retry delay for mutations
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000)
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 10000)
     }
   }
 })

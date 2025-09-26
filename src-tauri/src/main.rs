@@ -55,7 +55,9 @@ fn main() {
             baker_cancel_scan,
             baker_validate_folder,
             baker_read_breadcrumbs,
-            baker_update_breadcrumbs
+            baker_update_breadcrumbs,
+            baker_scan_current_files,
+            get_folder_size
         ])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");

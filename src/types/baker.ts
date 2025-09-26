@@ -1,6 +1,6 @@
 /**
  * Baker Feature - TypeScript Type Definitions
- * 
+ *
  * This file defines the TypeScript interfaces for the Baker folder scanning
  * and breadcrumbs management functionality.
  */
@@ -10,6 +10,7 @@ export interface ProjectFolder {
   name: string
   isValid: boolean
   hasBreadcrumbs: boolean
+  staleBreadcrumbs: boolean // true if breadcrumbs file differs from actual folder content
   lastScanned: string // ISO timestamp
   cameraCount: number
   validationErrors: string[]
@@ -22,8 +23,10 @@ export interface BreadcrumbsFile {
   parentFolder: string
   createdBy: string
   creationDateTime: string
+  folderSizeBytes?: number
   lastModified?: string
   scannedBy?: string
+  trelloCardUrl?: string
 }
 
 export interface FileInfo {
@@ -40,6 +43,7 @@ export interface ScanResult {
   validProjects: number
   updatedBreadcrumbs: number
   createdBreadcrumbs: number
+  totalFolderSize: number // Total size in bytes of all scanned folders
   errors: ScanError[]
   projects: ProjectFolder[]
 }
@@ -138,22 +142,26 @@ export interface UseBakerScanResult {
   scanResult: ScanResult | null
   isScanning: boolean
   error: string | null
-  
+
   // Actions
   startScan: (rootPath: string, options: ScanOptions) => Promise<void>
   cancelScan: () => void
-  
+
   // Cleanup
   clearResults: () => void
 }
 
 export interface UseBreadcrumbsManagerResult {
   // Actions
-  updateBreadcrumbs: (projectPaths: string[], options: {
-    createMissing: boolean
-    backupOriginals: boolean
-  }) => Promise<BatchUpdateResult>
-  
+  updateBreadcrumbs: (
+    projectPaths: string[],
+    options: {
+      createMissing: boolean
+      backupOriginals: boolean
+    }
+  ) => Promise<BatchUpdateResult>
+  clearResults: () => void
+
   // State
   isUpdating: boolean
   lastUpdateResult: BatchUpdateResult | null
@@ -163,8 +171,44 @@ export interface UseBreadcrumbsManagerResult {
 export interface UseBakerPreferencesResult {
   // State
   preferences: ScanPreferences
-  
+
   // Actions
   updatePreferences: (newPrefs: Partial<ScanPreferences>) => void
   resetToDefaults: () => void
+}
+
+// Breadcrumbs comparison and diff types
+export type FieldChangeType = 'added' | 'modified' | 'removed' | 'unchanged'
+
+export interface FieldChange {
+  type: FieldChangeType
+  field: string
+  oldValue?: unknown
+  newValue?: unknown
+}
+
+export interface BreadcrumbsDiff {
+  hasChanges: boolean
+  changes: FieldChange[]
+  summary: {
+    added: number
+    modified: number
+    removed: number
+    unchanged: number
+  }
+}
+
+export interface BreadcrumbsPreview {
+  current: BreadcrumbsFile | null
+  updated: BreadcrumbsFile
+  diff: BreadcrumbsDiff // Full diff including maintenance fields (for display)
+  meaningfulDiff?: BreadcrumbsDiff // Only meaningful changes (for confirmation logic)
+}
+
+export interface BreadcrumbsViewerProps {
+  breadcrumbs: BreadcrumbsFile
+  projectPath: string
+  previewMode?: boolean
+  preview?: BreadcrumbsPreview
+  onTogglePreview?: () => void
 }

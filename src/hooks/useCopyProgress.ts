@@ -32,20 +32,23 @@ export function useCopyProgress({
   onComplete
 }: UseCopyProgressOptions): UseCopyProgressReturn {
   console.log('useCopyProgress hook called with operationId:', operationId)
-  
+
   const listenersSetup = useRef(false)
   const [currentState, setCurrentState] = useState<CopyProgressState>({
     total: 100,
     completed: 0,
     percentage: 0,
-    status: 'idle',
+    status: 'idle'
   })
-  
+
   console.log('useCopyProgress initial state:', currentState)
 
   useEffect(() => {
-    console.log('useCopyProgress useEffect running, listenersSetup.current:', listenersSetup.current)
-    
+    console.log(
+      'useCopyProgress useEffect running, listenersSetup.current:',
+      listenersSetup.current
+    )
+
     if (listenersSetup.current) return
     listenersSetup.current = true
 
@@ -61,22 +64,22 @@ export function useCopyProgress({
 
           const progressValue = event.payload
           console.log('Received copy_progress event:', progressValue)
-          
+
           const newState: CopyProgressState = {
             total: 100,
             completed: progressValue,
             percentage: progressValue,
-            status: progressValue >= 100 ? 'completed' : 'copying',
+            status: progressValue >= 100 ? 'completed' : 'copying'
           }
 
           setCurrentState(newState)
           console.log('Updated state:', newState)
-          
+
           // Call legacy callbacks for backward compatibility
           if (onProgress) {
             onProgress(progressValue)
           }
-          
+
           if (progressValue >= 100 && onComplete) {
             onComplete(true)
           }
@@ -86,31 +89,31 @@ export function useCopyProgress({
           if (!isMounted) return
 
           console.log('Received copy_complete event')
-          
+
           const completedState: CopyProgressState = {
             total: 100,
             completed: 100,
             percentage: 100,
-            status: 'completed',
+            status: 'completed'
           }
 
           setCurrentState(completedState)
-          
+
           if (onComplete) {
             onComplete(true)
           }
         })
       } catch (error) {
         console.error('Failed to setup copy progress listeners:', error)
-        
+
         const errorState: CopyProgressState = {
           total: 100,
           completed: 0,
           percentage: 0,
           status: 'error',
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: error instanceof Error ? error.message : 'Unknown error'
         }
-        
+
         setCurrentState(errorState)
       }
     }
@@ -120,7 +123,7 @@ export function useCopyProgress({
     return () => {
       isMounted = false
       listenersSetup.current = false
-      
+
       setTimeout(() => {
         try {
           if (unlistenProgress) unlistenProgress()
@@ -137,14 +140,14 @@ export function useCopyProgress({
     completed: currentState.status === 'completed',
     status: currentState.status,
     error: currentState.error,
-    isActive: currentState.status === 'copying',
+    isActive: currentState.status === 'copying'
   }
-  
+
   // Only log when there's actual progress or state change to avoid spam
   if (currentState.status !== 'idle' || currentState.percentage > 0) {
     console.log('useCopyProgress returning:', returnValue)
   }
-  
+
   return returnValue
 }
 
@@ -156,6 +159,6 @@ export function useCopyProgressLegacy(
   return useCopyProgress({
     operationId: 'default',
     onProgress: setProgress,
-    onComplete: setCompleted,
+    onComplete: setCompleted
   })
 }

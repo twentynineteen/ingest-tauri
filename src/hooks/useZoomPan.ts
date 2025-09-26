@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback, useMemo } from 'react'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryOptions } from '../lib/query-utils'
-import { useCallback, useMemo } from 'react'
 
 interface ZoomPanState {
   zoomLevel: number
@@ -15,7 +15,10 @@ interface ZoomPanData extends ZoomPanState {
   isResetting?: boolean
 }
 
-export function useZoomPan(containerId: string = 'default', initialZoom = 1): ZoomPanData {
+export function useZoomPan(
+  containerId: string = 'default',
+  initialZoom = 1
+): ZoomPanData {
   const queryClient = useQueryClient()
   const queryKey = queryKeys.images.zoomPan(containerId)
 
@@ -26,7 +29,7 @@ export function useZoomPan(containerId: string = 'default', initialZoom = 1): Zo
         // Return default state - this is essentially client-side state
         return {
           zoomLevel: initialZoom,
-          pan: { x: 0, y: 0 },
+          pan: { x: 0, y: 0 }
         }
       },
       'STATIC', // Long cache time for UI state
@@ -35,25 +38,25 @@ export function useZoomPan(containerId: string = 'default', initialZoom = 1): Zo
         gcTime: 10 * 60 * 1000, // 10 minutes cache
         refetchOnWindowFocus: false,
         refetchOnMount: false,
-        refetchOnReconnect: false,
+        refetchOnReconnect: false
       }
     )
   )
 
-  const currentState = useMemo(() => 
-    data || { zoomLevel: initialZoom, pan: { x: 0, y: 0 } }, 
+  const currentState = useMemo(
+    () => data || { zoomLevel: initialZoom, pan: { x: 0, y: 0 } },
     [data, initialZoom]
   )
 
   const setZoomLevel = useCallback(
     (zoom: number | ((prev: number) => number)) => {
       const newZoom = typeof zoom === 'function' ? zoom(currentState.zoomLevel) : zoom
-      
+
       const newState: ZoomPanState = {
         zoomLevel: newZoom,
-        pan: newZoom === 1 ? { x: 0, y: 0 } : currentState.pan, // Reset pan when zoom is 1
+        pan: newZoom === 1 ? { x: 0, y: 0 } : currentState.pan // Reset pan when zoom is 1
       }
-      
+
       queryClient.setQueryData(queryKey, newState)
     },
     [queryClient, queryKey, currentState]
@@ -63,9 +66,9 @@ export function useZoomPan(containerId: string = 'default', initialZoom = 1): Zo
     (pan: { x: number; y: number }) => {
       const newState: ZoomPanState = {
         ...currentState,
-        pan,
+        pan
       }
-      
+
       queryClient.setQueryData(queryKey, newState)
     },
     [queryClient, queryKey, currentState]
@@ -74,9 +77,9 @@ export function useZoomPan(containerId: string = 'default', initialZoom = 1): Zo
   const resetZoomPan = useCallback(() => {
     const resetState: ZoomPanState = {
       zoomLevel: initialZoom,
-      pan: { x: 0, y: 0 },
+      pan: { x: 0, y: 0 }
     }
-    
+
     queryClient.setQueryData(queryKey, resetState)
   }, [queryClient, queryKey, initialZoom])
 
@@ -85,6 +88,6 @@ export function useZoomPan(containerId: string = 'default', initialZoom = 1): Zo
     pan: currentState.pan,
     setZoomLevel,
     setPan,
-    resetZoomPan,
+    resetZoomPan
   }
 }

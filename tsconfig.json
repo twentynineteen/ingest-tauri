@@ -12,7 +12,11 @@
     "isolatedModules": true,
     "baseUrl": "./src",
     "paths": {
-      "@components/*": ["components/*"]
+      "@components/*": ["components/*"],
+      "@hooks/*": ["hooks/*"],
+      "@lib/*": ["lib/*"],
+      "@utils/*": ["utils/*"],
+      "@/*": ["./*"]
     }
   },
   "include": ["src", "vite.config.ts", "**/*.ts", "**/*.tsx"],

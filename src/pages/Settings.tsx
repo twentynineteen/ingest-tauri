@@ -1,18 +1,18 @@
 import { Button } from '@components/ui/button'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { open as openPath } from '@tauri-apps/plugin-dialog'
 import { open } from '@tauri-apps/plugin-shell'
 import { useBreadcrumb } from 'hooks/useBreadcrumb'
 import React, { useState } from 'react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAppStore } from 'store/useAppStore'
 import ApiKeyInput from 'utils/ApiKeyInput'
-import { ApiKeys, loadApiKeys, saveApiKeys } from '../utils/storage'
-import { createQueryOptions, createQueryError, shouldRetry } from '../lib/query-utils'
 import { queryKeys } from '../lib/query-keys'
+import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
+import { ApiKeys, loadApiKeys, saveApiKeys } from '../utils/storage'
 
 const Settings: React.FC = () => {
   const queryClient = useQueryClient()
-  
+
   // Local state for form inputs (separate from cached data)
   const [localApiKeys, setLocalApiKeys] = useState<Partial<ApiKeys>>({})
 
@@ -27,10 +27,7 @@ const Settings: React.FC = () => {
         try {
           return await loadApiKeys()
         } catch (error) {
-          throw createQueryError(
-            `Failed to load API keys: ${error}`,
-            'SETTINGS_LOAD'
-          )
+          throw createQueryError(`Failed to load API keys: ${error}`, 'SETTINGS_LOAD')
         }
       },
       'DYNAMIC',
@@ -49,13 +46,10 @@ const Settings: React.FC = () => {
         await saveApiKeys({ ...apiKeys, ...newApiKeys })
         return { ...apiKeys, ...newApiKeys }
       } catch (error) {
-        throw createQueryError(
-          `Failed to save API keys: ${error}`,
-          'SETTINGS_SAVE'
-        )
+        throw createQueryError(`Failed to save API keys: ${error}`, 'SETTINGS_SAVE')
       }
     },
-    onSuccess: (updatedKeys) => {
+    onSuccess: updatedKeys => {
       // Update the cache with the new keys
       queryClient.setQueryData(queryKeys.settings.apiKeys(), updatedKeys)
     }
@@ -159,7 +153,9 @@ const Settings: React.FC = () => {
           <label className="block text-sm font-medium mb-2">Trello API Key</label>
           <ApiKeyInput
             apiKey={localApiKeys.trello || ''}
-            setApiKey={(newKey: string) => setLocalApiKeys({ ...localApiKeys, trello: newKey })}
+            setApiKey={(newKey: string) =>
+              setLocalApiKeys({ ...localApiKeys, trello: newKey })
+            }
             onSave={handleSaveTrelloKey}
           />
         </div>

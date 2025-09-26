@@ -3,9 +3,9 @@ import {
   AccordionItem,
   AccordionTrigger
 } from '@components/ui/accordion'
-import { format, parse } from 'date-fns'
 import React from 'react'
 import { Breadcrumb } from 'utils/types'
+import { formatBreadcrumbDate } from '../breadcrumbsComparison'
 import FileList from './FileList'
 import KeyValueRow from './KeyValueRow'
 
@@ -25,18 +25,19 @@ const BreadcrumbsAccordionItem: React.FC<Props> = ({ data }) => {
             <KeyValueRow label="Project Title" value={data.projectTitle} />
           )}
           {data.createdBy && (
-            <KeyValueRow 
-              label="Created By" 
-              value={typeof data.createdBy === 'string' ? data.createdBy : data.createdBy?.data || 'Unknown User'} 
+            <KeyValueRow
+              label="Created By"
+              value={
+                typeof data.createdBy === 'string'
+                  ? data.createdBy
+                  : data.createdBy?.data || 'Unknown User'
+              }
             />
           )}
           {data.creationDateTime && (
             <KeyValueRow
               label="Created On"
-              value={format(
-                parse(data.creationDateTime, 'dd/MM/yyyy, HH:mm:ss', new Date()),
-                'PPPpp'
-              )}
+              value={formatBreadcrumbDate(data.creationDateTime)}
             />
           )}
           {data.parentFolder && <KeyValueRow label="Folder" value={data.parentFolder} />}

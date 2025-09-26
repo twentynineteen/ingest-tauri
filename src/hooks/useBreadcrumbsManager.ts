@@ -1,6 +1,6 @@
 /**
  * useBreadcrumbsManager Hook
- * 
+ *
  * Custom React hook for managing breadcrumbs.json file operations.
  * Handles batch updates, creation, and error management.
  */
@@ -14,43 +14,53 @@ export function useBreadcrumbsManager(): UseBreadcrumbsManagerResult {
   const [lastUpdateResult, setLastUpdateResult] = useState<BatchUpdateResult | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const updateBreadcrumbs = useCallback(async (
-    projectPaths: string[], 
-    options: { createMissing: boolean; backupOriginals: boolean }
-  ): Promise<BatchUpdateResult> => {
-    if (isUpdating) {
-      throw new Error('Update operation already in progress')
-    }
+  const updateBreadcrumbs = useCallback(
+    async (
+      projectPaths: string[],
+      options: { createMissing: boolean; backupOriginals: boolean }
+    ): Promise<BatchUpdateResult> => {
+      if (isUpdating) {
+        throw new Error('Update operation already in progress')
+      }
 
-    if (projectPaths.length === 0) {
-      throw new Error('Project paths array cannot be empty')
-    }
+      if (projectPaths.length === 0) {
+        throw new Error('Project paths array cannot be empty')
+      }
 
-    setIsUpdating(true)
+      setIsUpdating(true)
+      setError(null)
+
+      try {
+        const result = await invoke<BatchUpdateResult>('baker_update_breadcrumbs', {
+          projectPaths,
+          createMissing: options.createMissing,
+          backupOriginals: options.backupOriginals
+        })
+
+        setLastUpdateResult(result)
+        return result
+      } catch (updateError) {
+        const errorMessage =
+          updateError instanceof Error ? updateError.message : String(updateError)
+        setError(errorMessage)
+        throw updateError
+      } finally {
+        setIsUpdating(false)
+      }
+    },
+    [isUpdating]
+  )
+
+  const clearResults = useCallback(() => {
+    setLastUpdateResult(null)
     setError(null)
-
-    try {
-      const result = await invoke<BatchUpdateResult>('baker_update_breadcrumbs', {
-        projectPaths,
-        createMissing: options.createMissing,
-        backupOriginals: options.backupOriginals
-      })
-
-      setLastUpdateResult(result)
-      return result
-    } catch (updateError) {
-      const errorMessage = updateError instanceof Error ? updateError.message : String(updateError)
-      setError(errorMessage)
-      throw updateError
-    } finally {
-      setIsUpdating(false)
-    }
-  }, [isUpdating])
+  }, [])
 
   return {
     updateBreadcrumbs,
     isUpdating,
     lastUpdateResult,
-    error
+    error,
+    clearResults
   }
 }

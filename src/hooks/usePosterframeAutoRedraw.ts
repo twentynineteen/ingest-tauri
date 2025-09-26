@@ -1,8 +1,8 @@
-import { useEffect, useRef, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useEffect, useMemo, useRef } from 'react'
 import { debounce } from 'utils/debounce'
-import { createQueryOptions, createQueryError, shouldRetry } from '../lib/query-utils'
 import { queryKeys } from '../lib/query-keys'
+import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
 
 interface AutoRedrawProps {
   draw: (imageUrl: string, title: string) => Promise<void>
@@ -11,18 +11,15 @@ interface AutoRedrawProps {
   debounceMs?: number
 }
 
-export function usePosterframeAutoRedraw({ 
-  draw, 
-  imageUrl, 
-  title, 
-  debounceMs = 300 
+export function usePosterframeAutoRedraw({
+  draw,
+  imageUrl,
+  title,
+  debounceMs = 300
 }: AutoRedrawProps) {
-  
   // Create stable keys for the drawing operation
-  const drawKey = useMemo(() => 
-    imageUrl && title.trim() ? 
-      `${imageUrl}-${title.trim()}` : 
-      null, 
+  const drawKey = useMemo(
+    () => (imageUrl && title.trim() ? `${imageUrl}-${title.trim()}` : null),
     [imageUrl, title]
   )
 
@@ -32,19 +29,16 @@ export function usePosterframeAutoRedraw({
       queryKeys.images.posterframe.autoRedraw(drawKey || 'pending'),
       async () => {
         if (!imageUrl || !title.trim()) return null
-        
+
         try {
           await draw(imageUrl, title)
-          return { 
-            imageUrl, 
-            title, 
-            drawnAt: new Date().toISOString() 
+          return {
+            imageUrl,
+            title,
+            drawnAt: new Date().toISOString()
           }
         } catch (error) {
-          throw createQueryError(
-            `Failed to draw posterframe: ${error}`,
-            'DRAW_OPERATION'
-          )
+          throw createQueryError(`Failed to draw posterframe: ${error}`, 'DRAW_OPERATION')
         }
       },
       'STATIC', // Use static profile for draw operations

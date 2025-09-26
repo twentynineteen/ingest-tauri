@@ -5,6 +5,9 @@
  * Simplified version using only existing UI components.
  */
 
+import type { ProjectFolder } from '@/types/baker'
+import { BatchUpdateConfirmationDialog } from '@components/BatchUpdateConfirmationDialog'
+import { BreadcrumbsViewerEnhanced } from '@components/BreadcrumbsViewerEnhanced'
 import ErrorBoundary from '@components/ErrorBoundary'
 import { Button } from '@components/ui/button'
 import {
@@ -16,7 +19,15 @@ import {
   DialogTrigger
 } from '@components/ui/dialog'
 import { Input } from '@components/ui/input'
+import { useBakerPreferences } from '@hooks/useBakerPreferences'
+import { useBakerScan } from '@hooks/useBakerScan'
+import { useBreadcrumbsManager } from '@hooks/useBreadcrumbsManager'
+import { useBreadcrumbsPreview } from '@hooks/useBreadcrumbsPreview'
+import { useLiveBreadcrumbsReader } from '@hooks/useLiveBreadcrumbsReader'
 import { open } from '@tauri-apps/plugin-dialog'
+import { formatFileSize } from '@utils/breadcrumbsComparison'
+import { readTextFile } from '@tauri-apps/plugin-fs'
+import { useTrelloBoard } from 'hooks'
 import { useBreadcrumb } from 'hooks/useBreadcrumb'
 import {
   AlertTriangle,
@@ -29,12 +40,6 @@ import {
   Square
 } from 'lucide-react'
 import React, { useCallback, useState } from 'react'
-import { useBakerPreferences } from '../../hooks/useBakerPreferences'
-import { useBakerScan } from '../../hooks/useBakerScan'
-import { useBreadcrumbsManager } from '../../hooks/useBreadcrumbsManager'
-import { useBreadcrumbsReader } from '../../hooks/useBreadcrumbsReader'
-import { BreadcrumbsViewer } from '../../components/BreadcrumbsViewer'
-import type { ProjectFolder } from '../../types/baker'
 
 const BakerPageContent: React.FC = () => {
   // Set breadcrumbs for navigation
@@ -45,13 +50,32 @@ const BakerPageContent: React.FC = () => {
   const [selectedProjects, setSelectedProjects] = useState<string[]>([])
   const [showPreferences, setShowPreferences] = useState(false)
   const [expandedProject, setExpandedProject] = useState<string | null>(null)
+  const [previewProject, setPreviewProject] = useState<string | null>(null)
+  const [showBatchConfirmation, setShowBatchConfirmation] = useState(false)
 
   // Custom hooks
   const { scanResult, isScanning, error, startScan, cancelScan, clearResults } =
     useBakerScan()
-  const { updateBreadcrumbs, isUpdating, lastUpdateResult } = useBreadcrumbsManager()
+  const {
+    updateBreadcrumbs,
+    isUpdating,
+    lastUpdateResult,
+    clearResults: clearUpdateResults
+  } = useBreadcrumbsManager()
   const { preferences, updatePreferences, resetToDefaults } = useBakerPreferences()
-  const { breadcrumbs, isLoading: isLoadingBreadcrumbs, error: breadcrumbsError, readBreadcrumbs, clearBreadcrumbs } = useBreadcrumbsReader()
+  const {
+    breadcrumbs,
+    isLoading: isLoadingBreadcrumbs,
+    error: breadcrumbsError,
+    readLiveBreadcrumbs,
+    clearBreadcrumbs
+  } = useLiveBreadcrumbsReader()
+  const { generatePreview, generateBatchPreviews, clearPreviews, getPreview } =
+    useBreadcrumbsPreview()
+
+  // Trello integration (optional)
+  const boardId = '55a504d70bed2bd21008dc5a' // Hard-coded boardId for 'small projects'
+  const { apiKey, token } = useTrelloBoard(boardId)
 
   // Handlers
   const handleSelectFolder = useCallback(async () => {
@@ -117,36 +141,128 @@ const BakerPageContent: React.FC = () => {
       return
     }
 
-    if (preferences.confirmBulkOperations) {
-      const confirmed = confirm(`Apply changes to ${selectedProjects.length} project(s)?`)
-
-      if (!confirmed) return
+    // Generate previews for selected projects before showing confirmation dialog
+    if (scanResult?.projects) {
+      const selectedProjectData = scanResult.projects.filter(p =>
+        selectedProjects.includes(p.path)
+      )
+      await generateBatchPreviews(selectedProjectData)
     }
 
+    // Show confirmation dialog with preview
+    setShowBatchConfirmation(true)
+  }, [selectedProjects, scanResult, generateBatchPreviews])
+
+  const handleConfirmBatchUpdate = useCallback(async () => {
+    const trelloErrors: Array<{project: string, error: string}> = []
+
     try {
+      // Update local breadcrumbs files first
       await updateBreadcrumbs(selectedProjects, {
         createMissing: preferences.createMissing,
         backupOriginals: preferences.backupOriginals
       })
 
-      // Clear selection after successful update
+      // Update Trello cards if API credentials are available
+      if (apiKey && token) {
+        for (const projectPath of selectedProjects) {
+          try {
+            // Read the updated breadcrumbs file
+            const breadcrumbsPath = `${projectPath}/breadcrumbs.json`
+            const breadcrumbsContent = await readTextFile(breadcrumbsPath)
+            const breadcrumbsData = JSON.parse(breadcrumbsContent)
+
+            // Check if this project has a linked Trello card
+            if (breadcrumbsData.trelloCardUrl) {
+              // Extract card ID from URL
+              const cardIdMatch = breadcrumbsData.trelloCardUrl.match(/\/c\/([^/]+)/)
+              if (cardIdMatch) {
+                const cardId = cardIdMatch[1]
+
+                // Create a mock TrelloCard object for the API call
+                const mockCard = {
+                  id: cardId,
+                  desc: '',
+                  name: 'Baker Update',
+                  idList: ''
+                }
+
+                // Use the core utility functions with the specific breadcrumbs data
+                const { generateBreadcrumbsBlock, updateTrelloCardWithBreadcrumbs } = await import('hooks/useAppendBreadcrumbs')
+
+                const block = generateBreadcrumbsBlock(breadcrumbsData)
+                if (block) {
+                  await updateTrelloCardWithBreadcrumbs(mockCard, block, apiKey, token, { autoReplace: true, silentErrors: true })
+                }
+              }
+            }
+          } catch (trelloError) {
+            const projectName = selectedProjects.find(p => p === projectPath)?.split('/').pop() || projectPath
+            trelloErrors.push({
+              project: projectName,
+              error: trelloError instanceof Error ? trelloError.message : String(trelloError)
+            })
+            console.warn(`Failed to update Trello card for ${projectPath}:`, trelloError)
+          }
+        }
+      }
+
+      // Clear selection and previews after update
       setSelectedProjects([])
+      clearPreviews()
+      setShowBatchConfirmation(false)
+
+      // Show Trello errors if any occurred
+      if (trelloErrors.length > 0) {
+        const errorMessage = `Breadcrumbs updated successfully, but ${trelloErrors.length} Trello card update(s) failed:\n\n` +
+          trelloErrors.map(({project, error}) => `• ${project}: ${error}`).join('\n')
+        alert(errorMessage)
+      }
     } catch (error) {
       alert(`Failed to update breadcrumbs: ${error}`)
+      setShowBatchConfirmation(false)
     }
-  }, [selectedProjects, preferences, updateBreadcrumbs])
+  }, [
+    selectedProjects,
+    preferences,
+    updateBreadcrumbs,
+    clearPreviews,
+    apiKey,
+    token
+  ])
 
-  const handleViewBreadcrumbs = useCallback(async (projectPath: string) => {
-    if (expandedProject === projectPath) {
-      // Collapse if already expanded
-      setExpandedProject(null)
-      clearBreadcrumbs()
-    } else {
-      // Expand and load breadcrumbs
-      setExpandedProject(projectPath)
-      await readBreadcrumbs(projectPath)
-    }
-  }, [expandedProject, readBreadcrumbs, clearBreadcrumbs])
+  const handleViewBreadcrumbs = useCallback(
+    async (projectPath: string) => {
+      if (expandedProject === projectPath) {
+        // Collapse if already expanded
+        setExpandedProject(null)
+        setPreviewProject(null)
+        clearBreadcrumbs()
+      } else {
+        // Expand and load live breadcrumbs
+        setExpandedProject(projectPath)
+        await readLiveBreadcrumbs(projectPath)
+      }
+    },
+    [expandedProject, readLiveBreadcrumbs, clearBreadcrumbs]
+  )
+
+  const handleTogglePreview = useCallback(
+    async (projectPath: string) => {
+      if (previewProject === projectPath) {
+        // Hide preview
+        setPreviewProject(null)
+      } else {
+        // Show preview and generate if needed
+        setPreviewProject(projectPath)
+        const project = scanResult?.projects.find(p => p.path === projectPath)
+        if (project && !getPreview(projectPath)) {
+          await generatePreview(projectPath, project)
+        }
+      }
+    },
+    [previewProject, scanResult, getPreview, generatePreview]
+  )
 
   return (
     <div className="px-6 space-y-6">
@@ -259,7 +375,19 @@ const BakerPageContent: React.FC = () => {
             </Button>
           )}
           {scanResult && (
-            <Button onClick={clearResults} variant="outline">
+            <Button
+              onClick={() => {
+                clearResults()
+                clearUpdateResults()
+                // Reset all view state
+                setSelectedProjects([])
+                setExpandedProject(null)
+                setPreviewProject(null)
+                clearBreadcrumbs()
+                clearPreviews()
+              }}
+              variant="outline"
+            >
               Clear Results
             </Button>
           )}
@@ -295,7 +423,7 @@ const BakerPageContent: React.FC = () => {
       {/* Results Summary */}
       {scanResult && !isScanning && (
         <div className="border rounded-lg p-6">
-          <div className="grid grid-cols-4 gap-4 text-center">
+          <div className="grid grid-cols-5 gap-4 text-center">
             <div>
               <p className="text-2xl font-bold">{scanResult.totalFolders}</p>
               <p className="text-sm text-gray-500">Folders Scanned</p>
@@ -311,6 +439,12 @@ const BakerPageContent: React.FC = () => {
                 {scanResult.projects.filter(p => p.hasBreadcrumbs).length}
               </p>
               <p className="text-sm text-gray-500">With Breadcrumbs</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-purple-600">
+                {formatFileSize(scanResult.totalFolderSize)}
+              </p>
+              <p className="text-sm text-gray-500">Total Size</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-orange-600">
@@ -336,7 +470,9 @@ const BakerPageContent: React.FC = () => {
                     <input
                       type="checkbox"
                       checked={selectedProjects.includes(project.path)}
-                      onChange={e => handleProjectSelection(project.path, e.target.checked)}
+                      onChange={e =>
+                        handleProjectSelection(project.path, e.target.checked)
+                      }
                     />
                     <div>
                       <p className="font-medium">{project.name}</p>
@@ -355,8 +491,17 @@ const BakerPageContent: React.FC = () => {
                       <span
                         className={`px-2 py-1 rounded ${project.hasBreadcrumbs ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
                       >
-                        {project.hasBreadcrumbs ? 'Has breadcrumbs' : 'Missing breadcrumbs'}
+                        {project.hasBreadcrumbs
+                          ? 'Has breadcrumbs'
+                          : 'Missing breadcrumbs'}
                       </span>
+                      {project.hasBreadcrumbs && (
+                        <span
+                          className={`px-2 py-1 rounded ${project.staleBreadcrumbs ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}
+                        >
+                          {project.staleBreadcrumbs ? 'Stale breadcrumbs' : 'Up to date'}
+                        </span>
+                      )}
                       <span className="px-2 py-1 rounded bg-gray-100 text-gray-800">
                         {project.cameraCount} camera{project.cameraCount !== 1 ? 's' : ''}
                       </span>
@@ -381,7 +526,9 @@ const BakerPageContent: React.FC = () => {
                     {isLoadingBreadcrumbs ? (
                       <div className="flex items-center justify-center py-4">
                         <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                        <span className="text-sm text-gray-500">Loading breadcrumbs...</span>
+                        <span className="text-sm text-gray-500">
+                          Loading breadcrumbs...
+                        </span>
                       </div>
                     ) : breadcrumbsError ? (
                       <div className="flex items-center justify-center py-4 text-red-600">
@@ -389,7 +536,13 @@ const BakerPageContent: React.FC = () => {
                         <span className="text-sm">{breadcrumbsError}</span>
                       </div>
                     ) : breadcrumbs ? (
-                      <BreadcrumbsViewer breadcrumbs={breadcrumbs} projectPath={project.path} />
+                      <BreadcrumbsViewerEnhanced
+                        breadcrumbs={breadcrumbs}
+                        projectPath={project.path}
+                        previewMode={previewProject === project.path}
+                        preview={getPreview(project.path)}
+                        onTogglePreview={() => handleTogglePreview(project.path)}
+                      />
                     ) : (
                       <div className="flex items-center justify-center py-4 text-gray-500">
                         <span className="text-sm">No breadcrumbs data found</span>
@@ -459,6 +612,18 @@ const BakerPageContent: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Batch Update Confirmation Dialog */}
+      <BatchUpdateConfirmationDialog
+        isOpen={showBatchConfirmation}
+        onClose={() => setShowBatchConfirmation(false)}
+        onConfirm={handleConfirmBatchUpdate}
+        selectedProjects={selectedProjects}
+        previews={selectedProjects
+          .map(path => getPreview(path))
+          .filter((preview): preview is NonNullable<typeof preview> => preview !== null)}
+        isLoading={isUpdating}
+      />
     </div>
   )
 }

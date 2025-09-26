@@ -1,11 +1,11 @@
 /**
  * useBakerPreferences Hook
- * 
+ *
  * Custom React hook for managing Baker user preferences.
  * Handles localStorage persistence and validation.
  */
 
-import { useCallback, useState, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { ScanPreferences, UseBakerPreferencesResult } from '../types/baker'
 
 const STORAGE_KEY = 'baker-preferences'
@@ -21,16 +21,30 @@ const DEFAULT_PREFERENCES: ScanPreferences = {
 
 function validatePreferences(prefs: Partial<ScanPreferences>): ScanPreferences {
   return {
-    autoUpdate: typeof prefs.autoUpdate === 'boolean' ? prefs.autoUpdate : DEFAULT_PREFERENCES.autoUpdate,
-    createMissing: typeof prefs.createMissing === 'boolean' ? prefs.createMissing : DEFAULT_PREFERENCES.createMissing,
-    backupOriginals: typeof prefs.backupOriginals === 'boolean' ? prefs.backupOriginals : DEFAULT_PREFERENCES.backupOriginals,
-    maxDepth: typeof prefs.maxDepth === 'number' && prefs.maxDepth > 0 && prefs.maxDepth <= 100 
-      ? prefs.maxDepth 
-      : DEFAULT_PREFERENCES.maxDepth,
-    includeHidden: typeof prefs.includeHidden === 'boolean' ? prefs.includeHidden : DEFAULT_PREFERENCES.includeHidden,
-    confirmBulkOperations: typeof prefs.confirmBulkOperations === 'boolean' 
-      ? prefs.confirmBulkOperations 
-      : DEFAULT_PREFERENCES.confirmBulkOperations
+    autoUpdate:
+      typeof prefs.autoUpdate === 'boolean'
+        ? prefs.autoUpdate
+        : DEFAULT_PREFERENCES.autoUpdate,
+    createMissing:
+      typeof prefs.createMissing === 'boolean'
+        ? prefs.createMissing
+        : DEFAULT_PREFERENCES.createMissing,
+    backupOriginals:
+      typeof prefs.backupOriginals === 'boolean'
+        ? prefs.backupOriginals
+        : DEFAULT_PREFERENCES.backupOriginals,
+    maxDepth:
+      typeof prefs.maxDepth === 'number' && prefs.maxDepth > 0 && prefs.maxDepth <= 100
+        ? prefs.maxDepth
+        : DEFAULT_PREFERENCES.maxDepth,
+    includeHidden:
+      typeof prefs.includeHidden === 'boolean'
+        ? prefs.includeHidden
+        : DEFAULT_PREFERENCES.includeHidden,
+    confirmBulkOperations:
+      typeof prefs.confirmBulkOperations === 'boolean'
+        ? prefs.confirmBulkOperations
+        : DEFAULT_PREFERENCES.confirmBulkOperations
   }
 }
 
@@ -44,7 +58,7 @@ function loadPreferencesFromStorage(): ScanPreferences {
   } catch (error) {
     console.warn('Failed to load Baker preferences from localStorage:', error)
   }
-  
+
   return DEFAULT_PREFERENCES
 }
 

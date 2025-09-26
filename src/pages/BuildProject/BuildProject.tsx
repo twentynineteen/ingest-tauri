@@ -45,7 +45,7 @@ const BuildProject: React.FC = () => {
   const { progress, completed } = useCopyProgress({
     operationId: 'build-project'
   })
-  
+
   console.log('BuildProject render - progress:', progress, 'completed:', completed)
 
   useCameraAutoRemap(files, numCameras, setFiles)

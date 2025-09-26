@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { loadApiKeys, ApiKeys } from '../utils/storage'
+import { ApiKeys, loadApiKeys } from '../utils/storage'
 
 export const useApiKeys = () => {
   return useQuery<ApiKeys>({
@@ -14,7 +14,7 @@ export const useApiKeys = () => {
 
 export const useSproutVideoApiKey = () => {
   const { data: apiKeys, isLoading, error } = useApiKeys()
-  
+
   return {
     apiKey: apiKeys?.sproutVideo || null,
     isLoading,

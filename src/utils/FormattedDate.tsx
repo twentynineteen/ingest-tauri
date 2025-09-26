@@ -2,19 +2,28 @@ import React from 'react'
 
 // Helper function to format ISO date string into "hh:mm dd/MM/yyyy"
 const formatDate = (dateStr: string): string => {
-  const date = new Date(dateStr)
+  try {
+    const date = new Date(dateStr)
 
-  // Extract hours and minutes, pad with leading zeros if needed
-  const hours = date.getHours().toString().padStart(2, '0')
-  const minutes = date.getMinutes().toString().padStart(2, '0')
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+      return dateStr // Return original string if invalid date
+    }
 
-  // Extract day, month (months are zero-indexed so add 1), and year
-  const day = date.getDate().toString().padStart(2, '0')
-  const month = (date.getMonth() + 1).toString().padStart(2, '0')
-  const year = date.getFullYear()
+    // Extract hours and minutes, pad with leading zeros if needed
+    const hours = date.getHours().toString().padStart(2, '0')
+    const minutes = date.getMinutes().toString().padStart(2, '0')
 
-  // Construct the formatted string
-  return `${hours}:${minutes} ${day}/${month}/${year}`
+    // Extract day, month (months are zero-indexed so add 1), and year
+    const day = date.getDate().toString().padStart(2, '0')
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
+    const year = date.getFullYear()
+
+    // Construct the formatted string
+    return `${hours}:${minutes} ${day}/${month}/${year}`
+  } catch {
+    return dateStr // Return original string if any error occurs
+  }
 }
 
 interface FormattedDateProps {

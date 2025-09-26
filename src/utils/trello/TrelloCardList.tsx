@@ -1,12 +1,12 @@
 // src/components/uploadTrello/TrelloCardList.tsx
 
-import React, { useState, useEffect } from 'react'
-import { 
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger
 } from '@components/ui/accordion'
+import React, { useEffect, useState } from 'react'
 import { TrelloCard } from '../TrelloCards'
 
 interface TrelloCardListProps {
@@ -51,8 +51,8 @@ const TrelloCardList: React.FC<TrelloCardListProps> = ({ grouped, onSelect }) =>
   }
 
   return (
-    <Accordion 
-      type="multiple" 
+    <Accordion
+      type="multiple"
       className="w-full"
       value={openSections}
       onValueChange={handleAccordionChange}

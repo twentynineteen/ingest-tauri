@@ -5,10 +5,11 @@ export const queryKeys = {
   projects: {
     all: ['projects'] as const,
     lists: () => ['projects', 'list'] as const,
-    list: (filters?: Record<string, unknown>) => ['projects', 'list', { filters }] as const,
+    list: (filters?: Record<string, unknown>) =>
+      ['projects', 'list', { filters }] as const,
     details: () => ['projects', 'detail'] as const,
     detail: (id: string | number) => ['projects', 'detail', id] as const,
-    status: (id: string | number) => ['projects', 'status', id] as const,
+    status: (id: string | number) => ['projects', 'status', id] as const
   },
 
   // Files domain
@@ -18,7 +19,8 @@ export const queryKeys = {
     selection: (projectId: string | number) => ['files', 'selection', projectId] as const,
     tree: (path?: string) => ['files', 'tree', path || 'root'] as const,
     progress: (operationId: string) => ['files', 'progress', operationId] as const,
-    autoSelection: (criteria: Record<string, unknown>) => ['files', 'auto-selection', JSON.stringify(criteria)] as const,
+    autoSelection: (criteria: Record<string, unknown>) =>
+      ['files', 'auto-selection', JSON.stringify(criteria)] as const
   },
 
   // Trello domain
@@ -29,7 +31,8 @@ export const queryKeys = {
     cards: (boardId: string) => ['trello', 'cards', boardId] as const,
     card: (cardId: string) => ['trello', 'card', cardId] as const,
     lists: (boardId: string) => ['trello', 'lists', boardId] as const,
-    integration: (projectId: string | number) => ['trello', 'integration', projectId] as const,
+    integration: (projectId: string | number) =>
+      ['trello', 'integration', projectId] as const
   },
 
   // User domain
@@ -38,7 +41,7 @@ export const queryKeys = {
     profile: () => ['user', 'profile'] as const,
     preferences: () => ['user', 'preferences'] as const,
     authentication: () => ['user', 'authentication'] as const,
-    breadcrumb: () => ['user', 'breadcrumb'] as const,
+    breadcrumb: () => ['user', 'breadcrumb'] as const
   },
 
   // Settings domain
@@ -48,15 +51,17 @@ export const queryKeys = {
     configuration: () => ['settings', 'configuration'] as const,
     theme: () => ['settings', 'theme'] as const,
     integrations: () => ['settings', 'integrations'] as const,
-    apiKeys: () => ['settings', 'api-keys'] as const,
+    apiKeys: () => ['settings', 'api-keys'] as const
   },
 
   // Sprout domain
   sprout: {
     all: ['sprout'] as const,
-    folders: (apiKey: string, parentId: string | null) => ['sprout', 'folders', apiKey, parentId || 'root'] as const,
+    folders: (apiKey: string, parentId: string | null) =>
+      ['sprout', 'folders', apiKey, parentId || 'root'] as const,
     videos: (apiKey: string) => ['sprout', 'videos', apiKey] as const,
-    video: (apiKey: string, videoId: string) => ['sprout', 'video', apiKey, videoId] as const,
+    video: (apiKey: string, videoId: string) =>
+      ['sprout', 'video', apiKey, videoId] as const
   },
 
   // Upload domain
@@ -69,8 +74,9 @@ export const queryKeys = {
     sprout: {
       all: () => ['upload', 'sprout'] as const,
       video: (videoId: string) => ['upload', 'sprout', 'video', videoId] as const,
-      posterframe: (videoId: string) => ['upload', 'sprout', 'posterframe', videoId] as const,
-    },
+      posterframe: (videoId: string) =>
+        ['upload', 'sprout', 'posterframe', videoId] as const
+    }
   },
 
   // Image/Canvas domain
@@ -80,18 +86,21 @@ export const queryKeys = {
     zoomPan: (containerId: string) => ['images', 'zoom-pan', containerId] as const,
     posterframe: {
       all: () => ['images', 'posterframe'] as const,
-      redraw: (canvasId: string) => ['images', 'posterframe', 'redraw', canvasId] as const,
-      autoRedraw: (videoId: string) => ['images', 'posterframe', 'auto-redraw', videoId] as const,
-    },
+      redraw: (canvasId: string) =>
+        ['images', 'posterframe', 'redraw', canvasId] as const,
+      autoRedraw: (videoId: string) =>
+        ['images', 'posterframe', 'auto-redraw', videoId] as const
+    }
   },
 
   // Camera domain
   camera: {
     all: ['camera'] as const,
     mapping: () => ['camera', 'mapping'] as const,
-    autoRemap: (projectId: string | number) => ['camera', 'auto-remap', projectId] as const,
-    assignment: (fileId: string) => ['camera', 'assignment', fileId] as const,
-  },
+    autoRemap: (projectId: string | number) =>
+      ['camera', 'auto-remap', projectId] as const,
+    assignment: (fileId: string) => ['camera', 'assignment', fileId] as const
+  }
 } as const
 
 export type QueryKeyFactory = typeof queryKeys
@@ -107,79 +116,80 @@ export const invalidationRules: InvalidationRule[] = [
   {
     trigger: ['projects', 'create'],
     invalidates: [queryKeys.projects.lists()],
-    strategy: 'exact',
+    strategy: 'exact'
   },
   {
     trigger: ['projects', 'update'],
     invalidates: [queryKeys.projects.lists()],
-    strategy: 'prefix',
+    strategy: 'prefix'
   },
-  
+
   // File operations
   {
     trigger: ['files', 'upload-complete'],
-    invalidates: [
-      queryKeys.projects.lists(),
-      queryKeys.files.selections(),
-    ],
-    strategy: 'prefix',
+    invalidates: [queryKeys.projects.lists(), queryKeys.files.selections()],
+    strategy: 'prefix'
   },
   {
     trigger: ['files', 'selection-change'],
     invalidates: [queryKeys.files.selections()],
-    strategy: 'prefix',
+    strategy: 'prefix'
   },
 
   // User profile updates
   {
     trigger: ['user', 'profile-update'],
     invalidates: [queryKeys.user.profile(), queryKeys.user.breadcrumb()],
-    strategy: 'exact',
+    strategy: 'exact'
   },
 
   // Settings changes
   {
     trigger: ['settings', 'update'],
     invalidates: [queryKeys.settings.all],
-    strategy: 'prefix',
+    strategy: 'prefix'
   },
 
   // Trello integration updates
   {
     trigger: ['trello', 'board-update'],
     invalidates: [queryKeys.trello.boards()],
-    strategy: 'prefix',
-  },
+    strategy: 'prefix'
+  }
 ]
 
 export function createQueryKey<T extends QueryKey>(key: T): T {
   return key
 }
 
-export function isQueryKeyMatch(queryKey: QueryKey, pattern: QueryKey, strategy: InvalidationRule['strategy'] = 'exact'): boolean {
+export function isQueryKeyMatch(
+  queryKey: QueryKey,
+  pattern: QueryKey,
+  strategy: InvalidationRule['strategy'] = 'exact'
+): boolean {
   switch (strategy) {
     case 'exact':
       return JSON.stringify(queryKey) === JSON.stringify(pattern)
-    
+
     case 'prefix':
       if (pattern.length > queryKey.length) return false
       return pattern.every((segment, index) => queryKey[index] === segment)
-    
+
     case 'predicate':
       // For now, treat predicate same as prefix
       // Can be extended with custom predicate functions later
       return isQueryKeyMatch(queryKey, pattern, 'prefix')
-    
+
     default:
       return false
   }
 }
 
 export function getInvalidationQueries(triggerKey: QueryKey): QueryKey[] {
-  const matchingRules = invalidationRules.filter(rule => 
+  const matchingRules = invalidationRules.filter(rule =>
     isQueryKeyMatch(triggerKey, rule.trigger, rule.strategy)
   )
-  
+
   return matchingRules.flatMap(rule => rule.invalidates)
 }
 
@@ -189,8 +199,17 @@ export function validateQueryKey(key: QueryKey): boolean {
   }
 
   const [domain, action] = key
-  const validDomains = ['projects', 'trello', 'files', 'user', 'settings', 'upload', 'images', 'camera']
-  
+  const validDomains = [
+    'projects',
+    'trello',
+    'files',
+    'user',
+    'settings',
+    'upload',
+    'images',
+    'camera'
+  ]
+
   if (typeof domain !== 'string' || !validDomains.includes(domain)) {
     return false
   }
@@ -201,7 +220,9 @@ export function validateQueryKey(key: QueryKey): boolean {
 
   // Validate identifiers are strings or numbers
   const identifiers = key.slice(2)
-  return identifiers.every(id => typeof id === 'string' || typeof id === 'number' || typeof id === 'object')
+  return identifiers.every(
+    id => typeof id === 'string' || typeof id === 'number' || typeof id === 'object'
+  )
 }
 
 // Helper functions for common patterns

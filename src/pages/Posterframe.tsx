@@ -14,7 +14,12 @@ const Posterframe = () => {
   const [videoTitle, setVideoTitle] = useState('')
   const [savePath, setSavePath] = useState<string | null>(null)
 
-  const { files: backgroundFiles, currentFolder, loadFolder, defaultFolder } = useBackgroundFolder()
+  const {
+    files: backgroundFiles,
+    currentFolder,
+    loadFolder,
+    defaultFolder
+  } = useBackgroundFolder()
   const { selectedFilePath, selectedFileBlob, selectFile } = useFileSelection()
   const { canvasRef, draw } = usePosterframeCanvas()
   const { zoomLevel, pan, setZoomLevel, setPan } = useZoomPan('posterframe-canvas')
@@ -91,7 +96,6 @@ const Posterframe = () => {
   const stopDragging = () => {
     setIsDragging(false)
   }
-
 
   return (
     <div className="w-full pb-4 border-b mb-4">

@@ -96,18 +96,31 @@ export function useCreateProject() {
       })
 
       const now = new Date()
-      const formattedDateTime = now.toLocaleString()
+      const formattedDateTime = now.toISOString()
+
+      // Calculate folder size after files are moved
+      let folderSizeBytes: number | undefined
+      try {
+        folderSizeBytes = await invoke<number>('get_folder_size', {
+          folderPath: projectFolder
+        })
+      } catch (error) {
+        console.warn('Failed to calculate folder size:', error)
+        folderSizeBytes = undefined
+      }
 
       const projectData: Breadcrumb = {
         projectTitle: title.trim(),
         numberOfCameras: numCameras,
         files: files.map(f => ({
           camera: f.camera,
-          name: f.file.name
+          name: f.file.name,
+          path: f.file.path
         })),
         parentFolder: selectedFolder,
         createdBy: username || 'Unknown User',
-        creationDateTime: formattedDateTime
+        creationDateTime: formattedDateTime,
+        folderSizeBytes
       }
 
       appStore.getState().setBreadcrumbs(projectData)

@@ -1,12 +1,8 @@
 import React from 'react'
-
-interface File {
-  id: string
-  name: string
-}
+import { FootageData } from 'utils/types'
 
 interface Props {
-  files: File[]
+  files: FootageData[]
 }
 
 const FileList: React.FC<Props> = ({ files }) => (
@@ -16,7 +12,9 @@ const FileList: React.FC<Props> = ({ files }) => (
     </p>
     <ul className="list-disc ml-5">
       {files.map(file => (
-        <li key={file.name}>{file.name}</li>
+        <li key={file.path}>
+          {file.name} (Camera {file.camera})
+        </li>
       ))}
     </ul>
   </>

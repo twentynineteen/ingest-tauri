@@ -14,7 +14,7 @@ interface BackgroundFolderData {
 export function useBackgroundFolder(): BackgroundFolderData {
   const defaultFolder = useAppStore(state => state.defaultBackgroundFolder)
   const [currentFolder, setCurrentFolder] = useState<string | null>(null)
-  
+
   // Determine which folder to load (current folder takes precedence over default)
   const folderToLoad = currentFolder || defaultFolder
 
@@ -26,7 +26,7 @@ export function useBackgroundFolder(): BackgroundFolderData {
     queryKey: ['backgroundFolder', folderToLoad],
     queryFn: async () => {
       if (!folderToLoad) return []
-      
+
       const dirFiles = await readDir(folderToLoad)
       return dirFiles
         .filter(f => f.name?.endsWith('.jpg'))
@@ -36,10 +36,13 @@ export function useBackgroundFolder(): BackgroundFolderData {
     enabled: !!folderToLoad
   })
 
-  const loadFolder = useCallback(async (folderPath: string) => {
-    setCurrentFolder(folderPath)
-    refetch()
-  }, [refetch])
+  const loadFolder = useCallback(
+    async (folderPath: string) => {
+      setCurrentFolder(folderPath)
+      refetch()
+    },
+    [refetch]
+  )
 
   return {
     files,
