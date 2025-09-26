@@ -120,7 +120,6 @@ export function useCreateProject() {
       )
 
       async function createTemplatePremiereProject() {
-        console.log('createTemplatePremiereProject called')
         setLoading(true)
         setMessage('')
 
@@ -157,7 +156,6 @@ export function useCreateProject() {
 
       // Set up event listener BEFORE calling move_files
       unlistenComplete = await listen<string[]>('copy_complete', async () => {
-        console.log('copy_complete event received, creating premiere template...')
         setCompleted?.(true)
         await createTemplatePremiereProject()
         await showDialogAndOpenFolder()
