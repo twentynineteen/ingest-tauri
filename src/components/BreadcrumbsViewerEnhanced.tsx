@@ -23,7 +23,7 @@ import {
 } from 'lucide-react'
 import React from 'react'
 import type { BreadcrumbsViewerProps, FieldChange } from '../types/baker'
-import { formatFieldValue } from '../utils/breadcrumbsComparison'
+import { formatFieldValue, formatBreadcrumbDateSimple } from '../utils/breadcrumbsComparison'
 import { Button } from './ui/button'
 
 export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
@@ -33,27 +33,8 @@ export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
   preview,
   onTogglePreview
 }) => {
-  const formatDate = (dateString: string) => {
-    if (!dateString || dateString === 'null' || dateString === 'undefined') {
-      return 'Not set'
-    }
-    
-    try {
-      // Handle RFC3339 timestamps from Rust backend
-      const date = new Date(dateString)
-      
-      // Check if the date is valid
-      if (isNaN(date.getTime())) {
-        console.warn('Invalid date string received:', dateString)
-        return 'Invalid date'
-      }
-      
-      return date.toLocaleString()
-    } catch (error) {
-      console.warn('Error parsing date:', dateString, error)
-      return 'Invalid date'
-    }
-  }
+  // Use centralized date formatting utility
+  const formatDate = formatBreadcrumbDateSimple
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 B'

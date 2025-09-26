@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import React from 'react'
 import type { BreadcrumbsViewerProps } from '../types/baker'
+import { formatBreadcrumbDateSimple } from '../utils/breadcrumbsComparison'
 import { Button } from './ui/button'
 
 export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
@@ -24,13 +25,8 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
   previewMode = false,
   onTogglePreview
 }) => {
-  const formatDate = (dateString: string) => {
-    try {
-      return new Date(dateString).toLocaleString()
-    } catch {
-      return dateString
-    }
-  }
+  // Use centralized date formatting utility
+  const formatDate = formatBreadcrumbDateSimple
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 B'

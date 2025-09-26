@@ -3,9 +3,9 @@ import {
   AccordionItem,
   AccordionTrigger
 } from '@components/ui/accordion'
-import { format, parse } from 'date-fns'
 import React from 'react'
 import { Breadcrumb } from 'utils/types'
+import { formatBreadcrumbDate } from '../breadcrumbsComparison'
 import FileList from './FileList'
 import KeyValueRow from './KeyValueRow'
 
@@ -37,30 +37,7 @@ const BreadcrumbsAccordionItem: React.FC<Props> = ({ data }) => {
           {data.creationDateTime && (
             <KeyValueRow
               label="Created On"
-              value={(() => {
-                try {
-                  // Try parsing as ISO string first (most common case)
-                  const isoDate = new Date(data.creationDateTime)
-                  if (!isNaN(isoDate.getTime())) {
-                    return format(isoDate, 'PPPpp')
-                  }
-
-                  // Fallback to parsing with the old format
-                  const parsedDate = parse(
-                    data.creationDateTime,
-                    'dd/MM/yyyy, HH:mm:ss',
-                    new Date()
-                  )
-                  if (!isNaN(parsedDate.getTime())) {
-                    return format(parsedDate, 'PPPpp')
-                  }
-
-                  // If all parsing fails, return the original string
-                  return data.creationDateTime
-                } catch {
-                  return data.creationDateTime
-                }
-              })()}
+              value={formatBreadcrumbDate(data.creationDateTime)}
             />
           )}
           {data.parentFolder && <KeyValueRow label="Folder" value={data.parentFolder} />}
