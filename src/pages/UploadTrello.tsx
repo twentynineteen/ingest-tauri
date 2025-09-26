@@ -236,10 +236,16 @@ const UploadTrello = () => {
                             currentBreadcrumbs.projectTitle
                           ) {
                             const breadcrumbsPath = `${currentBreadcrumbs.parentFolder}/${currentBreadcrumbs.projectTitle}/breadcrumbs.json`
-                            await writeTextFile(
-                              breadcrumbsPath,
-                              JSON.stringify(updatedBreadcrumbs, null, 2)
-                            )
+                            try {
+                              await writeTextFile(
+                                breadcrumbsPath,
+                                JSON.stringify(updatedBreadcrumbs, null, 2)
+                              )
+                            } catch (error) {
+                              // You may want to replace this with a toast or notification
+                              alert("Failed to save breadcrumbs: " + (error?.message || error));
+                              console.error("Failed to write breadcrumbs file:", error);
+                            }
                           }
 
                           // Refresh card details to show updated breadcrumbs
