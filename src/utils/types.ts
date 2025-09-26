@@ -15,6 +15,7 @@ export interface GetFoldersResponse {
 export interface FootageData {
   camera: number
   name: string
+  path: string
 }
 
 // interface for breadcrumb / project files first declared in BuildProject.tsx
@@ -25,6 +26,7 @@ export interface Breadcrumb {
   parentFolder?: string
   createdBy?: string | { data?: string; [key: string]: unknown }
   creationDateTime?: string
+  folderSizeBytes?: number
 }
 
 // Interface representing the JSON response from SproutVideo upload

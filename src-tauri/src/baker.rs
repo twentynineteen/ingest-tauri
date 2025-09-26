@@ -23,6 +23,8 @@ pub struct ProjectFolder {
     is_valid: bool,
     #[serde(rename = "hasBreadcrumbs")]
     has_breadcrumbs: bool,
+    #[serde(rename = "staleBreadcrumbs")]
+    stale_breadcrumbs: bool,
     #[serde(rename = "lastScanned")]
     last_scanned: String,
     #[serde(rename = "cameraCount")]
@@ -44,6 +46,8 @@ pub struct BreadcrumbsFile {
     created_by: String,
     #[serde(rename = "creationDateTime")]
     creation_date_time: String,
+    #[serde(rename = "folderSizeBytes")]
+    folder_size_bytes: Option<u64>,
     #[serde(rename = "lastModified")]
     last_modified: Option<String>,
     #[serde(rename = "scannedBy")]
@@ -153,6 +157,105 @@ fn should_skip_directory(path: &Path) -> bool {
     }
 }
 
+fn calculate_folder_size(path: &Path) -> Result<u64, std::io::Error> {
+    let mut total_size = 0u64;
+    
+    fn visit_dir(dir: &Path, total: &mut u64) -> Result<(), std::io::Error> {
+        if dir.is_dir() {
+            for entry in fs::read_dir(dir)? {
+                let entry = entry?;
+                let path = entry.path();
+                
+                if path.is_dir() {
+                    visit_dir(&path, total)?;
+                } else {
+                    if let Ok(metadata) = entry.metadata() {
+                        *total += metadata.len();
+                    }
+                }
+            }
+        }
+        Ok(())
+    }
+    
+    visit_dir(path, &mut total_size)?;
+    Ok(total_size)
+}
+
+
+fn check_breadcrumbs_stale(path: &Path) -> Result<bool, std::io::Error> {
+    let breadcrumbs_path = path.join("breadcrumbs.json");
+    
+    if !breadcrumbs_path.exists() {
+        return Ok(false); // No breadcrumbs file, so not stale
+    }
+    
+    // Read existing breadcrumbs
+    let content = fs::read_to_string(&breadcrumbs_path)?;
+    let existing_breadcrumbs: BreadcrumbsFile = match serde_json::from_str(&content) {
+        Ok(breadcrumbs) => breadcrumbs,
+        Err(_) => return Ok(true), // Corrupted breadcrumbs file = stale
+    };
+    
+    // Scan actual current files
+    let mut actual_files = Vec::new();
+    let footage_path = path.join("Footage");
+    
+    if let Ok(entries) = fs::read_dir(&footage_path) {
+        for entry in entries {
+            if let Ok(entry) = entry {
+                let folder_name = entry.file_name();
+                let name_str = folder_name.to_string_lossy().to_string();
+                
+                if name_str.starts_with("Camera ") && entry.path().is_dir() {
+                    if let Some(camera_num_str) = name_str.strip_prefix("Camera ") {
+                        if let Ok(camera_num) = camera_num_str.parse::<i32>() {
+                            if let Ok(camera_files) = fs::read_dir(entry.path()) {
+                                for file in camera_files {
+                                    if let Ok(file) = file {
+                                        let file_name = file.file_name().to_string_lossy().to_string();
+                                        
+                                        // Skip hidden files (starting with .) like .DS_Store
+                                        if file_name.starts_with('.') {
+                                            continue;
+                                        }
+                                        
+                                        if file.path().is_file() {
+                                            actual_files.push(FileInfo {
+                                                camera: camera_num,
+                                                name: file_name.clone(),
+                                                path: format!("Footage/{}/{}", name_str, file_name),
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Compare files: check if counts or content differ
+    if existing_breadcrumbs.files.len() != actual_files.len() {
+        return Ok(true); // Different number of files = stale
+    }
+    
+    // Sort both for comparison
+    let mut existing_files = existing_breadcrumbs.files.clone();
+    existing_files.sort_by(|a, b| a.camera.cmp(&b.camera).then_with(|| a.name.cmp(&b.name)));
+    actual_files.sort_by(|a, b| a.camera.cmp(&b.camera).then_with(|| a.name.cmp(&b.name)));
+    
+    // Compare file names and camera assignments
+    for (existing, actual) in existing_files.iter().zip(actual_files.iter()) {
+        if existing.name != actual.name || existing.camera != actual.camera {
+            return Ok(true); // Files differ = stale
+        }
+    }
+    
+    Ok(false) // Files match = not stale
+}
 
 fn validate_project_folder(path: &Path) -> (bool, Vec<String>, i32) {
     let mut errors = Vec::new();
@@ -293,11 +396,18 @@ fn scan_directory_recursive(
                         result.valid_projects += 1;
                     }
                     
+                    let stale_breadcrumbs = if has_breadcrumbs { 
+                        check_breadcrumbs_stale(&path).unwrap_or(false) 
+                    } else { 
+                        false 
+                    };
+                    
                     let project_folder = ProjectFolder {
                         path: path.to_string_lossy().to_string(),
                         name: file_name.to_string_lossy().to_string(),
                         is_valid,
                         has_breadcrumbs,
+                        stale_breadcrumbs,
                         last_scanned: get_current_timestamp(),
                         camera_count,
                         validation_errors: validation_errors.clone(),
@@ -360,11 +470,18 @@ fn scan_directory_recursive(
             result.valid_projects += 1;
         }
         
+        let stale_breadcrumbs = if has_breadcrumbs { 
+            check_breadcrumbs_stale(&root_path).unwrap_or(false) 
+        } else { 
+            false 
+        };
+        
         let project_folder = ProjectFolder {
             path: root_path.to_string_lossy().to_string(),
             name: root_path.file_name().unwrap_or_default().to_string_lossy().to_string(),
             is_valid,
             has_breadcrumbs,
+            stale_breadcrumbs,
             last_scanned: get_current_timestamp(),
             camera_count,
             validation_errors: validation_errors.clone(),
@@ -540,6 +657,11 @@ pub async fn baker_validate_folder(folder_path: String) -> Result<ProjectFolder,
 
     let (is_valid, validation_errors, camera_count) = validate_project_folder(path);
     let has_breadcrumbs = has_breadcrumbs_file(path);
+    let stale_breadcrumbs = if has_breadcrumbs { 
+        check_breadcrumbs_stale(path).unwrap_or(false) 
+    } else { 
+        false 
+    };
 
     Ok(ProjectFolder {
         path: folder_path.clone(),
@@ -550,6 +672,7 @@ pub async fn baker_validate_folder(folder_path: String) -> Result<ProjectFolder,
             .to_string(),
         is_valid,
         has_breadcrumbs,
+        stale_breadcrumbs,
         last_scanned: get_current_timestamp(),
         camera_count,
         validation_errors,
@@ -654,13 +777,18 @@ pub async fn baker_update_breadcrumbs(
                                 if let Ok(camera_files) = fs::read_dir(entry.path()) {
                                     for file in camera_files {
                                         if let Ok(file) = file {
+                                            let file_name = file.file_name().to_string_lossy().to_string();
+                                            
+                                            // Skip hidden files (starting with .) like .DS_Store
+                                            if file_name.starts_with('.') {
+                                                continue;
+                                            }
+                                            
                                             if file.path().is_file() {
                                                 files.push(FileInfo {
                                                     camera: camera_num,
-                                                    name: file.file_name().to_string_lossy().to_string(),
-                                                    path: format!("Footage/{}/{}", 
-                                                                name_str, 
-                                                                file.file_name().to_string_lossy()),
+                                                    name: file_name.clone(),
+                                                    path: format!("Footage/{}/{}", name_str, file_name),
                                                 });
                                             }
                                         }
@@ -680,6 +808,10 @@ pub async fn baker_update_breadcrumbs(
                     match serde_json::from_str::<BreadcrumbsFile>(&content) {
                         Ok(mut existing) => {
                             existing.files = files;
+                            // Preserve original creator and add Baker update suffix
+                            if !existing.created_by.ends_with(" - updated by Baker") {
+                                existing.created_by = format!("{} - updated by Baker", existing.created_by);
+                            }
                             existing.last_modified = Some(get_current_timestamp());
                             existing.scanned_by = Some("Baker".to_string());
                             existing
@@ -693,6 +825,7 @@ pub async fn baker_update_breadcrumbs(
                                 parent_folder: path.parent().unwrap_or(path).to_string_lossy().to_string(),
                                 created_by: "Baker".to_string(),
                                 creation_date_time: get_current_timestamp(),
+                                folder_size_bytes: calculate_folder_size(path).ok(),
                                 last_modified: Some(get_current_timestamp()),
                                 scanned_by: Some("Baker".to_string()),
                             }
@@ -716,6 +849,7 @@ pub async fn baker_update_breadcrumbs(
                 parent_folder: path.parent().unwrap_or(path).to_string_lossy().to_string(),
                 created_by: "Baker".to_string(),
                 creation_date_time: get_current_timestamp(),
+                folder_size_bytes: calculate_folder_size(path).ok(),
                 last_modified: Some(get_current_timestamp()),
                 scanned_by: Some("Baker".to_string()),
             }
@@ -748,4 +882,77 @@ pub async fn baker_update_breadcrumbs(
     }
 
     Ok(result)
+}
+
+#[tauri::command]
+pub async fn baker_scan_current_files(project_path: String) -> Result<Vec<FileInfo>, String> {
+    let path = Path::new(&project_path);
+    
+    if !path.exists() {
+        return Err("Project path does not exist".to_string());
+    }
+    
+    if !path.is_dir() {
+        return Err("Project path is not a directory".to_string());
+    }
+    
+    // Scan for files in camera folders (same logic as baker_update_breadcrumbs)
+    let mut files = Vec::new();
+    let footage_path = path.join("Footage");
+    
+    if let Ok(entries) = fs::read_dir(&footage_path) {
+        for entry in entries {
+            if let Ok(entry) = entry {
+                let folder_name = entry.file_name();
+                let name_str = folder_name.to_string_lossy();
+                
+                if name_str.starts_with("Camera ") && entry.path().is_dir() {
+                    if let Some(camera_num_str) = name_str.strip_prefix("Camera ") {
+                        if let Ok(camera_num) = camera_num_str.parse::<i32>() {
+                            if let Ok(camera_files) = fs::read_dir(entry.path()) {
+                                for file in camera_files {
+                                    if let Ok(file) = file {
+                                        let file_name = file.file_name().to_string_lossy().to_string();
+                                        
+                                        // Skip hidden files (starting with .) like .DS_Store
+                                        if file_name.starts_with('.') {
+                                            continue;
+                                        }
+                                        
+                                        if file.path().is_file() {
+                                            files.push(FileInfo {
+                                                camera: camera_num,
+                                                name: file_name.clone(),
+                                                path: file.path().to_string_lossy().to_string(),
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    // Sort files by camera number and then by name
+    files.sort_by(|a, b| a.camera.cmp(&b.camera).then_with(|| a.name.cmp(&b.name)));
+    
+    Ok(files)
+}
+
+#[tauri::command]
+pub async fn get_folder_size(folder_path: String) -> Result<u64, String> {
+    let path = Path::new(&folder_path);
+    
+    if !path.exists() {
+        return Err(format!("Path does not exist: {}", folder_path));
+    }
+    
+    if !path.is_dir() {
+        return Err(format!("Path is not a directory: {}", folder_path));
+    }
+    
+    calculate_folder_size(path).map_err(|e| format!("Failed to calculate folder size: {}", e))
 }

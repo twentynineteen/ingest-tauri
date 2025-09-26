@@ -47,10 +47,16 @@ export function useBreadcrumbsManager(): UseBreadcrumbsManagerResult {
     }
   }, [isUpdating])
 
+  const clearResults = useCallback(() => {
+    setLastUpdateResult(null)
+    setError(null)
+  }, [])
+
   return {
     updateBreadcrumbs,
     isUpdating,
     lastUpdateResult,
-    error
+    error,
+    clearResults
   }
 }

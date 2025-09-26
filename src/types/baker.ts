@@ -10,6 +10,7 @@ export interface ProjectFolder {
   name: string
   isValid: boolean
   hasBreadcrumbs: boolean
+  staleBreadcrumbs: boolean // true if breadcrumbs file differs from actual folder content
   lastScanned: string // ISO timestamp
   cameraCount: number
   validationErrors: string[]
@@ -22,6 +23,7 @@ export interface BreadcrumbsFile {
   parentFolder: string
   createdBy: string
   creationDateTime: string
+  folderSizeBytes?: number
   lastModified?: string
   scannedBy?: string
 }
@@ -153,6 +155,7 @@ export interface UseBreadcrumbsManagerResult {
     createMissing: boolean
     backupOriginals: boolean
   }) => Promise<BatchUpdateResult>
+  clearResults: () => void
   
   // State
   isUpdating: boolean
@@ -167,4 +170,40 @@ export interface UseBakerPreferencesResult {
   // Actions
   updatePreferences: (newPrefs: Partial<ScanPreferences>) => void
   resetToDefaults: () => void
+}
+
+// Breadcrumbs comparison and diff types
+export type FieldChangeType = 'added' | 'modified' | 'removed' | 'unchanged'
+
+export interface FieldChange {
+  type: FieldChangeType
+  field: string
+  oldValue?: unknown
+  newValue?: unknown
+}
+
+export interface BreadcrumbsDiff {
+  hasChanges: boolean
+  changes: FieldChange[]
+  summary: {
+    added: number
+    modified: number
+    removed: number
+    unchanged: number
+  }
+}
+
+export interface BreadcrumbsPreview {
+  current: BreadcrumbsFile | null
+  updated: BreadcrumbsFile
+  diff: BreadcrumbsDiff // Full diff including maintenance fields (for display)
+  meaningfulDiff?: BreadcrumbsDiff // Only meaningful changes (for confirmation logic)
+}
+
+export interface BreadcrumbsViewerProps {
+  breadcrumbs: BreadcrumbsFile
+  projectPath: string
+  previewMode?: boolean
+  preview?: BreadcrumbsPreview
+  onTogglePreview?: () => void
 }
