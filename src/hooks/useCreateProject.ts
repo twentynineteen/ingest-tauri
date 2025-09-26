@@ -84,17 +84,6 @@ export function useCreateProject() {
         camera
       ])
 
-      unlistenComplete = await listen<string[]>('copy_complete', async () => {
-        setCompleted?.(true)
-        await createTemplatePremiereProject()
-        await showDialogAndOpenFolder()
-      })
-
-      await invoke('move_files', {
-        files: filesToMove,
-        baseDest: projectFolder
-      })
-
       const now = new Date()
       const formattedDateTime = now.toISOString()
 
@@ -164,6 +153,18 @@ export function useCreateProject() {
           console.error('Error:', error)
         }
       }
+
+      // Set up event listener BEFORE calling move_files
+      unlistenComplete = await listen<string[]>('copy_complete', async () => {
+        setCompleted?.(true)
+        await createTemplatePremiereProject()
+        await showDialogAndOpenFolder()
+      })
+
+      await invoke('move_files', {
+        files: filesToMove,
+        baseDest: projectFolder
+      })
     } catch (error) {
       console.error('Error creating project:', error)
       alert('Error creating project: ' + error)
