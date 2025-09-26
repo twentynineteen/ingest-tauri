@@ -1,13 +1,22 @@
 /**
  * BreadcrumbsViewer Component
- * 
+ *
  * Displays the contents of a breadcrumbs.json file in a readable format.
  */
 
+import {
+  Calendar,
+  Camera,
+  Eye,
+  EyeOff,
+  File,
+  FolderOpen,
+  HardDrive,
+  User
+} from 'lucide-react'
 import React from 'react'
-import { Calendar, Camera, User, FolderOpen, File, HardDrive, Eye, EyeOff } from 'lucide-react'
-import { Button } from './ui/button'
 import type { BreadcrumbsViewerProps } from '../types/baker'
+import { Button } from './ui/button'
 
 export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
   breadcrumbs,
@@ -39,7 +48,11 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
             <h4 className="font-semibold text-gray-900 flex items-center">
               <File className="h-4 w-4 mr-2" />
               Breadcrumbs.json
-              {previewMode && <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Preview Mode</span>}
+              {previewMode && (
+                <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                  Preview Mode
+                </span>
+              )}
             </h4>
             <p className="text-xs text-gray-500 mt-1">{projectPath}</p>
           </div>
@@ -106,10 +119,9 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
           Folder Size
         </label>
         <p className="text-gray-900">
-          {breadcrumbs.folderSizeBytes 
+          {breadcrumbs.folderSizeBytes
             ? formatFileSize(breadcrumbs.folderSizeBytes)
-            : "Unknown value - update breadcrumb file"
-          }
+            : 'Unknown value - update breadcrumb file'}
         </p>
       </div>
 
@@ -118,13 +130,17 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
         <div className="grid grid-cols-2 gap-4">
           {breadcrumbs.lastModified && (
             <div>
-              <label className="block text-xs font-medium text-gray-600">Last Modified</label>
+              <label className="block text-xs font-medium text-gray-600">
+                Last Modified
+              </label>
               <p className="text-gray-900">{formatDate(breadcrumbs.lastModified)}</p>
             </div>
           )}
           {breadcrumbs.scannedBy && (
             <div>
-              <label className="block text-xs font-medium text-gray-600">Scanned By</label>
+              <label className="block text-xs font-medium text-gray-600">
+                Scanned By
+              </label>
               <p className="text-gray-900">{breadcrumbs.scannedBy}</p>
             </div>
           )}
@@ -148,7 +164,10 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
           </label>
           <div className="max-h-32 overflow-y-auto space-y-1">
             {breadcrumbs.files.map((file, index) => (
-              <div key={index} className="flex items-center justify-between bg-white rounded p-2">
+              <div
+                key={index}
+                className="flex items-center justify-between bg-white rounded p-2"
+              >
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium truncate">{file.name}</p>
                   <p className="text-xs text-gray-500 truncate">{file.path}</p>

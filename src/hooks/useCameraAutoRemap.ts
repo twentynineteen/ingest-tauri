@@ -1,7 +1,7 @@
-import { useEffect, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { createQueryOptions } from '../lib/query-utils'
+import { useEffect, useMemo } from 'react'
 import { queryKeys } from '../lib/query-keys'
+import { createQueryOptions } from '../lib/query-utils'
 
 export interface FootageFile {
   file: {
@@ -17,8 +17,8 @@ export function useCameraAutoRemap(
   setFiles: (updated: FootageFile[]) => void
 ) {
   // Create a unique query key based on files and camera count for memoization
-  const filesHash = useMemo(() => 
-    JSON.stringify(files.map(f => ({ path: f.file.path, camera: f.camera }))),
+  const filesHash = useMemo(
+    () => JSON.stringify(files.map(f => ({ path: f.file.path, camera: f.camera }))),
     [files]
   )
 
@@ -44,7 +44,7 @@ export function useCameraAutoRemap(
       'STATIC', // Use static profile for computed values
       {
         staleTime: Infinity, // Never stale - only updates when inputs change
-        gcTime: 5 * 60 * 1000, // Keep cached for 5 minutes
+        gcTime: 5 * 60 * 1000 // Keep cached for 5 minutes
       }
     )
   })
@@ -52,10 +52,10 @@ export function useCameraAutoRemap(
   // Apply remapped files when they change
   useEffect(() => {
     if (remappedFiles && remappedFiles !== files) {
-      const needsUpdate = remappedFiles.some((file, index) => 
-        !files[index] || file.camera !== files[index].camera
+      const needsUpdate = remappedFiles.some(
+        (file, index) => !files[index] || file.camera !== files[index].camera
       )
-      
+
       if (needsUpdate) {
         setFiles(remappedFiles)
       }

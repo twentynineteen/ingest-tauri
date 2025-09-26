@@ -1,22 +1,31 @@
 /**
  * Batch Update Confirmation Dialog
- * 
+ *
  * Shows a detailed summary of changes that Baker will make across
  * multiple projects before applying batch updates.
  */
 
+import {
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Edit,
+  HardDrive,
+  Minus,
+  Plus,
+  User
+} from 'lucide-react'
 import React from 'react'
-import { AlertTriangle, CheckCircle, Plus, Edit, Minus, HardDrive, Clock, User } from 'lucide-react'
+import type { BreadcrumbsPreview } from '../types/baker'
 import { Button } from './ui/button'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
-  DialogTitle,
-  DialogFooter
+  DialogTitle
 } from './ui/dialog'
-import type { BreadcrumbsPreview } from '../types/baker'
 
 interface BatchUpdateSummary {
   totalProjects: number
@@ -46,7 +55,9 @@ interface BatchUpdateConfirmationDialogProps {
   summary?: BatchUpdateSummary
 }
 
-export const BatchUpdateConfirmationDialog: React.FC<BatchUpdateConfirmationDialogProps> = ({
+export const BatchUpdateConfirmationDialog: React.FC<
+  BatchUpdateConfirmationDialogProps
+> = ({
   isOpen,
   onClose,
   onConfirm,
@@ -80,26 +91,33 @@ export const BatchUpdateConfirmationDialog: React.FC<BatchUpdateConfirmationDial
     commonChanges: {
       folderSizeCalculated: previews.filter(p => {
         const meaningfulDiff = p.meaningfulDiff || p.diff
-        return meaningfulDiff.changes.some(c => c.field === 'folderSizeBytes' && c.type === 'added')
+        return meaningfulDiff.changes.some(
+          c => c.field === 'folderSizeBytes' && c.type === 'added'
+        )
       }).length,
       filesUpdated: previews.filter(p => {
         const meaningfulDiff = p.meaningfulDiff || p.diff
-        return meaningfulDiff.changes.some(c => c.field === 'files' && c.type === 'modified')
+        return meaningfulDiff.changes.some(
+          c => c.field === 'files' && c.type === 'modified'
+        )
       }).length,
       timestampsUpdated: previews.filter(p =>
         p.diff.changes.some(c => c.field === 'lastModified')
       ).length,
       createdByUpdated: previews.filter(p => {
         const meaningfulDiff = p.meaningfulDiff || p.diff
-        return meaningfulDiff.changes.some(c => c.field === 'createdBy' && c.type === 'modified')
+        return meaningfulDiff.changes.some(
+          c => c.field === 'createdBy' && c.type === 'modified'
+        )
       }).length
     },
     estimatedDuration: selectedProjects.length > 10 ? '2-3 minutes' : 'Less than 1 minute'
   }
 
-  const hasChanges = calculatedSummary.totalChanges.added > 0 || 
-                    calculatedSummary.totalChanges.modified > 0 || 
-                    calculatedSummary.totalChanges.removed > 0
+  const hasChanges =
+    calculatedSummary.totalChanges.added > 0 ||
+    calculatedSummary.totalChanges.modified > 0 ||
+    calculatedSummary.totalChanges.removed > 0
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -114,7 +132,8 @@ export const BatchUpdateConfirmationDialog: React.FC<BatchUpdateConfirmationDial
             Confirm Batch Update
           </DialogTitle>
           <DialogDescription>
-            Review the changes Baker will make to {calculatedSummary.totalProjects} selected project{calculatedSummary.totalProjects !== 1 ? 's' : ''}.
+            Review the changes Baker will make to {calculatedSummary.totalProjects}{' '}
+            selected project{calculatedSummary.totalProjects !== 1 ? 's' : ''}.
           </DialogDescription>
         </DialogHeader>
 
@@ -122,15 +141,21 @@ export const BatchUpdateConfirmationDialog: React.FC<BatchUpdateConfirmationDial
           {/* Overview Stats */}
           <div className="grid grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
             <div className="text-center">
-              <div className="text-2xl font-bold text-gray-900">{calculatedSummary.totalProjects}</div>
+              <div className="text-2xl font-bold text-gray-900">
+                {calculatedSummary.totalProjects}
+              </div>
               <div className="text-xs text-gray-600">Total Projects</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">{calculatedSummary.projectsWithChanges}</div>
+              <div className="text-2xl font-bold text-orange-600">
+                {calculatedSummary.projectsWithChanges}
+              </div>
               <div className="text-xs text-gray-600">Will Be Updated</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{calculatedSummary.projectsWithoutChanges}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {calculatedSummary.projectsWithoutChanges}
+              </div>
               <div className="text-xs text-gray-600">No Changes</div>
             </div>
           </div>
@@ -218,7 +243,8 @@ export const BatchUpdateConfirmationDialog: React.FC<BatchUpdateConfirmationDial
                 <div className="flex items-center text-blue-800">
                   <Clock className="h-4 w-4 mr-2" />
                   <span className="text-sm">
-                    Estimated completion time: <strong>{calculatedSummary.estimatedDuration}</strong>
+                    Estimated completion time:{' '}
+                    <strong>{calculatedSummary.estimatedDuration}</strong>
                   </span>
                 </div>
               </div>
@@ -229,8 +255,9 @@ export const BatchUpdateConfirmationDialog: React.FC<BatchUpdateConfirmationDial
                   <div className="flex items-start text-yellow-800">
                     <AlertTriangle className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
                     <div className="text-sm">
-                      <strong>Large batch operation:</strong> You're updating {calculatedSummary.totalProjects} projects. 
-                      Consider running this operation during off-peak hours to avoid performance impact.
+                      <strong>Large batch operation:</strong> You're updating{' '}
+                      {calculatedSummary.totalProjects} projects. Consider running this
+                      operation during off-peak hours to avoid performance impact.
                     </div>
                   </div>
                 </div>
@@ -241,8 +268,12 @@ export const BatchUpdateConfirmationDialog: React.FC<BatchUpdateConfirmationDial
           {!hasChanges && (
             <div className="text-center py-8 text-gray-500">
               <CheckCircle className="h-12 w-12 mx-auto mb-3 text-green-600" />
-              <p className="text-lg font-medium text-gray-700 mb-1">No Changes Required</p>
-              <p className="text-sm">All selected projects already have up-to-date breadcrumbs files.</p>
+              <p className="text-lg font-medium text-gray-700 mb-1">
+                No Changes Required
+              </p>
+              <p className="text-sm">
+                All selected projects already have up-to-date breadcrumbs files.
+              </p>
             </div>
           )}
         </div>
@@ -254,15 +285,13 @@ export const BatchUpdateConfirmationDialog: React.FC<BatchUpdateConfirmationDial
           <Button
             onClick={onConfirm}
             disabled={isLoading || !hasChanges}
-            className={hasChanges ? "bg-orange-600 hover:bg-orange-700" : ""}
+            className={hasChanges ? 'bg-orange-600 hover:bg-orange-700' : ''}
           >
-            {isLoading ? (
-              "Updating..."
-            ) : hasChanges ? (
-              `Update ${calculatedSummary.projectsWithChanges} Project${calculatedSummary.projectsWithChanges !== 1 ? 's' : ''}`
-            ) : (
-              "Nothing to Update"
-            )}
+            {isLoading
+              ? 'Updating...'
+              : hasChanges
+                ? `Update ${calculatedSummary.projectsWithChanges} Project${calculatedSummary.projectsWithChanges !== 1 ? 's' : ''}`
+                : 'Nothing to Update'}
           </Button>
         </DialogFooter>
       </DialogContent>

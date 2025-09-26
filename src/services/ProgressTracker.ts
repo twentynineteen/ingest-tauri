@@ -76,13 +76,18 @@ export class ProgressTracker {
   /**
    * Update progress with new information
    */
-  public updateProgress(update: Partial<ProgressUpdate> & { phase: string; step: string; message: string }): void {
+  public updateProgress(
+    update: Partial<ProgressUpdate> & { phase: string; step: string; message: string }
+  ): void {
     const progressUpdate: ProgressUpdate = {
       id: this.generateUpdateId(),
       progress: update.progress || 0,
       total: update.total || 100,
       timestamp: new Date(),
-      estimatedTimeRemaining: this.calculateEstimatedTime(update.progress || 0, update.total || 100),
+      estimatedTimeRemaining: this.calculateEstimatedTime(
+        update.progress || 0,
+        update.total || 100
+      ),
       ...update
     }
 
@@ -110,7 +115,7 @@ export class ProgressTracker {
 
     const timeElapsed = Date.now() - this.startTime.getTime()
     const progressRatio = current / total
-    
+
     if (progressRatio <= 0) {
       return undefined
     }
@@ -122,9 +127,12 @@ export class ProgressTracker {
   /**
    * Subscribe to progress updates
    */
-  public subscribe(callback: (update: ProgressUpdate) => void, filter?: ProgressFilter): string {
+  public subscribe(
+    callback: (update: ProgressUpdate) => void,
+    filter?: ProgressFilter
+  ): string {
     const subscriptionId = `sub-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`
-    
+
     this.subscriptions.set(subscriptionId, {
       id: subscriptionId,
       callback,
@@ -188,8 +196,12 @@ export class ProgressTracker {
     const overallProgress = this.calculateOverallProgress()
     const timeElapsed = this.startTime ? Date.now() - this.startTime.getTime() : 0
 
-    const errors = this.progressHistory.filter(p => p.message.toLowerCase().includes('error')).length
-    const warnings = this.progressHistory.filter(p => p.message.toLowerCase().includes('warning')).length
+    const errors = this.progressHistory.filter(p =>
+      p.message.toLowerCase().includes('error')
+    ).length
+    const warnings = this.progressHistory.filter(p =>
+      p.message.toLowerCase().includes('warning')
+    ).length
 
     return {
       totalPhases,
@@ -224,21 +236,25 @@ export class ProgressTracker {
     }
 
     const phases = Array.from(this.phaseWeights.keys())
-    const totalWeight = Array.from(this.phaseWeights.values()).reduce((sum, weight) => sum + weight, 0)
-    
+    const totalWeight = Array.from(this.phaseWeights.values()).reduce(
+      (sum, weight) => sum + weight,
+      0
+    )
+
     let completedWeight = 0
     const currentPhaseIndex = phases.indexOf(this.currentProgress.phase)
-    
+
     // Add weight for completed phases
     for (let i = 0; i < currentPhaseIndex; i++) {
       completedWeight += this.phaseWeights.get(phases[i]) || 0
     }
-    
+
     // Add partial weight for current phase
     const currentPhaseWeight = this.phaseWeights.get(this.currentProgress.phase) || 0
-    const currentPhaseProgress = this.currentProgress.progress / this.currentProgress.total
+    const currentPhaseProgress =
+      this.currentProgress.progress / this.currentProgress.total
     completedWeight += currentPhaseWeight * currentPhaseProgress
-    
+
     return Math.min(100, (completedWeight / totalWeight) * 100)
   }
 
@@ -262,7 +278,7 @@ export class ProgressTracker {
   public formatProgressForConsole(update: ProgressUpdate): string {
     const percentage = ((update.progress / update.total) * 100).toFixed(1)
     const progressBar = this.createProgressBar(update.progress, update.total, 20)
-    
+
     const timeRemaining = update.estimatedTimeRemaining
       ? ` (ETA: ${this.formatDuration(update.estimatedTimeRemaining)})`
       : ''
@@ -277,7 +293,7 @@ export class ProgressTracker {
     const progress = current / total
     const completed = Math.floor(progress * width)
     const remaining = width - completed
-    
+
     return '█'.repeat(completed) + '░'.repeat(remaining)
   }
 

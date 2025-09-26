@@ -1,15 +1,30 @@
 /**
  * Enhanced BreadcrumbsViewer Component with Change Preview
- * 
+ *
  * Displays breadcrumbs.json files with side-by-side preview of changes
  * that Baker will make during updates.
  */
 
+import { open } from '@tauri-apps/plugin-shell'
+import {
+  Calendar,
+  Camera,
+  CheckCircle,
+  Edit,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  File,
+  FolderOpen,
+  HardDrive,
+  Minus,
+  Plus,
+  User
+} from 'lucide-react'
 import React from 'react'
-import { Calendar, Camera, User, FolderOpen, File, HardDrive, Eye, EyeOff, Plus, Minus, Edit, CheckCircle } from 'lucide-react'
-import { Button } from './ui/button'
 import type { BreadcrumbsViewerProps, FieldChange } from '../types/baker'
 import { formatFieldValue } from '../utils/breadcrumbsComparison'
+import { Button } from './ui/button'
 
 export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
   breadcrumbs,
@@ -36,26 +51,39 @@ export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
 
   const getChangeIcon = (type: string) => {
     switch (type) {
-      case 'added': return <Plus className="h-3 w-3 text-green-600" />
-      case 'modified': return <Edit className="h-3 w-3 text-orange-600" />
-      case 'removed': return <Minus className="h-3 w-3 text-red-600" />
-      default: return null
+      case 'added':
+        return <Plus className="h-3 w-3 text-green-600" />
+      case 'modified':
+        return <Edit className="h-3 w-3 text-orange-600" />
+      case 'removed':
+        return <Minus className="h-3 w-3 text-red-600" />
+      default:
+        return null
     }
   }
 
   const getChangeColor = (type: string) => {
     switch (type) {
-      case 'added': return 'bg-green-50 border-green-200'
-      case 'modified': return 'bg-orange-50 border-orange-200'
-      case 'removed': return 'bg-red-50 border-red-200'
-      default: return 'bg-white border-gray-200'
+      case 'added':
+        return 'bg-green-50 border-green-200'
+      case 'modified':
+        return 'bg-orange-50 border-orange-200'
+      case 'removed':
+        return 'bg-red-50 border-red-200'
+      default:
+        return 'bg-white border-gray-200'
     }
   }
 
-  const renderField = (label: string, value: unknown, icon?: React.ReactNode, change?: FieldChange) => {
+  const renderField = (
+    label: string,
+    value: unknown,
+    icon?: React.ReactNode,
+    change?: FieldChange
+  ) => {
     const changeColor = change ? getChangeColor(change.type) : 'bg-white border-gray-200'
     const changeIcon = change ? getChangeIcon(change.type) : null
-    
+
     return (
       <div className={`p-2 border rounded ${changeColor}`}>
         <label className="flex items-center text-xs font-medium text-gray-600">
@@ -63,7 +91,9 @@ export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
           {icon && <span className="mr-1">{icon}</span>}
           {label}
         </label>
-        <p className="text-gray-900 mt-1">{formatFieldValue(value, label.toLowerCase())}</p>
+        <p className="text-gray-900 mt-1">
+          {formatFieldValue(value, label.toLowerCase())}
+        </p>
       </div>
     )
   }
@@ -78,11 +108,17 @@ export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
     return (
       <div className="space-y-4">
         {/* Summary */}
-        <div className={`border rounded-lg p-3 ${hasMeaningfulChanges ? 'bg-blue-50 border-blue-200' : 'bg-green-50 border-green-200'}`}>
-          <h5 className={`font-medium mb-2 ${hasMeaningfulChanges ? 'text-blue-900' : 'text-green-900'}`}>
+        <div
+          className={`border rounded-lg p-3 ${hasMeaningfulChanges ? 'bg-blue-50 border-blue-200' : 'bg-green-50 border-green-200'}`}
+        >
+          <h5
+            className={`font-medium mb-2 ${hasMeaningfulChanges ? 'text-blue-900' : 'text-green-900'}`}
+          >
             Change Summary
           </h5>
-          <div className={`text-sm space-y-1 ${hasMeaningfulChanges ? 'text-blue-800' : 'text-green-800'}`}>
+          <div
+            className={`text-sm space-y-1 ${hasMeaningfulChanges ? 'text-blue-800' : 'text-green-800'}`}
+          >
             {hasMeaningfulChanges ? (
               <>
                 {summaryDiff.summary.added > 0 && (
@@ -124,13 +160,41 @@ export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
               {preview.current ? (
                 <>
                   {renderField('Project Title', preview.current.projectTitle)}
-                  {renderField('Number of Cameras', preview.current.numberOfCameras, <Camera className="h-3 w-3" />)}
-                  {renderField('Created By', preview.current.createdBy, <User className="h-3 w-3" />)}
-                  {renderField('Creation Date', formatDate(preview.current.creationDateTime), <Calendar className="h-3 w-3" />)}
-                  {preview.current.folderSizeBytes && renderField('Folder Size', formatFileSize(preview.current.folderSizeBytes), <HardDrive className="h-3 w-3" />)}
+                  {renderField(
+                    'Number of Cameras',
+                    preview.current.numberOfCameras,
+                    <Camera className="h-3 w-3" />
+                  )}
+                  {renderField(
+                    'Created By',
+                    preview.current.createdBy,
+                    <User className="h-3 w-3" />
+                  )}
+                  {renderField(
+                    'Creation Date',
+                    formatDate(preview.current.creationDateTime),
+                    <Calendar className="h-3 w-3" />
+                  )}
+                  {preview.current.folderSizeBytes &&
+                    renderField(
+                      'Folder Size',
+                      formatFileSize(preview.current.folderSizeBytes),
+                      <HardDrive className="h-3 w-3" />
+                    )}
+                  {preview.current.trelloCardUrl &&
+                    renderField(
+                      'Trello Card',
+                      preview.current.trelloCardUrl,
+                      <ExternalLink className="h-3 w-3" />
+                    )}
                   {renderField('Files', `${preview.current.files?.length || 0} files`)}
-                  {preview.current.lastModified && renderField('Last Modified', formatDate(preview.current.lastModified))}
-                  {preview.current.scannedBy && renderField('Scanned By', preview.current.scannedBy)}
+                  {preview.current.lastModified &&
+                    renderField(
+                      'Last Modified',
+                      formatDate(preview.current.lastModified)
+                    )}
+                  {preview.current.scannedBy &&
+                    renderField('Scanned By', preview.current.scannedBy)}
                 </>
               ) : (
                 <div className="text-center py-8 text-gray-500">
@@ -147,34 +211,110 @@ export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
               After Update
             </h5>
             <div className="space-y-3">
-              {preview.diff.changes.map((change, index) => {
-                if (change.field === 'projectTitle') {
-                  return <div key={`${change.field}-${index}`}>{renderField('Project Title', change.newValue, null, change)}</div>
-                }
-                if (change.field === 'numberOfCameras') {
-                  return <div key={`${change.field}-${index}`}>{renderField('Number of Cameras', change.newValue, <Camera className="h-3 w-3" />, change)}</div>
-                }
-                if (change.field === 'createdBy') {
-                  return <div key={`${change.field}-${index}`}>{renderField('Created By', change.newValue, <User className="h-3 w-3" />, change)}</div>
-                }
-                if (change.field === 'creationDateTime') {
-                  return <div key={`${change.field}-${index}`}>{renderField('Creation Date', formatDate(change.newValue as string), <Calendar className="h-3 w-3" />, change)}</div>
-                }
-                if (change.field === 'folderSizeBytes' && change.newValue) {
-                  return <div key={`${change.field}-${index}`}>{renderField('Folder Size', formatFileSize(change.newValue as number), <HardDrive className="h-3 w-3" />, change)}</div>
-                }
-                if (change.field === 'files') {
-                  const filesArray = change.newValue as Array<unknown>
-                  return <div key={`${change.field}-${index}`}>{renderField('Files', `${filesArray?.length || 0} files`, null, change)}</div>
-                }
-                if (change.field === 'lastModified') {
-                  return <div key={`${change.field}-${index}`}>{renderField('Last Modified', formatDate(change.newValue as string), null, change)}</div>
-                }
-                if (change.field === 'scannedBy') {
-                  return <div key={`${change.field}-${index}`}>{renderField('Scanned By', change.newValue, null, change)}</div>
-                }
-                return null
-              }).filter(Boolean)}
+              {preview.diff.changes
+                .map((change, index) => {
+                  if (change.field === 'projectTitle') {
+                    return (
+                      <div key={`${change.field}-${index}`}>
+                        {renderField('Project Title', change.newValue, null, change)}
+                      </div>
+                    )
+                  }
+                  if (change.field === 'numberOfCameras') {
+                    return (
+                      <div key={`${change.field}-${index}`}>
+                        {renderField(
+                          'Number of Cameras',
+                          change.newValue,
+                          <Camera className="h-3 w-3" />,
+                          change
+                        )}
+                      </div>
+                    )
+                  }
+                  if (change.field === 'createdBy') {
+                    return (
+                      <div key={`${change.field}-${index}`}>
+                        {renderField(
+                          'Created By',
+                          change.newValue,
+                          <User className="h-3 w-3" />,
+                          change
+                        )}
+                      </div>
+                    )
+                  }
+                  if (change.field === 'creationDateTime') {
+                    return (
+                      <div key={`${change.field}-${index}`}>
+                        {renderField(
+                          'Creation Date',
+                          formatDate(change.newValue as string),
+                          <Calendar className="h-3 w-3" />,
+                          change
+                        )}
+                      </div>
+                    )
+                  }
+                  if (change.field === 'folderSizeBytes' && change.newValue) {
+                    return (
+                      <div key={`${change.field}-${index}`}>
+                        {renderField(
+                          'Folder Size',
+                          formatFileSize(change.newValue as number),
+                          <HardDrive className="h-3 w-3" />,
+                          change
+                        )}
+                      </div>
+                    )
+                  }
+                  if (change.field === 'trelloCardUrl') {
+                    return (
+                      <div key={`${change.field}-${index}`}>
+                        {renderField(
+                          'Trello Card',
+                          change.newValue as string,
+                          <ExternalLink className="h-3 w-3" />,
+                          change
+                        )}
+                      </div>
+                    )
+                  }
+                  if (change.field === 'files') {
+                    const filesArray = change.newValue as Array<unknown>
+                    return (
+                      <div key={`${change.field}-${index}`}>
+                        {renderField(
+                          'Files',
+                          `${filesArray?.length || 0} files`,
+                          null,
+                          change
+                        )}
+                      </div>
+                    )
+                  }
+                  if (change.field === 'lastModified') {
+                    return (
+                      <div key={`${change.field}-${index}`}>
+                        {renderField(
+                          'Last Modified',
+                          formatDate(change.newValue as string),
+                          null,
+                          change
+                        )}
+                      </div>
+                    )
+                  }
+                  if (change.field === 'scannedBy') {
+                    return (
+                      <div key={`${change.field}-${index}`}>
+                        {renderField('Scanned By', change.newValue, null, change)}
+                      </div>
+                    )
+                  }
+                  return null
+                })
+                .filter(Boolean)}
             </div>
           </div>
         </div>
@@ -226,12 +366,39 @@ export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
           Folder Size
         </label>
         <p className="text-gray-900">
-          {breadcrumbs.folderSizeBytes 
+          {breadcrumbs.folderSizeBytes
             ? formatFileSize(breadcrumbs.folderSizeBytes)
-            : "Unknown value - update breadcrumb file"
-          }
+            : 'Unknown value - update breadcrumb file'}
         </p>
       </div>
+
+      {/* Trello Card URL */}
+      {breadcrumbs.trelloCardUrl && (
+        <div>
+          <label className="flex items-center text-xs font-medium text-gray-600">
+            <ExternalLink className="h-3 w-3 mr-1" />
+            Trello Card
+          </label>
+          <div className="flex items-center space-x-2">
+            <p className="text-gray-900 text-xs truncate flex-1">
+              {breadcrumbs.trelloCardUrl}
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={async () => {
+                if (breadcrumbs.trelloCardUrl) {
+                  await open(breadcrumbs.trelloCardUrl)
+                }
+              }}
+              className="text-xs px-2 py-1 h-6"
+            >
+              <ExternalLink className="h-3 w-3 mr-1" />
+              Open
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Modification Info */}
       {(breadcrumbs.lastModified || breadcrumbs.scannedBy) && (
@@ -268,7 +435,10 @@ export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
           </label>
           <div className="max-h-32 overflow-y-auto space-y-1">
             {breadcrumbs.files.map((file, index) => (
-              <div key={index} className="flex items-center justify-between bg-white rounded p-2">
+              <div
+                key={index}
+                className="flex items-center justify-between bg-white rounded p-2"
+              >
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium truncate">{file.name}</p>
                   <p className="text-xs text-gray-500 truncate">{file.path}</p>
@@ -300,7 +470,11 @@ export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
             <h4 className="font-semibold text-gray-900 flex items-center">
               <File className="h-4 w-4 mr-2" />
               Breadcrumbs.json
-              {previewMode && <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Preview Mode</span>}
+              {previewMode && (
+                <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                  Preview Mode
+                </span>
+              )}
             </h4>
             <p className="text-xs text-gray-500 mt-1">{projectPath}</p>
           </div>

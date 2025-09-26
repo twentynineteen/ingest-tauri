@@ -1,38 +1,43 @@
 /**
  * Breadcrumbs Comparison Utilities
- * 
+ *
  * Utilities for comparing breadcrumbs files and generating diffs
  * for preview functionality in Baker.
  */
 
-import type { BreadcrumbsFile, BreadcrumbsDiff, FieldChange, BreadcrumbsPreview } from '../types/baker'
+import type {
+  BreadcrumbsDiff,
+  BreadcrumbsFile,
+  BreadcrumbsPreview,
+  FieldChange
+} from '../types/baker'
 
 /**
  * Deep equality check for any value type
  */
 function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true
-  
+
   if (a == null || b == null) return a === b
-  
+
   if (typeof a !== typeof b) return false
-  
+
   if (typeof a === 'object') {
     if (Array.isArray(a) !== Array.isArray(b)) return false
-    
+
     if (Array.isArray(a)) {
       if (a.length !== (b as unknown[]).length) return false
       return a.every((item, index) => deepEqual(item, (b as unknown[])[index]))
     }
-    
+
     const keysA = Object.keys(a)
     const keysB = Object.keys(b)
-    
+
     if (keysA.length !== keysB.length) return false
-    
+
     return keysA.every(key => deepEqual(a[key], b[key]))
   }
-  
+
   return false
 }
 
@@ -43,36 +48,34 @@ function deepEqual(a: unknown, b: unknown): boolean {
  * @param includeMaintenance - Whether to include maintenance fields (timestamps, scannedBy)
  */
 export function compareBreadcrumbs(
-  current: BreadcrumbsFile | null, 
+  current: BreadcrumbsFile | null,
   updated: BreadcrumbsFile,
   includeMaintenance: boolean = true
 ): BreadcrumbsDiff {
   const changes: FieldChange[] = []
-  
+
   // Define meaningful content fields (always compared)
   const contentFields = [
     'projectTitle',
-    'numberOfCameras', 
+    'numberOfCameras',
     'files',
     'parentFolder',
     'createdBy',
     'creationDateTime',
-    'folderSizeBytes'
+    'folderSizeBytes',
+    'trelloCardUrl'
   ] as const
-  
+
   // Define maintenance fields (only compared if includeMaintenance is true)
-  const maintenanceFields = [
-    'lastModified',
-    'scannedBy'
-  ] as const
-  
-  const fieldsToCompare = includeMaintenance 
-    ? [...contentFields, ...maintenanceFields] 
+  const maintenanceFields = ['lastModified', 'scannedBy'] as const
+
+  const fieldsToCompare = includeMaintenance
+    ? [...contentFields, ...maintenanceFields]
     : contentFields
-  
+
   if (!current) {
     // All fields are new
-    fieldsToCompare.forEach(field => {
+    fieldsToCompare.forEach((field: keyof BreadcrumbsFile) => {
       if (updated[field] !== undefined) {
         changes.push({
           type: 'added',
@@ -83,10 +86,10 @@ export function compareBreadcrumbs(
     })
   } else {
     // Compare each field
-    fieldsToCompare.forEach(field => {
+    fieldsToCompare.forEach((field: keyof BreadcrumbsFile) => {
       const oldValue = current[field]
       const newValue = updated[field]
-      
+
       if (oldValue === undefined && newValue !== undefined) {
         changes.push({
           type: 'added',
@@ -116,7 +119,7 @@ export function compareBreadcrumbs(
       }
     })
   }
-  
+
   // Calculate summary
   const summary = changes.reduce(
     (acc, change) => {
@@ -125,7 +128,7 @@ export function compareBreadcrumbs(
     },
     { added: 0, modified: 0, removed: 0, unchanged: 0 }
   )
-  
+
   return {
     hasChanges: summary.added > 0 || summary.modified > 0 || summary.removed > 0,
     changes,
@@ -140,11 +143,13 @@ function isBakerMaintenanceChange(oldValue: unknown, newValue: unknown): boolean
   if (typeof oldValue !== 'string' || typeof newValue !== 'string') {
     return false
   }
-  
+
   // Check if new value is just old value + Baker suffix
   const bakerSuffix = ' - updated by Baker'
-  return newValue === oldValue + bakerSuffix || 
-         (newValue.endsWith(bakerSuffix) && newValue.startsWith(oldValue))
+  return (
+    newValue === oldValue + bakerSuffix ||
+    (newValue.endsWith(bakerSuffix) && newValue.startsWith(oldValue))
+  )
 }
 
 /**
@@ -152,31 +157,31 @@ function isBakerMaintenanceChange(oldValue: unknown, newValue: unknown): boolean
  * Use this for determining if user confirmation is actually needed
  */
 export function compareBreadcrumbsMeaningful(
-  current: BreadcrumbsFile | null, 
+  current: BreadcrumbsFile | null,
   updated: BreadcrumbsFile
 ): BreadcrumbsDiff {
   const fullDiff = compareBreadcrumbs(current, updated, true)
-  
+
   // Filter out maintenance changes
   const meaningfulChanges = fullDiff.changes.filter(change => {
     // Always exclude pure maintenance fields
     if (change.field === 'lastModified' || change.field === 'scannedBy') {
       return false
     }
-    
+
     // Filter out Baker maintenance createdBy changes
     if (change.field === 'createdBy' && change.type === 'modified') {
       return !isBakerMaintenanceChange(change.oldValue, change.newValue)
     }
-    
+
     // For folderSizeBytes, only meaningful if it's being added (was missing)
     if (change.field === 'folderSizeBytes') {
       return change.type === 'added'
     }
-    
+
     return true
   })
-  
+
   // Recalculate summary for meaningful changes only
   const summary = meaningfulChanges.reduce(
     (acc, change) => {
@@ -185,7 +190,7 @@ export function compareBreadcrumbsMeaningful(
     },
     { added: 0, modified: 0, removed: 0, unchanged: 0 }
   )
-  
+
   return {
     hasChanges: summary.added > 0 || summary.modified > 0 || summary.removed > 0,
     changes: meaningfulChanges,
@@ -205,44 +210,46 @@ export function generateBreadcrumbsPreview(
   }
 ): BreadcrumbsPreview {
   const now = new Date().toISOString()
-  
+
   // Generate what Baker would create/update
-  const updated: BreadcrumbsFile = current ? {
-    ...current,
-    files: projectData.files,
-    numberOfCameras: projectData.cameraCount,
-    // Update createdBy format if it's an update
-    createdBy: current.createdBy.endsWith(' - updated by Baker') 
-      ? current.createdBy 
-      : `${current.createdBy} - updated by Baker`,
-    lastModified: now,
-    scannedBy: 'Baker',
-    // Add folder size if missing
-    folderSizeBytes: current.folderSizeBytes || undefined
-  } : {
-    // New breadcrumbs file
-    projectTitle: projectPath.split('/').pop() || 'Unknown Project',
-    numberOfCameras: projectData.cameraCount,
-    files: projectData.files,
-    parentFolder: projectPath.split('/').slice(0, -1).join('/'),
-    createdBy: 'Baker',
-    creationDateTime: now,
-    folderSizeBytes: undefined,
-    lastModified: now,
-    scannedBy: 'Baker'
-  }
-  
+  const updated: BreadcrumbsFile = current
+    ? {
+        ...current,
+        files: projectData.files,
+        numberOfCameras: projectData.cameraCount,
+        // Update createdBy format if it's an update
+        createdBy: current.createdBy.endsWith(' - updated by Baker')
+          ? current.createdBy
+          : `${current.createdBy} - updated by Baker`,
+        lastModified: now,
+        scannedBy: 'Baker',
+        // Add folder size if missing
+        folderSizeBytes: current.folderSizeBytes || undefined
+      }
+    : {
+        // New breadcrumbs file
+        projectTitle: projectPath.split('/').pop() || 'Unknown Project',
+        numberOfCameras: projectData.cameraCount,
+        files: projectData.files,
+        parentFolder: projectPath.split('/').slice(0, -1).join('/'),
+        createdBy: 'Baker',
+        creationDateTime: now,
+        folderSizeBytes: undefined,
+        lastModified: now,
+        scannedBy: 'Baker'
+      }
+
   // Generate full diff for preview display (includes maintenance fields)
   const fullDiff = compareBreadcrumbs(current, updated, true)
-  
+
   // Generate meaningful diff for determining if changes actually matter
   const meaningfulDiff = compareBreadcrumbsMeaningful(current, updated)
-  
+
   // Debug logging (remove in production)
   if (process.env.NODE_ENV === 'development') {
     debugComparison(current, updated)
   }
-  
+
   return {
     current,
     updated,
@@ -264,9 +271,10 @@ export function formatFieldName(field: string): string {
     creationDateTime: 'Creation Date',
     folderSizeBytes: 'Folder Size',
     lastModified: 'Last Modified',
-    scannedBy: 'Scanned By'
+    scannedBy: 'Scanned By',
+    trelloCardUrl: 'Trello Card'
   }
-  
+
   return fieldNames[field] || field
 }
 
@@ -277,23 +285,32 @@ export function formatFieldValue(value: unknown, field: string): string {
   if (value === null || value === undefined) {
     return 'Not set'
   }
-  
+
   if (field === 'folderSizeBytes' && typeof value === 'number') {
     return formatFileSize(value)
   }
-  
+
   if (field === 'files' && Array.isArray(value)) {
     return `${value.length} files`
   }
-  
-  if (field === 'creationDateTime' || field === 'lastModified') {
+
+  if (
+    field === 'creationDateTime' ||
+    field === 'lastModified' ||
+    field === 'creation date' ||
+    field === 'last modified'
+  ) {
     try {
       return new Date(value as string).toLocaleString()
     } catch {
       return String(value)
     }
   }
-  
+
+  if (field === 'trelloCardUrl' || field === 'trello card') {
+    return String(value)
+  }
+
   return String(value)
 }
 
@@ -313,30 +330,32 @@ function formatFileSize(bytes: number): string {
  * Remove this in production - for debugging only
  */
 export function debugComparison(
-  current: BreadcrumbsFile | null, 
+  current: BreadcrumbsFile | null,
   updated: BreadcrumbsFile
 ): void {
   console.group('🔍 Breadcrumbs Comparison Debug')
-  
+
   const fullDiff = compareBreadcrumbs(current, updated, true)
   const meaningfulDiff = compareBreadcrumbsMeaningful(current, updated)
-  
+
   console.log('📄 Current:', current)
   console.log('🆕 Updated:', updated)
   console.log('📊 Full Diff:', fullDiff)
   console.log('⚡ Meaningful Diff:', meaningfulDiff)
-  
+
   console.log('🎯 Change Analysis:')
   fullDiff.changes.forEach(change => {
-    const isMeaningful = meaningfulDiff.changes.some(mc => 
-      mc.field === change.field && mc.type === change.type
+    const isMeaningful = meaningfulDiff.changes.some(
+      mc => mc.field === change.field && mc.type === change.type
     )
-    console.log(`  ${change.field}: ${change.type} ${isMeaningful ? '✅ MEANINGFUL' : '⚠️  MAINTENANCE'}`)
+    console.log(
+      `  ${change.field}: ${change.type} ${isMeaningful ? '✅ MEANINGFUL' : '⚠️  MAINTENANCE'}`
+    )
     if (change.oldValue !== change.newValue) {
       console.log(`    Old: ${JSON.stringify(change.oldValue)}`)
       console.log(`    New: ${JSON.stringify(change.newValue)}`)
     }
   })
-  
+
   console.groupEnd()
 }

@@ -1,12 +1,12 @@
 /**
  * useLiveBreadcrumbsReader Hook
- * 
+ *
  * Enhanced breadcrumbs reader that shows current file system state
  * instead of stale cached breadcrumbs data.
  */
 
-import { useState, useCallback } from 'react'
 import { invoke } from '@tauri-apps/api/core'
+import { useCallback, useState } from 'react'
 import type { BreadcrumbsFile, FileInfo } from '../types/baker'
 
 interface UseLiveBreadcrumbsReaderResult {
@@ -25,12 +25,15 @@ export function useLiveBreadcrumbsReader(): UseLiveBreadcrumbsReaderResult {
   const readLiveBreadcrumbs = useCallback(async (projectPath: string) => {
     setIsLoading(true)
     setError(null)
-    
+
     try {
       // Read existing breadcrumbs file for metadata
-      const existingBreadcrumbs = await invoke<BreadcrumbsFile | null>('baker_read_breadcrumbs', {
-        projectPath
-      })
+      const existingBreadcrumbs = await invoke<BreadcrumbsFile | null>(
+        'baker_read_breadcrumbs',
+        {
+          projectPath
+        }
+      )
 
       // Get actual current files from file system
       let actualFiles: FileInfo[] = []
@@ -39,7 +42,10 @@ export function useLiveBreadcrumbsReader(): UseLiveBreadcrumbsReaderResult {
           projectPath
         })
       } catch (scanError) {
-        console.warn(`Failed to scan current files for ${projectPath}, using cached data:`, scanError)
+        console.warn(
+          `Failed to scan current files for ${projectPath}, using cached data:`,
+          scanError
+        )
         // Fall back to existing breadcrumbs files if file system scan fails
         if (existingBreadcrumbs?.files) {
           actualFiles = existingBreadcrumbs.files
@@ -71,7 +77,8 @@ export function useLiveBreadcrumbsReader(): UseLiveBreadcrumbsReaderResult {
         setError('No breadcrumbs file found and no files detected in project')
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to read project data'
+      const errorMessage =
+        err instanceof Error ? err.message : 'Failed to read project data'
       setError(errorMessage)
       setBreadcrumbs(null)
     } finally {

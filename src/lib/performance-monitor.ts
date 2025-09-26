@@ -3,7 +3,7 @@ import React from 'react'
 
 /**
  * Performance Monitoring Utilities for React Query
- * 
+ *
  * Provides comprehensive performance monitoring, metrics collection,
  * and optimization insights for React Query operations.
  */
@@ -55,7 +55,7 @@ export class QueryPerformanceMonitor {
     const queryCache = this.queryClient.getQueryCache()
 
     // Listen for query state changes
-    queryCache.subscribe((event) => {
+    queryCache.subscribe(event => {
       if (event.type === 'added') {
         this.onQueryAdded(event.query)
       } else if (event.type === 'updated') {
@@ -83,7 +83,16 @@ export class QueryPerformanceMonitor {
   /**
    * Called when a query state is updated
    */
-  private onQueryUpdated(query: { queryKey: unknown[], state: { status: string, dataUpdatedAt: number, failureCount?: number, error?: Error, data?: unknown } }) {
+  private onQueryUpdated(query: {
+    queryKey: unknown[]
+    state: {
+      status: string
+      dataUpdatedAt: number
+      failureCount?: number
+      error?: Error
+      data?: unknown
+    }
+  }) {
     const queryKey = JSON.stringify(query.queryKey)
     const startTime = this.startTimes.get(queryKey)
 
@@ -91,7 +100,7 @@ export class QueryPerformanceMonitor {
 
     const duration = Date.now() - startTime
     const wasFromCache = query.state.dataUpdatedAt < startTime
-    
+
     // Only record metrics for completed queries (success or error)
     if (query.state.status === 'success' || query.state.status === 'error') {
       this.recordMetric({
@@ -120,7 +129,7 @@ export class QueryPerformanceMonitor {
    */
   private recordMetric(metric: QueryPerformanceMetric) {
     const queryKey = metric.queryKey
-    
+
     if (!this.metrics.has(queryKey)) {
       this.metrics.set(queryKey, [])
     }
@@ -165,13 +174,13 @@ export class QueryPerformanceMonitor {
     const totalQueries = allMetrics.length
     const totalResponseTime = allMetrics.reduce((sum, m) => sum + m.duration, 0)
     const averageResponseTime = totalResponseTime / totalQueries
-    
+
     const cacheHits = allMetrics.filter(m => m.cacheHit).length
     const cacheHitRate = (cacheHits / totalQueries) * 100
-    
+
     const errors = allMetrics.filter(m => m.status === 'error')
     const errorRate = (errors.length / totalQueries) * 100
-    
+
     // Define "slow" queries as those taking longer than 95th percentile
     const sortedByDuration = [...allMetrics].sort((a, b) => a.duration - b.duration)
     const p95Index = Math.floor(0.95 * sortedByDuration.length)
@@ -233,7 +242,8 @@ export class QueryPerformanceMonitor {
         category: 'cache',
         message: `Low cache hit rate (${metrics.cacheHitRate.toFixed(1)}%). Consider increasing staleTime for frequently accessed data.`,
         impact: 'medium',
-        recommendation: 'Increase staleTime for stable data or implement prefetching strategies'
+        recommendation:
+          'Increase staleTime for stable data or implement prefetching strategies'
       })
     }
 
@@ -255,24 +265,27 @@ export class QueryPerformanceMonitor {
         category: 'performance',
         message: `Slow average response time (${metrics.averageResponseTime.toFixed(0)}ms). Consider optimization.`,
         impact: 'medium',
-        recommendation: 'Implement query optimization, data pagination, or background prefetching'
+        recommendation:
+          'Implement query optimization, data pagination, or background prefetching'
       })
     }
 
     // Memory usage insights
-    if (metrics.memoryUsage.estimatedSizeBytes > 50 * 1024 * 1024) { // 50MB
+    if (metrics.memoryUsage.estimatedSizeBytes > 50 * 1024 * 1024) {
+      // 50MB
       insights.push({
         type: 'warning',
         category: 'memory',
         message: `High memory usage (${this.formatBytes(metrics.memoryUsage.estimatedSizeBytes)}). Consider cleanup strategies.`,
         impact: 'medium',
-        recommendation: 'Reduce gcTime for large datasets or implement selective data cleanup'
+        recommendation:
+          'Reduce gcTime for large datasets or implement selective data cleanup'
       })
     }
 
     // Slow queries insights
     if (metrics.slowQueries.length > 0) {
-      const slowestQuery = metrics.slowQueries.reduce((prev, curr) => 
+      const slowestQuery = metrics.slowQueries.reduce((prev, curr) =>
         prev.duration > curr.duration ? prev : curr
       )
       insights.push({
@@ -280,7 +293,8 @@ export class QueryPerformanceMonitor {
         category: 'performance',
         message: `${metrics.slowQueries.length} slow queries detected. Slowest: ${slowestQuery.duration}ms`,
         impact: 'low',
-        recommendation: 'Consider optimizing slow query endpoints or implementing background loading'
+        recommendation:
+          'Consider optimizing slow query endpoints or implementing background loading'
       })
     }
 
@@ -306,7 +320,7 @@ export class QueryPerformanceMonitor {
   clearMetrics() {
     this.metrics.clear()
     this.startTimes.clear()
-    
+
     // Clean up observers
     for (const observer of this.observers.values()) {
       observer.destroy()
@@ -323,11 +337,11 @@ export class QueryPerformanceMonitor {
   ): Promise<{ data: T; metrics: QueryPerformanceMetric }> {
     const start = Date.now()
     const keyString = JSON.stringify(queryKey)
-    
+
     try {
       const data = await queryFn()
       const duration = Date.now() - start
-      
+
       const metrics: QueryPerformanceMetric = {
         queryKey: keyString,
         duration,
@@ -337,13 +351,13 @@ export class QueryPerformanceMonitor {
         cacheHit: false, // Direct measurement is never from cache
         retryCount: 0
       }
-      
+
       this.recordMetric(metrics)
-      
+
       return { data, metrics }
     } catch (error) {
       const duration = Date.now() - start
-      
+
       const metrics: QueryPerformanceMetric = {
         queryKey: keyString,
         duration,
@@ -353,9 +367,9 @@ export class QueryPerformanceMonitor {
         retryCount: 0,
         errorType: error instanceof Error ? error.message : 'Unknown error'
       }
-      
+
       this.recordMetric(metrics)
-      
+
       throw error
     }
   }
@@ -364,7 +378,7 @@ export class QueryPerformanceMonitor {
     const sizes = ['B', 'KB', 'MB', 'GB']
     if (bytes === 0) return '0 B'
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
-    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i]
+    return Math.round((bytes / Math.pow(1024, i)) * 100) / 100 + ' ' + sizes[i]
   }
 }
 
@@ -384,13 +398,13 @@ export interface PerformanceInsight {
  */
 export function useQueryPerformance(queryClient: QueryClient) {
   const [monitor] = React.useState(() => new QueryPerformanceMonitor(queryClient))
-  
+
   React.useEffect(() => {
     return () => {
       monitor.clearMetrics()
     }
   }, [monitor])
-  
+
   return {
     getMetrics: () => monitor.getAggregatedMetrics(),
     getInsights: () => monitor.getPerformanceInsights(),
@@ -411,7 +425,11 @@ export function createPerformanceLogger() {
         dataSize: JSON.stringify(data).length
       })
     },
-    onError: (error: { message: string }, variables: unknown, context: { startTime?: number }) => {
+    onError: (
+      error: { message: string },
+      variables: unknown,
+      context: { startTime?: number }
+    ) => {
       const duration = Date.now() - (context.startTime || 0)
       console.error(`❌ Query failed after ${duration}ms`, {
         error: error.message,
@@ -439,7 +457,9 @@ export const initializePerformanceMonitor = (queryClient: QueryClient) => {
 
 export const getPerformanceMonitor = (): QueryPerformanceMonitor => {
   if (!globalPerformanceMonitor) {
-    throw new Error('Performance monitor not initialized. Call initializePerformanceMonitor() first.')
+    throw new Error(
+      'Performance monitor not initialized. Call initializePerformanceMonitor() first.'
+    )
   }
   return globalPerformanceMonitor
 }

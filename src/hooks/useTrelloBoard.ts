@@ -7,8 +7,8 @@ import {
   groupCardsByList,
   TrelloCard
 } from 'utils/TrelloCards'
-import { createQueryOptions, createQueryError, shouldRetry } from '../lib/query-utils'
 import { queryKeys } from '../lib/query-keys'
+import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
 
 interface TrelloBoardData {
   grouped: Record<string, TrelloCard[]>
@@ -40,7 +40,8 @@ export function useTrelloBoard(boardId: string): TrelloBoardData {
     ...createQueryOptions(
       queryKeys.trello.cards(boardId),
       async () => {
-        if (!apiKey || !token) throw createQueryError('API key or token missing', 'AUTHENTICATION')
+        if (!apiKey || !token)
+          throw createQueryError('API key or token missing', 'AUTHENTICATION')
         return fetchTrelloCards(apiKey, token, boardId)
       },
       'DYNAMIC',
@@ -57,7 +58,8 @@ export function useTrelloBoard(boardId: string): TrelloBoardData {
     ...createQueryOptions(
       queryKeys.trello.lists(boardId),
       async () => {
-        if (!apiKey || !token) throw createQueryError('API key or token missing', 'AUTHENTICATION')
+        if (!apiKey || !token)
+          throw createQueryError('API key or token missing', 'AUTHENTICATION')
         return fetchTrelloLists(apiKey, token, boardId)
       },
       'DYNAMIC',
@@ -72,7 +74,6 @@ export function useTrelloBoard(boardId: string): TrelloBoardData {
   // Use React Query's computed state pattern instead of useEffect
   const isDataReady = cards && lists && !cardsLoading && !listsLoading
   const isLoading = credentialsLoading || cardsLoading || listsLoading
-
 
   // Group cards when data changes
   useEffect(() => {

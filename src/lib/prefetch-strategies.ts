@@ -1,14 +1,14 @@
 import { QueryClient } from '@tanstack/react-query'
-import { queryKeys } from './query-keys'
-import { createQueryOptions, createQueryError, shouldRetry } from './query-utils'
-import { loadApiKeys } from '../utils/storage'
 import { core } from '@tauri-apps/api'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
+import { loadApiKeys } from '../utils/storage'
+import { queryKeys } from './query-keys'
+import { createQueryError, createQueryOptions, shouldRetry } from './query-utils'
 
 /**
  * Query Prefetching Strategies
- * 
+ *
  * Provides intelligent prefetching strategies to improve perceived performance
  * by loading data before it's needed by components.
  */
@@ -32,7 +32,7 @@ export class QueryPrefetchManager {
 
     // Run all prefetches concurrently, but don't block app startup on failures
     const results = await Promise.allSettled(prefetchPromises)
-    
+
     const failures = results.filter(result => result.status === 'rejected')
     if (failures.length > 0) {
       console.warn('Some startup data prefetching failed:', failures)
@@ -45,10 +45,7 @@ export class QueryPrefetchManager {
    * Prefetch user-specific data after authentication
    */
   async prefetchUserData() {
-    return Promise.allSettled([
-      this.prefetchUsername(),
-      this.prefetchApiKeys()
-    ])
+    return Promise.allSettled([this.prefetchUsername(), this.prefetchApiKeys()])
   }
 
   /**
@@ -62,10 +59,7 @@ export class QueryPrefetchManager {
           try {
             return await getVersion()
           } catch (error) {
-            throw createQueryError(
-              `Failed to get app version: ${error}`,
-              'SYSTEM_INFO'
-            )
+            throw createQueryError(`Failed to get app version: ${error}`, 'SYSTEM_INFO')
           }
         },
         'STATIC',
@@ -89,10 +83,7 @@ export class QueryPrefetchManager {
           try {
             return await core.invoke<string>('get_username')
           } catch (error) {
-            throw createQueryError(
-              `Failed to fetch username: ${error}`,
-              'AUTHENTICATION'
-            )
+            throw createQueryError(`Failed to fetch username: ${error}`, 'AUTHENTICATION')
           }
         },
         'STATIC',
@@ -116,10 +107,7 @@ export class QueryPrefetchManager {
           try {
             return await loadApiKeys()
           } catch (error) {
-            throw createQueryError(
-              `Failed to load API keys: ${error}`,
-              'SETTINGS_LOAD'
-            )
+            throw createQueryError(`Failed to load API keys: ${error}`, 'SETTINGS_LOAD')
           }
         },
         'DYNAMIC',
@@ -138,7 +126,9 @@ export class QueryPrefetchManager {
   async prefetchTrelloBoard(boardId: string, apiKey?: string, token?: string) {
     if (!apiKey || !token) {
       // Try to get API keys from cache or storage
-      const apiKeys = this.queryClient.getQueryData(queryKeys.settings.apiKeys()) as Record<string, string> | undefined
+      const apiKeys = this.queryClient.getQueryData(queryKeys.settings.apiKeys()) as
+        | Record<string, string>
+        | undefined
       if (!apiKeys?.trello || !apiKeys?.trelloToken) {
         console.log('Trello prefetch skipped: missing API credentials')
         return
@@ -182,7 +172,9 @@ export class QueryPrefetchManager {
   async prefetchSproutFolders(apiKey?: string, parentId: string | null = null) {
     if (!apiKey) {
       // Try to get API key from cache or storage
-      const apiKeys = this.queryClient.getQueryData(queryKeys.settings.apiKeys()) as Record<string, string> | undefined
+      const apiKeys = this.queryClient.getQueryData(queryKeys.settings.apiKeys()) as
+        | Record<string, string>
+        | undefined
       if (!apiKeys?.sproutVideo) {
         console.log('Sprout prefetch skipped: missing API key')
         return
@@ -224,18 +216,21 @@ export class QueryPrefetchManager {
     switch (route) {
       case '/settings':
       case '/settings/general':
-        return Promise.allSettled([
-          this.prefetchApiKeys(),
-          this.prefetchAppVersion()
-        ])
+        return Promise.allSettled([this.prefetchApiKeys(), this.prefetchAppVersion()])
 
       case '/upload-trello': {
         await this.prefetchApiKeys()
         // Get Trello credentials and prefetch board data
-        const apiKeys = this.queryClient.getQueryData(queryKeys.settings.apiKeys()) as Record<string, unknown>
+        const apiKeys = this.queryClient.getQueryData(
+          queryKeys.settings.apiKeys()
+        ) as Record<string, unknown>
         if (apiKeys?.trello && apiKeys?.trelloToken) {
           const defaultBoardId = '55a504d70bed2bd21008dc5a' // 'small projects' board
-          return this.prefetchTrelloBoard(defaultBoardId, apiKeys.trello as string, apiKeys.trelloToken as string)
+          return this.prefetchTrelloBoard(
+            defaultBoardId,
+            apiKeys.trello as string,
+            apiKeys.trelloToken as string
+          )
         }
         break
       }
@@ -243,7 +238,9 @@ export class QueryPrefetchManager {
       case '/upload-sprout': {
         await this.prefetchApiKeys()
         // Get Sprout credentials and prefetch root folders
-        const keys = this.queryClient.getQueryData(queryKeys.settings.apiKeys()) as Record<string, unknown>
+        const keys = this.queryClient.getQueryData(
+          queryKeys.settings.apiKeys()
+        ) as Record<string, unknown>
         if (keys?.sproutVideo) {
           return this.prefetchSproutFolders(keys.sproutVideo as string, null)
         }
@@ -274,16 +271,24 @@ export class QueryPrefetchManager {
 
     // If user is working with Trello, prefetch board data
     if (userActions.includes('trello') || currentRoute.includes('trello')) {
-      const apiKeys = this.queryClient.getQueryData(queryKeys.settings.apiKeys()) as Record<string, unknown>
+      const apiKeys = this.queryClient.getQueryData(
+        queryKeys.settings.apiKeys()
+      ) as Record<string, unknown>
       if (apiKeys?.trello && apiKeys?.trelloToken) {
         const defaultBoardId = '55a504d70bed2bd21008dc5a'
-        await this.prefetchTrelloBoard(defaultBoardId, apiKeys.trello as string, apiKeys.trelloToken as string)
+        await this.prefetchTrelloBoard(
+          defaultBoardId,
+          apiKeys.trello as string,
+          apiKeys.trelloToken as string
+        )
       }
     }
 
     // If user is working with Sprout, prefetch folder data
     if (userActions.includes('sprout') || currentRoute.includes('sprout')) {
-      const apiKeys = this.queryClient.getQueryData(queryKeys.settings.apiKeys()) as Record<string, unknown>
+      const apiKeys = this.queryClient.getQueryData(
+        queryKeys.settings.apiKeys()
+      ) as Record<string, unknown>
       if (apiKeys?.sproutVideo) {
         await this.prefetchSproutFolders(apiKeys.sproutVideo as string, null)
       }
@@ -296,10 +301,16 @@ export class QueryPrefetchManager {
   async prefetchOnHover(element: 'trello-button' | 'settings-link' | 'sprout-button') {
     switch (element) {
       case 'trello-button': {
-        const apiKeys = this.queryClient.getQueryData(queryKeys.settings.apiKeys()) as Record<string, unknown>
+        const apiKeys = this.queryClient.getQueryData(
+          queryKeys.settings.apiKeys()
+        ) as Record<string, unknown>
         if (apiKeys?.trello && apiKeys?.trelloToken) {
           const defaultBoardId = '55a504d70bed2bd21008dc5a'
-          return this.prefetchTrelloBoard(defaultBoardId, apiKeys.trello as string, apiKeys.trelloToken as string)
+          return this.prefetchTrelloBoard(
+            defaultBoardId,
+            apiKeys.trello as string,
+            apiKeys.trelloToken as string
+          )
         }
         break
       }
@@ -308,7 +319,9 @@ export class QueryPrefetchManager {
         return this.prefetchApiKeys()
 
       case 'sprout-button': {
-        const keys = this.queryClient.getQueryData(queryKeys.settings.apiKeys()) as Record<string, unknown>
+        const keys = this.queryClient.getQueryData(
+          queryKeys.settings.apiKeys()
+        ) as Record<string, unknown>
         if (keys?.sproutVideo) {
           return this.prefetchSproutFolders(keys.sproutVideo as string, null)
         }
@@ -320,7 +333,10 @@ export class QueryPrefetchManager {
   /**
    * Check if we should prefetch settings based on user patterns
    */
-  private shouldPrefetchSettings(previousRoutes: string[], currentRoute: string): boolean {
+  private shouldPrefetchSettings(
+    previousRoutes: string[],
+    currentRoute: string
+  ): boolean {
     // If user has visited settings recently, they might go back
     const hasVisitedSettingsRecently = previousRoutes
       .slice(-5) // Check last 5 routes
@@ -367,7 +383,9 @@ export const initializePrefetchManager = (queryClient: QueryClient) => {
 
 export const getPrefetchManager = (): QueryPrefetchManager => {
   if (!globalPrefetchManager) {
-    throw new Error('Prefetch manager not initialized. Call initializePrefetchManager() first.')
+    throw new Error(
+      'Prefetch manager not initialized. Call initializePrefetchManager() first.'
+    )
   }
   return globalPrefetchManager
 }

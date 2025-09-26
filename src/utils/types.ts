@@ -27,6 +27,7 @@ export interface Breadcrumb {
   createdBy?: string | { data?: string; [key: string]: unknown }
   creationDateTime?: string
   folderSizeBytes?: number
+  trelloCardUrl?: string
 }
 
 // Interface representing the JSON response from SproutVideo upload

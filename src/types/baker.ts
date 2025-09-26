@@ -1,6 +1,6 @@
 /**
  * Baker Feature - TypeScript Type Definitions
- * 
+ *
  * This file defines the TypeScript interfaces for the Baker folder scanning
  * and breadcrumbs management functionality.
  */
@@ -26,6 +26,7 @@ export interface BreadcrumbsFile {
   folderSizeBytes?: number
   lastModified?: string
   scannedBy?: string
+  trelloCardUrl?: string
 }
 
 export interface FileInfo {
@@ -140,23 +141,26 @@ export interface UseBakerScanResult {
   scanResult: ScanResult | null
   isScanning: boolean
   error: string | null
-  
+
   // Actions
   startScan: (rootPath: string, options: ScanOptions) => Promise<void>
   cancelScan: () => void
-  
+
   // Cleanup
   clearResults: () => void
 }
 
 export interface UseBreadcrumbsManagerResult {
   // Actions
-  updateBreadcrumbs: (projectPaths: string[], options: {
-    createMissing: boolean
-    backupOriginals: boolean
-  }) => Promise<BatchUpdateResult>
+  updateBreadcrumbs: (
+    projectPaths: string[],
+    options: {
+      createMissing: boolean
+      backupOriginals: boolean
+    }
+  ) => Promise<BatchUpdateResult>
   clearResults: () => void
-  
+
   // State
   isUpdating: boolean
   lastUpdateResult: BatchUpdateResult | null
@@ -166,7 +170,7 @@ export interface UseBreadcrumbsManagerResult {
 export interface UseBakerPreferencesResult {
   // State
   preferences: ScanPreferences
-  
+
   // Actions
   updatePreferences: (newPrefs: Partial<ScanPreferences>) => void
   resetToDefaults: () => void

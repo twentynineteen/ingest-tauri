@@ -10,13 +10,13 @@ import {
 } from '@components/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@components/ui/sidebar'
 import { useSidebar } from '@components/ui/use-sidebar'
+import { useQuery } from '@tanstack/react-query'
 import { core } from '@tauri-apps/api'
 import { getVersion } from '@tauri-apps/api/app'
 import { ChevronsUpDown, LogOut } from 'lucide-react'
-import { useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
-import { createQueryOptions, createQueryError, shouldRetry } from '../lib/query-utils'
 import { queryKeys } from '../lib/query-keys'
+import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
 
 type Props = {
   user: {
@@ -39,10 +39,7 @@ export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
         try {
           return await getVersion()
         } catch (error) {
-          throw createQueryError(
-            `Failed to get app version: ${error}`,
-            'SYSTEM_INFO'
-          )
+          throw createQueryError(`Failed to get app version: ${error}`, 'SYSTEM_INFO')
         }
       },
       'STATIC',
@@ -62,10 +59,7 @@ export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
         try {
           return await core.invoke<string>('get_username')
         } catch (error) {
-          throw createQueryError(
-            `Failed to fetch username: ${error}`,
-            'AUTHENTICATION'
-          )
+          throw createQueryError(`Failed to fetch username: ${error}`, 'AUTHENTICATION')
         }
       },
       'STATIC',
@@ -89,7 +83,8 @@ export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-lg">
-                  {(typeof username === 'string' ? username.charAt(0) : null) || user.name.charAt(0)}
+                  {(typeof username === 'string' ? username.charAt(0) : null) ||
+                    user.name.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -110,7 +105,8 @@ export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback className="rounded-lg">
-                    {(typeof username === 'string' ? username.charAt(0) : null) || user.name.charAt(0)}
+                    {(typeof username === 'string' ? username.charAt(0) : null) ||
+                      user.name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">

@@ -7,10 +7,7 @@ interface UseFuzzySearchOptions {
   includeMatches?: boolean
 }
 
-export function useFuzzySearch<T>(
-  items: T[],
-  options: UseFuzzySearchOptions
-) {
+export function useFuzzySearch<T>(items: T[], options: UseFuzzySearchOptions) {
   const [searchTerm, setSearchTerm] = useState('')
 
   const fuse = useMemo(() => {

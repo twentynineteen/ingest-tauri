@@ -7,6 +7,7 @@ import {
   DialogTitle
 } from '@components/ui/dialog'
 import { Input } from '@components/ui/input'
+import { writeTextFile } from '@tauri-apps/plugin-fs'
 import { open } from '@tauri-apps/plugin-shell'
 import {
   useAppendBreadcrumbs,
@@ -28,7 +29,10 @@ import VideoInfoTooltip from 'utils/trello/VideoInfoTooltip'
 import { TrelloCard } from 'utils/TrelloCards'
 import { Breadcrumb, SproutUploadResponse } from 'utils/types'
 import { useCardDetailsSync, useCardValidation } from './UploadTrello/UploadTrelloHooks'
-import { SelectedCard, createDefaultSproutUploadResponse } from './UploadTrello/UploadTrelloTypes'
+import {
+  createDefaultSproutUploadResponse,
+  SelectedCard
+} from './UploadTrello/UploadTrelloTypes'
 
 const UploadTrello = () => {
   // Hard-coded boardId for 'small projects'
@@ -94,8 +98,10 @@ const UploadTrello = () => {
   } = useTrelloCardDetails(selectedCard?.id ?? null, apiKey, token)
 
   useCardDetailsSync(selectedCard, apiKey, token, refetchCard, refetchMembers)
-  
-  useCardValidation(selectedCard, selectedCardDetails, isCardLoading, () => setSelectedCard(null))
+
+  useCardValidation(selectedCard, selectedCardDetails, isCardLoading, () =>
+    setSelectedCard(null)
+  )
 
   const { getBreadcrumbsBlock, applyBreadcrumbsToCard } = useAppendBreadcrumbs(
     apiKey,
@@ -107,7 +113,10 @@ const UploadTrello = () => {
   let uploadedVideo: SproutUploadResponse | null = null
 
   if (state?.latestSproutUpload) {
-    uploadedVideo = { ...createDefaultSproutUploadResponse(), ...state.latestSproutUpload }
+    uploadedVideo = {
+      ...createDefaultSproutUploadResponse(),
+      ...state.latestSproutUpload
+    }
   }
 
   const rawDescription = selectedCardDetails?.desc ?? ''
@@ -203,11 +212,36 @@ const UploadTrello = () => {
                   trigger={
                     <Button
                       onClick={async () => {
-                        const block = await getBreadcrumbsBlock(
-                          selectedCardDetails ?? null
-                        )
+                        if (!selectedCardDetails) return
+
+                        // First, add the Trello card URL to the breadcrumbs data
+                        const currentBreadcrumbs = appStore.getState().breadcrumbs
+                        const trelloCardUrl = `https://trello.com/c/${selectedCardDetails.id}`
+                        const updatedBreadcrumbs = {
+                          ...currentBreadcrumbs,
+                          trelloCardUrl
+                        }
+
+                        // Temporarily update the in-app store so getBreadcrumbsBlock includes the URL
+                        appStore.getState().setBreadcrumbs(updatedBreadcrumbs)
+
+                        const block = await getBreadcrumbsBlock(selectedCardDetails)
                         if (block && selectedCardDetails) {
                           await applyBreadcrumbsToCard(selectedCardDetails, block)
+
+                          // Save the updated breadcrumbs to the local file if we have the path info
+                          if (
+                            currentBreadcrumbs &&
+                            currentBreadcrumbs.parentFolder &&
+                            currentBreadcrumbs.projectTitle
+                          ) {
+                            const breadcrumbsPath = `${currentBreadcrumbs.parentFolder}/${currentBreadcrumbs.projectTitle}/breadcrumbs.json`
+                            await writeTextFile(
+                              breadcrumbsPath,
+                              JSON.stringify(updatedBreadcrumbs, null, 2)
+                            )
+                          }
+
                           // Refresh card details to show updated breadcrumbs
                           refetchCard()
                         }

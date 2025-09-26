@@ -1,5 +1,5 @@
-import { useCallback, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback, useEffect } from 'react'
 import { useBreadcrumbStore } from 'store/useBreadcrumbStore'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryOptions } from '../lib/query-utils'
@@ -35,14 +35,14 @@ export const useBreadcrumb = (items: BreadcrumbItem[]) => {
         return {
           path,
           items: breadcrumbItems,
-          updatedAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
         }
       },
       'STATIC', // Breadcrumb data is relatively stable
       {
         staleTime: 5 * 60 * 1000, // 5 minutes
         gcTime: 10 * 60 * 1000, // 10 minutes
-        refetchOnWindowFocus: false,
+        refetchOnWindowFocus: false
       }
     )
   )
@@ -58,7 +58,7 @@ export const useBreadcrumb = (items: BreadcrumbItem[]) => {
     const breadcrumbData: BreadcrumbData = {
       path,
       items: breadcrumbItems,
-      updatedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     }
 
     queryClient.setQueryData(queryKey, breadcrumbData)
@@ -72,6 +72,6 @@ export const useBreadcrumb = (items: BreadcrumbItem[]) => {
   // Return breadcrumb data for components that might need it
   return {
     breadcrumbData: data,
-    updateBreadcrumbs,
+    updateBreadcrumbs
   }
 }

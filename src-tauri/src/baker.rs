@@ -52,6 +52,8 @@ pub struct BreadcrumbsFile {
     last_modified: Option<String>,
     #[serde(rename = "scannedBy")]
     scanned_by: Option<String>,
+    #[serde(rename = "trelloCardUrl")]
+    trello_card_url: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -828,6 +830,7 @@ pub async fn baker_update_breadcrumbs(
                                 folder_size_bytes: calculate_folder_size(path).ok(),
                                 last_modified: Some(get_current_timestamp()),
                                 scanned_by: Some("Baker".to_string()),
+                                trello_card_url: None,
                             }
                         }
                     }
@@ -852,6 +855,7 @@ pub async fn baker_update_breadcrumbs(
                 folder_size_bytes: calculate_folder_size(path).ok(),
                 last_modified: Some(get_current_timestamp()),
                 scanned_by: Some("Baker".to_string()),
+                trello_card_url: None,
             }
         };
 

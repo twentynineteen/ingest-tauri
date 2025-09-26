@@ -5,8 +5,8 @@
 import { useMutation } from '@tanstack/react-query'
 import { ask, message } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
-import { check } from '@tauri-apps/plugin-updater'
 import { relaunch } from '@tauri-apps/plugin-process'
+import { check } from '@tauri-apps/plugin-updater'
 import { useVersionCheck } from './useVersionCheck'
 
 interface UpdateManagerOptions {
@@ -99,10 +99,10 @@ export function useUpdateManager() {
 async function performUpdate(): Promise<void> {
   try {
     console.log('Checking for updates using Tauri updater...')
-    
+
     // Use Tauri's built-in check() function
     const update = await check()
-    
+
     if (update) {
       console.log('Update found:', {
         version: update.version,
@@ -162,20 +162,18 @@ async function performUpdate(): Promise<void> {
           }
         )
       }
-      
     } else {
       throw new Error('No update available from Tauri updater')
     }
-
   } catch (error) {
     console.error('Tauri updater error:', error)
-    
+
     // Offer manual download as fallback
     const manualUpdate = await ask(
       `Automatic update failed. Would you like to download the update manually?\\n\\nError: ${error?.message || String(error)}`,
       {
         title: 'Update Failed',
-        kind: 'warning', 
+        kind: 'warning',
         okLabel: 'Download Manually',
         cancelLabel: 'Cancel'
       }

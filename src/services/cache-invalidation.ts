@@ -3,7 +3,7 @@ import { queryKeys } from '../lib/query-keys'
 
 /**
  * Cache Invalidation Service
- * 
+ *
  * Provides centralized cache invalidation utilities for React Query.
  * This service helps maintain data consistency across the application
  * by providing targeted cache invalidation strategies.
@@ -29,8 +29,8 @@ export class CacheInvalidationService {
    * Invalidate settings-related queries
    */
   async invalidateSettings() {
-    await this.queryClient.invalidateQueries({ 
-      queryKey: queryKeys.settings.apiKeys() 
+    await this.queryClient.invalidateQueries({
+      queryKey: queryKeys.settings.apiKeys()
     })
   }
 
@@ -40,13 +40,13 @@ export class CacheInvalidationService {
   async invalidateTrelloData(boardId?: string) {
     if (boardId) {
       // Invalidate specific board data
-      await this.queryClient.invalidateQueries({ 
+      await this.queryClient.invalidateQueries({
         queryKey: queryKeys.trello.board(boardId)
       })
     } else {
       // Invalidate all Trello data
-      await this.queryClient.invalidateQueries({ 
-        queryKey: queryKeys.trello.all() 
+      await this.queryClient.invalidateQueries({
+        queryKey: queryKeys.trello.all()
       })
     }
   }
@@ -57,13 +57,13 @@ export class CacheInvalidationService {
   async invalidateSproutData(apiKey?: string, parentId?: string | null) {
     if (apiKey && parentId !== undefined) {
       // Invalidate specific folder data
-      await this.queryClient.invalidateQueries({ 
+      await this.queryClient.invalidateQueries({
         queryKey: queryKeys.sprout.folders(apiKey, parentId)
       })
     } else {
       // Invalidate all Sprout data
-      await this.queryClient.invalidateQueries({ 
-        queryKey: queryKeys.sprout.all() 
+      await this.queryClient.invalidateQueries({
+        queryKey: queryKeys.sprout.all()
       })
     }
   }
@@ -72,8 +72,8 @@ export class CacheInvalidationService {
    * Invalidate system information queries
    */
   async invalidateSystemInfo() {
-    await this.queryClient.invalidateQueries({ 
-      queryKey: queryKeys.system.all() 
+    await this.queryClient.invalidateQueries({
+      queryKey: queryKeys.system.all()
     })
   }
 
@@ -84,9 +84,9 @@ export class CacheInvalidationService {
     if (typeof pattern === 'string') {
       // Invalidate queries containing the pattern string
       await this.queryClient.invalidateQueries({
-        predicate: (query) => {
-          return query.queryKey.some(key => 
-            typeof key === 'string' && key.includes(pattern)
+        predicate: query => {
+          return query.queryKey.some(
+            key => typeof key === 'string' && key.includes(pattern)
           )
         }
       })
@@ -128,16 +128,16 @@ export class CacheInvalidationService {
    * Batch invalidation for common scenarios
    */
   async invalidateUserSession() {
-    await Promise.all([
-      this.invalidateUserData(),
-      this.invalidateSettings()
-    ])
+    await Promise.all([this.invalidateUserData(), this.invalidateSettings()])
   }
 
   /**
    * Invalidate data after successful mutations
    */
-  async onSuccessfulMutation(mutationType: 'user' | 'settings' | 'trello' | 'sprout', context?: { boardId?: string; apiKey?: string; parentId?: string | null }) {
+  async onSuccessfulMutation(
+    mutationType: 'user' | 'settings' | 'trello' | 'sprout',
+    context?: { boardId?: string; apiKey?: string; parentId?: string | null }
+  ) {
     switch (mutationType) {
       case 'user':
         await this.invalidateUserData()
@@ -159,10 +159,11 @@ export class CacheInvalidationService {
   /**
    * Smart cache cleanup - remove stale queries older than specified age
    */
-  async cleanupStaleCache(maxAgeMs: number = 30 * 60 * 1000) { // 30 minutes default
+  async cleanupStaleCache(maxAgeMs: number = 30 * 60 * 1000) {
+    // 30 minutes default
     const now = Date.now()
     const queryCache = this.queryClient.getQueryCache()
-    
+
     queryCache.getAll().forEach(query => {
       const queryAge = now - (query.state.dataUpdatedAt || 0)
       if (queryAge > maxAgeMs && query.getObserversCount() === 0) {
@@ -178,7 +179,7 @@ export class CacheInvalidationService {
   getCacheStats() {
     const queryCache = this.queryClient.getQueryCache()
     const queries = queryCache.getAll()
-    
+
     const stats = {
       totalQueries: queries.length,
       activeQueries: queries.filter(q => q.getObserversCount() > 0).length,
@@ -187,7 +188,7 @@ export class CacheInvalidationService {
       loadingQueries: queries.filter(q => q.state.status === 'pending').length,
       cacheSize: this.estimateCacheSize(queries)
     }
-    
+
     return stats
   }
 
@@ -199,7 +200,7 @@ export class CacheInvalidationService {
         }
         return total
       }, 0)
-      
+
       if (sizeBytes < 1024) return `${sizeBytes} B`
       if (sizeBytes < 1024 * 1024) return `${Math.round(sizeBytes / 1024)} KB`
       return `${Math.round(sizeBytes / (1024 * 1024))} MB`

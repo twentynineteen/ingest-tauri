@@ -7,12 +7,19 @@ import {
   DialogTitle
 } from '@components/ui/dialog'
 import { Input } from '@components/ui/input'
+import { writeTextFile } from '@tauri-apps/plugin-fs'
 import { open } from '@tauri-apps/plugin-shell'
-import { useAppendBreadcrumbs, useFuzzySearch, useTrelloBoard, useTrelloCardDetails } from 'hooks'
+import {
+  useAppendBreadcrumbs,
+  useFuzzySearch,
+  useTrelloBoard,
+  useTrelloCardDetails
+} from 'hooks'
 import { ExternalLink, Search } from 'lucide-react'
 import React, { useEffect, useMemo, useState } from 'react'
-import { TrelloCard } from '../../utils/TrelloCards'
+import { appStore } from 'store/useAppStore'
 import TrelloCardList from '../../utils/trello/TrelloCardList'
+import { TrelloCard } from '../../utils/TrelloCards'
 
 interface TrelloIntegrationModalProps {
   isOpen: boolean
@@ -44,7 +51,11 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
   }, [grouped])
 
   // Use fuzzy search hook
-  const { searchTerm, setSearchTerm, results: filteredCards } = useFuzzySearch(allCards, {
+  const {
+    searchTerm,
+    setSearchTerm,
+    results: filteredCards
+  } = useFuzzySearch(allCards, {
     keys: ['name', 'desc'],
     threshold: 0.4
   })
@@ -54,7 +65,7 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
     if (!searchTerm.trim()) {
       return grouped
     }
-    
+
     const result: Record<string, TrelloCard[]> = {}
     filteredCards.forEach(card => {
       Object.entries(grouped).forEach(([listName, cards]) => {
@@ -99,9 +110,35 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
       setIsUpdating(true)
       setUpdateMessage(null)
 
+      // First, add the Trello card URL to the breadcrumbs data
+      const currentBreadcrumbs = appStore.getState().breadcrumbs
+      const trelloCardUrl = `https://trello.com/c/${selectedCardDetails.id}`
+      const updatedBreadcrumbs = {
+        ...currentBreadcrumbs,
+        trelloCardUrl
+      }
+
+      // Temporarily update the in-app store so getBreadcrumbsBlock includes the URL
+      appStore.getState().setBreadcrumbs(updatedBreadcrumbs)
+
+      // Generate the breadcrumbs block with the Trello URL included
       const block = await getBreadcrumbsBlock(selectedCardDetails)
       if (block && selectedCardDetails) {
         await applyBreadcrumbsToCard(selectedCardDetails, block)
+
+        // Save the updated breadcrumbs to the local file
+        if (
+          currentBreadcrumbs &&
+          currentBreadcrumbs.parentFolder &&
+          currentBreadcrumbs.projectTitle
+        ) {
+          const breadcrumbsPath = `${currentBreadcrumbs.parentFolder}/${currentBreadcrumbs.projectTitle}/breadcrumbs.json`
+          await writeTextFile(
+            breadcrumbsPath,
+            JSON.stringify(updatedBreadcrumbs, null, 2)
+          )
+        }
+
         setUpdateMessage('Successfully linked project to Trello card!')
       } else {
         setUpdateMessage('Failed to generate breadcrumbs block')
@@ -152,7 +189,7 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
               <Input
                 placeholder="Search cards by name or description..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="pl-10"
               />
             </div>
@@ -161,7 +198,9 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
                 <TrelloCardList grouped={filteredGrouped} onSelect={setSelectedCard} />
               ) : (
                 <p className="text-center text-gray-500 py-8">
-                  {searchTerm.trim() ? 'No cards found matching your search.' : 'No cards available.'}
+                  {searchTerm.trim()
+                    ? 'No cards found matching your search.'
+                    : 'No cards available.'}
                 </p>
               )}
             </div>

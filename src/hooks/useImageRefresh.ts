@@ -1,8 +1,8 @@
-import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { SproutUploadResponse } from '../utils/types'
+import { useState } from 'react'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryOptions } from '../lib/query-utils'
+import { SproutUploadResponse } from '../utils/types'
 
 interface UseImageRefreshReturn {
   thumbnailLoaded: boolean
@@ -19,7 +19,9 @@ interface ImageRefreshData {
   thumbnailLoaded: boolean
 }
 
-export const useImageRefresh = (response: SproutUploadResponse | null): UseImageRefreshReturn => {
+export const useImageRefresh = (
+  response: SproutUploadResponse | null
+): UseImageRefreshReturn => {
   const [thumbnailLoaded, setThumbnailLoaded] = useState(false)
 
   // Only create query if response is available
@@ -36,7 +38,7 @@ export const useImageRefresh = (response: SproutUploadResponse | null): UseImage
 
         // Generate a fresh URL with timestamp to force image refresh
         const timestamp = Date.now()
-        const refreshUrl = response.assets.thumbnails[0] 
+        const refreshUrl = response.assets.thumbnails[0]
           ? `${response.assets.thumbnails[0]}?t=${timestamp}`
           : `${response.embedded_url}/thumbnail.jpg?t=${timestamp}`
 
@@ -44,7 +46,7 @@ export const useImageRefresh = (response: SproutUploadResponse | null): UseImage
           id: response.id,
           url: refreshUrl,
           lastModified: new Date().toISOString(),
-          thumbnailLoaded: false,
+          thumbnailLoaded: false
         }
       },
       'REALTIME', // 30-second staleTime with auto-refetch
@@ -52,7 +54,7 @@ export const useImageRefresh = (response: SproutUploadResponse | null): UseImage
         enabled: !!response && !!videoId,
         refetchInterval: 30000, // 30 seconds
         refetchIntervalInBackground: false,
-        refetchOnWindowFocus: true,
+        refetchOnWindowFocus: true
         // Note: onSuccess is deprecated in newer React Query versions
         // Consider using useEffect to watch for data changes instead
       }
@@ -60,7 +62,7 @@ export const useImageRefresh = (response: SproutUploadResponse | null): UseImage
   )
 
   // Calculate refresh timestamp from data or fallback to current time
-  const refreshTimestamp = data?.lastModified 
+  const refreshTimestamp = data?.lastModified
     ? new Date(data.lastModified).getTime()
     : Date.now()
 
@@ -69,6 +71,6 @@ export const useImageRefresh = (response: SproutUploadResponse | null): UseImage
     refreshTimestamp,
     setThumbnailLoaded,
     isRefetching,
-    lastRefresh: data?.lastModified,
+    lastRefresh: data?.lastModified
   }
 }

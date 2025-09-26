@@ -4,7 +4,7 @@ import { del, get, set } from '@tauri-apps/plugin-store'
 
 /**
  * Advanced Query Client Configuration
- * 
+ *
  * Provides enhanced configuration for React Query including:
  * - Cache persistence across app restarts
  * - Advanced retry and error handling
@@ -20,7 +20,8 @@ class TauriStorePersister {
   private storeName: string
   private maxAge: number
 
-  constructor(storeName = 'react-query-cache', maxAge = 24 * 60 * 60 * 1000) { // 24 hours default
+  constructor(storeName = 'react-query-cache', maxAge = 24 * 60 * 60 * 1000) {
+    // 24 hours default
     this.storeName = storeName
     this.maxAge = maxAge
   }
@@ -44,7 +45,7 @@ class TauriStorePersister {
       if (!stored) return undefined
 
       const data = JSON.parse(stored)
-      
+
       // Check if data is expired
       if (data.timestamp && Date.now() - data.timestamp > this.maxAge) {
         await this.removeClient()
@@ -112,14 +113,18 @@ export function createPersistedQueryClient(
           // Don't retry on 4xx errors (client errors)
           if (error instanceof Error) {
             const message = error.message.toLowerCase()
-            if (message.includes('4') || message.includes('unauthorized') || message.includes('forbidden')) {
+            if (
+              message.includes('4') ||
+              message.includes('unauthorized') ||
+              message.includes('forbidden')
+            ) {
               return false
             }
           }
           return failureCount < 3
         },
         // Exponential backoff with jitter
-        retryDelay: (attemptIndex) => {
+        retryDelay: attemptIndex => {
           const baseDelay = Math.min(1000 * 2 ** attemptIndex, 30000)
           const jitter = Math.random() * 0.3 * baseDelay // 30% jitter
           return baseDelay + jitter
@@ -134,13 +139,17 @@ export function createPersistedQueryClient(
         retry: (failureCount, error) => {
           if (error instanceof Error) {
             const message = error.message.toLowerCase()
-            if (message.includes('4') || message.includes('unauthorized') || message.includes('forbidden')) {
+            if (
+              message.includes('4') ||
+              message.includes('unauthorized') ||
+              message.includes('forbidden')
+            ) {
               return false
             }
           }
           return failureCount < 2
         },
-        retryDelay: (attemptIndex) => {
+        retryDelay: attemptIndex => {
           const baseDelay = Math.min(1000 * 2 ** attemptIndex, 10000)
           const jitter = Math.random() * 0.3 * baseDelay
           return baseDelay + jitter
@@ -181,7 +190,8 @@ export class QueryClientOptimizer {
   /**
    * Start automatic memory cleanup
    */
-  startAutoCleanup(intervalMs = 5 * 60 * 1000) { // 5 minutes default
+  startAutoCleanup(intervalMs = 5 * 60 * 1000) {
+    // 5 minutes default
     this.stopAutoCleanup() // Clear any existing interval
 
     this.cleanupInterval = setInterval(() => {
@@ -217,28 +227,33 @@ export class QueryClientOptimizer {
       const hasError = query.state.status === 'error'
 
       // Remove old error queries that aren't being observed
-      if (hasError && !hasActiveObservers && queryAge > 60000) { // 1 minute for errors
+      if (hasError && !hasActiveObservers && queryAge > 60000) {
+        // 1 minute for errors
         queryCache.remove(query)
         errorCount++
         return
       }
 
       // Remove very old unused queries
-      if (!hasActiveObservers && queryAge > 30 * 60 * 1000) { // 30 minutes
+      if (!hasActiveObservers && queryAge > 30 * 60 * 1000) {
+        // 30 minutes
         queryCache.remove(query)
         removedCount++
         return
       }
 
       // Remove stale queries that haven't been used recently
-      if (isStale && !hasActiveObservers && queryAge > 10 * 60 * 1000) { // 10 minutes
+      if (isStale && !hasActiveObservers && queryAge > 10 * 60 * 1000) {
+        // 10 minutes
         queryCache.remove(query)
         removedCount++
       }
     })
 
     if (removedCount > 0 || errorCount > 0) {
-      console.log(`Query cleanup: removed ${removedCount} stale queries, ${errorCount} error queries`)
+      console.log(
+        `Query cleanup: removed ${removedCount} stale queries, ${errorCount} error queries`
+      )
     }
   }
 
@@ -324,7 +339,7 @@ export function applyQueryClientProfile(
   profile: keyof typeof QueryClientProfiles
 ) {
   const config = QueryClientProfiles[profile]
-  
+
   queryClient.setDefaultOptions({
     queries: {
       staleTime: config.staleTime,
@@ -342,21 +357,20 @@ export async function initializeOptimizedQueryClient(
   environment: 'development' | 'production' | 'testing' = 'production',
   persistenceConfig?: Partial<CachePersistenceConfig>
 ): Promise<{ queryClient: QueryClient; optimizer: QueryClientOptimizer }> {
-  
   // Create persisted query client
   const queryClient = await createPersistedQueryClient(persistenceConfig)
-  
+
   // Apply environment profile
   applyQueryClientProfile(queryClient, environment)
-  
+
   // Create optimizer
   const optimizer = new QueryClientOptimizer(queryClient)
-  
+
   // Start auto-cleanup in production
   if (environment === 'production') {
     optimizer.startAutoCleanup(5 * 60 * 1000) // 5 minutes
   }
-  
+
   return { queryClient, optimizer }
 }
 

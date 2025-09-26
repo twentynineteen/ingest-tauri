@@ -1,11 +1,11 @@
 // FolderTreeNavigator.tsx
+import { useQuery } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 import React, { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { queryKeys } from '../lib/query-keys'
+import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
 import { GetFoldersResponse, SproutFolder } from '../utils/types'
 import FolderTreeSprout from './FolderTreeSprout'
-import { createQueryOptions, createQueryError, shouldRetry } from '../lib/query-utils'
-import { queryKeys } from '../lib/query-keys'
 
 interface FolderTreeNavigatorProps {
   apiKey: string
@@ -15,7 +15,11 @@ const FolderTreeNavigator: React.FC<FolderTreeNavigatorProps> = ({ apiKey }) => 
   const [selectedFolder, setSelectedFolder] = useState<SproutFolder | null>(null)
 
   // Use React Query to fetch root folders
-  const { data: rootFolders = [], isLoading, error } = useQuery({
+  const {
+    data: rootFolders = [],
+    isLoading,
+    error
+  } = useQuery({
     ...createQueryOptions(
       queryKeys.sprout.folders(apiKey, null), // null for root folders
       async () => {

@@ -1,6 +1,6 @@
 /**
  * Breadcrumbs Validation and Error Handling Utilities
- * 
+ *
  * Utilities for validating breadcrumbs files, handling corrupted data,
  * and providing graceful fallbacks for edge cases.
  */
@@ -27,11 +27,17 @@ export interface ValidationResult {
 export function validateBreadcrumbs(data: unknown): ValidationResult {
   const errors: ValidationError[] = []
   const warnings: ValidationError[] = []
-  
+
   if (!data || typeof data !== 'object') {
     return {
       isValid: false,
-      errors: [{ field: 'root', message: 'Invalid or missing breadcrumbs data', severity: 'error' }],
+      errors: [
+        {
+          field: 'root',
+          message: 'Invalid or missing breadcrumbs data',
+          severity: 'error'
+        }
+      ],
       warnings: [],
       canRecover: false
     }
@@ -43,9 +49,17 @@ export function validateBreadcrumbs(data: unknown): ValidationResult {
   // Validate required fields
   if (!breadcrumbs.projectTitle || typeof breadcrumbs.projectTitle !== 'string') {
     if (!breadcrumbs.projectTitle) {
-      errors.push({ field: 'projectTitle', message: 'Project title is required', severity: 'error' })
+      errors.push({
+        field: 'projectTitle',
+        message: 'Project title is required',
+        severity: 'error'
+      })
     } else {
-      warnings.push({ field: 'projectTitle', message: 'Project title should be a string', severity: 'warning' })
+      warnings.push({
+        field: 'projectTitle',
+        message: 'Project title should be a string',
+        severity: 'warning'
+      })
       recoveredData.projectTitle = String(breadcrumbs.projectTitle)
     }
   } else {
@@ -55,20 +69,36 @@ export function validateBreadcrumbs(data: unknown): ValidationResult {
   // Validate number of cameras
   if (typeof breadcrumbs.numberOfCameras !== 'number') {
     if (breadcrumbs.numberOfCameras === undefined) {
-      warnings.push({ field: 'numberOfCameras', message: 'Number of cameras not specified, defaulting to 1', severity: 'warning' })
+      warnings.push({
+        field: 'numberOfCameras',
+        message: 'Number of cameras not specified, defaulting to 1',
+        severity: 'warning'
+      })
       recoveredData.numberOfCameras = 1
     } else {
       const parsed = parseInt(String(breadcrumbs.numberOfCameras), 10)
       if (isNaN(parsed) || parsed < 1) {
-        errors.push({ field: 'numberOfCameras', message: 'Number of cameras must be a positive number', severity: 'error' })
+        errors.push({
+          field: 'numberOfCameras',
+          message: 'Number of cameras must be a positive number',
+          severity: 'error'
+        })
       } else {
-        warnings.push({ field: 'numberOfCameras', message: 'Number of cameras converted to integer', severity: 'warning' })
+        warnings.push({
+          field: 'numberOfCameras',
+          message: 'Number of cameras converted to integer',
+          severity: 'warning'
+        })
         recoveredData.numberOfCameras = parsed
       }
     }
   } else {
     if (breadcrumbs.numberOfCameras < 1) {
-      errors.push({ field: 'numberOfCameras', message: 'Number of cameras must be at least 1', severity: 'error' })
+      errors.push({
+        field: 'numberOfCameras',
+        message: 'Number of cameras must be at least 1',
+        severity: 'error'
+      })
     } else {
       recoveredData.numberOfCameras = breadcrumbs.numberOfCameras
     }
@@ -77,7 +107,11 @@ export function validateBreadcrumbs(data: unknown): ValidationResult {
   // Validate files array
   if (breadcrumbs.files !== undefined) {
     if (!Array.isArray(breadcrumbs.files)) {
-      warnings.push({ field: 'files', message: 'Files should be an array, clearing invalid data', severity: 'warning' })
+      warnings.push({
+        field: 'files',
+        message: 'Files should be an array, clearing invalid data',
+        severity: 'warning'
+      })
       recoveredData.files = []
     } else {
       const validFiles: FileInfo[] = []
@@ -85,24 +119,24 @@ export function validateBreadcrumbs(data: unknown): ValidationResult {
         if (typeof file === 'object' && file !== null) {
           const fileObj = file as Record<string, unknown>
           const validFile: Partial<FileInfo> = {}
-          
+
           // Validate camera number
           if (typeof fileObj.camera === 'number') {
             if (fileObj.camera >= 1) {
               validFile.camera = fileObj.camera
             } else {
-              warnings.push({ 
-                field: `files[${index}].camera`, 
-                message: `File ${index}: Invalid camera number, defaulting to 1`, 
-                severity: 'warning' 
+              warnings.push({
+                field: `files[${index}].camera`,
+                message: `File ${index}: Invalid camera number, defaulting to 1`,
+                severity: 'warning'
               })
               validFile.camera = 1
             }
           } else {
-            warnings.push({ 
-              field: `files[${index}].camera`, 
-              message: `File ${index}: Missing camera number, defaulting to 1`, 
-              severity: 'warning' 
+            warnings.push({
+              field: `files[${index}].camera`,
+              message: `File ${index}: Missing camera number, defaulting to 1`,
+              severity: 'warning'
             })
             validFile.camera = 1
           }
@@ -111,10 +145,10 @@ export function validateBreadcrumbs(data: unknown): ValidationResult {
           if (typeof fileObj.name === 'string' && fileObj.name.trim()) {
             validFile.name = fileObj.name.trim()
           } else {
-            warnings.push({ 
-              field: `files[${index}].name`, 
-              message: `File ${index}: Invalid or missing name, using placeholder`, 
-              severity: 'warning' 
+            warnings.push({
+              field: `files[${index}].name`,
+              message: `File ${index}: Invalid or missing name, using placeholder`,
+              severity: 'warning'
             })
             validFile.name = `Unknown_File_${index + 1}`
           }
@@ -123,10 +157,10 @@ export function validateBreadcrumbs(data: unknown): ValidationResult {
           if (typeof fileObj.path === 'string' && fileObj.path.trim()) {
             validFile.path = fileObj.path.trim()
           } else {
-            warnings.push({ 
-              field: `files[${index}].path`, 
-              message: `File ${index}: Missing path, will need to be rescanned`, 
-              severity: 'warning' 
+            warnings.push({
+              field: `files[${index}].path`,
+              message: `File ${index}: Missing path, will need to be rescanned`,
+              severity: 'warning'
             })
             validFile.path = validFile.name || `Unknown_Path_${index + 1}`
           }
@@ -135,10 +169,10 @@ export function validateBreadcrumbs(data: unknown): ValidationResult {
             validFiles.push(validFile as FileInfo)
           }
         } else {
-          warnings.push({ 
-            field: `files[${index}]`, 
-            message: `File ${index}: Invalid file object, skipping`, 
-            severity: 'warning' 
+          warnings.push({
+            field: `files[${index}]`,
+            message: `File ${index}: Invalid file object, skipping`,
+            severity: 'warning'
           })
         }
       })
@@ -152,19 +186,19 @@ export function validateBreadcrumbs(data: unknown): ValidationResult {
       try {
         const date = new Date(value)
         if (isNaN(date.getTime())) {
-          warnings.push({ 
-            field, 
-            message: `Invalid timestamp format, will use current time`, 
-            severity: 'warning' 
+          warnings.push({
+            field,
+            message: `Invalid timestamp format, will use current time`,
+            severity: 'warning'
           })
           return new Date().toISOString()
         }
         return value
       } catch {
-        warnings.push({ 
-          field, 
-          message: `Corrupted timestamp, will use current time`, 
-          severity: 'warning' 
+        warnings.push({
+          field,
+          message: `Corrupted timestamp, will use current time`,
+          severity: 'warning'
         })
         return new Date().toISOString()
       }
@@ -173,11 +207,16 @@ export function validateBreadcrumbs(data: unknown): ValidationResult {
   }
 
   if (breadcrumbs.creationDateTime) {
-    recoveredData.creationDateTime = validateTimestamp('creationDateTime', breadcrumbs.creationDateTime) || new Date().toISOString()
+    recoveredData.creationDateTime =
+      validateTimestamp('creationDateTime', breadcrumbs.creationDateTime) ||
+      new Date().toISOString()
   }
 
   if (breadcrumbs.lastModified) {
-    recoveredData.lastModified = validateTimestamp('lastModified', breadcrumbs.lastModified)
+    recoveredData.lastModified = validateTimestamp(
+      'lastModified',
+      breadcrumbs.lastModified
+    )
   }
 
   // Validate string fields
@@ -186,10 +225,10 @@ export function validateBreadcrumbs(data: unknown): ValidationResult {
       if (typeof value === 'string') {
         return value.trim() || undefined
       } else {
-        warnings.push({ 
-          field, 
-          message: `${field} should be a string`, 
-          severity: 'warning' 
+        warnings.push({
+          field,
+          message: `${field} should be a string`,
+          severity: 'warning'
         })
         return String(value).trim() || undefined
       }
@@ -203,13 +242,16 @@ export function validateBreadcrumbs(data: unknown): ValidationResult {
 
   // Validate folder size
   if (breadcrumbs.folderSizeBytes !== undefined) {
-    if (typeof breadcrumbs.folderSizeBytes === 'number' && breadcrumbs.folderSizeBytes >= 0) {
+    if (
+      typeof breadcrumbs.folderSizeBytes === 'number' &&
+      breadcrumbs.folderSizeBytes >= 0
+    ) {
       recoveredData.folderSizeBytes = breadcrumbs.folderSizeBytes
     } else {
-      warnings.push({ 
-        field: 'folderSizeBytes', 
-        message: 'Invalid folder size, will be recalculated', 
-        severity: 'warning' 
+      warnings.push({
+        field: 'folderSizeBytes',
+        message: 'Invalid folder size, will be recalculated',
+        severity: 'warning'
       })
       recoveredData.folderSizeBytes = undefined
     }
@@ -223,7 +265,7 @@ export function validateBreadcrumbs(data: unknown): ValidationResult {
     errors,
     warnings,
     canRecover,
-    recoveredData: canRecover ? recoveredData as BreadcrumbsFile : undefined
+    recoveredData: canRecover ? (recoveredData as BreadcrumbsFile) : undefined
   }
 }
 
@@ -231,19 +273,22 @@ export function validateBreadcrumbs(data: unknown): ValidationResult {
  * Attempt to recover corrupted breadcrumbs data
  */
 export function recoverBreadcrumbs(
-  corruptedData: unknown, 
+  corruptedData: unknown,
   projectPath: string
 ): BreadcrumbsFile {
   const validation = validateBreadcrumbs(corruptedData)
-  
+
   if (validation.recoveredData && validation.canRecover) {
     return {
-      projectTitle: validation.recoveredData.projectTitle || extractProjectNameFromPath(projectPath),
+      projectTitle:
+        validation.recoveredData.projectTitle || extractProjectNameFromPath(projectPath),
       numberOfCameras: validation.recoveredData.numberOfCameras || 1,
       files: validation.recoveredData.files || [],
-      parentFolder: validation.recoveredData.parentFolder || extractParentFromPath(projectPath),
+      parentFolder:
+        validation.recoveredData.parentFolder || extractParentFromPath(projectPath),
       createdBy: validation.recoveredData.createdBy || 'Unknown',
-      creationDateTime: validation.recoveredData.creationDateTime || new Date().toISOString(),
+      creationDateTime:
+        validation.recoveredData.creationDateTime || new Date().toISOString(),
       folderSizeBytes: validation.recoveredData.folderSizeBytes,
       lastModified: validation.recoveredData.lastModified,
       scannedBy: validation.recoveredData.scannedBy
@@ -284,9 +329,9 @@ function extractParentFromPath(path: string): string {
  */
 export function hasSchemaIssues(data: unknown): boolean {
   if (!data || typeof data !== 'object') return true
-  
+
   const obj = data as Record<string, unknown>
-  
+
   // Check for old schema without path field in files
   if (Array.isArray(obj.files)) {
     return obj.files.some((file: unknown) => {
@@ -297,7 +342,7 @@ export function hasSchemaIssues(data: unknown): boolean {
       return true
     })
   }
-  
+
   return false
 }
 
@@ -306,14 +351,14 @@ export function hasSchemaIssues(data: unknown): boolean {
  */
 export function getErrorMessage(validation: ValidationResult): string {
   if (validation.isValid) return ''
-  
+
   const criticalErrors = validation.errors.filter(e => e.severity === 'error')
-  
+
   if (criticalErrors.length === 1) {
     return criticalErrors[0].message
   } else if (criticalErrors.length > 1) {
     return `${criticalErrors.length} validation errors detected. The breadcrumbs file appears to be corrupted.`
   }
-  
+
   return 'Unknown validation error'
 }

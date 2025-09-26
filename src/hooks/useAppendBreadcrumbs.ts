@@ -3,13 +3,10 @@ import { ask, confirm, open } from '@tauri-apps/plugin-dialog'
 import { readTextFile } from '@tauri-apps/plugin-fs'
 import { appStore } from 'store/useAppStore'
 import { TrelloCard } from 'utils/TrelloCards'
-import { Breadcrumb } from 'utils/types'
+import type { Breadcrumb } from 'utils/types'
 
 function formatBreadcrumbsForHumans(breadcrumbs: Breadcrumb): string {
-  const lines = [
-    'PROJECT DETAILS',
-    '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━'
-  ]
+  const lines = ['PROJECT DETAILS', '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━']
 
   if (breadcrumbs.projectTitle) {
     lines.push(`**Project:** ${breadcrumbs.projectTitle}`)
@@ -24,14 +21,19 @@ function formatBreadcrumbsForHumans(breadcrumbs: Breadcrumb): string {
   }
 
   if (breadcrumbs.createdBy) {
-    const creator = typeof breadcrumbs.createdBy === 'string' 
-      ? breadcrumbs.createdBy 
-      : breadcrumbs.createdBy?.data || 'Unknown User'
+    const creator =
+      typeof breadcrumbs.createdBy === 'string'
+        ? breadcrumbs.createdBy
+        : breadcrumbs.createdBy?.data || 'Unknown User'
     lines.push(`**Created by:** ${creator}`)
   }
 
   if (breadcrumbs.creationDateTime) {
     lines.push(`**Created:** ${breadcrumbs.creationDateTime}`)
+  }
+
+  if (breadcrumbs.trelloCardUrl) {
+    lines.push(`**Trello Card:** ${breadcrumbs.trelloCardUrl}`)
   }
 
   if (breadcrumbs.files && breadcrumbs.files.length > 0) {
@@ -96,7 +98,7 @@ export function useAppendBreadcrumbs(
       const humanReadableSummary = formatBreadcrumbsForHumans(finalBreadcrumbs)
       const breadcrumbMarker = '```json\n// BREADCRUMBS'
       const technicalBlock = `${breadcrumbMarker}\n${JSON.stringify(finalBreadcrumbs, null, 2)}\n\`\`\``
-      
+
       const breadcrumbsBlock = `${humanReadableSummary}\n\n---\n*Technical details for Bucket app below:*\n${technicalBlock}`
 
       return breadcrumbsBlock
@@ -111,35 +113,36 @@ export function useAppendBreadcrumbs(
     breadcrumbsBlock: string
   ): Promise<void> {
     const currentDesc = card.desc ?? ''
-    
+
     // Define regex patterns (without global flag for testing, with global flag for replacement)
-    const newFormatPattern = /PROJECT DETAILS\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[\s\S]*?```json\n\/\/ BREADCRUMBS[\s\S]*?```/
+    const newFormatPattern =
+      /PROJECT DETAILS\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━[\s\S]*?```json\n\/\/ BREADCRUMBS[\s\S]*?```/
     const legacyFormatPattern = /```json\n\/\/ BREADCRUMBS[\s\S]*?```/
-    
+
     // Check for existing breadcrumbs
     const hasNewFormatBreadcrumbs = newFormatPattern.test(currentDesc)
-    const hasLegacyFormatBreadcrumbs = legacyFormatPattern.test(currentDesc) && !hasNewFormatBreadcrumbs
+    const hasLegacyFormatBreadcrumbs =
+      legacyFormatPattern.test(currentDesc) && !hasNewFormatBreadcrumbs
     const hasBreadcrumbs = hasNewFormatBreadcrumbs || hasLegacyFormatBreadcrumbs
-    
+
     // Create global regex for replacement
-    const replacementRegex = hasNewFormatBreadcrumbs 
+    const replacementRegex = hasNewFormatBreadcrumbs
       ? new RegExp(newFormatPattern.source, 'g')
       : new RegExp(legacyFormatPattern.source, 'g')
 
     let updatedDesc = currentDesc
 
     if (hasBreadcrumbs) {
-      const breadcrumbsType = hasNewFormatBreadcrumbs ? 'project details' : 'legacy breadcrumbs'
+      const breadcrumbsType = hasNewFormatBreadcrumbs
+        ? 'project details'
+        : 'legacy breadcrumbs'
       const warningMessage = `This Trello card already contains ${breadcrumbsType} from a previous project link.\n\nReplacing them will remove the existing project connection and add the new one.\n\nDo you want to continue?`
-      
-      const shouldReplace: boolean = await confirm(
-        warningMessage,
-        {
-          title: 'Breadcrumbs Already Exist',
-          okLabel: 'Replace Existing',
-          cancelLabel: 'Cancel'
-        }
-      )
+
+      const shouldReplace: boolean = await confirm(warningMessage, {
+        title: 'Breadcrumbs Already Exist',
+        okLabel: 'Replace Existing',
+        cancelLabel: 'Cancel'
+      })
       if (!shouldReplace) return
       updatedDesc = currentDesc.replace(replacementRegex, breadcrumbsBlock)
     } else {
@@ -165,8 +168,8 @@ export function useAppendBreadcrumbs(
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          text: 'Linked this card to the project and left some breadcrumbs...' 
+        body: JSON.stringify({
+          text: 'Linked this card to the project and left some breadcrumbs...'
         })
       }
     )
