@@ -25,13 +25,14 @@ const BuildProject: React.FC = () => {
   const [files, setFiles] = useState<FootageFile[]>([])
   const [selectedFolder, setSelectedFolder] = useState<string>('')
 
-  const [progress, setProgress] = useState(0)
-  const [completed, setCompleted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [, setMessage] = useState('')
 
   // Trello integration state
   const [showTrelloModal, setShowTrelloModal] = useState(false)
+
+  // Track if title was sanitized to show warning
+  const [titleSanitized, setTitleSanitized] = useState(false)
 
   // Page label - shadcn breadcrumb component
   useBreadcrumb([
@@ -41,9 +42,27 @@ const BuildProject: React.FC = () => {
 
   const username = useUsername()
 
-  useCopyProgress(setProgress, setCompleted)
+  const { progress, completed } = useCopyProgress({
+    operationId: 'build-project'
+  })
+  
+  console.log('BuildProject render - progress:', progress, 'completed:', completed)
 
   useCameraAutoRemap(files, numCameras, setFiles)
+
+  // Sanitize title to prevent folder creation from forward slashes and other OS-unsafe characters
+  const sanitizeTitle = (input: string): string => {
+    // Only replace OS-unsafe characters, preserve spaces as-is
+    return input.replace(/[/\\:*?"<>|]/g, '-')
+  }
+
+  // Handle title change with sanitization
+  const handleTitleChange = (newTitle: string) => {
+    const sanitized = sanitizeTitle(newTitle)
+    const wasSanitized = sanitized !== newTitle
+    setTitle(sanitized)
+    setTitleSanitized(wasSanitized)
+  }
 
   const handleSelectFiles = async () => {
     const newFiles = await selectFiles()
@@ -56,9 +75,8 @@ const BuildProject: React.FC = () => {
     setNumCameras(2)
     setFiles([])
     setSelectedFolder('')
-    setProgress(0)
-    setCompleted(false)
     setMessage('')
+    setTitleSanitized(false)
   }
 
   // Logic to mark a given file with the camera number
@@ -87,14 +105,15 @@ const BuildProject: React.FC = () => {
   const { createProject } = useCreateProject()
 
   const handleCreateProject = () => {
+    console.log('Create Project clicked!')
+    console.log('Parameters:', { title, files: files.length, selectedFolder, numCameras })
+
     createProject({
       title,
       files,
       selectedFolder,
       numCameras,
       username: username.data || 'Unknown User',
-      setProgress,
-      setCompleted,
       setMessage,
       setLoading
     })
@@ -108,9 +127,10 @@ const BuildProject: React.FC = () => {
         <div className="px-4 mx-4">
           <ProjectInputs
             title={title}
-            onTitleChange={setTitle}
+            onTitleChange={handleTitleChange}
             numCameras={numCameras}
             onNumCamerasChange={setNumCameras}
+            showSanitizationWarning={titleSanitized}
           />
 
           <FolderSelector selectedFolder={selectedFolder} onSelect={setSelectedFolder} />
@@ -131,13 +151,15 @@ const BuildProject: React.FC = () => {
         </div>
 
         <div>
-          {/* 🔹 Show progress bar */}
-          <ProgressBar progress={progress} completed={completed} />
+          <div className="progress mx-4">
+            {/* 🔹 Show progress bar */}
+            <ProgressBar progress={progress} completed={completed} />
+          </div>
 
           {/* 🔹 Post-completion actions - shown after project completion */}
           {completed && !loading && (
             <div className="pt-6 text-center space-y-4 animate-fadeIn">
-              <div className="mx-4 p-6 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl shadow-sm">
+              <div className="mx-4 p-6 bg-linear-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl shadow-xs">
                 <h3 className="text-lg font-semibold text-green-800 mb-2">
                   Project Created Successfully! 🎉
                 </h3>

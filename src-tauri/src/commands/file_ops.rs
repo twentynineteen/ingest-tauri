@@ -3,7 +3,7 @@ use std::path::Path;
 use std::sync::Arc;
 use std::thread;
 use tauri::{command, AppHandle, Emitter};
-use crate::utils::file_copy::copy_file_with_progress;
+use crate::utils::file_copy::copy_file_with_overall_progress;
 
 #[command]
 pub fn move_files(
@@ -17,8 +17,9 @@ pub fn move_files(
     // Run file moving in a separate thread
     thread::spawn(move || {
         let mut moved_files = Vec::new();
+        let total_files = files.len();
 
-        for (file_path, camera_number) in files {
+        for (index, (file_path, camera_number)) in files.iter().enumerate() {
             let src_path = Path::new(&file_path);
             let camera_folder =
                 Path::new(base_dest.as_str()).join(format!("Footage/Camera {}", camera_number));
@@ -33,8 +34,8 @@ pub fn move_files(
 
             let dest_file_path = camera_folder.join(src_path.file_name().unwrap());
 
-            // Copy file with progress tracking
-            if let Err(e) = copy_file_with_progress(&src_path, &dest_file_path, &app_handle) {
+            // Copy file with overall progress tracking
+            if let Err(e) = copy_file_with_overall_progress(&src_path, &dest_file_path, &app_handle, index, total_files) {
                 eprintln!("Failed to copy file {}: {}", file_path, e);
                 continue;
             }

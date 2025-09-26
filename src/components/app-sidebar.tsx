@@ -33,6 +33,10 @@ const data = {
         {
           title: 'Build a project',
           url: '/ingest/build'
+        },
+        {
+          title: 'Baker',
+          url: '/ingest/baker'
         }
         // {
         //   title: 'History',

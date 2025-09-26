@@ -25,7 +25,22 @@ npm run build              # Build frontend only
 ```bash
 npm run eslint:fix         # Fix linting issues automatically
 npm run prettier:fix       # Format code automatically  
-npm run test               # Run Jest test suite
+npm run test               # Run Vitest test suite (migrating from Jest)
+```
+
+### Dependency Management
+```bash
+bun install                # Primary package manager for development
+bun update                 # Update dependencies to latest versions
+npm audit                  # Security vulnerability scanning
+bunx depcheck              # Detect unused dependencies
+```
+
+### Package Updates
+```bash
+# Basic package update commands
+npx npm-check-updates                 # Check for available updates
+npx npm-check-updates -u             # Update all dependencies to latest
 ```
 
 ## Architecture
@@ -35,7 +50,7 @@ npm run test               # Run Jest test suite
 - **Backend**: Tauri 2.0 (Rust) with extensive plugin ecosystem
 - **UI**: TailwindCSS + Radix UI components + Lucide icons
 - **State**: Zustand stores + TanStack React Query (preferred over useEffect)
-- **Testing**: Jest + Testing Library
+- **Testing**: Vitest + Testing Library (migrating from Jest)
 
 ### Project Structure
 ```
@@ -82,6 +97,12 @@ All file operations go through Tauri backend with progress tracking. Key pattern
 3. **Project Creation**: Generate folder structure + Adobe Premiere integration
 4. **Progress Tracking**: Real-time progress during file operations
 
+### Baker Workflow (NEW - Branch: 003-a-new-feature)
+1. **Drive Selection**: Choose root directory for scanning
+2. **Structure Validation**: Identify BuildProject-compatible folders (Footage/, Graphics/, Renders/, Projects/, Scripts/)
+3. **Breadcrumbs Management**: Update existing or create missing breadcrumbs.json files
+4. **Batch Operations**: Apply changes to multiple project folders with progress tracking
+
 ### External Integrations
 - **Adobe Premiere**: Project template generation
 - **Trello**: Project management card updates
@@ -90,6 +111,6 @@ All file operations go through Tauri backend with progress tracking. Key pattern
 ## Development Notes
 
 - **Main Branch**: `release` (use for PRs)
-- **Package Manager**: npm (compatible with Bun via bun.lockb)
+- **Package Manager**: Bun (primary) + npm (audit compatibility, maintains dual lock files)
 - **Platform**: Cross-platform desktop app, primary development on macOS
 - **Security**: Uses argon2 for password hashing, JWT for auth, Tauri stronghold for secure storage

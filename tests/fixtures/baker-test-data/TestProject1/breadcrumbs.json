@@ -1,0 +1,14 @@
+{
+  "projectTitle": "TestProject1",
+  "numberOfCameras": 1,
+  "files": [
+    {
+      "camera": 1,
+      "name": "video1.mp4",
+      "path": "Footage/Camera 1/video1.mp4"
+    }
+  ],
+  "parentFolder": "/tests/fixtures/baker-test-data",
+  "createdBy": "test-user",
+  "creationDateTime": "2025-01-01T00:00:00Z"
+}

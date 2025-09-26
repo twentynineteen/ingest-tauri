@@ -1,6 +1,12 @@
 // src/components/uploadTrello/TrelloCardList.tsx
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import { 
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@components/ui/accordion'
 import { TrelloCard } from '../TrelloCards'
 
 interface TrelloCardListProps {
@@ -11,31 +17,67 @@ interface TrelloCardListProps {
 /**
  * Renders a list of Trello cards grouped by their list names.
  * Allows selecting a card by clicking its name.
+ * Persists accordion state across page refreshes.
  */
 const TrelloCardList: React.FC<TrelloCardListProps> = ({ grouped, onSelect }) => {
+  const STORAGE_KEY = 'trello-accordion-state'
+  const [openSections, setOpenSections] = useState<string[]>([])
+
+  // Load accordion state from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedState = localStorage.getItem(STORAGE_KEY)
+      if (savedState) {
+        const parsedState = JSON.parse(savedState)
+        setOpenSections(parsedState)
+      }
+    } catch (error) {
+      console.error('Failed to load accordion state:', error)
+    }
+  }, [])
+
+  // Save accordion state to localStorage when it changes
+  const handleAccordionChange = (value: string[]) => {
+    setOpenSections(value)
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(value))
+    } catch (error) {
+      console.error('Failed to save accordion state:', error)
+    }
+  }
+
   if (Object.entries(grouped).length === 0) {
     return <p>No cards found.</p>
   }
 
   return (
-    <div>
+    <Accordion 
+      type="multiple" 
+      className="w-full"
+      value={openSections}
+      onValueChange={handleAccordionChange}
+    >
       {Object.entries(grouped).map(([listName, cards]) => (
-        <div key={listName}>
-          <h2 className="text-lg font-semibold mt-4">{listName}</h2>
-          <ul className="list-disc ml-5">
-            {cards.map(card => (
-              <li
-                key={card.id}
-                className="hover:bg-gray-200 px-3 py-1 rounded transition-colors cursor-pointer"
-                onClick={() => onSelect({ id: card.id, name: card.name })}
-              >
-                {card.name}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <AccordionItem key={listName} value={listName}>
+          <AccordionTrigger className="text-lg font-semibold">
+            {listName} ({cards.length})
+          </AccordionTrigger>
+          <AccordionContent>
+            <ul className="list-disc ml-5 space-y-1">
+              {cards.map(card => (
+                <li
+                  key={card.id}
+                  className="hover:bg-gray-200 px-3 py-1 rounded transition-colors cursor-pointer"
+                  onClick={() => onSelect({ id: card.id, name: card.name })}
+                >
+                  {card.name}
+                </li>
+              ))}
+            </ul>
+          </AccordionContent>
+        </AccordionItem>
       ))}
-    </div>
+    </Accordion>
   )
 }
 

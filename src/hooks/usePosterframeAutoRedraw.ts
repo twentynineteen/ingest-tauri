@@ -75,6 +75,14 @@ export function usePosterframeAutoRedraw({
     }, debounceMs)
   }, [debounceMs, triggerRedraw, drawKey])
 
+  // Trigger initial draw when image loads (even without title)
+  useEffect(() => {
+    if (imageUrl && !title.trim()) {
+      // Draw just the background image immediately when image is selected
+      draw(imageUrl, '')
+    }
+  }, [imageUrl, title, draw])
+
   // Trigger debounced redraw when dependencies change
   useEffect(() => {
     if (imageUrl && title.trim()) {

@@ -137,14 +137,14 @@ const Posterframe = () => {
             )}
           </div>
 
-          <div className="mt-6 text-center">
+          <div className="mt-4 text-center">
             <h3 className="font-medium mb-2 text-sm text-muted-foreground">
               Live Preview
             </h3>
 
             {selectedFileBlob ? (
               <div
-                className="relative border rounded shadow overflow-hidden"
+                className="relative border rounded shadow-sm overflow-hidden"
                 style={{
                   width: '384px',
                   height: '216px',
@@ -174,7 +174,7 @@ const Posterframe = () => {
                       width: '100%',
                       height: '100%'
                     }}
-                    className="max-w-md w-full border rounded shadow transition-transform"
+                    className="max-w-md w-full border rounded shadow-sm transition-transform"
                   />
                 </div>
               </div>
@@ -229,15 +229,15 @@ const Posterframe = () => {
               onClick={generateThumbnail}
               className="inline-flex items-center justify-center 
             p-0.5 me-2 overflow-hidden text-sm font-medium 
-            text-gray-900 rounded-lg group bg-gradient-to-br from-purple-500 
+            text-gray-900 rounded-lg group bg-linear-to-br from-purple-500 
             to-pink-500 group-hover:from-purple-500 group-hover:to-pink-500 
-            hover:text-white dark:text-white focus:ring-4 focus:outline-none 
+            hover:text-white dark:text-white focus:ring-4 focus:outline-hidden 
             focus:ring-purple-200 dark:focus:ring-purple-800"
             >
               <span
                 className="px-5 py-2.5 transition-all ease-in duration-75 
               bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent 
-              group-hover:dark:bg-transparent"
+              dark:group-hover:bg-transparent"
               >
                 Generate Thumbnail
               </span>

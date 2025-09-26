@@ -5,13 +5,15 @@ interface ProjectInputsProps {
   onTitleChange: (value: string) => void
   numCameras: number
   onNumCamerasChange: (value: number) => void
+  showSanitizationWarning?: boolean
 }
 
 const ProjectInputs: React.FC<ProjectInputsProps> = ({
   title,
   onTitleChange,
   numCameras,
-  onNumCamerasChange
+  onNumCamerasChange,
+  showSanitizationWarning = false
 }) => {
   return (
     <div className="title-camera-inline flex flex-row gap-6 pt-3">
@@ -34,9 +36,16 @@ const ProjectInputs: React.FC<ProjectInputsProps> = ({
             dark:focus:border-blue-500"
           placeholder="Enter title here"
         />
-        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-          e.g. DBA - IB1234 - J Doe - Introductions 060626
-        </p>
+        {showSanitizationWarning ? (
+          <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">
+            Some characters were changed to hyphens (/ \ : * ? " &lt; &gt; |) to ensure
+            compatibility
+          </p>
+        ) : (
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            e.g. DBA - IB1234 - J Doe - Introductions 060626
+          </p>
+        )}
       </div>
 
       {/* Number of Cameras Input */}

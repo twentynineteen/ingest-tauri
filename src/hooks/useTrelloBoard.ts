@@ -24,19 +24,12 @@ interface TrelloBoardData {
 export function useTrelloBoard(boardId: string): TrelloBoardData {
   const [grouped, setGrouped] = useState<Record<string, TrelloCard[]>>({})
 
-  // Use centralized API key management
+  // Use a simpler approach - direct query for credentials
   const { data: credentials, isLoading: credentialsLoading } = useQuery({
-    ...createQueryOptions(
-      queryKeys.user.authentication(),
-      loadApiKeys,
-      'STATIC',
-      {
-        staleTime: 5 * 60 * 1000, // 5 minutes
-        gcTime: 10 * 60 * 1000, // 10 minutes
-        retry: 2,
-        refetchOnWindowFocus: false
-      }
-    )
+    queryKey: ['api-keys'],
+    queryFn: loadApiKeys,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false
   })
 
   const apiKey = credentials?.trello || null
@@ -79,6 +72,7 @@ export function useTrelloBoard(boardId: string): TrelloBoardData {
   // Use React Query's computed state pattern instead of useEffect
   const isDataReady = cards && lists && !cardsLoading && !listsLoading
   const isLoading = credentialsLoading || cardsLoading || listsLoading
+
 
   // Group cards when data changes
   useEffect(() => {

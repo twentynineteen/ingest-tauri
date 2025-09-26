@@ -15,8 +15,8 @@ interface CreateProjectParams {
   selectedFolder: string
   numCameras: number
   username: string
-  setProgress: (value: number) => void
-  setCompleted: (value: boolean) => void
+  setProgress?: (value: number) => void
+  setCompleted?: (value: boolean) => void
   setMessage: (value: string) => void
   setLoading: (value: boolean) => void
 }
@@ -60,7 +60,6 @@ export function useCreateProject() {
       await remove(projectFolder, { recursive: true })
     }
 
-    let unlistenProgress: (() => void) | null = null
     let unlistenComplete: (() => void) | null = null
 
     try {
@@ -77,20 +76,16 @@ export function useCreateProject() {
         mkdir(`${projectFolder}/Scripts`, { recursive: true })
       ])
 
-      setProgress(0)
-      setCompleted(false)
+      setProgress?.(0)
+      setCompleted?.(false)
 
       const filesToMove: [string, number][] = files.map(({ file, camera }) => [
         file.path,
         camera
       ])
 
-      unlistenProgress = await listen<number>('copy_progress', event => {
-        setProgress(event.payload)
-      })
-
       unlistenComplete = await listen<string[]>('copy_complete', async () => {
-        setCompleted(true)
+        setCompleted?.(true)
         await createTemplatePremiereProject()
         await showDialogAndOpenFolder()
       })
@@ -160,7 +155,6 @@ export function useCreateProject() {
       console.error('Error creating project:', error)
       alert('Error creating project: ' + error)
     } finally {
-      if (unlistenProgress) unlistenProgress()
       if (unlistenComplete) unlistenComplete()
     }
   }

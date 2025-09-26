@@ -89,7 +89,7 @@ export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-lg">
-                  {username?.charAt(0) || user.name.charAt(0)}
+                  {(typeof username === 'string' ? username.charAt(0) : null) || user.name.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -100,7 +100,7 @@ export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
             side={isMobile ? 'bottom' : 'right'}
             align="end"
             sideOffset={4}
@@ -110,7 +110,7 @@ export function NavUser({ user, onLogout, onUpdateClicked }: Props) {
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback className="rounded-lg">
-                    {username?.charAt(0) || user.name.charAt(0)}
+                    {(typeof username === 'string' ? username.charAt(0) : null) || user.name.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">

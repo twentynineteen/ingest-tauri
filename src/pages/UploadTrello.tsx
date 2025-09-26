@@ -208,6 +208,8 @@ const UploadTrello = () => {
                         )
                         if (block && selectedCardDetails) {
                           await applyBreadcrumbsToCard(selectedCardDetails, block)
+                          // Refresh card details to show updated breadcrumbs
+                          refetchCard()
                         }
                       }}
                     >
@@ -243,6 +245,8 @@ const UploadTrello = () => {
                         onClick={async () => {
                           if (selectedCardDetails && uploadedVideo) {
                             await applyVideoInfoToCard(selectedCardDetails, uploadedVideo)
+                            // Refresh card details to show updated video info
+                            refetchCard()
                           }
                         }}
                       >
