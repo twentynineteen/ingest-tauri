@@ -10,9 +10,12 @@ use uuid::Uuid;
 // Performance optimization constants
 const PROGRESS_UPDATE_INTERVAL: Duration = Duration::from_millis(100); // Update UI every 100ms
 const SKIP_PATTERNS: &[&str] = &[
-    "node_modules", ".git", ".svn", ".hg", "vendor", "build", "dist", 
+    "node_modules", ".git", ".svn", ".hg", "vendor", "build", "dist",
     "target", ".cache", "tmp", "temp", "__pycache__", ".DS_Store"
 ];
+
+// Stale breadcrumbs detection constants
+const STALE_SIZE_THRESHOLD_BYTES: u64 = 1024; // 1KB - minimum folder size change to consider breadcrumbs stale
 
 // Data structures matching TypeScript interfaces
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -267,8 +270,8 @@ fn check_breadcrumbs_stale(path: &Path) -> Result<bool, std::io::Error> {
             existing_size - current_folder_size
         };
 
-        // Only consider it stale if size difference is >= 1KB (1024 bytes)
-        if size_diff >= 1024 {
+        // Only consider it stale if size difference exceeds threshold
+        if size_diff >= STALE_SIZE_THRESHOLD_BYTES {
             return Ok(true); // Significant folder size change = stale
         }
     }
