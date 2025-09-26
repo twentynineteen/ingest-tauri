@@ -25,8 +25,9 @@ import { useBreadcrumbsManager } from '@hooks/useBreadcrumbsManager'
 import { useBreadcrumbsPreview } from '@hooks/useBreadcrumbsPreview'
 import { useLiveBreadcrumbsReader } from '@hooks/useLiveBreadcrumbsReader'
 import { open } from '@tauri-apps/plugin-dialog'
+import { formatFileSize } from '@utils/breadcrumbsComparison'
 import { readTextFile } from '@tauri-apps/plugin-fs'
-import { useAppendBreadcrumbs, useTrelloBoard } from 'hooks'
+import { useTrelloBoard } from 'hooks'
 import { useBreadcrumb } from 'hooks/useBreadcrumb'
 import {
   AlertTriangle,
@@ -75,10 +76,6 @@ const BakerPageContent: React.FC = () => {
   // Trello integration (optional)
   const boardId = '55a504d70bed2bd21008dc5a' // Hard-coded boardId for 'small projects'
   const { apiKey, token } = useTrelloBoard(boardId)
-  const { getBreadcrumbsBlock, applyBreadcrumbsToCard } = useAppendBreadcrumbs(
-    apiKey,
-    token
-  )
 
   // Handlers
   const handleSelectFolder = useCallback(async () => {
@@ -157,6 +154,8 @@ const BakerPageContent: React.FC = () => {
   }, [selectedProjects, scanResult, generateBatchPreviews])
 
   const handleConfirmBatchUpdate = useCallback(async () => {
+    const trelloErrors: Array<{project: string, error: string}> = []
+
     try {
       // Update local breadcrumbs files first
       await updateBreadcrumbs(selectedProjects, {
@@ -181,41 +180,44 @@ const BakerPageContent: React.FC = () => {
                 const cardId = cardIdMatch[1]
 
                 // Create a mock TrelloCard object for the API call
-                const mockCard = { 
-                  id: cardId, 
-                  desc: '', 
-                  name: 'Baker Update', 
-                  idList: '' 
+                const mockCard = {
+                  id: cardId,
+                  desc: '',
+                  name: 'Baker Update',
+                  idList: ''
                 }
 
-                // Generate breadcrumbs block and update the card
-                // Temporarily update app store with the breadcrumbs data
-                const { appStore } = await import('store/useAppStore')
-                const originalBreadcrumbs = appStore.getState().breadcrumbs
-                appStore.getState().setBreadcrumbs(breadcrumbsData)
+                // Use the core utility functions with the specific breadcrumbs data
+                const { generateBreadcrumbsBlock, updateTrelloCardWithBreadcrumbs } = await import('hooks/useAppendBreadcrumbs')
 
-                try {
-                  const block = await getBreadcrumbsBlock(mockCard)
-                  if (block) {
-                    await applyBreadcrumbsToCard(mockCard, block)
-                  }
-                } finally {
-                  // Restore original breadcrumbs
-                  appStore.getState().setBreadcrumbs(originalBreadcrumbs)
+                const block = generateBreadcrumbsBlock(breadcrumbsData)
+                if (block) {
+                  await updateTrelloCardWithBreadcrumbs(mockCard, block, apiKey, token, { autoReplace: true, silentErrors: true })
                 }
               }
             }
           } catch (trelloError) {
+            const projectName = selectedProjects.find(p => p === projectPath)?.split('/').pop() || projectPath
+            trelloErrors.push({
+              project: projectName,
+              error: trelloError instanceof Error ? trelloError.message : String(trelloError)
+            })
             console.warn(`Failed to update Trello card for ${projectPath}:`, trelloError)
-            // Don't fail the entire operation if Trello update fails
           }
         }
       }
 
-      // Clear selection and previews after successful update
+      // Clear selection and previews after update
       setSelectedProjects([])
       clearPreviews()
       setShowBatchConfirmation(false)
+
+      // Show Trello errors if any occurred
+      if (trelloErrors.length > 0) {
+        const errorMessage = `Breadcrumbs updated successfully, but ${trelloErrors.length} Trello card update(s) failed:\n\n` +
+          trelloErrors.map(({project, error}) => `• ${project}: ${error}`).join('\n')
+        alert(errorMessage)
+      }
     } catch (error) {
       alert(`Failed to update breadcrumbs: ${error}`)
       setShowBatchConfirmation(false)
@@ -226,9 +228,7 @@ const BakerPageContent: React.FC = () => {
     updateBreadcrumbs,
     clearPreviews,
     apiKey,
-    token,
-    getBreadcrumbsBlock,
-    applyBreadcrumbsToCard
+    token
   ])
 
   const handleViewBreadcrumbs = useCallback(
@@ -423,7 +423,7 @@ const BakerPageContent: React.FC = () => {
       {/* Results Summary */}
       {scanResult && !isScanning && (
         <div className="border rounded-lg p-6">
-          <div className="grid grid-cols-4 gap-4 text-center">
+          <div className="grid grid-cols-5 gap-4 text-center">
             <div>
               <p className="text-2xl font-bold">{scanResult.totalFolders}</p>
               <p className="text-sm text-gray-500">Folders Scanned</p>
@@ -439,6 +439,12 @@ const BakerPageContent: React.FC = () => {
                 {scanResult.projects.filter(p => p.hasBreadcrumbs).length}
               </p>
               <p className="text-sm text-gray-500">With Breadcrumbs</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-purple-600">
+                {formatFileSize(scanResult.totalFolderSize)}
+              </p>
+              <p className="text-sm text-gray-500">Total Size</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-orange-600">

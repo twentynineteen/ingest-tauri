@@ -164,9 +164,28 @@ export function compareBreadcrumbsMeaningful(
 
   // Filter out maintenance changes
   const meaningfulChanges = fullDiff.changes.filter(change => {
-    // Always exclude pure maintenance fields
-    if (change.field === 'lastModified' || change.field === 'scannedBy') {
+    // Always exclude scannedBy (pure maintenance)
+    if (change.field === 'scannedBy') {
       return false
+    }
+
+    // For lastModified, allow changes if current value is invalid/corrupted
+    if (change.field === 'lastModified') {
+      if (change.type === 'added') {
+        return true // Adding missing lastModified is meaningful
+      }
+      if (change.type === 'modified' && change.oldValue) {
+        // Check if old value is invalid date - if so, fixing it is meaningful
+        try {
+          const oldDate = new Date(change.oldValue as string)
+          if (isNaN(oldDate.getTime())) {
+            return true // Fixing invalid date is meaningful
+          }
+        } catch {
+          return true // Fixing unparseable date is meaningful
+        }
+      }
+      return false // Otherwise, lastModified updates are maintenance
     }
 
     // Filter out Baker maintenance createdBy changes
@@ -174,9 +193,9 @@ export function compareBreadcrumbsMeaningful(
       return !isBakerMaintenanceChange(change.oldValue, change.newValue)
     }
 
-    // For folderSizeBytes, only meaningful if it's being added (was missing)
+    // For folderSizeBytes, meaningful if added or modified (indicates content changes)
     if (change.field === 'folderSizeBytes') {
-      return change.type === 'added'
+      return change.type === 'added' || change.type === 'modified'
     }
 
     return true
@@ -317,7 +336,7 @@ export function formatFieldValue(value: unknown, field: string): string {
 /**
  * Format file size for display
  */
-function formatFileSize(bytes: number): string {
+export function formatFileSize(bytes: number): string {
   if (bytes === 0) return '0 B'
   const k = 1024
   const sizes = ['B', 'KB', 'MB', 'GB', 'TB']

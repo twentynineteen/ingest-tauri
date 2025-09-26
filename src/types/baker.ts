@@ -43,6 +43,7 @@ export interface ScanResult {
   validProjects: number
   updatedBreadcrumbs: number
   createdBreadcrumbs: number
+  totalFolderSize: number // Total size in bytes of all scanned folders
   errors: ScanError[]
   projects: ProjectFolder[]
 }

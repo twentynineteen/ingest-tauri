@@ -8,7 +8,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import { useCallback, useState } from 'react'
 import type { BreadcrumbsFile, BreadcrumbsPreview, ProjectFolder } from '../types/baker'
-import { generateBreadcrumbsPreview } from '../utils/breadcrumbsComparison'
+import { generateBreadcrumbsPreview, compareBreadcrumbsMeaningful } from '../utils/breadcrumbsComparison'
 
 interface UseBreadcrumbsPreviewResult {
   // State
@@ -101,32 +101,60 @@ export function useBreadcrumbsPreview(): UseBreadcrumbsPreviewResult {
           cameraCount: projectData.cameraCount
         })
 
-        // Add folder size calculation if missing
-        if (!currentBreadcrumbs?.folderSizeBytes) {
-          try {
-            const folderSize = await invoke<number>('get_folder_size', {
-              folderPath: projectPath
-            })
-            preview.updated.folderSizeBytes = folderSize
+        // Always calculate current folder size to detect changes
+        try {
+          const currentFolderSize = await invoke<number>('get_folder_size', {
+            folderPath: projectPath
+          })
+          preview.updated.folderSizeBytes = currentFolderSize
 
-            // Update the diff to reflect folder size addition
-            const existingChange = preview.diff.changes.find(
-              c => c.field === 'folderSizeBytes'
-            )
-            if (existingChange) {
-              existingChange.newValue = folderSize
+          // Update the diff to reflect folder size changes
+          const existingChange = preview.diff.changes.find(
+            c => c.field === 'folderSizeBytes'
+          )
+
+          if (existingChange) {
+            // Update existing change with current folder size
+            existingChange.newValue = currentFolderSize
+
+            // Recalculate the change type based on new value
+            if (!currentBreadcrumbs?.folderSizeBytes) {
+              existingChange.type = 'added'
+            } else if (currentBreadcrumbs.folderSizeBytes !== currentFolderSize) {
+              existingChange.type = 'modified'
+              existingChange.oldValue = currentBreadcrumbs.folderSizeBytes
             } else {
-              preview.diff.changes.push({
-                type: 'added',
-                field: 'folderSizeBytes',
-                newValue: folderSize
-              })
+              existingChange.type = 'unchanged'
+            }
+          } else {
+            // Add new change entry
+            const changeType = !currentBreadcrumbs?.folderSizeBytes ? 'added' :
+                              currentBreadcrumbs.folderSizeBytes !== currentFolderSize ? 'modified' : 'unchanged'
+
+            preview.diff.changes.push({
+              type: changeType,
+              field: 'folderSizeBytes',
+              oldValue: currentBreadcrumbs?.folderSizeBytes,
+              newValue: currentFolderSize
+            })
+
+            if (changeType === 'added') {
               preview.diff.summary.added++
+            } else if (changeType === 'modified') {
+              preview.diff.summary.modified++
+            }
+
+            if (changeType === 'added' || changeType === 'modified') {
               preview.diff.hasChanges = true
             }
-          } catch (sizeError) {
-            console.warn(`Failed to calculate folder size for ${projectPath}:`, sizeError)
           }
+
+          // Also regenerate meaningful diff with the updated folder size
+          const meaningfulDiff = compareBreadcrumbsMeaningful(currentBreadcrumbs, preview.updated)
+          preview.meaningfulDiff = meaningfulDiff
+
+        } catch (sizeError) {
+          console.warn(`Failed to calculate folder size for ${projectPath}:`, sizeError)
         }
 
         setPreviews(prev => new Map(prev.set(projectPath, preview)))

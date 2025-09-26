@@ -79,6 +79,8 @@ pub struct ScanResult {
     updated_breadcrumbs: i32,
     #[serde(rename = "createdBreadcrumbs")]
     created_breadcrumbs: i32,
+    #[serde(rename = "totalFolderSize")]
+    total_folder_size: u64,
     errors: Vec<ScanError>,
     projects: Vec<ProjectFolder>,
 }
@@ -255,7 +257,22 @@ fn check_breadcrumbs_stale(path: &Path) -> Result<bool, std::io::Error> {
             return Ok(true); // Files differ = stale
         }
     }
-    
+
+    // Compare folder size to detect file content changes (with 1KB threshold)
+    let current_folder_size = calculate_folder_size(path).unwrap_or(0);
+    if let Some(existing_size) = existing_breadcrumbs.folder_size_bytes {
+        let size_diff = if current_folder_size > existing_size {
+            current_folder_size - existing_size
+        } else {
+            existing_size - current_folder_size
+        };
+
+        // Only consider it stale if size difference is >= 1KB (1024 bytes)
+        if size_diff >= 1024 {
+            return Ok(true); // Significant folder size change = stale
+        }
+    }
+
     Ok(false) // Files match = not stale
 }
 
@@ -325,6 +342,7 @@ fn scan_directory_recursive(
         valid_projects: 0,
         updated_breadcrumbs: 0,
         created_breadcrumbs: 0,
+        total_folder_size: 0,
         errors: Vec::new(),
         projects: Vec::new(),
     };
@@ -415,6 +433,10 @@ fn scan_directory_recursive(
                         validation_errors: validation_errors.clone(),
                     };
 
+                    // Calculate and accumulate folder size
+                    let folder_size = calculate_folder_size(&path).unwrap_or(0);
+                    result.total_folder_size += folder_size;
+
                     result.projects.push(project_folder);
                 } else if !validation_errors.is_empty() {
                     // Only recurse if folder is not a partial project structure
@@ -489,8 +511,12 @@ fn scan_directory_recursive(
             validation_errors: validation_errors.clone(),
         };
 
+        // Calculate and accumulate folder size for root folder
+        let root_folder_size = calculate_folder_size(&root_path).unwrap_or(0);
+        result.total_folder_size += root_folder_size;
+
         result.projects.push(project_folder);
-        
+
         // Emit discovery event for root folder
         let discovery_event = serde_json::json!({
             "scanId": scan_id,
@@ -816,6 +842,8 @@ pub async fn baker_update_breadcrumbs(
                             }
                             existing.last_modified = Some(get_current_timestamp());
                             existing.scanned_by = Some("Baker".to_string());
+                            // Recalculate folder size to ensure it's up to date
+                            existing.folder_size_bytes = calculate_folder_size(path).ok();
                             existing
                         }
                         Err(_) => {
@@ -927,7 +955,7 @@ pub async fn baker_scan_current_files(project_path: String) -> Result<Vec<FileIn
                                             files.push(FileInfo {
                                                 camera: camera_num,
                                                 name: file_name.clone(),
-                                                path: file.path().to_string_lossy().to_string(),
+                                                path: format!("Footage/{}/{}", name_str, file_name),
                                             });
                                         }
                                     }

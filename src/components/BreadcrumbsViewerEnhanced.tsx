@@ -34,10 +34,24 @@ export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
   onTogglePreview
 }) => {
   const formatDate = (dateString: string) => {
+    if (!dateString || dateString === 'null' || dateString === 'undefined') {
+      return 'Not set'
+    }
+    
     try {
-      return new Date(dateString).toLocaleString()
-    } catch {
-      return dateString
+      // Handle RFC3339 timestamps from Rust backend
+      const date = new Date(dateString)
+      
+      // Check if the date is valid
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date string received:', dateString)
+        return 'Invalid date'
+      }
+      
+      return date.toLocaleString()
+    } catch (error) {
+      console.warn('Error parsing date:', dateString, error)
+      return 'Invalid date'
     }
   }
 

@@ -15,6 +15,7 @@
       "@components/*": ["components/*"],
       "@hooks/*": ["hooks/*"],
       "@lib/*": ["lib/*"],
+      "@utils/*": ["utils/*"],
       "@/*": ["./*"]
     }
   },
