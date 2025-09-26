@@ -19,10 +19,15 @@ const SKIP_PATTERNS: &[&str] = &[
 pub struct ProjectFolder {
     path: String,
     name: String,
+    #[serde(rename = "isValid")]
     is_valid: bool,
+    #[serde(rename = "hasBreadcrumbs")]
     has_breadcrumbs: bool,
+    #[serde(rename = "lastScanned")]
     last_scanned: String,
+    #[serde(rename = "cameraCount")]
     camera_count: i32,
+    #[serde(rename = "validationErrors")]
     validation_errors: Vec<String>,
 }
 
@@ -192,7 +197,13 @@ fn validate_project_folder(path: &Path) -> (bool, Vec<String>, i32) {
 }
 
 fn has_breadcrumbs_file(path: &Path) -> bool {
-    path.join("breadcrumbs.json").exists()
+    let breadcrumbs_path = path.join("breadcrumbs.json");
+    let exists = breadcrumbs_path.exists();
+    
+    // Debug logging - show both positive and negative results
+    println!("[Baker] Breadcrumbs check: {} -> {}", path.display(), if exists { "FOUND" } else { "MISSING" });
+    
+    exists
 }
 
 fn scan_directory_recursive(
@@ -270,15 +281,23 @@ fn scan_directory_recursive(
 
                 // Check if this folder is a valid project
                 let (is_valid, validation_errors, camera_count) = validate_project_folder(&path);
+                let has_breadcrumbs = has_breadcrumbs_file(&path);
                 
-                if is_valid {
-                    result.valid_projects += 1;
+                // Debug logging for each folder checked
+                println!("[Baker] Sub-folder: {} | Valid: {} | HasBreadcrumbs: {} | CameraCount: {}", 
+                    path.display(), is_valid, has_breadcrumbs, camera_count);
+                
+                // Include folder if it's either valid OR has breadcrumbs
+                if is_valid || has_breadcrumbs {
+                    if is_valid {
+                        result.valid_projects += 1;
+                    }
                     
                     let project_folder = ProjectFolder {
                         path: path.to_string_lossy().to_string(),
                         name: file_name.to_string_lossy().to_string(),
                         is_valid,
-                        has_breadcrumbs: has_breadcrumbs_file(&path),
+                        has_breadcrumbs,
                         last_scanned: get_current_timestamp(),
                         camera_count,
                         validation_errors: validation_errors.clone(),
@@ -304,12 +323,13 @@ fn scan_directory_recursive(
                     }
                 }
 
-                // Emit discovery event for valid projects
-                if is_valid {
+                // Emit discovery event for valid projects or folders with breadcrumbs
+                if is_valid || has_breadcrumbs {
                     let discovery_event = serde_json::json!({
                         "scanId": scan_id,
                         "projectPath": path.to_string_lossy(),
                         "isValid": is_valid,
+                        "hasBreadcrumbs": has_breadcrumbs,
                         "errors": validation_errors
                     });
 
@@ -321,6 +341,49 @@ fn scan_directory_recursive(
         Ok(())
     }
 
+    // First check the root directory itself
+    let (is_valid, validation_errors, camera_count) = validate_project_folder(root_path);
+    let has_breadcrumbs = has_breadcrumbs_file(root_path);
+    
+    println!("[Baker] ===== ROOT FOLDER ANALYSIS =====");
+    println!("[Baker] Path: {}", root_path.display());
+    println!("[Baker] Valid BuildProject: {}", is_valid);
+    println!("[Baker] Has breadcrumbs.json: {}", has_breadcrumbs);
+    println!("[Baker] Camera count: {}", camera_count);
+    if !validation_errors.is_empty() {
+        println!("[Baker] Validation errors: {:?}", validation_errors);
+    }
+    println!("[Baker] ================================");
+    
+    if is_valid || has_breadcrumbs {
+        if is_valid {
+            result.valid_projects += 1;
+        }
+        
+        let project_folder = ProjectFolder {
+            path: root_path.to_string_lossy().to_string(),
+            name: root_path.file_name().unwrap_or_default().to_string_lossy().to_string(),
+            is_valid,
+            has_breadcrumbs,
+            last_scanned: get_current_timestamp(),
+            camera_count,
+            validation_errors: validation_errors.clone(),
+        };
+
+        result.projects.push(project_folder);
+        
+        // Emit discovery event for root folder
+        let discovery_event = serde_json::json!({
+            "scanId": scan_id,
+            "projectPath": root_path.to_string_lossy(),
+            "isValid": is_valid,
+            "hasBreadcrumbs": has_breadcrumbs,
+            "errors": validation_errors
+        });
+        let _ = app_handle.emit("baker_scan_discovery", discovery_event);
+    }
+
+    // Then scan subdirectories
     match visit_directory(
         root_path,
         0,

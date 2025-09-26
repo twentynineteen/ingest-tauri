@@ -1,46 +1,57 @@
 /**
  * Baker Page Component
- * 
+ *
  * Main page for Baker folder scanning and breadcrumbs management functionality.
  * Simplified version using only existing UI components.
  */
 
-import React, { useState, useCallback } from 'react'
-import { useBreadcrumb } from 'hooks/useBreadcrumb'
-import { useBakerScan } from '../../hooks/useBakerScan'
-import { useBreadcrumbsManager } from '../../hooks/useBreadcrumbsManager'
-import { useBakerPreferences } from '../../hooks/useBakerPreferences'
+import ErrorBoundary from '@components/ErrorBoundary'
 import { Button } from '@components/ui/button'
-import { Input } from '@components/ui/input'
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
   DialogTitle,
   DialogTrigger
 } from '@components/ui/dialog'
+import { Input } from '@components/ui/input'
 import { open } from '@tauri-apps/plugin-dialog'
-import { FolderOpen, Play, Square, Settings, RefreshCw, CheckCircle, AlertTriangle } from 'lucide-react'
+import { useBreadcrumb } from 'hooks/useBreadcrumb'
+import {
+  AlertTriangle,
+  CheckCircle,
+  Eye,
+  FolderOpen,
+  Play,
+  RefreshCw,
+  Settings,
+  Square
+} from 'lucide-react'
+import React, { useCallback, useState } from 'react'
+import { useBakerPreferences } from '../../hooks/useBakerPreferences'
+import { useBakerScan } from '../../hooks/useBakerScan'
+import { useBreadcrumbsManager } from '../../hooks/useBreadcrumbsManager'
+import { useBreadcrumbsReader } from '../../hooks/useBreadcrumbsReader'
+import { BreadcrumbsViewer } from '../../components/BreadcrumbsViewer'
 import type { ProjectFolder } from '../../types/baker'
-import ErrorBoundary from '@components/ErrorBoundary'
 
 const BakerPageContent: React.FC = () => {
   // Set breadcrumbs for navigation
-  useBreadcrumb([
-    { label: 'Ingest footage', href: '/ingest/build' },
-    { label: 'Baker' }
-  ])
+  useBreadcrumb([{ label: 'Ingest footage', href: '/ingest/build' }, { label: 'Baker' }])
 
   // Local state
   const [selectedFolder, setSelectedFolder] = useState<string>('')
   const [selectedProjects, setSelectedProjects] = useState<string[]>([])
   const [showPreferences, setShowPreferences] = useState(false)
+  const [expandedProject, setExpandedProject] = useState<string | null>(null)
 
   // Custom hooks
-  const { scanResult, isScanning, error, startScan, cancelScan, clearResults } = useBakerScan()
+  const { scanResult, isScanning, error, startScan, cancelScan, clearResults } =
+    useBakerScan()
   const { updateBreadcrumbs, isUpdating, lastUpdateResult } = useBreadcrumbsManager()
   const { preferences, updatePreferences, resetToDefaults } = useBakerPreferences()
+  const { breadcrumbs, isLoading: isLoadingBreadcrumbs, error: breadcrumbsError, readBreadcrumbs, clearBreadcrumbs } = useBreadcrumbsReader()
 
   // Handlers
   const handleSelectFolder = useCallback(async () => {
@@ -50,7 +61,7 @@ const BakerPageContent: React.FC = () => {
         multiple: false,
         title: 'Select folder to scan for projects'
       })
-      
+
       if (selected && typeof selected === 'string') {
         setSelectedFolder(selected)
       }
@@ -77,15 +88,18 @@ const BakerPageContent: React.FC = () => {
     }
   }, [selectedFolder, preferences, startScan])
 
-  const handleProjectSelection = useCallback((projectPath: string, isSelected: boolean) => {
-    setSelectedProjects(prev => {
-      if (isSelected) {
-        return [...prev, projectPath]
-      } else {
-        return prev.filter(path => path !== projectPath)
-      }
-    })
-  }, [])
+  const handleProjectSelection = useCallback(
+    (projectPath: string, isSelected: boolean) => {
+      setSelectedProjects(prev => {
+        if (isSelected) {
+          return [...prev, projectPath]
+        } else {
+          return prev.filter(path => path !== projectPath)
+        }
+      })
+    },
+    []
+  )
 
   const handleSelectAll = useCallback(() => {
     if (scanResult?.projects) {
@@ -104,10 +118,8 @@ const BakerPageContent: React.FC = () => {
     }
 
     if (preferences.confirmBulkOperations) {
-      const confirmed = confirm(
-        `Apply changes to ${selectedProjects.length} project(s)?`
-      )
-      
+      const confirmed = confirm(`Apply changes to ${selectedProjects.length} project(s)?`)
+
       if (!confirmed) return
     }
 
@@ -116,7 +128,7 @@ const BakerPageContent: React.FC = () => {
         createMissing: preferences.createMissing,
         backupOriginals: preferences.backupOriginals
       })
-      
+
       // Clear selection after successful update
       setSelectedProjects([])
     } catch (error) {
@@ -124,8 +136,20 @@ const BakerPageContent: React.FC = () => {
     }
   }, [selectedProjects, preferences, updateBreadcrumbs])
 
+  const handleViewBreadcrumbs = useCallback(async (projectPath: string) => {
+    if (expandedProject === projectPath) {
+      // Collapse if already expanded
+      setExpandedProject(null)
+      clearBreadcrumbs()
+    } else {
+      // Expand and load breadcrumbs
+      setExpandedProject(projectPath)
+      await readBreadcrumbs(projectPath)
+    }
+  }, [expandedProject, readBreadcrumbs, clearBreadcrumbs])
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="px-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between border-b pb-4">
         <h2 className="text-2xl font-semibold">Baker</h2>
@@ -149,7 +173,7 @@ const BakerPageContent: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={preferences.createMissing}
-                  onChange={(e) => updatePreferences({ createMissing: e.target.checked })}
+                  onChange={e => updatePreferences({ createMissing: e.target.checked })}
                 />
               </label>
               <label className="flex items-center justify-between">
@@ -157,7 +181,7 @@ const BakerPageContent: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={preferences.backupOriginals}
-                  onChange={(e) => updatePreferences({ backupOriginals: e.target.checked })}
+                  onChange={e => updatePreferences({ backupOriginals: e.target.checked })}
                 />
               </label>
               <label className="flex items-center justify-between">
@@ -165,7 +189,7 @@ const BakerPageContent: React.FC = () => {
                 <input
                   type="checkbox"
                   checked={preferences.includeHidden}
-                  onChange={(e) => updatePreferences({ includeHidden: e.target.checked })}
+                  onChange={e => updatePreferences({ includeHidden: e.target.checked })}
                 />
               </label>
               <div>
@@ -175,7 +199,9 @@ const BakerPageContent: React.FC = () => {
                   min="1"
                   max="20"
                   value={preferences.maxDepth}
-                  onChange={(e) => updatePreferences({ maxDepth: parseInt(e.target.value) })}
+                  onChange={e =>
+                    updatePreferences({ maxDepth: parseInt(e.target.value) })
+                  }
                   className="w-full"
                 />
               </div>
@@ -183,9 +209,7 @@ const BakerPageContent: React.FC = () => {
                 <Button variant="outline" onClick={resetToDefaults}>
                   Reset to Defaults
                 </Button>
-                <Button onClick={() => setShowPreferences(false)}>
-                  Done
-                </Button>
+                <Button onClick={() => setShowPreferences(false)}>Done</Button>
               </div>
             </div>
           </DialogContent>
@@ -211,8 +235,8 @@ const BakerPageContent: React.FC = () => {
           </Button>
         </div>
         <div className="flex space-x-2">
-          <Button 
-            onClick={handleStartScan} 
+          <Button
+            onClick={handleStartScan}
             disabled={!selectedFolder || isScanning}
             className="flex-1"
           >
@@ -259,7 +283,8 @@ const BakerPageContent: React.FC = () => {
             <div>
               <p className="font-medium">Scanning in progress...</p>
               <p className="text-sm text-gray-500">
-                {scanResult.totalFolders} folders scanned • {scanResult.validProjects} projects found
+                {scanResult.totalFolders} folders scanned • {scanResult.validProjects}{' '}
+                projects found
               </p>
             </div>
             <RefreshCw className="h-5 w-5 animate-spin" />
@@ -276,7 +301,9 @@ const BakerPageContent: React.FC = () => {
               <p className="text-sm text-gray-500">Folders Scanned</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-green-600">{scanResult.validProjects}</p>
+              <p className="text-2xl font-bold text-green-600">
+                {scanResult.validProjects}
+              </p>
               <p className="text-sm text-gray-500">Valid Projects</p>
             </div>
             <div>
@@ -286,7 +313,9 @@ const BakerPageContent: React.FC = () => {
               <p className="text-sm text-gray-500">With Breadcrumbs</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-orange-600">{scanResult.errors.length}</p>
+              <p className="text-2xl font-bold text-orange-600">
+                {scanResult.errors.length}
+              </p>
               <p className="text-sm text-gray-500">Errors</p>
             </div>
           </div>
@@ -296,32 +325,78 @@ const BakerPageContent: React.FC = () => {
       {/* Project Results */}
       {scanResult?.projects.length ? (
         <div className="border rounded-lg p-6 space-y-4">
-          <h3 className="text-lg font-medium">Found Projects ({scanResult.projects.length})</h3>
-          <div className="space-y-2 max-h-60 overflow-y-auto">
+          <h3 className="text-lg font-medium">
+            Found Projects ({scanResult.projects.length})
+          </h3>
+          <div className="space-y-2 max-h-96 overflow-y-auto">
             {scanResult.projects.map((project: ProjectFolder) => (
-              <div key={project.path} className="flex items-center justify-between p-3 border rounded">
-                <div className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={selectedProjects.includes(project.path)}
-                    onChange={(e) => handleProjectSelection(project.path, e.target.checked)}
-                  />
-                  <div>
-                    <p className="font-medium">{project.name}</p>
-                    <p className="text-sm text-gray-500 truncate max-w-md">{project.path}</p>
+              <div key={project.path} className="border rounded">
+                <div className="flex items-center justify-between p-3">
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedProjects.includes(project.path)}
+                      onChange={e => handleProjectSelection(project.path, e.target.checked)}
+                    />
+                    <div>
+                      <p className="font-medium">{project.name}</p>
+                      <p className="text-sm text-gray-500 truncate max-w-md">
+                        {project.path}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <div className="flex space-x-2 text-xs">
+                      <span
+                        className={`px-2 py-1 rounded ${project.isValid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+                      >
+                        {project.isValid ? 'Valid' : 'Invalid'}
+                      </span>
+                      <span
+                        className={`px-2 py-1 rounded ${project.hasBreadcrumbs ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
+                      >
+                        {project.hasBreadcrumbs ? 'Has breadcrumbs' : 'Missing breadcrumbs'}
+                      </span>
+                      <span className="px-2 py-1 rounded bg-gray-100 text-gray-800">
+                        {project.cameraCount} camera{project.cameraCount !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                    {project.hasBreadcrumbs && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleViewBreadcrumbs(project.path)}
+                        className="ml-2"
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        {expandedProject === project.path ? 'Hide' : 'View'}
+                      </Button>
+                    )}
                   </div>
                 </div>
-                <div className="flex space-x-2 text-xs">
-                  <span className={`px-2 py-1 rounded ${project.isValid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {project.isValid ? 'Valid' : 'Invalid'}
-                  </span>
-                  <span className={`px-2 py-1 rounded ${project.hasBreadcrumbs ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
-                    {project.hasBreadcrumbs ? 'Has breadcrumbs' : 'Missing breadcrumbs'}
-                  </span>
-                  <span className="px-2 py-1 rounded bg-gray-100 text-gray-800">
-                    {project.cameraCount} camera{project.cameraCount !== 1 ? 's' : ''}
-                  </span>
-                </div>
+
+                {/* Breadcrumbs Viewer */}
+                {expandedProject === project.path && (
+                  <div className="border-t p-3">
+                    {isLoadingBreadcrumbs ? (
+                      <div className="flex items-center justify-center py-4">
+                        <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+                        <span className="text-sm text-gray-500">Loading breadcrumbs...</span>
+                      </div>
+                    ) : breadcrumbsError ? (
+                      <div className="flex items-center justify-center py-4 text-red-600">
+                        <AlertTriangle className="h-4 w-4 mr-2" />
+                        <span className="text-sm">{breadcrumbsError}</span>
+                      </div>
+                    ) : breadcrumbs ? (
+                      <BreadcrumbsViewer breadcrumbs={breadcrumbs} projectPath={project.path} />
+                    ) : (
+                      <div className="flex items-center justify-center py-4 text-gray-500">
+                        <span className="text-sm">No breadcrumbs data found</span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -338,7 +413,8 @@ const BakerPageContent: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <span className="text-sm">
-                {selectedProjects.length} of {scanResult.projects.length} projects selected
+                {selectedProjects.length} of {scanResult.projects.length} projects
+                selected
               </span>
               <Button variant="link" size="sm" onClick={handleSelectAll}>
                 Select All
@@ -347,7 +423,7 @@ const BakerPageContent: React.FC = () => {
                 Clear Selection
               </Button>
             </div>
-            <Button 
+            <Button
               onClick={handleApplyChanges}
               disabled={selectedProjects.length === 0 || isUpdating}
             >
@@ -373,9 +449,12 @@ const BakerPageContent: React.FC = () => {
           <div className="flex items-center">
             <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
             <span className="text-green-800">
-              Update complete: {lastUpdateResult.successful.length} successful, {lastUpdateResult.failed.length} failed
-              {lastUpdateResult.created.length > 0 && ` • ${lastUpdateResult.created.length} created`}
-              {lastUpdateResult.updated.length > 0 && ` • ${lastUpdateResult.updated.length} updated`}
+              Update complete: {lastUpdateResult.successful.length} successful,{' '}
+              {lastUpdateResult.failed.length} failed
+              {lastUpdateResult.created.length > 0 &&
+                ` • ${lastUpdateResult.created.length} created`}
+              {lastUpdateResult.updated.length > 0 &&
+                ` • ${lastUpdateResult.updated.length} updated`}
             </span>
           </div>
         </div>
@@ -391,9 +470,7 @@ const BakerPage: React.FC = () => {
         <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center">
           <div className="max-w-md">
             <AlertTriangle className="h-12 w-12 text-red-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-              Baker Error
-            </h2>
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Baker Error</h2>
             <div className="text-gray-600 mb-6">
               <p>An error occurred while loading the Baker page. This could be due to:</p>
               <ul className="text-left mt-2 space-y-1">
@@ -403,9 +480,13 @@ const BakerPage: React.FC = () => {
               </ul>
               {error && process.env.NODE_ENV === 'development' && (
                 <details className="mt-4 text-left bg-gray-50 p-4 rounded-md text-sm">
-                  <summary className="cursor-pointer font-medium">Technical Details</summary>
+                  <summary className="cursor-pointer font-medium">
+                    Technical Details
+                  </summary>
                   <div className="mt-2">
-                    <p><strong>Error:</strong> {error.message}</p>
+                    <p>
+                      <strong>Error:</strong> {error.message}
+                    </p>
                   </div>
                 </details>
               )}
@@ -417,7 +498,7 @@ const BakerPage: React.FC = () => {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => window.location.href = '/ingest/build'}
+                onClick={() => (window.location.href = '/ingest/build')}
                 className="flex-1"
               >
                 Back to Build
