@@ -12,6 +12,7 @@ import { FolderSelector } from '@components/Baker/FolderSelector'
 import { ProjectList } from '@components/Baker/ProjectList'
 import { ScanResults } from '@components/Baker/ScanResults'
 import ErrorBoundary from '@components/ErrorBoundary'
+import { Button } from '@components/ui/button'
 import { useBakerPreferences } from '@hooks/useBakerPreferences'
 import { useBakerScan } from '@hooks/useBakerScan'
 import { useBakerTrelloIntegration } from '@hooks/useBakerTrelloIntegration'
@@ -290,16 +291,17 @@ const BakerPage: React.FC = () => {
               )}
             </div>
             <div className="flex gap-2 justify-center">
-              <button onClick={retry} className="flex-1">
+              <Button onClick={retry} className="flex-1">
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Retry
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={() => (window.location.href = '/ingest/build')}
+                variant="outline"
                 className="flex-1"
               >
                 Back to Build
-              </button>
+              </Button>
             </div>
           </div>
         </div>
