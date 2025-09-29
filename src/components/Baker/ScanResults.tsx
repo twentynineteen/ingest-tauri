@@ -41,7 +41,7 @@ export const ScanResults: React.FC<ScanResultsProps> = ({
   // Show results summary after scan
   return (
     <div className="border rounded-lg p-6">
-      <div className="grid grid-cols-6 gap-4 text-center">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-center">
         <div>
           <p className="text-2xl font-bold">{scanResult.totalFolders}</p>
           <p className="text-sm text-gray-500">Folders Scanned</p>
