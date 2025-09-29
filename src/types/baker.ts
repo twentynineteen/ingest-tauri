@@ -199,11 +199,37 @@ export interface BreadcrumbsDiff {
   }
 }
 
+export interface DetailedFieldChange extends FieldChange {
+  fieldDisplayName: string
+  formattedOldValue: string
+  formattedNewValue: string
+  category: 'content' | 'metadata' | 'maintenance'
+  impact: 'high' | 'medium' | 'low'
+}
+
+export interface ProjectChangeDetail {
+  projectPath: string
+  projectName: string
+  hasChanges: boolean
+  changeCategories: {
+    content: DetailedFieldChange[]
+    metadata: DetailedFieldChange[]
+    maintenance: DetailedFieldChange[]
+  }
+  summary: {
+    contentChanges: number
+    metadataChanges: number
+    maintenanceChanges: number
+    totalChanges: number
+  }
+}
+
 export interface BreadcrumbsPreview {
   current: BreadcrumbsFile | null
   updated: BreadcrumbsFile
   diff: BreadcrumbsDiff // Full diff including maintenance fields (for display)
   meaningfulDiff?: BreadcrumbsDiff // Only meaningful changes (for confirmation logic)
+  detailedChanges?: ProjectChangeDetail // Enhanced detailed change information
 }
 
 export interface BreadcrumbsViewerProps {
