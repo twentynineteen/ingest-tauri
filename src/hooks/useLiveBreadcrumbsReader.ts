@@ -9,6 +9,9 @@ import { invoke } from '@tauri-apps/api/core'
 import { useCallback, useState } from 'react'
 import type { BreadcrumbsFile, FileInfo } from '../types/baker'
 
+// Constants
+const RAW_CONTENT_PREVIEW_LIMIT = 200
+
 interface UseLiveBreadcrumbsReaderResult {
   breadcrumbs: BreadcrumbsFile | null
   isLoading: boolean
@@ -114,7 +117,7 @@ export function useLiveBreadcrumbsReader(): UseLiveBreadcrumbsReaderResult {
           }
           
           setBreadcrumbs(fallbackBreadcrumbs)
-          setError(`Warning: Breadcrumbs file is corrupted. Showing data recovered from file system. Raw content: ${rawContent.substring(0, 200)}${rawContent.length > 200 ? '...' : ''}`)
+          setError(`Warning: Breadcrumbs file is corrupted. Showing data recovered from file system. Raw content: ${rawContent.substring(0, RAW_CONTENT_PREVIEW_LIMIT)}${rawContent.length > RAW_CONTENT_PREVIEW_LIMIT ? '...' : ''}`)
           return
         }
       } catch {
