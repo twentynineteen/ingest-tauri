@@ -462,8 +462,12 @@ export function categorizeField(
     scannedBy: { category: 'maintenance', impact: 'low' }
   } as const
 
-  return fieldCategories[field as keyof typeof fieldCategories] || { category: 'metadata', impact: 'medium' }
-}
+  if (fieldCategories[field as keyof typeof fieldCategories]) {
+    return fieldCategories[field as keyof typeof fieldCategories];
+  } else {
+    console.warn(`[breadcrumbsComparison] Unknown field encountered in categorizeField: '${field}'. Defaulting to category 'metadata' with 'medium' impact.`);
+    return { category: 'metadata', impact: 'medium' };
+  }
 
 /**
  * Create detailed field change with formatted values and categorization
