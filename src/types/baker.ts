@@ -11,6 +11,7 @@ export interface ProjectFolder {
   isValid: boolean
   hasBreadcrumbs: boolean
   staleBreadcrumbs: boolean // true if breadcrumbs file differs from actual folder content
+  invalidBreadcrumbs: boolean // true if breadcrumbs file exists but is corrupted/unparseable
   lastScanned: string // ISO timestamp
   cameraCount: number
   validationErrors: string[]

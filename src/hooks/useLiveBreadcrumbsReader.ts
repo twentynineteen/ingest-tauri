@@ -28,12 +28,21 @@ export function useLiveBreadcrumbsReader(): UseLiveBreadcrumbsReaderResult {
 
     try {
       // Read existing breadcrumbs file for metadata
-      const existingBreadcrumbs = await invoke<BreadcrumbsFile | null>(
-        'baker_read_breadcrumbs',
-        {
-          projectPath
-        }
-      )
+      let existingBreadcrumbs: BreadcrumbsFile | null = null
+      try {
+        existingBreadcrumbs = await invoke<BreadcrumbsFile | null>(
+          'baker_read_breadcrumbs',
+          {
+            projectPath
+          }
+        )
+      } catch (breadcrumbsError) {
+        console.warn(
+          `Failed to read existing breadcrumbs for ${projectPath}:`,
+          breadcrumbsError
+        )
+        // Continue without existing breadcrumbs - will create from file system
+      }
 
       // Get actual current files from file system
       let actualFiles: FileInfo[] = []
@@ -77,10 +86,44 @@ export function useLiveBreadcrumbsReader(): UseLiveBreadcrumbsReaderResult {
         setError('No breadcrumbs file found and no files detected in project')
       }
     } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to read project data'
-      setError(errorMessage)
-      setBreadcrumbs(null)
+      // Check if we have an invalid breadcrumbs file that we can show raw content for
+      try {
+        const rawContent = await invoke<string | null>('baker_read_raw_breadcrumbs', {
+          projectPath
+        })
+        
+        if (rawContent) {
+          // We have a corrupted breadcrumbs file - try to get file system data as fallback
+          let actualFiles: FileInfo[] = []
+          try {
+            actualFiles = await invoke<FileInfo[]>('baker_scan_current_files', {
+              projectPath
+            })
+          } catch {
+            // Ignore file scan errors
+          }
+          
+          const projectName = projectPath.split('/').pop() || 'Unknown Project'
+          const fallbackBreadcrumbs: BreadcrumbsFile = {
+            projectTitle: projectName,
+            numberOfCameras: Math.max(1, Math.max(...actualFiles.map(f => f.camera), 0)),
+            files: actualFiles,
+            parentFolder: projectPath.split('/').slice(0, -1).join('/'),
+            createdBy: 'Baker (recovered from file system)',
+            creationDateTime: new Date().toISOString()
+          }
+          
+          setBreadcrumbs(fallbackBreadcrumbs)
+          setError(`Warning: Breadcrumbs file is corrupted. Showing data recovered from file system. Raw content: ${rawContent.substring(0, 200)}${rawContent.length > 200 ? '...' : ''}`)
+          return
+        }
+      } catch {
+        // Ignore raw content read errors - fallback to regular error handling
+        const errorMessage =
+          err instanceof Error ? err.message : 'Failed to read project data'
+        setError(errorMessage)
+        setBreadcrumbs(null)
+      }
     } finally {
       setIsLoading(false)
     }

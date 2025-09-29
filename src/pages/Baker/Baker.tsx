@@ -423,7 +423,7 @@ const BakerPageContent: React.FC = () => {
       {/* Results Summary */}
       {scanResult && !isScanning && (
         <div className="border rounded-lg p-6">
-          <div className="grid grid-cols-5 gap-4 text-center">
+          <div className="grid grid-cols-6 gap-4 text-center">
             <div>
               <p className="text-2xl font-bold">{scanResult.totalFolders}</p>
               <p className="text-sm text-gray-500">Folders Scanned</p>
@@ -436,9 +436,15 @@ const BakerPageContent: React.FC = () => {
             </div>
             <div>
               <p className="text-2xl font-bold text-blue-600">
-                {scanResult.projects.filter(p => p.hasBreadcrumbs).length}
+                {scanResult.projects.filter(p => p.hasBreadcrumbs && !p.invalidBreadcrumbs).length}
               </p>
-              <p className="text-sm text-gray-500">With Breadcrumbs</p>
+              <p className="text-sm text-gray-500">Valid Breadcrumbs</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-red-600">
+                {scanResult.projects.filter(p => p.invalidBreadcrumbs).length}
+              </p>
+              <p className="text-sm text-gray-500">Invalid Breadcrumbs</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-purple-600">
@@ -489,9 +495,17 @@ const BakerPageContent: React.FC = () => {
                         {project.isValid ? 'Valid' : 'Invalid'}
                       </span>
                       <span
-                        className={`px-2 py-1 rounded ${project.hasBreadcrumbs ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}
+                        className={`px-2 py-1 rounded ${
+                          project.invalidBreadcrumbs 
+                            ? 'bg-red-100 text-red-800'
+                            : project.hasBreadcrumbs 
+                            ? 'bg-blue-100 text-blue-800' 
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
                       >
-                        {project.hasBreadcrumbs
+                        {project.invalidBreadcrumbs 
+                          ? 'Invalid breadcrumbs'
+                          : project.hasBreadcrumbs
                           ? 'Has breadcrumbs'
                           : 'Missing breadcrumbs'}
                       </span>
@@ -506,7 +520,7 @@ const BakerPageContent: React.FC = () => {
                         {project.cameraCount} camera{project.cameraCount !== 1 ? 's' : ''}
                       </span>
                     </div>
-                    {project.hasBreadcrumbs && (
+                    {(project.hasBreadcrumbs || project.invalidBreadcrumbs) && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -514,7 +528,7 @@ const BakerPageContent: React.FC = () => {
                         className="ml-2"
                       >
                         <Eye className="h-4 w-4 mr-1" />
-                        {expandedProject === project.path ? 'Hide' : 'View'}
+                        {expandedProject === project.path ? 'Hide' : project.invalidBreadcrumbs ? 'View (Corrupted)' : 'View'}
                       </Button>
                     )}
                   </div>

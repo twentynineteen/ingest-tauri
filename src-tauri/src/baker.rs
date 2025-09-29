@@ -34,6 +34,8 @@ pub struct ProjectFolder {
     camera_count: i32,
     #[serde(rename = "validationErrors")]
     validation_errors: Vec<String>,
+    #[serde(rename = "invalidBreadcrumbs")]
+    invalid_breadcrumbs: bool,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -201,7 +203,10 @@ fn check_breadcrumbs_stale(path: &Path) -> Result<bool, std::io::Error> {
     let content = fs::read_to_string(&breadcrumbs_path)?;
     let existing_breadcrumbs: BreadcrumbsFile = match serde_json::from_str(&content) {
         Ok(breadcrumbs) => breadcrumbs,
-        Err(_) => return Ok(true), // Corrupted breadcrumbs file = stale
+        Err(parse_err) => {
+            println!("[Baker] Breadcrumbs parsing failed for {}: {}", path.display(), parse_err);
+            return Ok(false); // Corrupted/invalid breadcrumbs should not be treated as stale but as non-existent
+        }
     };
     
     // Scan actual current files
@@ -279,6 +284,31 @@ fn check_breadcrumbs_stale(path: &Path) -> Result<bool, std::io::Error> {
     Ok(false) // Files match = not stale
 }
 
+fn has_invalid_breadcrumbs_file(path: &Path) -> bool {
+    let breadcrumbs_path = path.join("breadcrumbs.json");
+    
+    if !breadcrumbs_path.exists() {
+        return false; // No file = not invalid
+    }
+    
+    // Check if file exists but is not parseable
+    match fs::read_to_string(&breadcrumbs_path) {
+        Ok(content) => {
+            match serde_json::from_str::<BreadcrumbsFile>(&content) {
+                Ok(_) => false, // Valid file
+                Err(_) => {
+                    println!("[Baker] Invalid breadcrumbs file detected: {}", path.display());
+                    true // Invalid/corrupted file
+                }
+            }
+        }
+        Err(_) => {
+            println!("[Baker] Unreadable breadcrumbs file detected: {}", path.display());
+            true // Unreadable file
+        }
+    }
+}
+
 fn validate_project_folder(path: &Path) -> (bool, Vec<String>, i32) {
     let mut errors = Vec::new();
     let mut camera_count = 0;
@@ -323,12 +353,31 @@ fn validate_project_folder(path: &Path) -> (bool, Vec<String>, i32) {
 
 fn has_breadcrumbs_file(path: &Path) -> bool {
     let breadcrumbs_path = path.join("breadcrumbs.json");
-    let exists = breadcrumbs_path.exists();
     
-    // Debug logging - show both positive and negative results
-    println!("[Baker] Breadcrumbs check: {} -> {}", path.display(), if exists { "FOUND" } else { "MISSING" });
+    if !breadcrumbs_path.exists() {
+        println!("[Baker] Breadcrumbs check: {} -> MISSING (file not found)", path.display());
+        return false;
+    }
     
-    exists
+    // Verify the file is valid JSON and parseable
+    match fs::read_to_string(&breadcrumbs_path) {
+        Ok(content) => {
+            match serde_json::from_str::<BreadcrumbsFile>(&content) {
+                Ok(_) => {
+                    println!("[Baker] Breadcrumbs check: {} -> FOUND (valid)", path.display());
+                    true
+                }
+                Err(e) => {
+                    println!("[Baker] Breadcrumbs check: {} -> INVALID (parse error: {})", path.display(), e);
+                    false
+                }
+            }
+        }
+        Err(e) => {
+            println!("[Baker] Breadcrumbs check: {} -> INVALID (read error: {})", path.display(), e);
+            false
+        }
+    }
 }
 
 fn scan_directory_recursive(
@@ -408,13 +457,14 @@ fn scan_directory_recursive(
                 // Check if this folder is a valid project
                 let (is_valid, validation_errors, camera_count) = validate_project_folder(&path);
                 let has_breadcrumbs = has_breadcrumbs_file(&path);
+                let invalid_breadcrumbs = has_invalid_breadcrumbs_file(&path);
                 
                 // Debug logging for each folder checked
-                println!("[Baker] Sub-folder: {} | Valid: {} | HasBreadcrumbs: {} | CameraCount: {}", 
-                    path.display(), is_valid, has_breadcrumbs, camera_count);
+                println!("[Baker] Sub-folder: {} | Valid: {} | HasBreadcrumbs: {} | InvalidBreadcrumbs: {} | CameraCount: {}", 
+                    path.display(), is_valid, has_breadcrumbs, invalid_breadcrumbs, camera_count);
                 
-                // Include folder if it's either valid OR has breadcrumbs
-                if is_valid || has_breadcrumbs {
+                // Include folder if it's either valid OR has breadcrumbs OR has invalid breadcrumbs
+                if is_valid || has_breadcrumbs || invalid_breadcrumbs {
                     if is_valid {
                         result.valid_projects += 1;
                     }
@@ -434,6 +484,7 @@ fn scan_directory_recursive(
                         last_scanned: get_current_timestamp(),
                         camera_count,
                         validation_errors: validation_errors.clone(),
+                        invalid_breadcrumbs,
                     };
 
                     // Calculate and accumulate folder size
@@ -461,12 +512,13 @@ fn scan_directory_recursive(
                 }
 
                 // Emit discovery event for valid projects or folders with breadcrumbs
-                if is_valid || has_breadcrumbs {
+                if is_valid || has_breadcrumbs || invalid_breadcrumbs {
                     let discovery_event = serde_json::json!({
                         "scanId": scan_id,
                         "projectPath": path.to_string_lossy(),
                         "isValid": is_valid,
                         "hasBreadcrumbs": has_breadcrumbs,
+                        "invalidBreadcrumbs": invalid_breadcrumbs,
                         "errors": validation_errors
                     });
 
@@ -481,18 +533,20 @@ fn scan_directory_recursive(
     // First check the root directory itself
     let (is_valid, validation_errors, camera_count) = validate_project_folder(root_path);
     let has_breadcrumbs = has_breadcrumbs_file(root_path);
+    let invalid_breadcrumbs = has_invalid_breadcrumbs_file(root_path);
     
     println!("[Baker] ===== ROOT FOLDER ANALYSIS =====");
     println!("[Baker] Path: {}", root_path.display());
     println!("[Baker] Valid BuildProject: {}", is_valid);
     println!("[Baker] Has breadcrumbs.json: {}", has_breadcrumbs);
+    println!("[Baker] Invalid breadcrumbs.json: {}", invalid_breadcrumbs);
     println!("[Baker] Camera count: {}", camera_count);
     if !validation_errors.is_empty() {
         println!("[Baker] Validation errors: {:?}", validation_errors);
     }
     println!("[Baker] ================================");
     
-    if is_valid || has_breadcrumbs {
+    if is_valid || has_breadcrumbs || invalid_breadcrumbs {
         if is_valid {
             result.valid_projects += 1;
         }
@@ -512,6 +566,7 @@ fn scan_directory_recursive(
             last_scanned: get_current_timestamp(),
             camera_count,
             validation_errors: validation_errors.clone(),
+            invalid_breadcrumbs,
         };
 
         // Calculate and accumulate folder size for root folder
@@ -526,6 +581,7 @@ fn scan_directory_recursive(
             "projectPath": root_path.to_string_lossy(),
             "isValid": is_valid,
             "hasBreadcrumbs": has_breadcrumbs,
+            "invalidBreadcrumbs": invalid_breadcrumbs,
             "errors": validation_errors
         });
         let _ = app_handle.emit("baker_scan_discovery", discovery_event);
@@ -688,6 +744,7 @@ pub async fn baker_validate_folder(folder_path: String) -> Result<ProjectFolder,
 
     let (is_valid, validation_errors, camera_count) = validate_project_folder(path);
     let has_breadcrumbs = has_breadcrumbs_file(path);
+    let invalid_breadcrumbs = has_invalid_breadcrumbs_file(path);
     let stale_breadcrumbs = if has_breadcrumbs { 
         check_breadcrumbs_stale(path).unwrap_or(false) 
     } else { 
@@ -707,6 +764,7 @@ pub async fn baker_validate_folder(folder_path: String) -> Result<ProjectFolder,
         last_scanned: get_current_timestamp(),
         camera_count,
         validation_errors,
+        invalid_breadcrumbs,
     })
 }
 
@@ -990,4 +1048,24 @@ pub async fn get_folder_size(folder_path: String) -> Result<u64, String> {
     }
     
     calculate_folder_size(path).map_err(|e| format!("Failed to calculate folder size: {}", e))
+}
+
+#[tauri::command]
+pub async fn baker_read_raw_breadcrumbs(project_path: String) -> Result<Option<String>, String> {
+    let path = Path::new(&project_path);
+    
+    if !path.exists() {
+        return Err("Project path does not exist".to_string());
+    }
+
+    let breadcrumbs_path = path.join("breadcrumbs.json");
+    
+    if !breadcrumbs_path.exists() {
+        return Ok(None);
+    }
+
+    match fs::read_to_string(&breadcrumbs_path) {
+        Ok(content) => Ok(Some(content)),
+        Err(e) => Err(format!("Failed to read breadcrumbs file: {}", e))
+    }
 }
