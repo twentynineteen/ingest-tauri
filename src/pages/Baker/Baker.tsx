@@ -217,6 +217,8 @@ const BakerPageContent: React.FC = () => {
           isLoadingBreadcrumbs={isLoadingBreadcrumbs}
           breadcrumbsError={breadcrumbsError}
           getPreview={getPreview}
+          trelloApiKey={apiKey}
+          trelloApiToken={token}
         />
       )}
 

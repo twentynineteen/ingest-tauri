@@ -25,13 +25,17 @@ import React from 'react'
 import type { BreadcrumbsViewerProps, FieldChange } from '../types/baker'
 import { formatFieldValue, formatBreadcrumbDateSimple } from '../utils/breadcrumbsComparison'
 import { Button } from './ui/button'
+import { VideoLinksManager } from './Baker/VideoLinksManager'
+import { TrelloCardsManager } from './Baker/TrelloCardsManager'
 
 export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
   breadcrumbs,
   projectPath,
   previewMode = false,
   preview,
-  onTogglePreview
+  onTogglePreview,
+  trelloApiKey,
+  trelloApiToken
 }) => {
   // Use centralized date formatting utility
   const formatDate = formatBreadcrumbDateSimple
@@ -454,6 +458,20 @@ export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
           <p className="text-xs">No files recorded in breadcrumbs</p>
         </div>
       )}
+
+      {/* Video Links Section - Feature 004 */}
+      <div className="border-t pt-4 mt-4">
+        <VideoLinksManager projectPath={projectPath} />
+      </div>
+
+      {/* Trello Cards Section - Feature 004 */}
+      <div className="border-t pt-4 mt-4">
+        <TrelloCardsManager
+          projectPath={projectPath}
+          trelloApiKey={trelloApiKey}
+          trelloApiToken={trelloApiToken}
+        />
+      </div>
     </div>
   )
 

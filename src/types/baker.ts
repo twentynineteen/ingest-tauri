@@ -5,8 +5,9 @@
  * and breadcrumbs management functionality.
  */
 
-// Re-export media types for convenience
-export type { VideoLink, TrelloCard } from './media'
+// Import and re-export media types for convenience
+import type { VideoLink, TrelloCard } from './media'
+export type { VideoLink, TrelloCard }
 
 export interface ProjectFolder {
   path: string
@@ -250,4 +251,6 @@ export interface BreadcrumbsViewerProps {
   previewMode?: boolean
   preview?: BreadcrumbsPreview
   onTogglePreview?: () => void
+  trelloApiKey?: string
+  trelloApiToken?: string
 }
