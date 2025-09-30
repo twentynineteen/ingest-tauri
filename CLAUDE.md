@@ -105,8 +105,33 @@ All file operations go through Tauri backend with progress tracking. Key pattern
 
 ### External Integrations
 - **Adobe Premiere**: Project template generation
-- **Trello**: Project management card updates
-- **Sprout Video**: Video hosting + posterframe generation
+- **Trello**: Project management card updates via REST API (GET /1/cards/{id})
+- **Sprout Video**: Video hosting + posterframe generation, thumbnails cached in breadcrumbs
+
+### Recent Features
+
+#### Phase 004: Multiple Video Links and Trello Cards (Branch: 004-embed-multiple-video)
+- **Status**: Phase 1 Design Complete (data models, contracts, tests planned)
+- **Summary**: Enhanced breadcrumbs.json to support arrays of video links and Trello cards instead of single values
+- **Key Changes**:
+  - New `videoLinks[]` array field (replaces implicit single video)
+  - New `trelloCards[]` array field (replaces single `trelloCardUrl`)
+  - Backward-compatible: Legacy `trelloCardUrl` preserved for old file readers
+  - Sprout Video thumbnails cached in breadcrumbs (no real-time API calls)
+  - Trello card titles fetched via API and cached (7-day refresh)
+- **Data Models**: See `specs/004-embed-multiple-video/data-model.md`
+- **API Contracts**: See `specs/004-embed-multiple-video/contracts/tauri-commands.md`
+- **User Workflows**: See `specs/004-embed-multiple-video/quickstart.md`
+
+#### Phase 003: Baker Workflow (Branch: 003-a-new-feature - MERGED)
+- Folder scanning and breadcrumbs batch management
+- Stale breadcrumbs detection and validation
+- Detailed change previews before applying updates
+
+#### Phase 002: Legacy Code Modernization (MERGED)
+- Migrated from useEffect to TanStack React Query for data fetching
+- Refactored large components into focused, reusable pieces
+- Improved error handling and loading states
 
 ## Development Notes
 

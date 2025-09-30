@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "Bucket"
-version = "0.8.2"
+version = "0.8.3"
 dependencies = [
  "argon2",
  "base64ct",
@@ -17,6 +17,7 @@ dependencies = [
  "log",
  "quick-xml 0.29.0",
  "rand 0.8.5",
+ "regex",
  "reqwest 0.11.27",
  "serde",
  "serde_json",

@@ -7,6 +7,9 @@ use std::time::{Duration, Instant};
 use tauri::{AppHandle, Emitter, State};
 use uuid::Uuid;
 
+// Import media types
+use app_lib::media::{VideoLink, TrelloCard};
+
 // Performance optimization constants
 const PROGRESS_UPDATE_INTERVAL: Duration = Duration::from_millis(100); // Update UI every 100ms
 const SKIP_PATTERNS: &[&str] = &[
@@ -41,24 +44,35 @@ pub struct ProjectFolder {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct BreadcrumbsFile {
     #[serde(rename = "projectTitle")]
-    project_title: String,
+    pub project_title: String,
     #[serde(rename = "numberOfCameras")]
-    number_of_cameras: i32,
-    files: Vec<FileInfo>,
+    pub number_of_cameras: i32,
+    pub files: Vec<FileInfo>,
     #[serde(rename = "parentFolder")]
-    parent_folder: String,
+    pub parent_folder: String,
     #[serde(rename = "createdBy")]
-    created_by: String,
+    pub created_by: String,
     #[serde(rename = "creationDateTime")]
-    creation_date_time: String,
+    pub creation_date_time: String,
     #[serde(rename = "folderSizeBytes")]
-    folder_size_bytes: Option<u64>,
+    pub folder_size_bytes: Option<u64>,
     #[serde(rename = "lastModified")]
-    last_modified: Option<String>,
+    pub last_modified: Option<String>,
     #[serde(rename = "scannedBy")]
-    scanned_by: Option<String>,
+    pub scanned_by: Option<String>,
+
+    // === DEPRECATED FIELD (keep for backward compatibility) ===
     #[serde(rename = "trelloCardUrl")]
-    trello_card_url: Option<String>,
+    pub trello_card_url: Option<String>,
+
+    // === NEW FIELDS (Phase 004) ===
+    /// Array of video links associated with this project
+    #[serde(rename = "videoLinks", skip_serializing_if = "Option::is_none")]
+    pub video_links: Option<Vec<VideoLink>>,
+
+    /// Array of Trello cards associated with this project
+    #[serde(rename = "trelloCards", skip_serializing_if = "Option::is_none")]
+    pub trello_cards: Option<Vec<TrelloCard>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -920,6 +934,8 @@ pub async fn baker_update_breadcrumbs(
                                 last_modified: Some(get_current_timestamp()),
                                 scanned_by: Some("Baker".to_string()),
                                 trello_card_url: None,
+                                video_links: None,
+                                trello_cards: None,
                             }
                         }
                     }
@@ -945,6 +961,8 @@ pub async fn baker_update_breadcrumbs(
                 last_modified: Some(get_current_timestamp()),
                 scanned_by: Some("Baker".to_string()),
                 trello_card_url: None,
+                video_links: None,
+                trello_cards: None,
             }
         };
 
@@ -1053,13 +1071,13 @@ pub async fn get_folder_size(folder_path: String) -> Result<u64, String> {
 #[tauri::command]
 pub async fn baker_read_raw_breadcrumbs(project_path: String) -> Result<Option<String>, String> {
     let path = Path::new(&project_path);
-    
+
     if !path.exists() {
         return Err("Project path does not exist".to_string());
     }
 
     let breadcrumbs_path = path.join("breadcrumbs.json");
-    
+
     if !breadcrumbs_path.exists() {
         return Ok(None);
     }
@@ -1068,4 +1086,334 @@ pub async fn baker_read_raw_breadcrumbs(project_path: String) -> Result<Option<S
         Ok(content) => Ok(Some(content)),
         Err(e) => Err(format!("Failed to read breadcrumbs file: {}", e))
     }
+}
+
+// ============================================================================
+// Feature 004: Multiple Video Links and Trello Cards
+// ============================================================================
+
+/// Helper: Extract Trello card ID from URL
+fn extract_trello_card_id(url: &str) -> Option<String> {
+    let re = regex::Regex::new(r"trello\.com/c/([a-zA-Z0-9]{8,24})").ok()?;
+    re.captures(url)?.get(1).map(|m| m.as_str().to_string())
+}
+
+/// Helper: Migrate legacy trelloCardUrl to trelloCards array
+fn migrate_trello_card_url(breadcrumbs: &BreadcrumbsFile) -> Vec<TrelloCard> {
+    // If already has new format, return it
+    if let Some(cards) = &breadcrumbs.trello_cards {
+        if !cards.is_empty() {
+            return cards.clone();
+        }
+    }
+
+    // If has legacy format, migrate it
+    if let Some(url) = &breadcrumbs.trello_card_url {
+        if let Some(card_id) = extract_trello_card_id(url) {
+            return vec![TrelloCard {
+                url: url.clone(),
+                card_id: card_id.clone(),
+                title: format!("Card {}", card_id), // Default title
+                board_name: None,
+                last_fetched: None,
+            }];
+        }
+    }
+
+    Vec::new()
+}
+
+/// Helper: Ensure backward compatible write (updates trelloCardUrl field)
+fn ensure_backward_compatible_write(breadcrumbs: &mut BreadcrumbsFile) {
+    if let Some(cards) = &breadcrumbs.trello_cards {
+        if !cards.is_empty() {
+            breadcrumbs.trello_card_url = Some(cards[0].url.clone());
+        } else {
+            breadcrumbs.trello_card_url = None;
+        }
+    } else {
+        breadcrumbs.trello_card_url = None;
+    }
+}
+
+/// Helper: Write breadcrumbs file to disk
+fn write_breadcrumbs_file(project_path: &str, breadcrumbs: &BreadcrumbsFile) -> Result<(), String> {
+    let path = Path::new(project_path);
+    let breadcrumbs_path = path.join("breadcrumbs.json");
+
+    let json = serde_json::to_string_pretty(breadcrumbs)
+        .map_err(|e| format!("Failed to serialize breadcrumbs: {}", e))?;
+
+    fs::write(&breadcrumbs_path, json)
+        .map_err(|e| format!("Failed to write breadcrumbs file: {}", e))?;
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn baker_get_video_links(project_path: String) -> Result<Vec<VideoLink>, String> {
+    let breadcrumbs = baker_read_breadcrumbs(project_path).await?;
+
+    match breadcrumbs {
+        Some(b) => Ok(b.video_links.unwrap_or_default()),
+        None => Ok(Vec::new()),
+    }
+}
+
+#[tauri::command]
+pub async fn baker_associate_video_link(
+    project_path: String,
+    video_link: VideoLink,
+) -> Result<BreadcrumbsFile, String> {
+    let mut breadcrumbs = baker_read_breadcrumbs(project_path.clone())
+        .await?
+        .ok_or("No breadcrumbs file found")?;
+
+    // Initialize video_links if None
+    if breadcrumbs.video_links.is_none() {
+        breadcrumbs.video_links = Some(Vec::new());
+    }
+
+    let videos = breadcrumbs.video_links.as_mut().unwrap();
+
+    // Validate max 20 videos
+    if videos.len() >= 20 {
+        return Err("Maximum of 20 videos per project reached".to_string());
+    }
+
+    // Add new video
+    videos.push(video_link);
+
+    // Update last_modified timestamp
+    breadcrumbs.last_modified = Some(chrono::Utc::now().to_rfc3339());
+
+    // Write to disk
+    write_breadcrumbs_file(&project_path, &breadcrumbs)?;
+
+    Ok(breadcrumbs)
+}
+
+#[tauri::command]
+pub async fn baker_remove_video_link(
+    project_path: String,
+    video_index: usize,
+) -> Result<BreadcrumbsFile, String> {
+    let mut breadcrumbs = baker_read_breadcrumbs(project_path.clone())
+        .await?
+        .ok_or("No breadcrumbs file found")?;
+
+    let videos = breadcrumbs
+        .video_links
+        .as_mut()
+        .ok_or("No videos found")?;
+
+    if video_index >= videos.len() {
+        return Err("Video index out of bounds".to_string());
+    }
+
+    videos.remove(video_index);
+
+    // Update last_modified timestamp
+    breadcrumbs.last_modified = Some(chrono::Utc::now().to_rfc3339());
+
+    // Write to disk
+    write_breadcrumbs_file(&project_path, &breadcrumbs)?;
+
+    Ok(breadcrumbs)
+}
+
+#[tauri::command]
+pub async fn baker_update_video_link(
+    project_path: String,
+    video_index: usize,
+    updated_link: VideoLink,
+) -> Result<BreadcrumbsFile, String> {
+    let mut breadcrumbs = baker_read_breadcrumbs(project_path.clone())
+        .await?
+        .ok_or("No breadcrumbs file found")?;
+
+    let videos = breadcrumbs
+        .video_links
+        .as_mut()
+        .ok_or("No videos found")?;
+
+    if video_index >= videos.len() {
+        return Err("Video index out of bounds".to_string());
+    }
+
+    videos[video_index] = updated_link;
+
+    // Update last_modified timestamp
+    breadcrumbs.last_modified = Some(chrono::Utc::now().to_rfc3339());
+
+    // Write to disk
+    write_breadcrumbs_file(&project_path, &breadcrumbs)?;
+
+    Ok(breadcrumbs)
+}
+
+#[tauri::command]
+pub async fn baker_reorder_video_links(
+    project_path: String,
+    from_index: usize,
+    to_index: usize,
+) -> Result<BreadcrumbsFile, String> {
+    let mut breadcrumbs = baker_read_breadcrumbs(project_path.clone())
+        .await?
+        .ok_or("No breadcrumbs file found")?;
+
+    let videos = breadcrumbs
+        .video_links
+        .as_mut()
+        .ok_or("No videos found")?;
+
+    if from_index >= videos.len() || to_index >= videos.len() {
+        return Err("Index out of bounds".to_string());
+    }
+
+    let video = videos.remove(from_index);
+    videos.insert(to_index, video);
+
+    // Update last_modified timestamp
+    breadcrumbs.last_modified = Some(chrono::Utc::now().to_rfc3339());
+
+    // Write to disk
+    write_breadcrumbs_file(&project_path, &breadcrumbs)?;
+
+    Ok(breadcrumbs)
+}
+
+#[tauri::command]
+pub async fn baker_get_trello_cards(project_path: String) -> Result<Vec<TrelloCard>, String> {
+    let breadcrumbs = baker_read_breadcrumbs(project_path).await?;
+
+    match breadcrumbs {
+        Some(b) => {
+            // Migration: If no trelloCards array but trelloCardUrl exists, migrate in-memory
+            Ok(migrate_trello_card_url(&b))
+        },
+        None => Ok(Vec::new()),
+    }
+}
+
+#[tauri::command]
+pub async fn baker_associate_trello_card(
+    project_path: String,
+    trello_card: TrelloCard,
+) -> Result<BreadcrumbsFile, String> {
+    let mut breadcrumbs = baker_read_breadcrumbs(project_path.clone())
+        .await?
+        .ok_or("No breadcrumbs file found")?;
+
+    // Initialize trello_cards if None
+    if breadcrumbs.trello_cards.is_none() {
+        breadcrumbs.trello_cards = Some(Vec::new());
+    }
+
+    let cards = breadcrumbs.trello_cards.as_mut().unwrap();
+
+    // Validate max 10 cards
+    if cards.len() >= 10 {
+        return Err("Maximum of 10 Trello cards per project reached".to_string());
+    }
+
+    // Check for duplicate cardId
+    if cards.iter().any(|c| c.card_id == trello_card.card_id) {
+        return Err("This Trello card is already associated with the project".to_string());
+    }
+
+    // Add new card
+    cards.push(trello_card);
+
+    // Update backward-compatible field
+    ensure_backward_compatible_write(&mut breadcrumbs);
+
+    // Update last_modified timestamp
+    breadcrumbs.last_modified = Some(chrono::Utc::now().to_rfc3339());
+
+    // Write to disk
+    write_breadcrumbs_file(&project_path, &breadcrumbs)?;
+
+    Ok(breadcrumbs)
+}
+
+#[tauri::command]
+pub async fn baker_remove_trello_card(
+    project_path: String,
+    card_index: usize,
+) -> Result<BreadcrumbsFile, String> {
+    let mut breadcrumbs = baker_read_breadcrumbs(project_path.clone())
+        .await?
+        .ok_or("No breadcrumbs file found")?;
+
+    let cards = breadcrumbs
+        .trello_cards
+        .as_mut()
+        .ok_or("No cards found")?;
+
+    if card_index >= cards.len() {
+        return Err("Card index out of bounds".to_string());
+    }
+
+    cards.remove(card_index);
+
+    // Update backward-compatible field
+    ensure_backward_compatible_write(&mut breadcrumbs);
+
+    // Update last_modified timestamp
+    breadcrumbs.last_modified = Some(chrono::Utc::now().to_rfc3339());
+
+    // Write to disk
+    write_breadcrumbs_file(&project_path, &breadcrumbs)?;
+
+    Ok(breadcrumbs)
+}
+
+#[tauri::command]
+pub async fn baker_fetch_trello_card_details(
+    card_url: String,
+    api_key: String,
+    api_token: String,
+) -> Result<TrelloCard, String> {
+    // Extract cardId from URL
+    let card_id = extract_trello_card_id(&card_url)
+        .ok_or("Invalid Trello card URL format")?;
+
+    // Make API request
+    let client = reqwest::Client::new();
+    let url = format!(
+        "https://api.trello.com/1/cards/{}?key={}&token={}",
+        card_id, api_key, api_token
+    );
+
+    let response = client
+        .get(&url)
+        .send()
+        .await
+        .map_err(|e| format!("Network error: {}", e))?;
+
+    if response.status() == 401 {
+        return Err("Unauthorized: Invalid API credentials".to_string());
+    }
+
+    if response.status() == 404 {
+        return Err("Card not found".to_string());
+    }
+
+    if !response.status().is_success() {
+        return Err(format!("API error: {}", response.status()));
+    }
+
+    let data: serde_json::Value = response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse API response: {}", e))?;
+
+    Ok(TrelloCard {
+        url: card_url,
+        card_id,
+        title: data["name"].as_str().unwrap_or("Unknown").to_string(),
+        board_name: data["idBoard"].as_str().map(|_| "Mock Board Name".to_string()),
+        last_fetched: Some(chrono::Utc::now().to_rfc3339()),
+    })
 }

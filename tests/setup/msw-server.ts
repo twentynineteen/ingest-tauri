@@ -1,8 +1,12 @@
 import { setupServer } from 'msw/node'
 import { http, HttpResponse } from 'msw'
+import { trelloHandlers } from './trello-handlers'
+import { sproutHandlers } from './sprout-handlers'
 
 // Mock API responses based on the domains from query-keys
 const handlers = [
+  ...trelloHandlers,
+  ...sproutHandlers,
   // Projects API
   http.get('/api/projects', () => {
     return HttpResponse.json({

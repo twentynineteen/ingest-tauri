@@ -5,6 +5,9 @@
  * and breadcrumbs management functionality.
  */
 
+// Re-export media types for convenience
+export type { VideoLink, TrelloCard } from './media'
+
 export interface ProjectFolder {
   path: string
   name: string
@@ -27,7 +30,16 @@ export interface BreadcrumbsFile {
   folderSizeBytes?: number
   lastModified?: string
   scannedBy?: string
+
+  // === DEPRECATED FIELD (keep for backward compatibility) ===
   trelloCardUrl?: string
+
+  // === NEW FIELDS (Phase 004) ===
+  /** Array of video links associated with this project */
+  videoLinks?: VideoLink[]
+
+  /** Array of Trello cards associated with this project */
+  trelloCards?: TrelloCard[]
 }
 
 export interface FileInfo {
