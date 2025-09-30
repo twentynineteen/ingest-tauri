@@ -55,26 +55,16 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
   const [fetchError, setFetchError] = useState<string | null>(null)
 
   const handleFetchVideoDetails = async () => {
-    console.log('[VideoLinksManager] Fetch button clicked')
-    console.log('[VideoLinksManager] URL:', formData.url)
-    console.log('[VideoLinksManager] API Key available:', !!apiKey)
-    console.log('[VideoLinksManager] API Key value:', apiKey)
-
-    if (!formData.url || !apiKey) {
-      console.log('[VideoLinksManager] Early return - missing URL or API key')
-      return
-    }
+    if (!formData.url || !apiKey) return
 
     setFetchError(null)
     setValidationErrors([])
 
     try {
-      console.log('[VideoLinksManager] Calling fetchVideoDetailsAsync...')
       const details = await fetchVideoDetailsAsync({
         videoUrl: formData.url,
         apiKey
       })
-      console.log('[VideoLinksManager] Received details:', details)
 
       // Auto-populate fields from API response
       setFormData({
@@ -84,7 +74,6 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
         sproutVideoId: details.id
       })
     } catch (error) {
-      console.error('[VideoLinksManager] Fetch failed:', error)
       const errorMessage =
         error instanceof Error ? error.message : 'Failed to fetch video details'
       setFetchError(errorMessage)
@@ -166,7 +155,7 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Video Links</h3>
           <p className="text-sm text-gray-500">
-            {videoLinks.length} of 20 videos • Sprout Video uploads
+            {videoLinks.length} {videoLinks.length === 1 ? 'video' : 'videos'} • Sprout Video uploads
           </p>
         </div>
 

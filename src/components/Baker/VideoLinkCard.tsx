@@ -5,6 +5,7 @@
 
 import { ExternalLink, Trash2, ChevronUp, ChevronDown, Video } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import type { VideoLink } from '../../types/baker'
 
 interface VideoLinkCardProps {
@@ -30,8 +31,12 @@ export function VideoLinkCard({
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
   }
 
-  const openInBrowser = () => {
-    window.open(videoLink.url, '_blank')
+  const openInBrowser = async () => {
+    try {
+      await openUrl(videoLink.url)
+    } catch (error) {
+      console.error('Failed to open video URL:', error)
+    }
   }
 
   return (

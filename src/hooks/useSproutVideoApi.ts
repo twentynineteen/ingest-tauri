@@ -34,25 +34,18 @@ interface FetchVideoDetailsParams {
 export function useSproutVideoApi() {
   const fetchVideoDetails = useMutation({
     mutationFn: async ({ videoUrl, apiKey }: FetchVideoDetailsParams) => {
-      console.log('[useSproutVideoApi] Starting fetch with URL:', videoUrl)
-      console.log('[useSproutVideoApi] API Key length:', apiKey?.length || 0)
-
       // Parse URL to extract video ID
       const videoId = parseSproutVideoUrl(videoUrl)
-      console.log('[useSproutVideoApi] Parsed video ID:', videoId)
 
       if (!videoId) {
-        console.error('[useSproutVideoApi] Failed to parse video ID from URL')
         throw new Error('Invalid Sprout Video URL format')
       }
 
       // Fetch details from Sprout API via Tauri command
-      console.log('[useSproutVideoApi] Invoking Tauri command...')
       const details = await invoke<SproutVideoDetails>('fetch_sprout_video_details', {
         videoId,
         apiKey
       })
-      console.log('[useSproutVideoApi] Received details from Tauri:', details)
 
       return details
     }

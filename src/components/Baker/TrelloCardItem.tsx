@@ -5,6 +5,7 @@
 
 import { ExternalLink, Trash2, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import type { TrelloCard } from '../../types/baker'
 
 interface TrelloCardItemProps {
@@ -38,8 +39,12 @@ export function TrelloCardItem({ trelloCard, onRemove, onRefresh }: TrelloCardIt
     return diffDays > 7
   }
 
-  const openInBrowser = () => {
-    window.open(trelloCard.url, '_blank')
+  const openInBrowser = async () => {
+    try {
+      await openUrl(trelloCard.url)
+    } catch (error) {
+      console.error('Failed to open Trello URL:', error)
+    }
   }
 
   const stale = isStale(trelloCard.lastFetched)
@@ -88,13 +93,13 @@ export function TrelloCardItem({ trelloCard, onRemove, onRefresh }: TrelloCardIt
 
       {/* Actions */}
       <div className="flex gap-1">
-        {onRefresh && stale && (
+        {onRefresh && (
           <Button
             variant="ghost"
             size="icon"
             onClick={onRefresh}
-            className="h-8 w-8 text-orange-600 hover:text-orange-700"
-            title="Refresh card details"
+            className={`h-8 w-8 ${stale ? 'text-orange-600 hover:text-orange-700' : 'text-gray-600 hover:text-gray-700'}`}
+            title={stale ? "Refresh stale card details" : "Refresh card details"}
           >
             <RefreshCw className="h-4 w-4" />
           </Button>

@@ -1409,11 +1409,32 @@ pub async fn baker_fetch_trello_card_details(
         .await
         .map_err(|e| format!("Failed to parse API response: {}", e))?;
 
+    // Optionally fetch board name if idBoard is present
+    let board_name = if let Some(board_id) = data["idBoard"].as_str() {
+        let board_url = format!(
+            "https://api.trello.com/1/boards/{}?key={}&token={}&fields=name",
+            board_id, api_key, api_token
+        );
+
+        match client.get(&board_url).send().await {
+            Ok(board_response) if board_response.status().is_success() => {
+                board_response
+                    .json::<serde_json::Value>()
+                    .await
+                    .ok()
+                    .and_then(|board_data| board_data["name"].as_str().map(|s| s.to_string()))
+            }
+            _ => None,
+        }
+    } else {
+        None
+    };
+
     Ok(TrelloCard {
         url: card_url,
         card_id,
         title: data["name"].as_str().unwrap_or("Unknown").to_string(),
-        board_name: data["idBoard"].as_str().map(|_| "Mock Board Name".to_string()),
+        board_name,
         last_fetched: Some(chrono::Utc::now().to_rfc3339()),
     })
 }

@@ -1,8 +1,7 @@
-# Implementation Plan: Multiple Video Links and Trello Cards
+# Implementation Plan: [FEATURE]
 
-**Branch**: `004-embed-multiple-video` | **Date**: 2025-09-30 | **Spec**: [spec.md](./spec.md)
-**Input**: Feature specification from `/specs/004-embed-multiple-video/spec.md`
-**User Context**: In the video links section in the found projects area in Baker, when adding a video, the user should be able to enter only the Sprout Video URL. The URL should be parsed for the video ID and the rest of the information retrieved via the API.
+**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
+**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
 
 ## Execution Flow (/plan command scope)
 ```
@@ -30,56 +29,51 @@
 - Phase 3-4: Implementation execution (manual or via tools)
 
 ## Summary
-
-This feature enhances the breadcrumbs.json data model to support multiple video links and Trello cards per project, replacing the single-value approach. Users will be able to enter only a Sprout Video URL in the Baker interface, and the system will automatically parse the video ID and fetch metadata (title, thumbnail) from the Sprout Video API. The implementation focuses on URL parsing, API integration, and seamless UI updates.
+[Extract from feature spec: primary requirement + technical approach from research]
 
 ## Technical Context
-**Language/Version**: TypeScript 5.7 (frontend), Rust 1.75+ (backend)
-**Primary Dependencies**: React 18.3, TanStack React Query, Tauri 2.0, reqwest (Rust HTTP client), serde (JSON parsing)
-**Storage**: File system (breadcrumbs.json files in project directories)
-**Testing**: Vitest (frontend), cargo test (backend)
-**Target Platform**: Desktop (macOS, Windows, Linux via Tauri)
-**Project Type**: Desktop application (Tauri = web frontend + Rust backend)
-**Performance Goals**: <500ms for Sprout API fetches, <100ms for URL parsing
-**Constraints**: Offline-capable for display (cached thumbnails), online-required for API fetches
-**Scale/Scope**: ~20 videos max per project, ~10 Trello cards max per project, hundreds of projects per drive scan
+**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
+**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
+**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
+**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
+**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
+**Project Type**: [single/web/mobile - determines source structure]  
+**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
+**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
+**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
 **Simplicity**:
-- Projects: 1 (Tauri app with frontend + backend)
-- Using framework directly? YES (React components, Tauri commands without wrappers)
-- Single data model? YES (VideoLink and TrelloCard types shared between TS and Rust via serde)
-- Avoiding patterns? YES (direct Tauri invoke, no Repository pattern - file system operations)
+- Projects: [#] (max 3 - e.g., api, cli, tests)
+- Using framework directly? (no wrapper classes)
+- Single data model? (no DTOs unless serialization differs)
+- Avoiding patterns? (no Repository/UoW without proven need)
 
 **Architecture**:
-- EVERY feature as library? PARTIAL - Tauri commands act as library-like endpoints, reusable via hooks
-- Libraries listed:
-  - `useBreadcrumbsVideoLinks` - React Query hook for video link operations
-  - `useSproutVideoApi` - NEW hook for parsing URLs and fetching Sprout API data
-  - Rust baker module - breadcrumbs file operations
-  - Rust media module - Sprout Video API integration
-- CLI per library: N/A (desktop app, not CLI)
-- Library docs: Component documentation in code comments
+- EVERY feature as library? (no direct app code)
+- Libraries listed: [name + purpose for each]
+- CLI per library: [commands with --help/--version/--format]
+- Library docs: llms.txt format planned?
 
 **Testing (NON-NEGOTIABLE)**:
-- RED-GREEN-Refactor cycle enforced? YES - tests written first for URL parsing and API integration
-- Git commits show tests before implementation? YES - commit order will be verified
-- Order: Contract→Integration→E2E→Unit strictly followed? YES
-- Real dependencies used? PARTIAL - actual file system, mocked Sprout API for tests (external service)
-- Integration tests for: URL parsing, breadcrumbs updates, VideoLinksManager component
+- RED-GREEN-Refactor cycle enforced? (test MUST fail first)
+- Git commits show tests before implementation?
+- Order: Contract→Integration→E2E→Unit strictly followed?
+- Real dependencies used? (actual DBs, not mocks)
+- Integration tests for: new libraries, contract changes, shared schemas?
 - FORBIDDEN: Implementation before test, skipping RED phase
 
 **Observability**:
-- Structured logging included? YES - Tauri backend logs, frontend error boundaries
-- Frontend logs → backend? NO (not required for this feature)
-- Error context sufficient? YES - API errors, validation errors with user-friendly messages
+- Structured logging included?
+- Frontend logs → backend? (unified stream)
+- Error context sufficient?
 
 **Versioning**:
-- Version number assigned? Phase 1 of feature 004
-- BUILD increments on every change? YES - following SemVer
-- Breaking changes handled? YES - backward compatible with existing breadcrumbs.json files
+- Version number assigned? (MAJOR.MINOR.BUILD)
+- BUILD increments on every change?
+- Breaking changes handled? (parallel tests, migration plan)
 
 ## Project Structure
 
@@ -131,7 +125,7 @@ ios/ or android/
 └── [platform-specific structure]
 ```
 
-**Structure Decision**: Hybrid approach - Tauri app structure with frontend (src/) and backend (src-tauri/) separation. This is the standard Tauri pattern combining web frontend with Rust backend.
+**Structure Decision**: [DEFAULT to Option 1 unless Technical Context indicates web/mobile app]
 
 ## Phase 0: Outline & Research
 1. **Extract unknowns from Technical Context** above:
@@ -192,37 +186,17 @@ ios/ or android/
 **Task Generation Strategy**:
 - Load `/templates/tasks-template.md` as base
 - Generate tasks from Phase 1 design docs (contracts, data model, quickstart)
-- New user requirement: URL parsing and API fetch for Sprout Video
-- Key task areas:
-  1. **URL Parsing** (TypeScript):
-     - Write tests for `parseSproutVideoUrl` function
-     - Implement URL parsing for public and embed URLs
-     - Edge case handling (invalid formats, malformed URLs)
-  2. **Tauri Command** (Rust):
-     - Contract test for `fetch_sprout_video_details`
-     - Implement Sprout Video API GET request
-     - Error handling (network, 404, auth)
-  3. **React Hook** (TypeScript):
-     - Create `useSproutVideoApi` hook with TanStack React Query
-     - Integration test with mocked API
-  4. **UI Integration**:
-     - Update VideoLinksManager to use URL fetch
-     - Add loading states and error messages
-     - Auto-populate form fields on successful fetch
-     - Manual override capability
+- Each contract → contract test task [P]
+- Each entity → model creation task [P] 
+- Each user story → integration test task
+- Implementation tasks to make tests pass
 
 **Ordering Strategy**:
-- TDD order: Tests before implementation
-- Dependency order:
-  1. URL parsing tests + implementation [P]
-  2. Rust command contract test [P]
-  3. Rust command implementation
-  4. TypeScript hook tests [P]
-  5. TypeScript hook implementation
-  6. UI component integration
+- TDD order: Tests before implementation 
+- Dependency order: Models before services before UI
 - Mark [P] for parallel execution (independent files)
 
-**Estimated Output**: 30-35 numbered, ordered tasks in tasks.md (includes new URL parsing/API fetch tasks)
+**Estimated Output**: 25-30 numbered, ordered tasks in tasks.md
 
 **IMPORTANT**: This phase is executed by the /tasks command, NOT by /plan
 
@@ -246,23 +220,18 @@ ios/ or android/
 *This checklist is updated during execution flow*
 
 **Phase Status**:
-- [x] Phase 0: Research complete (/plan command) - Added Sprout Video URL parsing and API fetch research
-- [x] Phase 1: Design complete (/plan command) - Updated contracts with `fetch_sprout_video_details` command
-- [x] Phase 2: Task planning complete (/plan command - describe approach only)
+- [ ] Phase 0: Research complete (/plan command)
+- [ ] Phase 1: Design complete (/plan command)
+- [ ] Phase 2: Task planning complete (/plan command - describe approach only)
 - [ ] Phase 3: Tasks generated (/tasks command)
 - [ ] Phase 4: Implementation complete
 - [ ] Phase 5: Validation passed
 
 **Gate Status**:
-- [x] Initial Constitution Check: PASS
-- [x] Post-Design Constitution Check: PASS
-  - No new violations introduced
-  - URL parsing uses simple regex (no new libraries)
-  - New Tauri command follows existing pattern
-  - New hook follows TanStack React Query pattern
-  - UI updates follow existing component patterns
-- [x] All NEEDS CLARIFICATION resolved
-- [x] Complexity deviations documented (none required - within constitutional limits)
+- [ ] Initial Constitution Check: PASS
+- [ ] Post-Design Constitution Check: PASS
+- [ ] All NEEDS CLARIFICATION resolved
+- [ ] Complexity deviations documented
 
 ---
 *Based on Constitution v2.1.1 - See `/memory/constitution.md`*
