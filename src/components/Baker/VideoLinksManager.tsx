@@ -20,6 +20,8 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { VideoLinkCard } from './VideoLinkCard'
 import { useBreadcrumbsVideoLinks } from '../../hooks/useBreadcrumbsVideoLinks'
+import { useSproutVideoApi } from '../../hooks/useSproutVideoApi'
+import { useSproutVideoApiKey } from '../../hooks/useApiKeys'
 import { validateVideoLink } from '../../utils/validation'
 import type { VideoLink } from '../../types/baker'
 
@@ -39,6 +41,9 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
     addError
   } = useBreadcrumbsVideoLinks({ projectPath })
 
+  const { apiKey } = useSproutVideoApiKey()
+  const { fetchVideoDetailsAsync, isFetching: isFetchingVideo } = useSproutVideoApi()
+
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [formData, setFormData] = useState({
     url: '',
@@ -47,6 +52,44 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
     sproutVideoId: ''
   })
   const [validationErrors, setValidationErrors] = useState<string[]>([])
+  const [fetchError, setFetchError] = useState<string | null>(null)
+
+  const handleFetchVideoDetails = async () => {
+    console.log('[VideoLinksManager] Fetch button clicked')
+    console.log('[VideoLinksManager] URL:', formData.url)
+    console.log('[VideoLinksManager] API Key available:', !!apiKey)
+    console.log('[VideoLinksManager] API Key value:', apiKey)
+
+    if (!formData.url || !apiKey) {
+      console.log('[VideoLinksManager] Early return - missing URL or API key')
+      return
+    }
+
+    setFetchError(null)
+    setValidationErrors([])
+
+    try {
+      console.log('[VideoLinksManager] Calling fetchVideoDetailsAsync...')
+      const details = await fetchVideoDetailsAsync({
+        videoUrl: formData.url,
+        apiKey
+      })
+      console.log('[VideoLinksManager] Received details:', details)
+
+      // Auto-populate fields from API response
+      setFormData({
+        ...formData,
+        title: details.title,
+        thumbnailUrl: details.assets.poster_frames[0] || '',
+        sproutVideoId: details.id
+      })
+    } catch (error) {
+      console.error('[VideoLinksManager] Fetch failed:', error)
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to fetch video details'
+      setFetchError(errorMessage)
+    }
+  }
 
   const handleAddVideo = () => {
     // Build VideoLink object
@@ -145,13 +188,43 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
             <div className="space-y-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="video-url">Video URL *</Label>
-                <Input
-                  id="video-url"
-                  placeholder="https://sproutvideo.com/videos/..."
-                  value={formData.url}
-                  onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                />
+                <div className="flex gap-2">
+                  <Input
+                    id="video-url"
+                    placeholder="https://sproutvideo.com/videos/..."
+                    value={formData.url}
+                    onChange={(e) => {
+                      setFormData({ ...formData, url: e.target.value })
+                      setFetchError(null)
+                    }}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={handleFetchVideoDetails}
+                    disabled={!formData.url || !apiKey || isFetchingVideo}
+                  >
+                    {isFetchingVideo ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      'Fetch Details'
+                    )}
+                  </Button>
+                </div>
+                {!apiKey && formData.url && (
+                  <p className="text-xs text-amber-600">
+                    Sprout Video API key not configured. Go to Settings to add it.
+                  </p>
+                )}
               </div>
+
+              {fetchError && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{fetchError}</AlertDescription>
+                </Alert>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="video-title">Title *</Label>

@@ -293,6 +293,171 @@ const selectRenderFile = async () => {
 
 ---
 
+## 6. Sprout Video URL Parsing and API Fetching (NEW)
+
+### User Requirement
+
+In the Baker video links section, users should be able to enter only the Sprout Video URL. The system should:
+1. Parse the URL to extract the video ID
+2. Fetch video metadata from Sprout Video API
+3. Auto-populate title, thumbnail, and other fields
+
+### API Research
+
+**Sprout Video API Documentation**: https://sproutvideo.com/docs/api.html
+
+**Get Video Details Endpoint**:
+```
+GET https://api.sproutvideo.com/v1/videos/:id
+Headers: SproutVideo-Api-Key: {api_key}
+```
+
+**Response Structure**:
+```json
+{
+  "id": "a098d2bcd33e1c328",
+  "title": "Video Title",
+  "description": "Video description",
+  "duration": 120,
+  "assets": {
+    "poster_frames": ["https://cdn.sproutvideo.com/.../frame_0000.jpg"]
+  },
+  "created_at": "2025-01-20T14:22:00.000Z",
+  "embed_code": "<iframe src='...'></iframe>",
+  // ... other fields
+}
+```
+
+**URL Patterns**:
+```typescript
+// Public video page URL
+https://sproutvideo.com/videos/{VIDEO_ID}
+
+// Embed URL
+https://videos.sproutvideo.com/embed/{VIDEO_ID}/{SECURITY_TOKEN}
+
+// Example video IDs
+"a098d2bcd33e1c328"
+"xyz789abc123def"
+```
+
+### Implementation Strategy
+
+**URL Parsing Function** (TypeScript):
+```typescript
+export function parseSproutVideoUrl(url: string): string | null {
+  // Pattern 1: https://sproutvideo.com/videos/{id}
+  const publicMatch = url.match(/sproutvideo\.com\/videos\/([a-zA-Z0-9]+)/)
+  if (publicMatch) return publicMatch[1]
+
+  // Pattern 2: https://videos.sproutvideo.com/embed/{id}/...
+  const embedMatch = url.match(/videos\.sproutvideo\.com\/embed\/([a-zA-Z0-9]+)/)
+  if (embedMatch) return embedMatch[1]
+
+  return null // Invalid URL
+}
+```
+
+**Tauri Command** (Rust):
+```rust
+#[tauri::command]
+pub async fn fetch_sprout_video_details(
+    video_id: String,
+    api_key: String,
+) -> Result<SproutVideoDetails, String> {
+    let client = reqwest::Client::new();
+    let url = format!("https://api.sproutvideo.com/v1/videos/{}", video_id);
+
+    let response = client
+        .get(&url)
+        .header("SproutVideo-Api-Key", api_key)
+        .send()
+        .await
+        .map_err(|e| format!("API request failed: {}", e))?;
+
+    if !response.status().is_success() {
+        return Err(format!("API returned error: {}", response.status()));
+    }
+
+    let video_data: SproutVideoDetails = response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse response: {}", e))?;
+
+    Ok(video_data)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SproutVideoDetails {
+    id: String,
+    title: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    description: Option<String>,
+    duration: u32,
+    assets: SproutAssets,
+    created_at: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SproutAssets {
+    poster_frames: Vec<String>,
+}
+```
+
+**React Hook** (TypeScript):
+```typescript
+import { useMutation } from '@tanstack/react-query'
+import { invoke } from '@tauri-apps/api/core'
+
+export function useSproutVideoApi() {
+  const fetchVideoDetails = useMutation({
+    mutationFn: async ({ videoUrl, apiKey }: { videoUrl: string; apiKey: string }) => {
+      // Parse URL to get video ID
+      const videoId = parseSproutVideoUrl(videoUrl)
+      if (!videoId) {
+        throw new Error('Invalid Sprout Video URL')
+      }
+
+      // Fetch details from API
+      const details = await invoke<SproutVideoDetails>('fetch_sprout_video_details', {
+        videoId,
+        apiKey
+      })
+
+      return details
+    }
+  })
+
+  return {
+    fetchVideoDetails: fetchVideoDetails.mutate,
+    isFetching: fetchVideoDetails.isPending,
+    error: fetchVideoDetails.error
+  }
+}
+```
+
+**UI Flow**:
+1. User enters Sprout Video URL in dialog
+2. On input blur or button click, parse URL
+3. If valid, show loading state and fetch metadata
+4. Auto-populate title, thumbnail fields
+5. User can edit if needed, then save
+
+**Error Handling**:
+- Invalid URL format → Show validation error
+- API key missing → Prompt user to add in Settings
+- API request fails → Show error message with retry option
+- Video not found (404) → "Video not found or access denied"
+
+**Decision**: Create `useSproutVideoApi` hook and `fetch_sprout_video_details` Tauri command
+- **Rationale**: Separates URL parsing (frontend) from API fetching (backend), reuses existing API key management
+- **Alternatives considered**:
+  - Manual entry of all fields → Poor UX, error-prone
+  - Fetch on paste event → Too aggressive, may trigger before user finishes
+  - Backend URL parsing → Unnecessary Rust code, TS regex is sufficient
+
+---
+
 ## Research Conclusions
 
 All NEEDS CLARIFICATION items resolved:
@@ -302,5 +467,6 @@ All NEEDS CLARIFICATION items resolved:
 3. ✅ **Serde Migration**: Use `Option<Vec<T>>` with `skip_serializing_if`
 4. ✅ **UI Components**: Manual array management with Radix UI primitives
 5. ✅ **Renders Folder**: Default file picker to `[PROJECT]/Renders/`
+6. ✅ **URL Parsing & API Fetch**: Parse Sprout Video URLs (frontend), fetch metadata via new Tauri command
 
-**Next Phase**: Proceed to Phase 1 (data-model.md, contracts, quickstart.md)
+**Next Phase**: Proceed to Phase 1 (data-model.md, contracts, quickstart.md) - Update contracts with new `fetch_sprout_video_details` command

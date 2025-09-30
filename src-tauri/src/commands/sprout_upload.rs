@@ -14,6 +14,7 @@ use tauri::Emitter;
 use tauri::{command, AppHandle};
 use tokio::io::{AsyncRead, AsyncReadExt, BufReader};
 use tokio::sync::Mutex;
+use app_lib::media::SproutVideoDetails;
 
 #[command]
 pub async fn get_folders(
@@ -194,4 +195,39 @@ async fn upload_video_task(
         let _ = app_handle.emit("upload_error", error_message.clone());
         Err(error_message)
     }
+}
+
+/// Fetches video metadata from Sprout Video API given a video ID
+/// Feature: 004-embed-multiple-video - URL auto-fetch
+#[command]
+pub async fn fetch_sprout_video_details(
+    video_id: String,
+    api_key: String,
+) -> Result<SproutVideoDetails, String> {
+    let client = Client::builder()
+        .timeout(Duration::from_secs(10))
+        .build()
+        .map_err(|e| format!("Failed to create HTTP client: {}", e))?;
+
+    let url = format!("https://api.sproutvideo.com/v1/videos/{}", video_id);
+
+    let response = client
+        .get(&url)
+        .header("SproutVideo-Api-Key", api_key)
+        .send()
+        .await
+        .map_err(|e| format!("API request failed: {}", e))?;
+
+    let status = response.status();
+
+    if !status.is_success() {
+        return Err(format!("API returned error: {}", status));
+    }
+
+    let video_data: SproutVideoDetails = response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse response: {}", e))?;
+
+    Ok(video_data)
 }

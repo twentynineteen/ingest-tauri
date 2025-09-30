@@ -602,6 +602,57 @@ export function useBreadcrumbsTrelloCards({ projectPath }: { projectPath: string
 
 ---
 
+### 11. `fetch_sprout_video_details`
+
+Fetches video metadata from Sprout Video API given a video ID.
+
+**Rust Signature**:
+```rust
+#[tauri::command]
+pub async fn fetch_sprout_video_details(
+    video_id: String,
+    api_key: String,
+) -> Result<SproutVideoDetails, String>
+```
+
+**Request Parameters**:
+```typescript
+{
+  video_id: string   // Sprout Video ID (extracted from URL)
+  api_key: string    // Sprout Video API key from settings
+}
+```
+
+**Response**:
+```typescript
+// Success: SproutVideoDetails
+{
+  id: "a098d2bcd33e1c328",
+  title: "Video Title",
+  description?: "Video description",
+  duration: 120,
+  assets: {
+    poster_frames: ["https://cdn.sproutvideo.com/.../frame_0000.jpg"]
+  },
+  created_at: "2025-01-20T14:22:00.000Z"
+}
+
+// Error: String
+"API request failed: Connection refused"
+"API returned error: 404"
+"Failed to parse response: Invalid JSON"
+```
+
+**Validation Rules**:
+- `video_id` must be non-empty alphanumeric string
+- `api_key` must be non-empty
+
+**Side Effects**:
+- Makes HTTP GET request to `https://api.sproutvideo.com/v1/videos/{video_id}`
+- Does NOT modify breadcrumbs file (frontend handles association)
+
+---
+
 ## Error Handling
 
 All commands return `Result<T, String>` where the error string contains a human-readable message.
@@ -633,6 +684,93 @@ addVideoLink.mutate(newLink, {
     toast.error(`Failed to add video: ${error}`)
   }
 })
+```
+
+### Custom Hook: `useSproutVideoApi`
+
+```typescript
+import { useMutation } from '@tanstack/react-query'
+import { invoke } from '@tauri-apps/api/core'
+
+export function parseSproutVideoUrl(url: string): string | null {
+  // Pattern 1: https://sproutvideo.com/videos/{id}
+  const publicMatch = url.match(/sproutvideo\.com\/videos\/([a-zA-Z0-9]+)/)
+  if (publicMatch) return publicMatch[1]
+
+  // Pattern 2: https://videos.sproutvideo.com/embed/{id}/...
+  const embedMatch = url.match(/videos\.sproutvideo\.com\/embed\/([a-zA-Z0-9]+)/)
+  if (embedMatch) return embedMatch[1]
+
+  return null // Invalid URL
+}
+
+interface SproutVideoDetails {
+  id: string
+  title: string
+  description?: string
+  duration: number
+  assets: {
+    poster_frames: string[]
+  }
+  created_at: string
+}
+
+export function useSproutVideoApi() {
+  const fetchVideoDetails = useMutation({
+    mutationFn: async ({ videoUrl, apiKey }: { videoUrl: string; apiKey: string }) => {
+      // Parse URL to get video ID
+      const videoId = parseSproutVideoUrl(videoUrl)
+      if (!videoId) {
+        throw new Error('Invalid Sprout Video URL format')
+      }
+
+      // Fetch details from API
+      const details = await invoke<SproutVideoDetails>('fetch_sprout_video_details', {
+        videoId,
+        apiKey
+      })
+
+      return details
+    }
+  })
+
+  return {
+    fetchVideoDetails: fetchVideoDetails.mutate,
+    fetchVideoDetailsAsync: fetchVideoDetails.mutateAsync,
+    isFetching: fetchVideoDetails.isPending,
+    error: fetchVideoDetails.error,
+    data: fetchVideoDetails.data
+  }
+}
+```
+
+**Usage in VideoLinksManager**:
+```typescript
+const { apiKey } = useSproutVideoApiKey()
+const { fetchVideoDetailsAsync, isFetching } = useSproutVideoApi()
+const { addVideoLink } = useBreadcrumbsVideoLinks({ projectPath })
+
+const handleUrlBlur = async () => {
+  if (!formData.url || !apiKey) return
+
+  try {
+    const details = await fetchVideoDetailsAsync({
+      videoUrl: formData.url,
+      apiKey
+    })
+
+    // Auto-populate fields from API response
+    setFormData({
+      ...formData,
+      title: details.title,
+      thumbnailUrl: details.assets.poster_frames[0] || '',
+      sproutVideoId: details.id
+    })
+  } catch (error) {
+    console.error('Failed to fetch video details:', error)
+    setValidationErrors([`Failed to fetch video details: ${error.message}`])
+  }
+}
 ```
 
 ---

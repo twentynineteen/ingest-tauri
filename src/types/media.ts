@@ -45,3 +45,35 @@ export interface TrelloCard {
   /** ISO 8601 timestamp of last title fetch */
   lastFetched?: string
 }
+
+/**
+ * Sprout Video API response structure
+ * Returned from fetch_sprout_video_details Tauri command
+ */
+export interface SproutVideoDetails {
+  /** Sprout Video ID */
+  id: string
+
+  /** Video title from Sprout API */
+  title: string
+
+  /** Video description (optional) */
+  description?: string
+
+  /** Video duration in seconds (floating point for precision) */
+  duration: number
+
+  /** Asset URLs including thumbnails */
+  assets: SproutAssets
+
+  /** ISO 8601 timestamp of video creation */
+  created_at: string
+}
+
+/**
+ * Sprout Video assets structure
+ */
+export interface SproutAssets {
+  /** Array of poster frame/thumbnail URLs */
+  poster_frames: string[]
+}

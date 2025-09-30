@@ -68,7 +68,9 @@ fn main() {
             baker_get_trello_cards,
             baker_associate_trello_card,
             baker_remove_trello_card,
-            baker_fetch_trello_card_details
+            baker_fetch_trello_card_details,
+            // Feature 004 Phase 2: Sprout Video URL auto-fetch
+            fetch_sprout_video_details
         ])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");

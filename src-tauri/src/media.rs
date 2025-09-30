@@ -47,3 +47,34 @@ pub struct TrelloCard {
     #[serde(rename = "lastFetched", skip_serializing_if = "Option::is_none")]
     pub last_fetched: Option<String>,
 }
+
+/// Sprout Video API response structure
+/// Returned from fetch_sprout_video_details command
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SproutVideoDetails {
+    /// Sprout Video ID
+    pub id: String,
+
+    /// Video title from Sprout API
+    pub title: String,
+
+    /// Video description (optional)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+
+    /// Video duration in seconds (floating point for precision)
+    pub duration: f64,
+
+    /// Asset URLs including thumbnails
+    pub assets: SproutAssets,
+
+    /// ISO 8601 timestamp of video creation
+    pub created_at: String,
+}
+
+/// Sprout Video assets structure
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SproutAssets {
+    /// Array of poster frame/thumbnail URLs
+    pub poster_frames: Vec<String>,
+}
