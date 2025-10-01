@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react'
-import { Plus, AlertCircle, Loader2 } from 'lucide-react'
+import { Plus, AlertCircle, Loader2, Upload as UploadIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -18,10 +18,14 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { VideoLinkCard } from './VideoLinkCard'
 import { useBreadcrumbsVideoLinks } from '../../hooks/useBreadcrumbsVideoLinks'
 import { useSproutVideoApi } from '../../hooks/useSproutVideoApi'
 import { useSproutVideoApiKey } from '../../hooks/useApiKeys'
+import { useFileUpload } from '../../hooks/useFileUpload'
+import { useUploadEvents } from '../../hooks/useUploadEvents'
+import { useSproutVideoProcessor } from '../../hooks/useSproutVideoProcessor'
 import { validateVideoLink } from '../../utils/validation'
 import type { VideoLink } from '../../types/baker'
 
@@ -43,8 +47,12 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
 
   const { apiKey } = useSproutVideoApiKey()
   const { fetchVideoDetailsAsync, isFetching: isFetchingVideo } = useSproutVideoApi()
+  const { selectedFile, uploading, response, selectFile, uploadFile, resetUploadState } =
+    useFileUpload()
+  const { progress, message } = useUploadEvents()
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [addMode, setAddMode] = useState<'url' | 'upload'>('url')
   const [formData, setFormData] = useState({
     url: '',
     title: '',
@@ -53,6 +61,22 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
   })
   const [validationErrors, setValidationErrors] = useState<string[]>([])
   const [fetchError, setFetchError] = useState<string | null>(null)
+
+  // React Query-based upload processor (replaces useEffect pattern)
+  const videoProcessor = useSproutVideoProcessor({
+    response,
+    selectedFile,
+    uploading,
+    enabled: addMode === 'upload',
+    onVideoReady: (videoLink) => {
+      addVideoLink(videoLink)
+      resetUploadState()
+      setIsDialogOpen(false)
+    },
+    onError: (error) => {
+      setValidationErrors([error])
+    }
+  })
 
   const handleFetchVideoDetails = async () => {
     if (!formData.url || !apiKey) return
@@ -129,6 +153,42 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
     }
   }
 
+  const handleUploadAndAdd = async () => {
+    if (!selectedFile || !apiKey) return
+
+    try {
+      await uploadFile(apiKey)
+    } catch (error) {
+      console.error('Upload failed:', error)
+    }
+  }
+
+  const handleDialogOpenChange = (open: boolean) => {
+    setIsDialogOpen(open)
+
+    if (!open) {
+      // Reset all state when closing
+      setFormData({ url: '', title: '', thumbnailUrl: '', sproutVideoId: '' })
+      setValidationErrors([])
+      setFetchError(null)
+      setAddMode('url')
+      resetUploadState()
+      videoProcessor.reset()
+    }
+  }
+
+  const handleTabChange = (value: string) => {
+    setAddMode(value as 'url' | 'upload')
+    setValidationErrors([])
+    setFetchError(null)
+
+    // Reset upload state when switching away from upload tab
+    if (value === 'url') {
+      resetUploadState()
+      videoProcessor.reset()
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -159,7 +219,7 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
           </p>
         </div>
 
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
           <DialogTrigger asChild>
             <Button disabled={videoLinks.length >= 20 || isUpdating}>
               <Plus className="mr-2 h-4 w-4" />
@@ -174,7 +234,14 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4 py-4">
+            <Tabs value={addMode} onValueChange={handleTabChange}>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="url">Enter URL</TabsTrigger>
+                <TabsTrigger value="upload">Upload File</TabsTrigger>
+              </TabsList>
+
+              {/* URL Entry Tab */}
+              <TabsContent value="url" className="space-y-4 py-4">
               <div className="space-y-2">
                 <Label htmlFor="video-url">Video URL *</Label>
                 <div className="flex gap-2">
@@ -267,13 +334,97 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
                   </AlertDescription>
                 </Alert>
               )}
-            </div>
+              </TabsContent>
+
+              {/* Upload File Tab */}
+              <TabsContent value="upload" className="space-y-4 py-4">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Video File *</Label>
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={selectFile}
+                        disabled={uploading}
+                        className="flex-1"
+                      >
+                        <UploadIcon className="mr-2 h-4 w-4" />
+                        Select Video File
+                      </Button>
+                    </div>
+                    {selectedFile && (
+                      <p className="text-sm text-gray-600">
+                        Selected: <span className="font-medium">{selectedFile.split('/').pop()}</span>
+                      </p>
+                    )}
+                  </div>
+
+                  {!apiKey && (
+                    <Alert>
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        Sprout Video API key not configured. Go to Settings to add it.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {uploading && (
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Uploading: {progress}%</span>
+                      </div>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                        <div
+                          className="h-full bg-blue-600 transition-all duration-300"
+                          style={{ width: `${progress}%` }}
+                          role="progressbar"
+                          aria-valuenow={progress}
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {message && !uploading && (
+                    <Alert variant={typeof message === 'string' && message.includes('failed') ? 'destructive' : 'default'}>
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>{String(message)}</AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              </TabsContent>
+            </Tabs>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleAddVideo}>Add Video</Button>
+              {addMode === 'url' ? (
+                <>
+                  <Button variant="outline" onClick={() => handleDialogOpenChange(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleAddVideo}>Add Video</Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" onClick={() => handleDialogOpenChange(false)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleUploadAndAdd}
+                    disabled={!selectedFile || !apiKey || uploading}
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Uploading... {progress}%
+                      </>
+                    ) : (
+                      'Upload and Add'
+                    )}
+                  </Button>
+                </>
+              )}
             </DialogFooter>
           </DialogContent>
         </Dialog>
