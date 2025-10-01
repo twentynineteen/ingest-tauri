@@ -45,58 +45,89 @@ As a video editor, I want to upload 2 final render videos to Sprout Video and as
 
 ### Steps
 
-1. **Navigate to BuildProject page**
+1. **Navigate to Baker page and select project**
    ```
-   Open app → BuildProject tab
-   ```
-
-2. **Select test project folder**
-   ```
-   Click "Select Project Folder"
-   Choose: /path/to/TestProject
+   Open app → Baker tab
+   Scan folder containing test project
+   Select TestProject from results
+   Click "Edit" button to open breadcrumbs editor
    ```
 
-3. **Upload first video**
+2. **Navigate to Video Links section**
    ```
-   Click "Upload Video" button
-   File picker defaults to: /path/to/TestProject/Renders/
+   In breadcrumbs editor, locate "Video Links" section
+   Click "Add Video" button
+   ```
+
+   **Expected**:
+   - Dialog opens with title "Add Video Link"
+   - Two tabs visible: "Enter URL" and "Upload File"
+   - "Enter URL" tab is active by default
+
+3. **Switch to Upload File tab**
+   ```
+   Click "Upload File" tab
+   ```
+
+   **Expected**:
+   - Upload interface shown with "Select Video File" button
+   - No file selected yet
+   - "Upload and Add" button is disabled
+
+4. **Select first video file**
+   ```
+   Click "Select Video File" button
+   File picker opens, defaulted to: /path/to/TestProject/Renders/
    Select: final-edit-v1.mp4
-   Enter title: "Final Edit - Version 1"
-   Click "Upload to Sprout Video"
    ```
 
    **Expected**:
-   - Progress bar shows upload progress
-   - On completion: Video thumbnail appears
-   - Sprout Video link displayed
-   - Breadcrumbs updated indicator shown
+   - File picker shows video filters (mp4, mov, avi, mkv, webm)
+   - Selected filename displayed below button: "Selected: final-edit-v1.mp4"
+   - "Upload and Add" button is now enabled
 
-4. **Verify first video association**
+5. **Upload first video**
    ```
-   Click "View Breadcrumbs" button
-   Navigate to "Videos" tab in preview modal
+   Click "Upload and Add" button
    ```
 
    **Expected**:
-   - 1 video card shown
-   - Thumbnail displayed (from Sprout CDN)
-   - Title: "Final Edit - Version 1"
-   - Link to Sprout Video functional
-   - Source file: "final-edit-v1.mp4" displayed
+   - Button shows "Uploading... X%"
+   - Progress bar appears showing upload progress (0-100%)
+   - Button is disabled during upload
+   - Progress updates smoothly every ~100ms
 
-5. **Upload second video**
+6. **First upload completes**
    ```
-   Click "Upload Another Video" button
+   Wait for upload to complete (progress reaches 100%)
+   ```
+
+   **Expected**:
+   - Dialog automatically closes
+   - Video appears in Video Links list
+   - Video card shows:
+     - Thumbnail (from Sprout CDN)
+     - Title: "final-edit-v1" (from filename, no extension)
+     - Sprout Video ID displayed
+     - Upload date/time
+     - External link icon to Sprout Video
+   - Success indicator or toast notification
+
+7. **Add second video**
+   ```
+   Click "Add Video" button again
+   Click "Upload File" tab
+   Click "Select Video File"
    Select: final-edit-v2.mp4
-   Enter title: "Final Edit - Version 2"
-   Click "Upload to Sprout Video"
+   Click "Upload and Add"
    ```
 
    **Expected**:
-   - Second video uploads successfully
-   - Both videos now shown in preview
+   - Second upload progresses with progress bar
+   - On completion, both videos shown in list
+   - Videos displayed in order added
 
-6. **Verify breadcrumbs.json file**
+8. **Verify breadcrumbs.json file**
    ```
    Open: /path/to/TestProject/breadcrumbs.json
    ```
@@ -109,7 +140,7 @@ As a video editor, I want to upload 2 final render videos to Sprout Video and as
        {
          "url": "https://sproutvideo.com/videos/abc123",
          "sproutVideoId": "abc123",
-         "title": "Final Edit - Version 1",
+         "title": "final-edit-v1",
          "thumbnailUrl": "https://cdn.sproutvideo.com/.../frame_0000.jpg",
          "uploadDate": "2025-01-20T14:22:00.000Z",
          "sourceRenderFile": "final-edit-v1.mp4"
@@ -117,7 +148,7 @@ As a video editor, I want to upload 2 final render videos to Sprout Video and as
        {
          "url": "https://sproutvideo.com/videos/def456",
          "sproutVideoId": "def456",
-         "title": "Final Edit - Version 2",
+         "title": "final-edit-v2",
          "thumbnailUrl": "https://cdn.sproutvideo.com/.../frame_0001.jpg",
          "uploadDate": "2025-01-20T14:25:00.000Z",
          "sourceRenderFile": "final-edit-v2.mp4"
@@ -434,24 +465,62 @@ As a user, I want clear error messages when things go wrong (invalid URLs, API f
 
 1. **Test invalid video URL**
    ```
-   BuildProject → Manage Videos → Add Video
+   Baker → Video Links → Add Video → Enter URL tab
    Enter URL: http://example.com/video (non-HTTPS)
    Click "Add"
    ```
 
    **Expected**:
-   - Error toast: "Video URL must use HTTPS"
+   - Error alert: "Video URL must use HTTPS"
    - Video not added to list
 
-2. **Test invalid Trello URL**
+2. **Test upload without API key**
    ```
-   Manage Trello Cards → Add Card
-   Enter URL: https://example.com/not-trello
-   Click "Fetch Details"
+   Baker → Video Links → Add Video → Upload File tab
+   (Ensure Sprout API key is NOT configured in Settings)
    ```
 
    **Expected**:
-   - Error toast: "Invalid Trello card URL format"
+   - Alert shown: "Sprout Video API key not configured. Go to Settings to add it."
+   - "Upload and Add" button is disabled
+   - Cannot proceed with upload
+
+3. **Test upload timeout (simulated)**
+   ```
+   Baker → Video Links → Add Video → Upload File tab
+   Select very large video file (>5GB if available)
+   Click "Upload and Add"
+   Wait for timeout (45 minutes)
+   ```
+
+   **Expected**:
+   - Progress bar shows upload progress
+   - After 45 minutes, error alert: "Upload timed out after 45 minutes. Please try again."
+   - File remains selected
+   - "Upload and Add" button re-enabled for retry
+
+4. **Test network error during upload**
+   ```
+   Baker → Video Links → Add Video → Upload File tab
+   Select video file
+   Click "Upload and Add"
+   Disconnect network during upload
+   ```
+
+   **Expected**:
+   - Error alert: "Network connection error. Check your internet connection and try again."
+   - Upload stops
+   - File remains selected for retry
+
+5. **Test invalid Trello URL**
+   ```
+   Baker → Trello Cards → Add Card → Enter URL tab
+   Enter URL: https://example.com/not-trello
+   Click "Add Card"
+   ```
+
+   **Expected**:
+   - Error alert: "Invalid Trello card URL format"
    - Card not added
 
 3. **Test API failure (Trello)**

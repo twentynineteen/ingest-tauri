@@ -806,3 +806,371 @@ const unlisten = await listen('video_upload_progress', (event) => {
 ## Testing Contracts
 
 See `contracts/test-scenarios.md` for detailed test cases validating these contracts.
+
+---
+
+## UI Component Patterns: Video Upload Toggle (Enhancement)
+
+### Component: VideoLinksManager (Enhanced)
+
+**Enhancement Date**: 2025-09-30
+**Feature**: Add upload toggle (URL entry OR file upload)
+
+#### Component Props (Unchanged)
+
+```typescript
+interface VideoLinksManagerProps {
+  projectPath: string  // Absolute path to project folder
+}
+```
+
+#### Component State (Enhanced)
+
+```typescript
+// Existing state
+const { videoLinks, addVideoLink, removeVideoLink, reorderVideoLinks, isUpdating } =
+  useBreadcrumbsVideoLinks({ projectPath })
+
+// NEW: Add mode toggle
+const [addMode, setAddMode] = useState<'url' | 'upload'>('url')
+
+// NEW: Upload hooks
+const { selectedFile, uploading, response, selectFile, uploadFile, resetUploadState } =
+  useFileUpload()
+const { progress, message } = useUploadEvents()
+
+// Existing URL mode state (unchanged)
+const [formData, setFormData] = useState({
+  url: '',
+  title: '',
+  thumbnailUrl: '',
+  sproutVideoId: ''
+})
+```
+
+#### UI Structure (Enhanced)
+
+```tsx
+<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+  <DialogTrigger asChild>
+    <Button>
+      <Plus className="mr-2 h-4 w-4" />
+      Add Video
+    </Button>
+  </DialogTrigger>
+
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Add Video Link</DialogTitle>
+      <DialogDescription>
+        Add a video by entering a Sprout Video URL or uploading a file
+      </DialogDescription>
+    </DialogHeader>
+
+    {/* NEW: Tabs for URL vs Upload */}
+    <Tabs value={addMode} onValueChange={(v) => setAddMode(v as 'url' | 'upload')}>
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="url">Enter URL</TabsTrigger>
+        <TabsTrigger value="upload">Upload File</TabsTrigger>
+      </TabsList>
+
+      {/* EXISTING: URL entry tab */}
+      <TabsContent value="url" className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="video-url">Video URL *</Label>
+          <div className="flex gap-2">
+            <Input
+              id="video-url"
+              placeholder="https://sproutvideo.com/videos/..."
+              value={formData.url}
+              onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={handleFetchVideoDetails}
+              disabled={!formData.url || !apiKey || isFetchingVideo}
+            >
+              {isFetchingVideo ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Fetch Details'}
+            </Button>
+          </div>
+        </div>
+
+        {/* Existing title, sproutId, thumbnailUrl fields */}
+        {/* ... */}
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
+          <Button onClick={handleAddVideoFromUrl}>Add Video</Button>
+        </DialogFooter>
+      </TabsContent>
+
+      {/* NEW: Upload file tab */}
+      <TabsContent value="upload" className="space-y-4">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Select Video File</Label>
+            <Button onClick={selectFile} className="w-full" disabled={uploading}>
+              <Upload className="mr-2 h-4 w-4" />
+              Select Video File
+            </Button>
+            {selectedFile && (
+              <p className="text-sm text-gray-600">
+                Selected: {selectedFile.split('/').pop()}
+              </p>
+            )}
+          </div>
+
+          {uploading && (
+            <div className="space-y-2">
+              <p className="text-sm text-gray-500">Uploading: {progress}%</p>
+              <Progress value={progress} />
+            </div>
+          )}
+
+          {message && (
+            <Alert variant={message.includes('failed') ? 'destructive' : 'default'}>
+              <AlertDescription>{message}</AlertDescription>
+            </Alert>
+          )}
+
+          {!apiKey && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Sprout Video API key not configured. Go to Settings to add it.
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => handleDialogClose(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleUploadAndAdd}
+            disabled={!selectedFile || uploading || !apiKey}
+          >
+            {uploading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Uploading... {progress}%
+              </>
+            ) : (
+              <>
+                <Upload className="mr-2 h-4 w-4" />
+                Upload and Add
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </TabsContent>
+    </Tabs>
+
+    {/* Error display (shared between tabs) */}
+    {validationErrors.length > 0 && (
+      <Alert variant="destructive">
+        <AlertCircle className="h-4 w-4" />
+        <AlertDescription>
+          <ul className="list-disc pl-4 space-y-1">
+            {validationErrors.map((err, i) => (
+              <li key={i}>{err}</li>
+            ))}
+          </ul>
+        </AlertDescription>
+      </Alert>
+    )}
+  </DialogContent>
+</Dialog>
+```
+
+#### Event Handlers (NEW)
+
+```typescript
+// Upload workflow handler
+const handleUploadAndAdd = async () => {
+  if (!selectedFile || !apiKey) return
+
+  // Reset states
+  setValidationErrors([])
+
+  // Check limit before uploading
+  if (videoLinks.length >= 20) {
+    setValidationErrors(['Maximum of 20 videos per project reached'])
+    return
+  }
+
+  try {
+    // Upload file
+    await uploadFile(apiKey)
+
+    // Wait for response (set by useFileUpload via event listener)
+    // Response is available in `response` state
+
+  } catch (error) {
+    setValidationErrors([error instanceof Error ? error.message : 'Upload failed'])
+  }
+}
+
+// Watch for upload completion
+useEffect(() => {
+  if (response && selectedFile) {
+    // Create VideoLink from upload response
+    const videoLink = createVideoLinkFromUpload(response, selectedFile)
+
+    // Validate
+    const errors = validateVideoLink(videoLink)
+    if (errors.length > 0) {
+      setValidationErrors(errors)
+      return
+    }
+
+    // Add to breadcrumbs
+    addVideoLink(videoLink)
+
+    // Reset and close
+    resetUploadState()
+    setIsDialogOpen(false)
+  }
+}, [response, selectedFile])
+
+// Tab change cleanup
+const handleTabChange = (newMode: 'url' | 'upload') => {
+  setAddMode(newMode)
+  setValidationErrors([])
+  resetUploadState()
+}
+
+// Dialog close cleanup
+const handleDialogClose = (open: boolean) => {
+  setIsDialogOpen(open)
+  if (!open) {
+    resetUploadState()
+    setFormData({ url: '', title: '', thumbnailUrl: '', sproutVideoId: '' })
+    setValidationErrors([])
+    setAddMode('url')
+  }
+}
+```
+
+#### Helper Function: Create VideoLink from Upload
+
+```typescript
+function createVideoLinkFromUpload(
+  response: SproutUploadResponse,
+  filePath: string
+): VideoLink {
+  const filename = filePath.split('/').pop() || 'video'
+  const titleFallback = filename.replace(/\.[^/.]+$/, '') // Remove extension
+
+  return {
+    url: response.embedded_url || `https://sproutvideo.com/videos/${response.id}`,
+    sproutVideoId: response.id,
+    title: response.title || titleFallback,
+    thumbnailUrl: response.assets?.poster_frames?.[0],
+    uploadDate: response.created_at,
+    sourceRenderFile: filename
+  }
+}
+```
+
+#### State Transitions
+
+**Upload Flow**:
+1. **Idle**: User in "Upload File" tab, no file selected
+   - State: `selectedFile = null`, `uploading = false`
+   - UI: "Select Video File" button enabled
+
+2. **File Selected**: User clicked select button, chose file
+   - State: `selectedFile = "/path/to/video.mp4"`, `uploading = false`
+   - UI: Filename displayed, "Upload and Add" button enabled
+
+3. **Uploading**: User clicked "Upload and Add", upload in progress
+   - State: `uploading = true`, `progress = 0-100`
+   - UI: Progress bar visible, buttons disabled
+
+4. **Upload Complete**: Backend emitted `upload_complete` event
+   - State: `response = SproutUploadResponse`, `uploading = false`
+   - Action: Create VideoLink, validate, add to breadcrumbs, close dialog
+
+5. **Upload Error**: Backend emitted `upload_error` event
+   - State: `message = "Upload failed: ..."`, `uploading = false`
+   - UI: Error alert shown, "Upload and Add" button re-enabled for retry
+
+**Cleanup Triggers**:
+- Dialog closes → Reset all upload state
+- Tab switches → Clear errors, reset progress
+- Upload succeeds → Reset state, close dialog
+
+#### Integration with Existing Hooks
+
+**useFileUpload** (from UploadSprout.tsx):
+- `selectFile()`: Opens file picker with video filters
+- `uploadFile(apiKey)`: Invokes `upload_video` Tauri command
+- `resetUploadState()`: Clears selectedFile, response, uploading state
+
+**useUploadEvents** (from UploadSprout.tsx):
+- Listens to `upload_progress`, `upload_complete`, `upload_error` events
+- Provides reactive `progress`, `uploading`, `message` state via React Query
+
+**useBreadcrumbsVideoLinks** (existing):
+- `addVideoLink(videoLink)`: Same mutation used for URL and upload paths
+
+#### Validation Rules
+
+**Upload-Specific**:
+1. File must be selected before upload
+2. API key must be configured
+3. File must be video format (enforced by file picker filters)
+4. Project must not exceed 20 video limit
+5. Upload response must contain valid data (url, id, title)
+
+**Shared with URL Path**:
+- `validateVideoLink()` function checks URL format, title length, etc.
+
+#### Error Handling
+
+**Upload Errors**:
+- **No API Key**: Show alert, disable upload button
+- **Upload Timeout**: Show error with retry button
+- **Network Error**: Show error with retry button
+- **API Error (4xx/5xx)**: Parse error from backend, show specific message
+
+**Error Display**:
+- Errors from `message` state (upload events) shown in Alert component
+- Validation errors from `validationErrors` state shown in separate Alert
+
+---
+
+## Summary: UI Contracts
+
+### VideoLinksManager Component Contract
+
+**Props**:
+- `projectPath: string` (absolute path)
+
+**Events**:
+- Dialog opens/closes
+- Tab switches (URL ↔ Upload)
+- File selected
+- Upload starts/progresses/completes/errors
+- VideoLink added to breadcrumbs
+
+**State Management**:
+- Uses `useBreadcrumbsVideoLinks` hook for CRUD operations
+- Uses `useFileUpload` + `useUploadEvents` hooks for upload workflow
+- Uses `useSproutVideoApiKey` hook for API key access
+
+**External Dependencies**:
+- ShadCN UI: Dialog, Tabs, Button, Input, Label, Progress, Alert
+- Lucide React: Plus, Upload, Loader2, AlertCircle icons
+- @tauri-apps/plugin-dialog: File picker
+- TanStack React Query: Async state management
+
+**Backward Compatibility**:
+- URL entry tab is default
+- Existing behavior unchanged when not using upload
+- Upload is additive feature, can be ignored by users who prefer URL workflow
+
+---

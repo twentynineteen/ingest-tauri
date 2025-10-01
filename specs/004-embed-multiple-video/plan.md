@@ -1,7 +1,7 @@
-# Implementation Plan: [FEATURE]
+# Implementation Plan: Video Upload Toggle for Video Links
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/specs/[###-feature-name]/spec.md`
+**Branch**: `004-embed-multiple-video` | **Date**: 2025-09-30 | **Spec**: [spec.md](./spec.md)
+**Input**: Feature specification from `/specs/004-embed-multiple-video/spec.md`
 
 ## Execution Flow (/plan command scope)
 ```
@@ -29,51 +29,52 @@
 - Phase 3-4: Implementation execution (manual or via tools)
 
 ## Summary
-[Extract from feature spec: primary requirement + technical approach from research]
+Enhance the VideoLinksManager component to allow users to upload videos directly through a toggle interface (similar to the TrelloCardsManager), rather than only supporting URL entry. This provides a seamless workflow: users can either paste an existing Sprout Video URL OR upload a video file directly from their filesystem (defaulting to the project's Renders/ folder). The upload logic from UploadSprout.tsx will be adapted and integrated into the VideoLinksManager dialog.
 
 ## Technical Context
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [e.g., pytest, XCTest, cargo test or NEEDS CLARIFICATION]  
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: TypeScript 5.7, React 18.3, Rust 1.75 (Tauri backend)
+**Primary Dependencies**: React, Tauri 2.0, TanStack React Query, ShadCN/Radix UI, Sprout Video API
+**Storage**: Local JSON files (breadcrumbs.json), Sprout Video cloud storage
+**Testing**: Vitest + React Testing Library
+**Target Platform**: Desktop (macOS/Windows/Linux) via Tauri
+**Project Type**: Desktop application (Tauri frontend + Rust backend)
+**Performance Goals**: Upload progress tracking with <500ms UI response time, support videos up to 5GB
+**Constraints**: Desktop file access via Tauri dialogs, Sprout Video API rate limits, breadcrumbs file <100KB
+**Scale/Scope**: Single-user desktop app, ~20 video links per project, file operations via Tauri commands
+**User Requirements**: Just like TrelloCardsManager has URL/Select toggle, VideoLinksManager needs URL/Upload toggle referencing UploadSprout.tsx upload logic
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
 **Simplicity**:
-- Projects: [#] (max 3 - e.g., api, cli, tests)
-- Using framework directly? (no wrapper classes)
-- Single data model? (no DTOs unless serialization differs)
-- Avoiding patterns? (no Repository/UoW without proven need)
+- Projects: 1 (Tauri desktop app with src/ and src-tauri/)
+- Using framework directly? YES (React, TanStack Query, ShadCN components used directly)
+- Single data model? YES (VideoLink model already defined in data-model.md, no DTOs needed)
+- Avoiding patterns? YES (No Repository pattern, direct Tauri command invocations)
 
 **Architecture**:
-- EVERY feature as library? (no direct app code)
-- Libraries listed: [name + purpose for each]
-- CLI per library: [commands with --help/--version/--format]
-- Library docs: llms.txt format planned?
+- EVERY feature as library? NO - This is a UI enhancement within existing component structure
+- Libraries listed: N/A - Using existing hooks (useFileUpload, useUploadEvents) from UploadSprout
+- CLI per library: N/A - Desktop GUI application
+- Library docs: N/A - Internal UI component
 
 **Testing (NON-NEGOTIABLE)**:
-- RED-GREEN-Refactor cycle enforced? (test MUST fail first)
-- Git commits show tests before implementation?
-- Order: Contract→Integration→E2E→Unit strictly followed?
-- Real dependencies used? (actual DBs, not mocks)
-- Integration tests for: new libraries, contract changes, shared schemas?
+- RED-GREEN-Refactor cycle enforced? YES (will write component tests first)
+- Git commits show tests before implementation? YES (following TDD workflow)
+- Order: Contract→Integration→E2E→Unit strictly followed? YES (contract tests for Tauri upload command exist, will add component integration tests)
+- Real dependencies used? YES (actual Sprout Video API via existing Tauri commands)
+- Integration tests for: New UI component behavior, upload dialog state transitions, error handling
 - FORBIDDEN: Implementation before test, skipping RED phase
 
 **Observability**:
-- Structured logging included?
-- Frontend logs → backend? (unified stream)
-- Error context sufficient?
+- Structured logging included? YES (Tauri backend has structured logging, frontend uses console with error context)
+- Frontend logs → backend? YES (errors from Tauri commands propagate to frontend with context)
+- Error context sufficient? YES (upload progress events, Sprout API errors captured and displayed)
 
 **Versioning**:
-- Version number assigned? (MAJOR.MINOR.BUILD)
-- BUILD increments on every change?
-- Breaking changes handled? (parallel tests, migration plan)
+- Version number assigned? Feature 004 (part of existing MAJOR.MINOR.BUILD cycle)
+- BUILD increments on every change? YES (following existing project versioning)
+- Breaking changes handled? NO BREAKING CHANGES (additive feature, backward compatible with existing VideoLinksManager)
 
 ## Project Structure
 
@@ -184,19 +185,61 @@ ios/ or android/
 *This section describes what the /tasks command will do - DO NOT execute during /plan*
 
 **Task Generation Strategy**:
-- Load `/templates/tasks-template.md` as base
-- Generate tasks from Phase 1 design docs (contracts, data model, quickstart)
-- Each contract → contract test task [P]
-- Each entity → model creation task [P] 
-- Each user story → integration test task
-- Implementation tasks to make tests pass
+- Load Phase 1 outputs: contracts/tauri-commands.md, quickstart.md, research.md
+- Generate tasks from UI component contracts (VideoLinksManager enhancement)
+- Focus on additive feature: upload tab in existing dialog
+- Reuse existing hooks and commands (useFileUpload, useUploadEvents, upload_video)
 
-**Ordering Strategy**:
-- TDD order: Tests before implementation 
-- Dependency order: Models before services before UI
-- Mark [P] for parallel execution (independent files)
+**Key Task Categories**:
+1. **Component Tests** (TDD - write first):
+   - Test tab switching between URL and Upload modes
+   - Test file selection opens with correct default path
+   - Test upload button disabled states
+   - Test progress bar updates during upload
+   - Test successful upload auto-adds VideoLink
+   - Test error states and retry logic
+   - Test dialog cleanup on close/tab switch
 
-**Estimated Output**: 25-30 numbered, ordered tasks in tasks.md
+2. **UI Implementation**:
+   - Add Tabs component to VideoLinksManager dialog
+   - Wrap existing URL form in TabsContent
+   - Create Upload tab with file selection and progress UI
+   - Integrate useFileUpload and useUploadEvents hooks
+   - Implement createVideoLinkFromUpload helper function
+   - Add event handlers for upload workflow
+   - Implement state cleanup on tab switch/dialog close
+
+3. **Integration Testing**:
+   - End-to-end test: Select file → Upload → Add to breadcrumbs
+   - Verify breadcrumbs.json updated with correct VideoLink
+   - Verify Baker preview shows uploaded video
+
+**Ordering Strategy** (TDD-first):
+1. Write component tests (RED phase) [P]
+2. Implement upload tab UI structure
+3. Integrate upload hooks
+4. Implement helper functions
+5. Run tests, iterate to GREEN phase
+6. Integration tests
+7. Manual testing via quickstart.md
+
+**Estimated Output**: 10-12 focused tasks (smaller scope than full feature, focused on UI enhancement)
+
+**Parallel Execution Opportunities**:
+- Test writing can happen in parallel with design review [P]
+- UI structure and helper functions independent [P]
+- Error handling tests can be written in parallel with happy path tests [P]
+
+**Dependencies**:
+- Existing hooks: useFileUpload, useUploadEvents (already implemented)
+- Existing Tauri command: upload_video (already implemented)
+- Existing components: Tabs, Button, Progress, Alert (ShadCN UI)
+- Existing validation: validateVideoLink function
+
+**Risk Mitigation**:
+- Start with tests to catch integration issues early
+- Manual testing with quickstart.md before marking complete
+- Verify upload state cleanup to prevent memory leaks
 
 **IMPORTANT**: This phase is executed by the /tasks command, NOT by /plan
 
@@ -220,18 +263,40 @@ ios/ or android/
 *This checklist is updated during execution flow*
 
 **Phase Status**:
-- [ ] Phase 0: Research complete (/plan command)
-- [ ] Phase 1: Design complete (/plan command)
-- [ ] Phase 2: Task planning complete (/plan command - describe approach only)
-- [ ] Phase 3: Tasks generated (/tasks command)
+- [x] Phase 0: Research complete (/plan command)
+  - research.md updated with Section 7: Video Upload Toggle Enhancement
+  - All implementation patterns researched (Tabs component, hooks reuse, upload workflow)
+  - No new NEEDS CLARIFICATION items
+- [x] Phase 1: Design complete (/plan command)
+  - contracts/tauri-commands.md enhanced with UI Component Patterns section
+  - quickstart.md updated with upload workflow (Workflow 1 steps 1-8)
+  - quickstart.md error handling updated (Workflow 6 steps 2-4)
+  - data-model.md unchanged (VideoLink already defined, no new fields needed)
+- [x] Phase 2: Task planning approach described (/plan command)
+  - TDD-first strategy defined (10-12 focused tasks)
+  - Dependencies identified (existing hooks, commands, components)
+  - Parallel execution opportunities marked
+  - Risk mitigation strategy documented
+- [ ] Phase 3: Tasks generated (/tasks command - NOT done by /plan)
 - [ ] Phase 4: Implementation complete
 - [ ] Phase 5: Validation passed
 
 **Gate Status**:
-- [ ] Initial Constitution Check: PASS
-- [ ] Post-Design Constitution Check: PASS
-- [ ] All NEEDS CLARIFICATION resolved
-- [ ] Complexity deviations documented
+- [x] Initial Constitution Check: PASS
+  - Simplicity: 1 project, using frameworks directly, no new patterns
+  - Architecture: UI enhancement within existing component structure
+  - Testing: TDD enforced, test-first workflow planned
+  - Observability: Existing logging sufficient
+  - Versioning: Feature 004 enhancement, no breaking changes
+- [x] Post-Design Constitution Check: PASS
+  - No complexity deviations introduced
+  - Reusing existing hooks and commands (DRY principle)
+  - Additive feature, backward compatible
+- [x] All NEEDS CLARIFICATION resolved
+  - No new unknowns introduced in enhancement
+  - All research findings documented in research.md Section 7
+- [x] Complexity deviations documented
+  - N/A - No deviations from constitutional principles
 
 ---
 *Based on Constitution v2.1.1 - See `/memory/constitution.md`*

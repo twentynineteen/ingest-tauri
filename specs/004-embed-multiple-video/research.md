@@ -470,3 +470,235 @@ All NEEDS CLARIFICATION items resolved:
 6. ✅ **URL Parsing & API Fetch**: Parse Sprout Video URLs (frontend), fetch metadata via new Tauri command
 
 **Next Phase**: Proceed to Phase 1 (data-model.md, contracts, quickstart.md) - Update contracts with new `fetch_sprout_video_details` command
+
+---
+
+## 7. Video Upload Toggle Enhancement (NEW - 2025-09-30)
+
+### User Requirement
+
+Extend VideoLinksManager to support direct video upload (similar to TrelloCardsManager's URL/Select toggle). Users should be able to either:
+- **Option A**: Enter an existing Sprout Video URL (current functionality)
+- **Option B**: Upload a video file directly from their filesystem (NEW)
+
+### Implementation Analysis
+
+**Reference Pattern**: TrelloCardsManager (lines 59-303)
+- Uses ShadCN `Tabs` component with `TabsList` and `TabsContent`
+- State: `const [addMode, setAddMode] = useState<'url' | 'select'>('url')`
+- Tab 1: URL entry with manual input
+- Tab 2: Selection from Trello board with search/filter
+
+**Proposed Pattern for VideoLinksManager**:
+- Tab 1: "Enter URL" (existing functionality, keep as-is)
+- Tab 2: "Upload File" (NEW - integrate upload logic)
+- State: `const [addMode, setAddMode] = useState<'url' | 'upload'>('url')`
+
+### Reusable Hooks from UploadSprout.tsx
+
+**useFileUpload Hook** ([src/hooks/useFileUpload.ts](../../src/hooks/useFileUpload.ts)):
+```typescript
+const {
+  selectedFile,      // File path string
+  uploading,         // Boolean upload state
+  response,          // SproutUploadResponse | null
+  selectFile,        // () => Promise<void> - Opens file picker
+  uploadFile,        // (apiKey: string) => Promise<void>
+  resetUploadState   // () => void
+} = useFileUpload()
+```
+
+**Key Features**:
+- File picker with video filters (mp4, mov, avi)
+- Tauri command invocation: `upload_video(filePath, apiKey, folderId)`
+- Event listeners for `upload_complete` and `upload_error`
+- 45-minute timeout for large files
+- Proper cleanup and error handling
+
+**useUploadEvents Hook** ([src/hooks/useUploadEvents.ts](../../src/hooks/useUploadEvents.ts)):
+```typescript
+const {
+  progress,    // number (0-100)
+  uploading,   // boolean
+  message,     // string | null
+  setProgress, // (progress: number) => void
+  setMessage   // (message: string | null) => void
+} = useUploadEvents()
+```
+
+**Key Features**:
+- React Query integration for state management
+- Real-time progress updates via Tauri events (`upload_progress`)
+- Completion/error handling via Tauri events
+
+### File Selection Default Path
+
+**Requirement**: Default to project's Renders/ folder when available
+
+**Implementation**:
+```typescript
+// Check if Renders folder exists
+const rendersPath = `${projectPath}/Renders`
+const rendersExists = await invoke<boolean>('path_exists', { path: rendersPath })
+
+const file = await open({
+  multiple: false,
+  defaultPath: rendersExists ? rendersPath : undefined,
+  filters: [
+    { name: 'Videos', extensions: ['mp4', 'mov', 'avi', 'mkv', 'webm'] }
+  ]
+})
+```
+
+**Note**: Requires `path_exists` Tauri command (likely already exists, verify in Phase 1)
+
+### Auto-Population from Upload Response
+
+**SproutUploadResponse Structure** (from existing code):
+```typescript
+interface SproutUploadResponse {
+  id: string                     // Sprout Video ID
+  title: string                  // Video title (may be empty)
+  created_at: string             // ISO 8601 timestamp
+  assets: {
+    poster_frames: string[]      // Thumbnail URLs
+  }
+  embed_code: string
+  embedded_url: string           // Direct video URL
+  duration: number
+}
+```
+
+**VideoLink Mapping**:
+```typescript
+const createVideoLinkFromUpload = (
+  response: SproutUploadResponse,
+  filePath: string
+): VideoLink => {
+  const filename = filePath.split('/').pop() || 'video'
+  const titleFallback = filename.replace(/\.[^/.]+$/, '') // Remove extension
+
+  return {
+    url: response.embedded_url || `https://sproutvideo.com/videos/${response.id}`,
+    sproutVideoId: response.id,
+    title: response.title || titleFallback,
+    thumbnailUrl: response.assets?.poster_frames?.[0],
+    uploadDate: response.created_at,
+    sourceRenderFile: filename
+  }
+}
+```
+
+### UI Workflow
+
+**Upload Tab Content**:
+1. "Select Video File" button → opens file picker
+2. Display selected filename below button
+3. "Upload and Add" button (disabled until file selected)
+4. Progress bar during upload (with percentage)
+5. Success: Auto-add to videoLinks, close dialog, reset state
+6. Error: Display error message, enable retry
+
+**State Management**:
+- Dialog open/close: Reset all upload state
+- Tab switch: Clear errors, reset upload progress
+- Successful upload: Reset form, close dialog
+- Upload error: Keep file selected, show retry button
+
+### Error Handling
+
+**Error Categories**:
+1. **No API Key**: "Sprout Video API key not configured. Go to Settings."
+2. **No File Selected**: Button disabled, no error message
+3. **Upload Timeout**: "Upload timed out after 45 minutes. Please try again."
+4. **Network Error**: "Network connection error. Check your internet connection."
+5. **API Error**: "Upload failed: HTTP {status} - {message}"
+6. **Validation Error**: (Should not occur, Sprout returns valid data)
+
+**UI States**:
+- Idle: "Upload File" tab, select button enabled
+- File selected: Filename shown, upload button enabled
+- Uploading: Progress bar visible, buttons disabled
+- Success: Auto-close dialog, show success toast
+- Error: Error alert shown, retry button enabled
+
+### Integration Points
+
+**With VideoLinksManager**:
+- Add `Tabs` component to existing dialog
+- Wrap existing URL form in `TabsContent value="url"`
+- Add new upload form in `TabsContent value="upload"`
+- Use existing `addVideoLink` mutation
+- Use existing `validateVideoLink` function
+
+**With useBreadcrumbsVideoLinks Hook**:
+- No changes needed
+- Upload path uses same `addVideoLink` mutation as URL path
+
+**With Baker**:
+- No changes needed
+- Videos added via upload appear same as URL-added videos
+
+### Performance Considerations
+
+1. **Large File Uploads**:
+   - Backend streams in 65KB chunks
+   - Progress events every ~100ms
+   - Supports up to 5GB files
+   - 45-minute timeout
+
+2. **UI Responsiveness**:
+   - Progress updates via events (no polling)
+   - Dialog remains responsive during upload
+   - User can't cancel (no abort mechanism) - future enhancement
+
+3. **Memory Usage**:
+   - File streaming prevents full-file-in-memory
+   - React Query caches upload state efficiently
+
+### Testing Strategy
+
+**Component Tests** (NEW):
+1. Tab switching between URL and Upload modes
+2. File selection opens with correct filters and default path
+3. Upload button disabled states (no file, no API key, uploading)
+4. Progress bar updates during mock upload
+5. Successful upload auto-adds VideoLink with correct fields
+6. Error states display correctly
+7. Dialog cleanup resets upload state
+
+**Integration Tests** (NEW):
+1. End-to-end: Select file → Upload → Add to breadcrumbs
+2. Verify breadcrumbs.json updated with correct VideoLink
+3. Verify Baker preview shows uploaded video
+
+**Contract Tests** (Already Exist):
+- `upload_video` Tauri command contract test
+- `fetch_sprout_video_details` contract test
+
+### Decision Summary
+
+**Decision**: Add Upload tab to VideoLinksManager using Tabs component, reusing useFileUpload and useUploadEvents hooks
+
+**Rationale**:
+1. **Consistency**: Mirrors TrelloCardsManager's toggle pattern (familiar UX)
+2. **Code Reuse**: Leverages existing upload logic from UploadSprout.tsx
+3. **No New Dependencies**: Uses existing ShadCN Tabs component
+4. **Backward Compatible**: Additive feature, doesn't change URL entry flow
+5. **Performance**: Streaming upload with real-time progress tracking
+
+**Alternatives Considered**:
+- Separate upload dialog: Inconsistent with Trello pattern
+- Replace URL entry with upload-only: Removes flexibility
+- Dropdown menu instead of tabs: Less discoverable, requires extra clicks
+- New upload hook: Duplicates logic, adds maintenance burden
+
+**Open Questions for Phase 1**:
+1. ✅ Does `path_exists` Tauri command exist? (Check contracts)
+2. ✅ Should cancel button abort upload? (Not in MVP, future enhancement)
+3. ✅ Default to URL or Upload tab? (URL - less disruptive)
+4. ✅ Show upload history? (No - out of scope for single-upload workflow)
+
+---
+
+**Research Phase Complete**: All unknowns resolved, ready for Phase 1 design
