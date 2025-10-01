@@ -21,3 +21,14 @@ export const useSproutVideoApiKey = () => {
     error
   }
 }
+
+export const useTrelloApiKeys = () => {
+  const { data: apiKeys, isLoading, error } = useApiKeys()
+
+  return {
+    apiKey: apiKeys?.trello || null,
+    apiToken: apiKeys?.trelloToken || null,
+    isLoading,
+    error
+  }
+}

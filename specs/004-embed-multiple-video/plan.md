@@ -1,6 +1,6 @@
-# Implementation Plan: Video Upload Toggle for Video Links
+# Implementation Plan: BuildProject Trello Cards Array Migration
 
-**Branch**: `004-embed-multiple-video` | **Date**: 2025-09-30 | **Spec**: [spec.md](./spec.md)
+**Branch**: `004-embed-multiple-video` | **Date**: 2025-10-01 | **Spec**: [spec.md](./spec.md)
 **Input**: Feature specification from `/specs/004-embed-multiple-video/spec.md`
 
 ## Execution Flow (/plan command scope)
@@ -29,52 +29,53 @@
 - Phase 3-4: Implementation execution (manual or via tools)
 
 ## Summary
-Enhance the VideoLinksManager component to allow users to upload videos directly through a toggle interface (similar to the TrelloCardsManager), rather than only supporting URL entry. This provides a seamless workflow: users can either paste an existing Sprout Video URL OR upload a video file directly from their filesystem (defaulting to the project's Renders/ folder). The upload logic from UploadSprout.tsx will be adapted and integrated into the VideoLinksManager dialog.
+
+Migrate BuildProject from legacy single Trello card storage (`trelloCardUrl`) to array-based storage (`trelloCards[]`) matching Baker's implementation. Replace `TrelloIntegrationModal` with Baker's `TrelloCardsManager` component to support multiple Trello cards per project, enabling users to link pre-production, production, and post-production cards to a single project.
+
+**User Context**: @src/pages/Baker/ has a robust method of linking Trello cards which stores them in an array inside of breadcrumbs.json. Update @src/pages/BuildProject/ to link the Trello cards to the array instead of the separate trello card url - which is no longer required.
 
 ## Technical Context
-**Language/Version**: TypeScript 5.7, React 18.3, Rust 1.75 (Tauri backend)
-**Primary Dependencies**: React, Tauri 2.0, TanStack React Query, ShadCN/Radix UI, Sprout Video API
-**Storage**: Local JSON files (breadcrumbs.json), Sprout Video cloud storage
-**Testing**: Vitest + React Testing Library
-**Target Platform**: Desktop (macOS/Windows/Linux) via Tauri
+**Language/Version**: TypeScript 5.7, Rust 1.75 (Tauri 2.0 backend)
+**Primary Dependencies**: React 18.3, TanStack React Query, @radix-ui/react-tabs, Tauri plugins
+**Storage**: JSON files (breadcrumbs.json in project directories)
+**Testing**: Vitest + Testing Library (migrating from Jest)
+**Target Platform**: macOS desktop (Tauri cross-platform app)
 **Project Type**: Desktop application (Tauri frontend + Rust backend)
-**Performance Goals**: Upload progress tracking with <500ms UI response time, support videos up to 5GB
-**Constraints**: Desktop file access via Tauri dialogs, Sprout Video API rate limits, breadcrumbs file <100KB
-**Scale/Scope**: Single-user desktop app, ~20 video links per project, file operations via Tauri commands
-**User Requirements**: Just like TrelloCardsManager has URL/Select toggle, VideoLinksManager needs URL/Upload toggle referencing UploadSprout.tsx upload logic
+**Performance Goals**: Sub-second file I/O, smooth UI updates during breadcrumbs modifications
+**Constraints**: Backward compatibility with existing breadcrumbs.json files (preserve `trelloCardUrl` field)
+**Scale/Scope**: ~10-50 projects per user, 1-10 Trello cards per project, small JSON file operations
 
 ## Constitution Check
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
 **Simplicity**:
-- Projects: 1 (Tauri desktop app with src/ and src-tauri/)
-- Using framework directly? YES (React, TanStack Query, ShadCN components used directly)
-- Single data model? YES (VideoLink model already defined in data-model.md, no DTOs needed)
-- Avoiding patterns? YES (No Repository pattern, direct Tauri command invocations)
+- Projects: 1 (Desktop app with Tauri frontend + backend) ✅
+- Using framework directly? YES - React/Tauri without wrappers ✅
+- Single data model? YES - BreadcrumbsFile struct used across frontend/backend ✅
+- Avoiding patterns? YES - Direct component reuse, no new abstractions ✅
 
 **Architecture**:
-- EVERY feature as library? NO - This is a UI enhancement within existing component structure
-- Libraries listed: N/A - Using existing hooks (useFileUpload, useUploadEvents) from UploadSprout
-- CLI per library: N/A - Desktop GUI application
-- Library docs: N/A - Internal UI component
+- EVERY feature as library? N/A - Desktop app, not library architecture
+- Component reuse: Reusing Baker's TrelloCardsManager & VideoLinksManager ✅
+- Hooks documented: useBreadcrumbsTrelloCards, useBreadcrumbsVideoLinks documented in code ✅
 
 **Testing (NON-NEGOTIABLE)**:
-- RED-GREEN-Refactor cycle enforced? YES (will write component tests first)
-- Git commits show tests before implementation? YES (following TDD workflow)
-- Order: Contract→Integration→E2E→Unit strictly followed? YES (contract tests for Tauri upload command exist, will add component integration tests)
-- Real dependencies used? YES (actual Sprout Video API via existing Tauri commands)
-- Integration tests for: New UI component behavior, upload dialog state transitions, error handling
-- FORBIDDEN: Implementation before test, skipping RED phase
+- RED-GREEN-Refactor cycle enforced? YES - Contract tests exist, will extend ✅
+- Git commits show tests before implementation? YES - Following TDD workflow ✅
+- Order: Contract→Integration→E2E→Unit strictly followed? YES ✅
+- Real dependencies used? YES - Real file system, actual breadcrumbs.json files ✅
+- Integration tests for: Component integration with existing Baker commands ✅
+- FORBIDDEN: Implementation before test ✅
 
 **Observability**:
-- Structured logging included? YES (Tauri backend has structured logging, frontend uses console with error context)
-- Frontend logs → backend? YES (errors from Tauri commands propagate to frontend with context)
-- Error context sufficient? YES (upload progress events, Sprout API errors captured and displayed)
+- Structured logging included? YES - Tauri backend logs via tracing crate ✅
+- Frontend logs → backend? N/A - Desktop app, shared console ✅
+- Error context sufficient? YES - TanStack Query error boundaries + Tauri error propagation ✅
 
 **Versioning**:
-- Version number assigned? Feature 004 (part of existing MAJOR.MINOR.BUILD cycle)
-- BUILD increments on every change? YES (following existing project versioning)
-- Breaking changes handled? NO BREAKING CHANGES (additive feature, backward compatible with existing VideoLinksManager)
+- Version number assigned? 0.8.3 (existing, will increment BUILD) ✅
+- BUILD increments on every change? YES - Following semver ✅
+- Breaking changes handled? YES - Backward compatibility via optional fields ✅
 
 ## Project Structure
 
@@ -126,122 +127,106 @@ ios/ or android/
 └── [platform-specific structure]
 ```
 
-**Structure Decision**: [DEFAULT to Option 1 unless Technical Context indicates web/mobile app]
+**Structure Decision**: Tauri desktop application structure (frontend `src/` + backend `src-tauri/src/`)
 
-## Phase 0: Outline & Research
-1. **Extract unknowns from Technical Context** above:
-   - For each NEEDS CLARIFICATION → research task
-   - For each dependency → best practices task
-   - For each integration → patterns task
+## Phase 0: Outline & Research ✅ COMPLETE
 
-2. **Generate and dispatch research agents**:
-   ```
-   For each unknown in Technical Context:
-     Task: "Research {unknown} for {feature context}"
-   For each technology choice:
-     Task: "Find best practices for {tech} in {domain}"
-   ```
+**Research Findings** (see [research.md](./research.md)):
 
-3. **Consolidate findings** in `research.md` using format:
-   - Decision: [what was chosen]
-   - Rationale: [why chosen]
-   - Alternatives considered: [what else evaluated]
+1. ✅ **Baker Component Analysis**: TrelloCardsManager and VideoLinksManager are generic, reusable components
+2. ✅ **Data Model Compatibility**: TypeScript/Rust types already defined for trelloCards[] array
+3. ✅ **Backend Commands**: baker_* Tauri commands exist and functional for breadcrumbs operations
+4. ✅ **UI Pattern**: Radix UI Tabs component (@radix-ui/react-tabs already installed)
+5. ✅ **Backward Compatibility**: Optional field pattern preserves legacy trelloCardUrl field
+6. ✅ **Migration Strategy**: Replace TrelloIntegrationModal with TrelloCardsManager component
 
-**Output**: research.md with all NEEDS CLARIFICATION resolved
+**Key Decision**: Reuse Baker components directly without modification - they are project-path aware and generic.
 
-## Phase 1: Design & Contracts
+**Output**: research.md complete with BuildProject-specific implementation findings
+
+## Phase 1: Design & Contracts ✅ COMPLETE
 *Prerequisites: research.md complete*
 
-1. **Extract entities from feature spec** → `data-model.md`:
-   - Entity name, fields, relationships
-   - Validation rules from requirements
-   - State transitions if applicable
+**Completed Artifacts**:
 
-2. **Generate API contracts** from functional requirements:
-   - For each user action → endpoint
-   - Use standard REST/GraphQL patterns
-   - Output OpenAPI/GraphQL schema to `/contracts/`
+1. ✅ **data-model.md**: Comprehensive entity definitions
+   - `VideoLink`: URL, sproutVideoId, title, thumbnailUrl, uploadDate, sourceRenderFile
+   - `TrelloCard`: URL, cardId, title, boardName, lastFetched
+   - `BreadcrumbsFile`: Enhanced with videoLinks[] and trelloCards[] arrays
+   - Validation rules, state transitions, backward compatibility notes
 
-3. **Generate contract tests** from contracts:
-   - One test file per endpoint
-   - Assert request/response schemas
-   - Tests must fail (no implementation yet)
+2. ✅ **contracts/tauri-commands.md**: Tauri command API contracts
+   - `baker_associate_video_link` - Add video to breadcrumbs
+   - `baker_remove_video_link` - Remove video by index
+   - `baker_reorder_video_links` - Reorder videos
+   - `baker_get_video_links` - Retrieve all videos
+   - `baker_associate_trello_card` - Add Trello card
+   - `baker_remove_trello_card` - Remove card by index
+   - `baker_get_trello_cards` - Retrieve all cards
+   - `baker_fetch_trello_card_details` - Fetch card metadata from API
+   - `fetch_sprout_video_details` - Fetch video metadata from Sprout API
 
-4. **Extract test scenarios** from user stories:
-   - Each story → integration test scenario
-   - Quickstart test = story validation steps
+3. ✅ **contracts/test-scenarios.md**: Integration test scenarios
+   - Contract test templates for each command
+   - Validation scenarios for edge cases
+   - Error handling test cases
 
-5. **Update agent file incrementally** (O(1) operation):
-   - Run `/scripts/update-agent-context.sh [claude|gemini|copilot]` for your AI assistant
-   - If exists: Add only NEW tech from current plan
-   - Preserve manual additions between markers
-   - Update recent changes (keep last 3)
-   - Keep under 150 lines for token efficiency
-   - Output to repository root
+4. ✅ **quickstart.md**: Developer validation workflows
+   - Workflow 1: Upload multiple videos and associate with project
+   - Workflow 2: Link multiple Trello cards to project
+   - Workflow 3: Baker preview of multiple media items
+   - Workflow 4: BuildProject integration with Trello cards array
 
-**Output**: data-model.md, /contracts/*, failing tests, quickstart.md, agent-specific file
+5. ✅ **CLAUDE.md updates**: Context documented in main CLAUDE.md file
+   - Phase 004 feature description added
+   - Data models and contracts referenced
+   - Recent changes tracked
 
-## Phase 2: Task Planning Approach
-*This section describes what the /tasks command will do - DO NOT execute during /plan*
+**Output**: All Phase 1 artifacts complete and validated
 
-**Task Generation Strategy**:
-- Load Phase 1 outputs: contracts/tauri-commands.md, quickstart.md, research.md
-- Generate tasks from UI component contracts (VideoLinksManager enhancement)
-- Focus on additive feature: upload tab in existing dialog
-- Reuse existing hooks and commands (useFileUpload, useUploadEvents, upload_video)
+## Phase 2: BuildProject-Specific Task Planning
 
-**Key Task Categories**:
-1. **Component Tests** (TDD - write first):
-   - Test tab switching between URL and Upload modes
-   - Test file selection opens with correct default path
-   - Test upload button disabled states
-   - Test progress bar updates during upload
-   - Test successful upload auto-adds VideoLink
-   - Test error states and retry logic
-   - Test dialog cleanup on close/tab switch
+**Scope**: Migrate BuildProject to use Trello cards array instead of single trelloCardUrl
 
-2. **UI Implementation**:
-   - Add Tabs component to VideoLinksManager dialog
-   - Wrap existing URL form in TabsContent
-   - Create Upload tab with file selection and progress UI
-   - Integrate useFileUpload and useUploadEvents hooks
-   - Implement createVideoLinkFromUpload helper function
-   - Add event handlers for upload workflow
-   - Implement state cleanup on tab switch/dialog close
+**Task Generation Strategy for BuildProject Migration**:
+1. **Component Integration Tasks**:
+   - Import TrelloCardsManager and VideoLinksManager into BuildProject
+   - Replace TrelloIntegrationModal with array-based managers
+   - Update success banner UI to show media management sections
 
-3. **Integration Testing**:
-   - End-to-end test: Select file → Upload → Add to breadcrumbs
-   - Verify breadcrumbs.json updated with correct VideoLink
-   - Verify Baker preview shows uploaded video
+2. **State Management Tasks**:
+   - Verify useBreadcrumbsTrelloCards hook works with BuildProject paths
+   - Test projectPath format compatibility (BuildProject vs Baker)
+   - Ensure appStore breadcrumbs updates propagate correctly
 
-**Ordering Strategy** (TDD-first):
-1. Write component tests (RED phase) [P]
-2. Implement upload tab UI structure
-3. Integrate upload hooks
-4. Implement helper functions
-5. Run tests, iterate to GREEN phase
+3. **UI/UX Tasks**:
+   - Replace "Link to Trello" button with embedded managers
+   - Add Video Links section after project creation
+   - Match Baker's styling and layout patterns
+   - Add empty state messaging for zero cards/videos
+
+4. **Backward Compatibility Tasks**:
+   - Test reading legacy breadcrumbs with single trelloCardUrl
+   - Verify migration from trelloCardUrl → trelloCards[] array
+   - Ensure old breadcrumbs remain readable
+
+5. **Integration Testing Tasks**:
+   - E2E test: BuildProject creation → Add Trello card → Verify breadcrumbs
+   - Cross-page test: BuildProject creates → Baker displays correctly
+   - Regression test: Existing workflows still functional
+
+**Ordering Strategy**:
+1. Type definitions (already complete) ✅
+2. Backend commands (already complete) ✅
+3. Component imports and integration
+4. UI layout updates
+5. State management verification
 6. Integration tests
-7. Manual testing via quickstart.md
+7. Documentation updates
 
-**Estimated Output**: 10-12 focused tasks (smaller scope than full feature, focused on UI enhancement)
+**Estimated Output**: 10-15 tasks specifically for BuildProject migration
 
-**Parallel Execution Opportunities**:
-- Test writing can happen in parallel with design review [P]
-- UI structure and helper functions independent [P]
-- Error handling tests can be written in parallel with happy path tests [P]
-
-**Dependencies**:
-- Existing hooks: useFileUpload, useUploadEvents (already implemented)
-- Existing Tauri command: upload_video (already implemented)
-- Existing components: Tabs, Button, Progress, Alert (ShadCN UI)
-- Existing validation: validateVideoLink function
-
-**Risk Mitigation**:
-- Start with tests to catch integration issues early
-- Manual testing with quickstart.md before marking complete
-- Verify upload state cleanup to prevent memory leaks
-
-**IMPORTANT**: This phase is executed by the /tasks command, NOT by /plan
+**Note**: Baker implementation (phases 0-2) already complete. This focuses ONLY on BuildProject migration.
 
 ## Phase 3+: Future Implementation
 *These phases are beyond the scope of the /plan command*
@@ -251,52 +236,55 @@ ios/ or android/
 **Phase 5**: Validation (run tests, execute quickstart.md, performance validation)
 
 ## Complexity Tracking
-*Fill ONLY if Constitution Check has violations that must be justified*
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+**No constitutional violations identified**. Implementation follows established patterns:
+- Reuses existing components (TrelloCardsManager, VideoLinksManager)
+- Uses existing data models and Tauri commands
+- No new dependencies or architectural patterns required
+- Backward compatibility via optional fields (standard Rust/serde pattern)
 
 
 ## Progress Tracking
 *This checklist is updated during execution flow*
 
 **Phase Status**:
-- [x] Phase 0: Research complete (/plan command)
-  - research.md updated with Section 7: Video Upload Toggle Enhancement
-  - All implementation patterns researched (Tabs component, hooks reuse, upload workflow)
-  - No new NEEDS CLARIFICATION items
-- [x] Phase 1: Design complete (/plan command)
-  - contracts/tauri-commands.md enhanced with UI Component Patterns section
-  - quickstart.md updated with upload workflow (Workflow 1 steps 1-8)
-  - quickstart.md error handling updated (Workflow 6 steps 2-4)
-  - data-model.md unchanged (VideoLink already defined, no new fields needed)
-- [x] Phase 2: Task planning approach described (/plan command)
-  - TDD-first strategy defined (10-12 focused tasks)
-  - Dependencies identified (existing hooks, commands, components)
-  - Parallel execution opportunities marked
-  - Risk mitigation strategy documented
-- [ ] Phase 3: Tasks generated (/tasks command - NOT done by /plan)
+- [x] Phase 0: Research complete (/plan command) ✅
+- [x] Phase 1: Design complete (/plan command) ✅
+- [x] Phase 2: Task planning approach defined (/plan command) ✅
+- [ ] Phase 3: BuildProject migration tasks generated (/tasks command) - NEXT STEP
 - [ ] Phase 4: Implementation complete
 - [ ] Phase 5: Validation passed
 
 **Gate Status**:
-- [x] Initial Constitution Check: PASS
-  - Simplicity: 1 project, using frameworks directly, no new patterns
-  - Architecture: UI enhancement within existing component structure
-  - Testing: TDD enforced, test-first workflow planned
-  - Observability: Existing logging sufficient
-  - Versioning: Feature 004 enhancement, no breaking changes
-- [x] Post-Design Constitution Check: PASS
-  - No complexity deviations introduced
-  - Reusing existing hooks and commands (DRY principle)
-  - Additive feature, backward compatible
-- [x] All NEEDS CLARIFICATION resolved
-  - No new unknowns introduced in enhancement
-  - All research findings documented in research.md Section 7
-- [x] Complexity deviations documented
-  - N/A - No deviations from constitutional principles
+- [x] Initial Constitution Check: PASS ✅
+- [x] Post-Design Constitution Check: PASS ✅
+- [x] All NEEDS CLARIFICATION resolved ✅
+- [x] Complexity deviations: NONE ✅
+
+**Implementation Status**:
+- [x] Baker: TrelloCardsManager implemented and tested ✅
+- [x] Baker: VideoLinksManager implemented and tested ✅
+- [x] Backend: All Tauri commands implemented ✅
+- [x] Types: TypeScript and Rust types defined ✅
+- [ ] BuildProject: Component integration (PENDING)
+- [ ] BuildProject: UI updates (PENDING)
+- [ ] BuildProject: Testing (PENDING)
+
+---
+
+## Next Steps
+
+**Ready for `/tasks` command** to generate BuildProject-specific implementation tasks.
+
+**Focus Areas**:
+1. Replace `TrelloIntegrationModal` with `TrelloCardsManager` in BuildProject.tsx
+2. Add `VideoLinksManager` component to post-creation success UI
+3. Update breadcrumbs state management for BuildProject workflow
+4. Write integration tests for BuildProject → Baker cross-page functionality
+5. Update CLAUDE.md with BuildProject migration notes
+
+**Estimated Implementation Time**: 2-4 hours for component integration + testing
 
 ---
 *Based on Constitution v2.1.1 - See `/memory/constitution.md`*
+*Planning completed: 2025-10-01*

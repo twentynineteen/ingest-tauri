@@ -8,8 +8,8 @@ import {
 } from 'hooks'
 import { FootageFile } from 'hooks/useCameraAutoRemap'
 import React, { useState } from 'react'
-import TrelloIntegrationButton from '../../components/trello/TrelloIntegrationButton'
-import TrelloIntegrationModal from '../../components/trello/TrelloIntegrationModal'
+import { TrelloCardsManager } from '../../components/Baker/TrelloCardsManager'
+import { useTrelloApiKeys } from 'hooks/useApiKeys'
 import FolderSelector from './FolderSelector'
 import ProgressBar from './ProgressBar'
 import ProjectActions from './ProjectActions'
@@ -28,8 +28,6 @@ const BuildProject: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const [, setMessage] = useState('')
 
-  // Trello integration state
-  const [showTrelloModal, setShowTrelloModal] = useState(false)
 
   // Track if title was sanitized to show warning
   const [titleSanitized, setTitleSanitized] = useState(false)
@@ -45,6 +43,8 @@ const BuildProject: React.FC = () => {
   const { progress, completed } = useCopyProgress({
     operationId: 'build-project'
   })
+
+  const { apiKey, apiToken } = useTrelloApiKeys()
 
   console.log('BuildProject render - progress:', progress, 'completed:', completed)
 
@@ -157,29 +157,26 @@ const BuildProject: React.FC = () => {
           </div>
 
           {/* 🔹 Post-completion actions - shown after project completion */}
-          {completed && !loading && (
-            <div className="pt-6 text-center space-y-4 animate-fadeIn">
+          {completed && !loading && selectedFolder && title && (
+            <div className="pt-6 space-y-4 animate-fadeIn">
               <div className="mx-4 p-6 bg-linear-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl shadow-xs">
-                <h3 className="text-lg font-semibold text-green-800 mb-2">
+                <h3 className="text-lg font-semibold text-green-800 mb-4 text-center">
                   Project Created Successfully! 🎉
                 </h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Link your project to a Trello card to keep track of your workflow
-                </p>
-                <div className="flex justify-center">
-                  <TrelloIntegrationButton onClick={() => setShowTrelloModal(true)} />
-                </div>
+
+                {/* Trello Cards Manager */}
+                <TrelloCardsManager
+                  projectPath={`${selectedFolder}/${title}`}
+                  trelloApiKey={apiKey}
+                  trelloApiToken={apiToken}
+                  autoSyncToTrello={true}
+                />
               </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Trello Integration Modal */}
-      <TrelloIntegrationModal
-        isOpen={showTrelloModal}
-        onClose={() => setShowTrelloModal(false)}
-      />
     </div>
   )
 }
