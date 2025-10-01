@@ -3,7 +3,7 @@
  * Feature: 004-embed-multiple-video
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Plus, AlertCircle, Loader2, Upload as UploadIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -20,14 +20,18 @@ import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { VideoLinkCard } from './VideoLinkCard'
+import { TrelloCardUpdateDialog } from './TrelloCardUpdateDialog'
 import { useBreadcrumbsVideoLinks } from '../../hooks/useBreadcrumbsVideoLinks'
+import { useBreadcrumbsTrelloCards } from '../../hooks/useBreadcrumbsTrelloCards'
 import { useSproutVideoApi } from '../../hooks/useSproutVideoApi'
-import { useSproutVideoApiKey } from '../../hooks/useApiKeys'
+import { useSproutVideoApiKey, useTrelloApiKey } from '../../hooks/useApiKeys'
 import { useFileUpload } from '../../hooks/useFileUpload'
 import { useUploadEvents } from '../../hooks/useUploadEvents'
 import { useSproutVideoProcessor } from '../../hooks/useSproutVideoProcessor'
 import { validateVideoLink } from '../../utils/validation'
-import type { VideoLink } from '../../types/baker'
+import { generateBreadcrumbsBlock, updateTrelloCardWithBreadcrumbs } from '../../hooks/useAppendBreadcrumbs'
+import { invoke } from '@tauri-apps/api/core'
+import type { VideoLink, BreadcrumbsFile } from '../../types/baker'
 
 interface VideoLinksManagerProps {
   projectPath: string
@@ -45,13 +49,16 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
     addError
   } = useBreadcrumbsVideoLinks({ projectPath })
 
+  const { trelloCards } = useBreadcrumbsTrelloCards({ projectPath })
   const { apiKey } = useSproutVideoApiKey()
+  const { apiKey: trelloApiKey, token: trelloToken } = useTrelloApiKey()
   const { fetchVideoDetailsAsync, isFetching: isFetchingVideo } = useSproutVideoApi()
   const { selectedFile, uploading, response, selectFile, uploadFile, resetUploadState } =
     useFileUpload()
   const { progress, message } = useUploadEvents()
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isTrelloDialogOpen, setIsTrelloDialogOpen] = useState(false)
   const [addMode, setAddMode] = useState<'url' | 'upload'>('url')
   const [formData, setFormData] = useState({
     url: '',
@@ -61,6 +68,7 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
   })
   const [validationErrors, setValidationErrors] = useState<string[]>([])
   const [fetchError, setFetchError] = useState<string | null>(null)
+  const [uploadSuccess, setUploadSuccess] = useState(false)
 
   // React Query-based upload processor (replaces useEffect pattern)
   const videoProcessor = useSproutVideoProcessor({
@@ -70,13 +78,26 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
     enabled: addMode === 'upload',
     onVideoReady: (videoLink) => {
       addVideoLink(videoLink)
-      resetUploadState()
-      setIsDialogOpen(false)
+      // Don't reset upload state here - keep the success UI showing
+      // Don't auto-close - let user see success and close manually
+
+      // Auto-trigger Trello card update if we have cards
+      if (trelloCards && trelloCards.length > 0 && trelloApiKey && trelloToken) {
+        setIsTrelloDialogOpen(true)
+      }
     },
     onError: (error) => {
       setValidationErrors([error])
+      setUploadSuccess(false)
     }
   })
+
+  // Track when upload completes (response received, even if still processing)
+  useEffect(() => {
+    if (response && !uploading && addMode === 'upload') {
+      setUploadSuccess(true)
+    }
+  }, [response, uploading, addMode])
 
   const handleFetchVideoDetails = async () => {
     if (!formData.url || !apiKey) return
@@ -163,6 +184,45 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
     }
   }
 
+  const handleTrelloCardUpdate = async (selectedCardIndexes: number[]) => {
+    if (!trelloApiKey || !trelloToken) {
+      throw new Error('Trello API credentials not configured')
+    }
+
+    // Get current breadcrumbs with updated video links
+    const breadcrumbsData = await invoke<BreadcrumbsFile>('baker_get_breadcrumbs', {
+      projectPath
+    })
+
+    // Generate updated breadcrumbs block
+    const breadcrumbsBlock = generateBreadcrumbsBlock(breadcrumbsData)
+
+    // Update selected cards
+    const updatePromises = selectedCardIndexes.map(async (index) => {
+      const card = trelloCards[index]
+      // Fetch full card details from Trello API to get current description
+      const response = await fetch(
+        `https://api.trello.com/1/cards/${card.cardId}?key=${trelloApiKey}&token=${trelloToken}`
+      )
+      const fullCard = await response.json()
+
+      await updateTrelloCardWithBreadcrumbs(
+        fullCard,
+        breadcrumbsBlock,
+        trelloApiKey,
+        trelloToken,
+        { autoReplace: true, silentErrors: false }
+      )
+    })
+
+    await Promise.all(updatePromises)
+  }
+
+  const handleAddTrelloCard = () => {
+    // TODO: Implement navigation to TrelloCardsManager or open add dialog
+    console.log('Add Trello Card functionality to be implemented')
+  }
+
   const handleDialogOpenChange = (open: boolean) => {
     setIsDialogOpen(open)
 
@@ -172,6 +232,7 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
       setValidationErrors([])
       setFetchError(null)
       setAddMode('url')
+      setUploadSuccess(false)
       resetUploadState()
       videoProcessor.reset()
     }
@@ -181,6 +242,7 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
     setAddMode(value as 'url' | 'upload')
     setValidationErrors([])
     setFetchError(null)
+    setUploadSuccess(false)
 
     // Reset upload state when switching away from upload tab
     if (value === 'url') {
@@ -405,6 +467,10 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
                   </Button>
                   <Button onClick={handleAddVideo}>Add Video</Button>
                 </>
+              ) : uploadSuccess ? (
+                <Button onClick={() => handleDialogOpenChange(false)} className="w-full">
+                  Finish
+                </Button>
               ) : (
                 <>
                   <Button variant="outline" onClick={() => handleDialogOpenChange(false)}>
@@ -460,6 +526,15 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
           <span className="ml-2 text-sm text-gray-500">Updating...</span>
         </div>
       )}
+
+      {/* Trello Card Update Dialog */}
+      <TrelloCardUpdateDialog
+        open={isTrelloDialogOpen}
+        onOpenChange={setIsTrelloDialogOpen}
+        trelloCards={trelloCards}
+        onUpdate={handleTrelloCardUpdate}
+        onAddTrelloCard={handleAddTrelloCard}
+      />
     </div>
   )
 }

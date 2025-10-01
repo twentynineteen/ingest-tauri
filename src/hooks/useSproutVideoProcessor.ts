@@ -41,23 +41,20 @@ function processUploadResponse(
     }
   }
 
-  // Check if we have a valid embedded_url (video must be processed)
-  // Sprout Video initially returns state="inspecting" with no embedded_url
-  if (!response.embedded_url) {
-    console.log(`Video ${response.id} state: ${response.state}, waiting for processing...`)
-    return {
-      videoLink: null,
-      shouldAdd: false,
-      error: undefined // Not an error, just not ready yet
-    }
-  }
-
   // Extract filename without path and extension for fallback title
   const filename = selectedFile.split('/').pop()?.split('.')[0] || 'Untitled'
   const sourceFilename = selectedFile.split('/').pop() || ''
 
+  // Use embedded_url if available, otherwise construct URL from video ID
+  // Sprout Video initially returns state="inspecting" with no embedded_url
+  const videoUrl = response.embedded_url || `https://sproutvideo.com/videos/${response.id}`
+
+  if (!response.embedded_url) {
+    console.log(`Video ${response.id} state: ${response.state}, adding with constructed URL...`)
+  }
+
   const videoLink: VideoLink = {
-    url: response.embedded_url,
+    url: videoUrl,
     sproutVideoId: response.id,
     title: response.title || filename,
     thumbnailUrl: response.assets?.poster_frames?.[0] || undefined,

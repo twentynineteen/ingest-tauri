@@ -10,13 +10,17 @@ interface UseFuzzySearchOptions {
 export function useFuzzySearch<T>(items: T[], options: UseFuzzySearchOptions) {
   const [searchTerm, setSearchTerm] = useState('')
 
+  // Stringify options for stable comparison
+  const optionsKey = JSON.stringify({
+    keys: options.keys,
+    threshold: options.threshold ?? 0.3,
+    includeMatches: options.includeMatches ?? false
+  })
+
   const fuse = useMemo(() => {
-    return new Fuse(items, {
-      keys: options.keys,
-      threshold: options.threshold ?? 0.3,
-      includeMatches: options.includeMatches ?? false
-    })
-  }, [items, options.keys, options.threshold, options.includeMatches])
+    const opts = JSON.parse(optionsKey)
+    return new Fuse(items, opts)
+  }, [items, optionsKey])
 
   const results = useMemo(() => {
     if (!searchTerm.trim()) {

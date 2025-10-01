@@ -113,11 +113,12 @@ export const useUploadEvents = (): UseUploadEventsReturn => {
           }
         })
 
-        unlistenComplete = await listen('upload_complete', event => {
+        unlistenComplete = await listen('upload_complete', () => {
           if (isMounted) {
-            const messageValue = event.payload as string
+            // Backend sends the response object, not a string message
+            // Convert to a success message for display
             updateUploadState({
-              message: messageValue,
+              message: 'Upload successful',
               uploading: false,
               progress: 100
             })

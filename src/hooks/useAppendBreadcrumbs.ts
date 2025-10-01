@@ -32,8 +32,24 @@ function formatBreadcrumbsForHumans(breadcrumbs: Breadcrumb): string {
     lines.push(`**Created:** ${breadcrumbs.creationDateTime}`)
   }
 
+  // Add video links if present (Phase 004)
+  if (breadcrumbs.videoLinks && breadcrumbs.videoLinks.length > 0) {
+    lines.push(`\n**Videos:** ${breadcrumbs.videoLinks.length} linked`)
+    breadcrumbs.videoLinks.forEach((video, index) => {
+      lines.push(`   ${index + 1}. [${video.title}](${video.url})`)
+    })
+  }
+
   if (breadcrumbs.trelloCardUrl) {
-    lines.push(`**Trello Card:** ${breadcrumbs.trelloCardUrl}`)
+    lines.push(`\n**Trello Card:** ${breadcrumbs.trelloCardUrl}`)
+  }
+
+  // Add Trello cards if present (Phase 004)
+  if (breadcrumbs.trelloCards && breadcrumbs.trelloCards.length > 0) {
+    lines.push(`**Trello Cards:** ${breadcrumbs.trelloCards.length} linked`)
+    breadcrumbs.trelloCards.forEach((card, index) => {
+      lines.push(`   ${index + 1}. [${card.title}](${card.url})`)
+    })
   }
 
   if (breadcrumbs.files && breadcrumbs.files.length > 0) {

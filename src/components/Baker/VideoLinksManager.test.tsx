@@ -666,7 +666,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
       })
     })
 
-    it('should close dialog after successful add', async () => {
+    it('should keep dialog open after successful add and show Close button', async () => {
       vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
         selectedFile: '/test/video.mp4',
         uploading: false,
@@ -686,13 +686,21 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
       const uploadTab = screen.getByRole('tab', { name: /upload file/i })
       await userEvent.click(uploadTab)
 
-      // Dialog should close after successful add
+      // Dialog should stay open after successful add
       await waitFor(() => {
-        expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+        expect(mockAddVideoLink).toHaveBeenCalled()
+      })
+
+      // Dialog should still be open
+      expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+      // Should show a "Finish" button in the footer
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /^finish$/i })).toBeInTheDocument()
       })
     })
 
-    it('should reset upload state after successful add', async () => {
+    it('should reset upload state when closing dialog after successful add', async () => {
       vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
         selectedFile: '/test/video.mp4',
         uploading: false,
@@ -710,6 +718,16 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
       const uploadTab = screen.getByRole('tab', { name: /upload file/i })
       await userEvent.click(uploadTab)
 
+      // Wait for upload success
+      await waitFor(() => {
+        expect(mockAddVideoLink).toHaveBeenCalled()
+      })
+
+      // Now close the dialog
+      const finishButton = screen.getByRole('button', { name: /^finish$/i })
+      await userEvent.click(finishButton)
+
+      // Reset should be called when dialog closes
       await waitFor(() => {
         expect(mockResetUploadState).toHaveBeenCalled()
       })
