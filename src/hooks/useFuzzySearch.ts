@@ -14,7 +14,9 @@ export function useFuzzySearch<T>(items: T[], options: UseFuzzySearchOptions) {
     return new Fuse(items, {
       keys: options.keys,
       threshold: options.threshold ?? 0.3,
-      includeMatches: options.includeMatches ?? false
+      includeMatches: options.includeMatches ?? false,
+      ignoreLocation: true,
+      minMatchCharLength: 2
     })
   }, [items, options.keys, options.threshold, options.includeMatches])
 

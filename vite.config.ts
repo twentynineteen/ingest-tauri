@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
+/// <reference types="vitest" />
+
 const host = process.env.TAURI_DEV_HOST
 
 // https://vitejs.dev/config/
@@ -45,5 +47,11 @@ export default defineConfig({
     cssMinify: !process.env.TAURI_DEBUG ? 'lightningcss' : false,
     // produce sourcemaps for debug builds
     sourcemap: !!process.env.TAURI_DEBUG
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./tests/setup/vitest-setup.ts', './tests/setup/msw-server.ts'],
+    mockReset: true
   }
 })

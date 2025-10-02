@@ -58,7 +58,19 @@ fn main() {
             baker_update_breadcrumbs,
             baker_scan_current_files,
             get_folder_size,
-            baker_read_raw_breadcrumbs
+            baker_read_raw_breadcrumbs,
+            // Feature 004: Multiple video links and Trello cards
+            baker_get_video_links,
+            baker_associate_video_link,
+            baker_remove_video_link,
+            baker_update_video_link,
+            baker_reorder_video_links,
+            baker_get_trello_cards,
+            baker_associate_trello_card,
+            baker_remove_trello_card,
+            baker_fetch_trello_card_details,
+            // Feature 004 Phase 2: Sprout Video URL auto-fetch
+            fetch_sprout_video_details
         ])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");

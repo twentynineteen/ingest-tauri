@@ -22,6 +22,8 @@ interface ProjectListProps {
   isLoadingBreadcrumbs: boolean
   breadcrumbsError: string | null
   getPreview: (projectPath: string) => BreadcrumbsPreview | null
+  trelloApiKey?: string
+  trelloApiToken?: string
 }
 
 export const ProjectList: React.FC<ProjectListProps> = ({
@@ -35,7 +37,9 @@ export const ProjectList: React.FC<ProjectListProps> = ({
   breadcrumbs,
   isLoadingBreadcrumbs,
   breadcrumbsError,
-  getPreview
+  getPreview,
+  trelloApiKey,
+  trelloApiToken
 }) => {
   if (projects.length === 0) {
     return (
@@ -138,6 +142,8 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                     previewMode={previewProject === project.path}
                     preview={getPreview(project.path)}
                     onTogglePreview={() => onTogglePreview(project.path)}
+                    trelloApiKey={trelloApiKey}
+                    trelloApiToken={trelloApiToken}
                   />
                 ) : (
                   <div className="flex items-center justify-center py-4 text-gray-500">
