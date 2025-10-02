@@ -2,7 +2,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { ask, confirm, open } from '@tauri-apps/plugin-dialog'
 import { readTextFile } from '@tauri-apps/plugin-fs'
 import { appStore } from 'store/useAppStore'
-import { TrelloCard } from 'utils/TrelloCards'
+import { TrelloCard as LegacyTrelloCard } from 'utils/TrelloCards'
+import type { TrelloCard } from 'types/media'
 import type { Breadcrumb } from 'utils/types'
 
 function formatBreadcrumbsForHumans(breadcrumbs: Breadcrumb): string {
@@ -83,7 +84,7 @@ export function generateBreadcrumbsBlock(breadcrumbsData: Breadcrumb): string {
 
 // Utility function to update Trello card with breadcrumbs without dialogs
 export async function updateTrelloCardWithBreadcrumbs(
-  card: TrelloCard,
+  card: LegacyTrelloCard,
   breadcrumbsBlock: string,
   apiKey: string,
   token: string,
@@ -167,12 +168,12 @@ export function useAppendBreadcrumbs(
     silentErrors?: boolean
   } = {}
 ): {
-  getBreadcrumbsBlock: (card: TrelloCard | null) => Promise<string | null>
-  applyBreadcrumbsToCard: (card: TrelloCard, breadcrumbsBlock: string) => Promise<void>
+  getBreadcrumbsBlock: (card: LegacyTrelloCard | null) => Promise<string | null>
+  applyBreadcrumbsToCard: (card: LegacyTrelloCard, breadcrumbsBlock: string) => Promise<void>
 } {
   const queryClient = useQueryClient()
 
-  async function getBreadcrumbsBlock(card: TrelloCard | null): Promise<string | null> {
+  async function getBreadcrumbsBlock(card: LegacyTrelloCard | null): Promise<string | null> {
     if (!card || !apiKey || !token) return null
 
     try {
@@ -227,7 +228,7 @@ export function useAppendBreadcrumbs(
   }
 
   async function applyBreadcrumbsToCard(
-    card: TrelloCard,
+    card: LegacyTrelloCard,
     breadcrumbsBlock: string
   ): Promise<void> {
     try {

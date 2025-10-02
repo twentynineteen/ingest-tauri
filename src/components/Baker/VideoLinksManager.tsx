@@ -190,7 +190,7 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
     }
 
     // Get current breadcrumbs with updated video links
-    const breadcrumbsData = await invoke<BreadcrumbsFile>('baker_get_breadcrumbs', {
+    const breadcrumbsData = await invoke<BreadcrumbsFile>('baker_read_breadcrumbs', {
       projectPath
     })
 
