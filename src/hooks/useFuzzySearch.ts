@@ -10,13 +10,6 @@ interface UseFuzzySearchOptions {
 export function useFuzzySearch<T>(items: T[], options: UseFuzzySearchOptions) {
   const [searchTerm, setSearchTerm] = useState('')
 
-  // Stringify options for stable comparison
-  const optionsKey = JSON.stringify({
-    keys: options.keys,
-    threshold: options.threshold ?? 0.3,
-    includeMatches: options.includeMatches ?? false
-  })
-
   const fuse = useMemo(() => {
     return new Fuse(items, {
       keys: options.keys,

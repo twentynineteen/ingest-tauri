@@ -24,7 +24,7 @@ import { TrelloCardUpdateDialog } from './TrelloCardUpdateDialog'
 import { useBreadcrumbsVideoLinks } from '../../hooks/useBreadcrumbsVideoLinks'
 import { useBreadcrumbsTrelloCards } from '../../hooks/useBreadcrumbsTrelloCards'
 import { useSproutVideoApi } from '../../hooks/useSproutVideoApi'
-import { useSproutVideoApiKey, useTrelloApiKey } from '../../hooks/useApiKeys'
+import { useSproutVideoApiKey, useTrelloApiKeys } from '../../hooks/useApiKeys'
 import { useFileUpload } from '../../hooks/useFileUpload'
 import { useUploadEvents } from '../../hooks/useUploadEvents'
 import { useSproutVideoProcessor } from '../../hooks/useSproutVideoProcessor'
@@ -51,7 +51,7 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
 
   const { trelloCards } = useBreadcrumbsTrelloCards({ projectPath })
   const { apiKey } = useSproutVideoApiKey()
-  const { apiKey: trelloApiKey, token: trelloToken } = useTrelloApiKey()
+  const { apiKey: trelloApiKey, apiToken: trelloToken } = useTrelloApiKeys()
   const { fetchVideoDetailsAsync, isFetching: isFetchingVideo } = useSproutVideoApi()
   const { selectedFile, uploading, response, selectFile, uploadFile, resetUploadState } =
     useFileUpload()
