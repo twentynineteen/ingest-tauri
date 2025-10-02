@@ -2,7 +2,6 @@
 
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
-import { resolveResource } from '@tauri-apps/api/path'
 import { confirm } from '@tauri-apps/plugin-dialog'
 import { exists, mkdir, remove, writeTextFile } from '@tauri-apps/plugin-fs'
 import { appStore } from 'store/useAppStore'
@@ -125,11 +124,9 @@ export function useCreateProject() {
 
         try {
           const filePath = `${projectData.parentFolder}/${projectData.projectTitle}/Projects/`
-          const location = await resolveResource('Premiere 4K Template 2025.prproj')
 
           const result = await invoke('copy_premiere_project', {
             destinationFolder: filePath,
-            location,
             newTitle: projectData.projectTitle
           })
 
@@ -156,9 +153,17 @@ export function useCreateProject() {
 
       // Set up event listener BEFORE calling move_files
       unlistenComplete = await listen<string[]>('copy_complete', async () => {
-        setCompleted?.(true)
-        await createTemplatePremiereProject()
-        await showDialogAndOpenFolder()
+        try {
+          setCompleted?.(true)
+          await createTemplatePremiereProject()
+          await showDialogAndOpenFolder()
+        } catch (error) {
+          console.error('Error in copy_complete handler:', error)
+          alert('Error completing project: ' + error)
+        } finally {
+          // Clean up the event listener after handling the event
+          if (unlistenComplete) unlistenComplete()
+        }
       })
 
       await invoke('move_files', {
@@ -168,7 +173,7 @@ export function useCreateProject() {
     } catch (error) {
       console.error('Error creating project:', error)
       alert('Error creating project: ' + error)
-    } finally {
+      // Clean up listener if we error before move_files completes
       if (unlistenComplete) unlistenComplete()
     }
   }
