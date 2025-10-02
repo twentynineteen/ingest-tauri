@@ -22,12 +22,12 @@ export const useSproutVideoApiKey = () => {
   }
 }
 
-export const useTrelloApiKey = () => {
+export const useTrelloApiKeys = () => {
   const { data: apiKeys, isLoading, error } = useApiKeys()
 
   return {
-    apiKey: apiKeys?.trelloApiKey || null,
-    token: apiKeys?.trelloToken || null,
+    apiKey: apiKeys?.trello || null,
+    apiToken: apiKeys?.trelloToken || null,
     isLoading,
     error
   }

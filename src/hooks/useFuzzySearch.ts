@@ -18,9 +18,14 @@ export function useFuzzySearch<T>(items: T[], options: UseFuzzySearchOptions) {
   })
 
   const fuse = useMemo(() => {
-    const opts = JSON.parse(optionsKey)
-    return new Fuse(items, opts)
-  }, [items, optionsKey])
+    return new Fuse(items, {
+      keys: options.keys,
+      threshold: options.threshold ?? 0.3,
+      includeMatches: options.includeMatches ?? false,
+      ignoreLocation: true,
+      minMatchCharLength: 2
+    })
+  }, [items, options.keys, options.threshold, options.includeMatches])
 
   const results = useMemo(() => {
     if (!searchTerm.trim()) {

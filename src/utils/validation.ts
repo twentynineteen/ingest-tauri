@@ -101,9 +101,10 @@ export function isValidHttpsUrl(url: string, maxLength: number = 2048): boolean 
  * Helper: Validates if a string is valid ISO 8601 format
  */
 export function isValidIso8601(dateString: string): boolean {
-  // ISO 8601 format: YYYY-MM-DDTHH:mm:ss.sssZ or YYYY-MM-DDTHH:mm:ssZ
+  // ISO 8601 / RFC3339 format: YYYY-MM-DDTHH:mm:ss.sss+00:00 or YYYY-MM-DDTHH:mm:ssZ
+  // More flexible to accept various formats including subseconds with varying precision
   const iso8601Pattern =
-    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?([+-]\d{2}:\d{2}|Z)$/
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?([+-]\d{2}:\d{2}|Z)$/
   if (!iso8601Pattern.test(dateString)) {
     return false
   }

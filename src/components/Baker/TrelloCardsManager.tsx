@@ -30,12 +30,14 @@ interface TrelloCardsManagerProps {
   projectPath: string
   trelloApiKey?: string
   trelloApiToken?: string
+  autoSyncToTrello?: boolean // Auto-update Trello card description with breadcrumbs after adding
 }
 
 export function TrelloCardsManager({
   projectPath,
   trelloApiKey,
-  trelloApiToken
+  trelloApiToken,
+  autoSyncToTrello = false
 }: TrelloCardsManagerProps) {
   const {
     trelloCards,
@@ -43,13 +45,11 @@ export function TrelloCardsManager({
     error,
     addTrelloCard,
     removeTrelloCard,
-    fetchCardDetails,
     fetchCardDetailsAsync,
     isUpdating,
     isFetchingDetails,
     addError,
-    fetchError,
-    fetchedCardData
+    fetchError
   } = useBreadcrumbsTrelloCards({ projectPath })
 
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -57,16 +57,73 @@ export function TrelloCardsManager({
   const [validationErrors, setValidationErrors] = useState<string[]>([])
   const [isFetchingCard, setIsFetchingCard] = useState(false)
   const [addMode, setAddMode] = useState<'url' | 'select'>('url')
+  const [isSyncingToTrello, setIsSyncingToTrello] = useState(false)
+
+  // Helper function to sync breadcrumbs to Trello card description
+  const syncBreadcrumbsToTrello = async (cardData: TrelloCard) => {
+    if (!autoSyncToTrello || !trelloApiKey || !trelloApiToken) {
+      return
+    }
+
+    try {
+      setIsSyncingToTrello(true)
+
+      // Read breadcrumbs file
+      const { readTextFile } = await import('@tauri-apps/plugin-fs')
+      const breadcrumbsPath = `${projectPath}/breadcrumbs.json`
+      const breadcrumbsContent = await readTextFile(breadcrumbsPath)
+      const breadcrumbsData = JSON.parse(breadcrumbsContent)
+
+      // Import utility functions
+      const { generateBreadcrumbsBlock, updateTrelloCardWithBreadcrumbs } =
+        await import('../../hooks/useAppendBreadcrumbs')
+
+      // Convert breadcrumbs TrelloCard to API TrelloCard format
+      const apiCard = {
+        id: cardData.cardId,
+        name: cardData.title,
+        desc: '', // Will be fetched from Trello API
+        idList: ''
+      }
+
+      // Fetch current card details from Trello to get the description
+      const response = await fetch(
+        `https://api.trello.com/1/cards/${cardData.cardId}?key=${trelloApiKey}&token=${trelloApiToken}`,
+        { method: 'GET' }
+      )
+
+      if (response.ok) {
+        const currentCard = await response.json()
+        apiCard.desc = currentCard.desc || ''
+        apiCard.idList = currentCard.idList || ''
+      }
+
+      // Generate and update
+      const block = generateBreadcrumbsBlock(breadcrumbsData)
+      await updateTrelloCardWithBreadcrumbs(
+        apiCard,
+        block,
+        trelloApiKey,
+        trelloApiToken,
+        { autoReplace: true, silentErrors: false }
+      )
+    } catch (err) {
+      console.error('Failed to sync breadcrumbs to Trello:', err)
+      // Don't throw - allow card to be added even if sync fails
+    } finally {
+      setIsSyncingToTrello(false)
+    }
+  }
 
   // Fetch Trello board cards if API credentials are available
   const boardId = '55a504d70bed2bd21008dc5a' // Small projects board
-  const { grouped, isLoading: isBoardLoading, apiKey, token } = useTrelloBoard(
+  const { grouped, isLoading: isBoardLoading } = useTrelloBoard(
     trelloApiKey && trelloApiToken ? boardId : null
   )
 
   // Flatten all cards for search
   const allCards = useMemo(() => {
-    const cards: any[] = []
+    const cards: Array<{ id: string; name: string; desc?: string }> = []
     Object.values(grouped).forEach(cardList => {
       cards.push(...cardList)
     })
@@ -80,7 +137,7 @@ export function TrelloCardsManager({
     results: filteredCards
   } = useFuzzySearch(allCards, {
     keys: ['name', 'desc'],
-    threshold: 0.4
+    threshold: 0.3
   })
 
   // Re-group filtered cards by list
@@ -89,10 +146,10 @@ export function TrelloCardsManager({
       return grouped
     }
 
-    const result: Record<string, any[]> = {}
+    const result: Record<string, Array<{ id: string; name: string; desc?: string }>> = {}
     filteredCards.forEach(card => {
       Object.entries(grouped).forEach(([listName, cards]) => {
-        if (cards.some((c: any) => c.id === card.id)) {
+        if (cards.some(c => c.id === card.id)) {
           if (!result[listName]) {
             result[listName] = []
           }
@@ -133,6 +190,10 @@ export function TrelloCardsManager({
 
         // Add card
         addTrelloCard(cardData)
+
+        // Sync to Trello if auto-sync is enabled
+        await syncBreadcrumbsToTrello(cardData)
+
         setIsDialogOpen(false)
       } catch (err) {
         setValidationErrors([
@@ -187,6 +248,10 @@ export function TrelloCardsManager({
 
         // Add card
         addTrelloCard(cardData)
+
+        // Sync to Trello if auto-sync is enabled
+        await syncBreadcrumbsToTrello(cardData)
+
         setCardUrl('')
         setIsDialogOpen(false)
       } catch (err) {
@@ -211,6 +276,10 @@ export function TrelloCardsManager({
       }
 
       addTrelloCard(newCard)
+
+      // Sync to Trello if auto-sync is enabled (async, don't await)
+      syncBreadcrumbsToTrello(newCard)
+
       setCardUrl('')
       setIsDialogOpen(false)
     }
@@ -440,11 +509,15 @@ export function TrelloCardsManager({
         </div>
       )}
 
-      {(isUpdating || isFetchingDetails) && (
+      {(isUpdating || isFetchingDetails || isSyncingToTrello) && (
         <div className="flex items-center justify-center py-4">
           <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
           <span className="ml-2 text-sm text-gray-500">
-            {isFetchingDetails ? 'Fetching card details...' : 'Updating...'}
+            {isSyncingToTrello
+              ? 'Syncing breadcrumbs to Trello...'
+              : isFetchingDetails
+                ? 'Fetching card details...'
+                : 'Updating...'}
           </span>
         </div>
       )}
