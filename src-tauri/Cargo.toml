@@ -1,6 +1,6 @@
 [package]
 name = "Bucket"
-version = "0.8.3"
+version = "0.8.4"
 description = "An app to streamline ingesting and uploading video content"
 authors = ["Daniel Mills"]
 license = "MIT"
@@ -76,3 +76,6 @@ tauri-plugin-updater = "2.9.0"
 
 [profile.dev.package.objc2]
 debug-assertions = false
+
+[dev-dependencies]
+tempfile = "3.8"

@@ -16,10 +16,7 @@ use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 /// * `Ok(String)` with the file's contents if successful.
 /// * `Err(String)` if an error occurs (for example, if the file doesn't exist or cannot be read).
 #[tauri::command]
-pub fn open_resource_file(
-        handle: AppHandle, 
-        relative_file_path: &str
-    ) -> Result<Vec<u8>, String> {
+pub fn open_resource_file(handle: AppHandle, relative_file_path: &str) -> Result<Vec<u8>, String> {
     // Retrieve the resource directory using Tauri's PathResolver.
     let resource_dir: PathBuf = handle
         .path()
@@ -63,7 +60,6 @@ pub fn copy_premiere_project(
     let file_data =
         open_resource_file(handle.clone(), "resources/Premiere 4K Template 2025.prproj")?;
 
-        
     // Define the destination path
     let destination_path =
         PathBuf::from(destination_folder.clone()).join(format!("{}.prproj", new_title));
@@ -92,10 +88,31 @@ pub fn copy_premiere_project(
     }
 
     // Write the file data to the destination path
-    let mut file =
-        fs::File::create(&destination_path).map_err(|e| format!("Error creating file: {}", e))?;
-    file.write_all(&file_data)
-        .map_err(|e| format!("Error writing file: {}", e))?;
+    let mut file = fs::File::create(&destination_path).map_err(|e| {
+        format!(
+            "Failed to create file '{}': {} ({:?})",
+            destination_path.display(),
+            e,
+            e.kind()
+        )
+    })?;
+    file.write_all(&file_data).map_err(|e| {
+        format!(
+            "Failed to write template data to '{}': {} ({} bytes, error: {:?})",
+            destination_path.display(),
+            e,
+            file_data.len(),
+            e.kind()
+        )
+    })?;
+    file.sync_all().map_err(|e| {
+        format!(
+            "Failed to sync file '{}' to disk: {} ({:?})",
+            destination_path.display(),
+            e,
+            e.kind()
+        )
+    })?;
 
     println!("File successfully copied to {:?}", destination_path);
     Ok(())
@@ -170,3 +187,7 @@ fn open_folder_internal(destination: String) -> Result<(), String> {
         Err(e) => Err(format!("Failed to open folder: {}", e)),
     }
 }
+
+#[cfg(test)]
+#[path = "tests/premiere_test.rs"]
+mod premiere_test;

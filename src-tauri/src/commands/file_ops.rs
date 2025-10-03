@@ -1,9 +1,9 @@
+use crate::utils::file_copy::copy_file_with_overall_progress;
 use std::fs;
 use std::path::Path;
 use std::sync::Arc;
 use std::thread;
 use tauri::{command, AppHandle, Emitter};
-use crate::utils::file_copy::copy_file_with_overall_progress;
 
 #[command]
 pub fn move_files(
@@ -35,7 +35,13 @@ pub fn move_files(
             let dest_file_path = camera_folder.join(src_path.file_name().unwrap());
 
             // Copy file with overall progress tracking
-            if let Err(e) = copy_file_with_overall_progress(&src_path, &dest_file_path, &app_handle, index, total_files) {
+            if let Err(e) = copy_file_with_overall_progress(
+                &src_path,
+                &dest_file_path,
+                &app_handle,
+                index,
+                total_files,
+            ) {
                 eprintln!("Failed to copy file {}: {}", file_path, e);
                 continue;
             }

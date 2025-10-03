@@ -3,14 +3,13 @@ use std::io::{BufReader, BufWriter, Read, Write};
 use std::path::Path;
 use tauri::{AppHandle, Emitter};
 
-
 /// File Copy with Overall Progress Tracking across multiple files
 pub fn copy_file_with_overall_progress(
-    src: &Path, 
-    dest: &Path, 
+    src: &Path,
+    dest: &Path,
     app_handle: &AppHandle,
     file_index: usize,
-    total_files: usize
+    total_files: usize,
 ) -> std::io::Result<()> {
     let src_file = File::open(src)?;
     let dest_file = File::create(dest)?;
@@ -34,7 +33,7 @@ pub fn copy_file_with_overall_progress(
         let file_progress = copied_size as f64 / total_size as f64;
         let files_completed = file_index as f64;
         let overall_progress = (files_completed + file_progress) / total_files as f64 * 100.0;
-        
+
         let _ = app_handle.emit("copy_progress", overall_progress);
     }
 

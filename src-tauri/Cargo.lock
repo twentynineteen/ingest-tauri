@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "Bucket"
-version = "0.8.3"
+version = "0.8.4"
 dependencies = [
  "argon2",
  "base64ct",
@@ -33,6 +33,7 @@ dependencies = [
  "tauri-plugin-process",
  "tauri-plugin-shell",
  "tauri-plugin-updater",
+ "tempfile",
  "tokio",
  "tokio-util",
  "uuid",

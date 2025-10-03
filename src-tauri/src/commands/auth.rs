@@ -1,5 +1,5 @@
-use tauri::State;
 use crate::state::AuthState;
+use tauri::State;
 
 #[tauri::command]
 pub fn check_auth(token: String, state: State<AuthState>) -> String {
