@@ -76,3 +76,6 @@ tauri-plugin-updater = "2.9.0"
 
 [profile.dev.package.objc2]
 debug-assertions = false
+
+[dev-dependencies]
+tempfile = "3.8"

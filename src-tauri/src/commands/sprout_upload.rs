@@ -1,3 +1,4 @@
+use app_lib::media::SproutVideoDetails;
 use bytes::Bytes;
 use futures_util::stream::unfold;
 use futures_util::TryStreamExt;
@@ -14,7 +15,6 @@ use tauri::Emitter;
 use tauri::{command, AppHandle};
 use tokio::io::{AsyncRead, AsyncReadExt, BufReader};
 use tokio::sync::Mutex;
-use app_lib::media::SproutVideoDetails;
 
 #[command]
 pub async fn get_folders(
@@ -83,7 +83,7 @@ impl<R: AsyncRead + Unpin> AsyncRead for ProgressReader<R> {
                         *progress_guard += bytes_read as u64;
                         let percentage = (*progress_guard as f64 / self.total_size as f64) * 100.0;
                         println!("Upload progress: {:.2}%", percentage);
-                        
+
                         // Emit progress event to frontend
                         if let Err(e) = self.app_handle.emit("upload_progress", percentage as u32) {
                             eprintln!("Failed to emit progress event: {}", e);
