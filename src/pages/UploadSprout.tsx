@@ -14,7 +14,7 @@ import EmbedCodeInput from '../utils/EmbedCodeInput'
 const UploadSprout = () => {
   // Custom hooks
   const { apiKey, isLoading: apiKeyLoading } = useSproutVideoApiKey()
-  const { progress, uploading, message, setProgress, setMessage } = useUploadEvents()
+  const { progress, uploading, message, setProgress, setMessage, setUploading } = useUploadEvents()
   const { selectedFile, response, selectFile, uploadFile } = useFileUpload()
   const { thumbnailLoaded, refreshTimestamp, setThumbnailLoaded } =
     useImageRefresh(response)
@@ -30,6 +30,7 @@ const UploadSprout = () => {
     // Reset progress and message before starting upload
     setProgress(0)
     setMessage(null)
+    setUploading(true)
     uploadFile(apiKey)
   }
 
@@ -78,7 +79,11 @@ const UploadSprout = () => {
               </Button>
 
               {message && (
-                <div className="mt-4 p-3 rounded-md bg-red-100 text-red-800 border border-red-200">
+                <div className={`mt-4 p-3 rounded-md border ${
+                  message.toLowerCase().includes('success')
+                    ? 'bg-green-100 text-green-800 border-green-200'
+                    : 'bg-red-100 text-red-800 border-red-200'
+                }`}>
                   {message}
                 </div>
               )}
