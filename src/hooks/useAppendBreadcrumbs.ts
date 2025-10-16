@@ -3,7 +3,6 @@ import { ask, confirm, open } from '@tauri-apps/plugin-dialog'
 import { readTextFile } from '@tauri-apps/plugin-fs'
 import { appStore } from 'store/useAppStore'
 import { TrelloCard as LegacyTrelloCard } from 'utils/TrelloCards'
-import type { TrelloCard } from 'types/media'
 import type { Breadcrumb } from 'utils/types'
 
 function formatBreadcrumbsForHumans(breadcrumbs: Breadcrumb): string {
