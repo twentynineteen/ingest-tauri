@@ -12,23 +12,43 @@ import { z } from 'zod'
 // Autocue Prompt (v1.0.0)
 // ============================================================================
 
-export const AUTOCUE_PROMPT = `You are an autocue script formatter. Your job is to transform scripts into teleprompter-ready format.
+export const AUTOCUE_PROMPT = `You are an expert teleprompter script formatter at a prestigious business school, specializing in adapting video scripts for autocue delivery.
 
-Use the available tools to:
-1. Format paragraphs for optimal readability (proper line breaks, capitalization)
-2. Add timing marks for pacing
-3. Standardize capitalization (all caps for names, proper case for body text)
-4. Remove unnecessary formatting that hinders reading
+Your goal is to take scripts that read well on paper but may not flow naturally when read aloud on an iPad-based autocue system. The autocue scrolls at a fixed speed, so your formatting must ensure the script feels natural, engaging, and easy to read aloud, while allowing the presenter to breathe comfortably and emphasize key ideas.
 
-Maintain the original meaning and content. Focus on making the script easy to read aloud at a glance.
+Because playback speed cannot change, you use line breaks, pauses, and spacing to guide pacing and emphasis — ensuring the presenter sounds composed, confident, and engaging.
 
-Guidelines:
-- Break long paragraphs into shorter, readable chunks
-- Use consistent line length (around 60 characters)
-- Add pause marks at natural break points
-- Capitalize proper nouns and names for emphasis
-- Preserve essential formatting (bold, italic) but remove distracting elements
-- Keep the flow natural for spoken delivery`
+You must:
+
+Preserve all text content exactly as written — never rewrite or alter the meaning.
+
+Format for rhythm and delivery, ensuring the script supports a smooth, confident performance.
+
+Highlight important keywords that help guide tone and emphasis.
+
+Structure line breaks and spacing so the script feels balanced and readable on-screen. Ensure that line breaks are double spaced for the autocue to read the gap appropriately.
+
+Formatting Guidelines:
+
+Use bold to highlight key words or short phrases for emphasis.
+
+Insert [PAUSE] for natural or dramatic pauses.
+
+Insert [END] at the end of the script.
+
+Break long sentences into shorter, teleprompter-friendly lines (avoid more than 12-15 words per line).
+
+Add consistent blank line spacing between paragraphs to signal a breathing moment.
+
+Maintain a clear and steady rhythm — prioritize pacing and cadence over aesthetics.
+
+Tone & Objective:
+
+Aim for clarity, confidence, and conversational flow.
+
+Imagine the presenter is addressing a live audience — formatting should help them sound natural and in control.
+
+Avoid overusing bold or pause cues; use them strategically for rhythm and energy.`
 
 export const PROMPT_VERSION = '1.0.0'
 
@@ -48,7 +68,7 @@ export const formatParagraphTool = tool({
     capitalizationStyle: z
       .enum(['upper', 'sentence', 'title'])
       .default('sentence')
-      .describe('Capitalization style to apply'),
+      .describe('Capitalization style to apply')
   }),
   execute: async ({ originalText, maxLineLength, capitalizationStyle }) => {
     let formatted = originalText
@@ -57,7 +77,7 @@ export const formatParagraphTool = tool({
     if (capitalizationStyle === 'upper') {
       formatted = formatted.toUpperCase()
     } else if (capitalizationStyle === 'title') {
-      formatted = formatted.replace(/\b\w/g, (char) => char.toUpperCase())
+      formatted = formatted.replace(/\b\w/g, char => char.toUpperCase())
     }
 
     // Break into lines
@@ -78,7 +98,7 @@ export const formatParagraphTool = tool({
     }
 
     return { formattedText: lines.join('\n') }
-  },
+  }
 })
 
 // ============================================================================
@@ -93,10 +113,7 @@ export const addTimingMarksTool = tool({
       .enum(['slow', 'medium', 'fast'])
       .default('medium')
       .describe('Reading pace (affects pause duration)'),
-    pauseSymbol: z
-      .string()
-      .default('[PAUSE]')
-      .describe('Symbol to use for pauses'),
+    pauseSymbol: z.string().default('[PAUSE]').describe('Symbol to use for pauses')
   }),
   execute: async ({ text, pace, pauseSymbol }) => {
     // Calculate pause duration based on pace
@@ -111,9 +128,9 @@ export const addTimingMarksTool = tool({
 
     return {
       markedText: marked,
-      pauseDuration,
+      pauseDuration
     }
-  },
+  }
 })
 
 // ============================================================================
@@ -132,7 +149,7 @@ export const highlightNamesCapsTool = tool({
     autoDetect: z
       .boolean()
       .default(true)
-      .describe('Auto-detect capitalized words as names'),
+      .describe('Auto-detect capitalized words as names')
   }),
   execute: async ({ text, namesToCapitalize, autoDetect }) => {
     let result = text
@@ -145,9 +162,21 @@ export const highlightNamesCapsTool = tool({
 
     // Auto-detect names (words that start with capital letter)
     if (autoDetect) {
-      result = result.replace(/\b[A-Z][a-z]+\b/g, (match) => {
+      result = result.replace(/\b[A-Z][a-z]+\b/g, match => {
         // Skip common words
-        const commonWords = ['The', 'A', 'An', 'In', 'On', 'At', 'To', 'For', 'And', 'But', 'Or']
+        const commonWords = [
+          'The',
+          'A',
+          'An',
+          'In',
+          'On',
+          'At',
+          'To',
+          'For',
+          'And',
+          'But',
+          'Or'
+        ]
         if (commonWords.includes(match)) {
           return match
         }
@@ -156,7 +185,7 @@ export const highlightNamesCapsTool = tool({
     }
 
     return { processedText: result }
-  },
+  }
 })
 
 // ============================================================================
@@ -164,13 +193,14 @@ export const highlightNamesCapsTool = tool({
 // ============================================================================
 
 export const removeUnnecessaryFormattingTool = tool({
-  description: 'Strip formatting that hinders autocue reading (colors, fonts, complex styling)',
+  description:
+    'Strip formatting that hinders autocue reading (colors, fonts, complex styling)',
   parameters: z.object({
     html: z.string().describe('HTML content to clean'),
     preserveTags: z
       .array(z.string())
       .default(['strong', 'em', 'h1', 'h2', 'h3', 'p', 'br'])
-      .describe('HTML tags to preserve'),
+      .describe('HTML tags to preserve')
   }),
   execute: async ({ html, preserveTags }) => {
     // Create regex to match tags NOT in preserveTags
@@ -190,7 +220,7 @@ export const removeUnnecessaryFormattingTool = tool({
     const normalized = noClasses.replace(/\s+/g, ' ').trim()
 
     return { cleanedHtml: normalized }
-  },
+  }
 })
 
 // ============================================================================
@@ -201,7 +231,7 @@ export const autocueFormattingTools = {
   formatParagraph: formatParagraphTool,
   addTimingMarks: addTimingMarksTool,
   highlightNamesCaps: highlightNamesCapsTool,
-  removeUnnecessaryFormatting: removeUnnecessaryFormattingTool,
+  removeUnnecessaryFormatting: removeUnnecessaryFormattingTool
 }
 
 // ============================================================================
@@ -212,21 +242,21 @@ export const TOOL_DEFINITIONS = [
   {
     name: 'formatParagraph',
     description: 'Reformat paragraphs for autocue readability',
-    enabled: true,
+    enabled: true
   },
   {
     name: 'addTimingMarks',
     description: 'Add timing marks for pacing',
-    enabled: true,
+    enabled: true
   },
   {
     name: 'highlightNamesCaps',
     description: 'Capitalize proper nouns',
-    enabled: true,
+    enabled: true
   },
   {
     name: 'removeUnnecessaryFormatting',
     description: 'Clean distracting formatting',
-    enabled: true,
-  },
+    enabled: true
+  }
 ]

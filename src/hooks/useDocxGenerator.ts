@@ -11,7 +11,6 @@ import {
   TextRun,
   HeadingLevel,
   Packer,
-  AlignmentType,
 } from 'docx'
 import { save } from '@tauri-apps/plugin-dialog'
 import { writeFile } from '@tauri-apps/plugin-fs'

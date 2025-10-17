@@ -7,9 +7,8 @@
 import { useState, useRef } from 'react'
 import { streamText } from 'ai'
 import { ModelFactory } from '../services/ai/modelFactory'
-import { AUTOCUE_PROMPT, autocueFormattingTools } from '../utils/aiPrompts'
+import { AUTOCUE_PROMPT } from '../utils/aiPrompts'
 import type {
-  ProcessingRequest,
   ProcessedOutput,
   ProviderConfiguration,
 } from '../types/scriptFormatter'
@@ -65,14 +64,16 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         })
 
         // Stream text with AI SDK (FR-011: streaming responses)
-        const streamResult = await streamText({
+        // Note: Removed tools for Phase 1 - direct text formatting is simpler
+        const streamResult = streamText({
           model,
           messages: [
             { role: 'system', content: AUTOCUE_PROMPT },
-            { role: 'user', content: options.text },
+            {
+              role: 'user',
+              content: `Format this script for autocue/teleprompter reading. Preserve all line breaks and paragraph structure:\n\n${options.text}`,
+            },
           ],
-          tools: autocueFormattingTools, // Agent-based formatting
-          maxTokens: 4096,
           temperature: 0.7,
           abortSignal: abortControllerRef.current.signal,
         })
@@ -95,11 +96,22 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         setProgress(100)
         options.onProgress?.(100)
 
+        // Debug logging
+        console.log('Formatted text preview (first 200 chars):', formattedText.substring(0, 200))
+        console.log('Line breaks found:', formattedText.split('\n').length)
+
         // Create ProcessedOutput
+        // Convert line breaks to proper HTML paragraphs
+        const htmlContent = formattedText
+          .split('\n')
+          .filter((line) => line.trim().length > 0)
+          .map((line) => `<p>${line}</p>`)
+          .join('\n')
+
         const output: ProcessedOutput = {
           id: crypto.randomUUID(),
           requestId: crypto.randomUUID(), // Create request ID
-          formattedHtml: `<p>${formattedText}</p>`, // Basic HTML wrapping
+          formattedHtml: htmlContent,
           formattedText,
           diffData: {
             additions: [],

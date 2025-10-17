@@ -4,9 +4,8 @@
  * Purpose: Provider management and switching (provider-agnostic architecture)
  */
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { providerRegistry, getDefaultConfig } from '../services/ai/providerConfig'
-import { ModelFactory } from '../services/ai/modelFactory'
 import type {
   AIProvider,
   ProviderConfiguration,
@@ -25,26 +24,30 @@ interface UseAIProviderResult {
 }
 
 export function useAIProvider(): UseAIProviderResult {
-  const [activeProvider, setActiveProvider] = useState<AIProvider | null>(null)
-  const [availableProviders, setAvailableProviders] = useState<AIProvider[]>([])
-
-  // Initialize providers on mount
-  useEffect(() => {
+  // Initialize providers immediately
+  const [availableProviders, setAvailableProviders] = useState<AIProvider[]>(() => {
     const adapters = providerRegistry.list()
-
-    const providers: AIProvider[] = adapters.map((adapter) => ({
+    return adapters.map((adapter) => ({
       id: adapter.id,
       displayName: adapter.displayName,
       type: adapter.type,
       status: 'not-configured',
       configuration: getDefaultConfig(adapter.id),
     }))
+  })
 
-    setAvailableProviders(providers)
-
-    // Restore active provider from localStorage
+  // Initialize active provider from localStorage or default
+  const [activeProvider, setActiveProvider] = useState<AIProvider | null>(() => {
     const savedProviderId = localStorage.getItem(STORAGE_KEYS.ACTIVE_PROVIDER)
     const savedConfig = localStorage.getItem(STORAGE_KEYS.PROVIDER_CONFIG)
+
+    const providers = providerRegistry.list().map((adapter) => ({
+      id: adapter.id,
+      displayName: adapter.displayName,
+      type: adapter.type,
+      status: 'not-configured' as const,
+      configuration: getDefaultConfig(adapter.id),
+    }))
 
     if (savedProviderId) {
       const provider = providers.find((p) => p.id === savedProviderId)
@@ -56,13 +59,13 @@ export function useAIProvider(): UseAIProviderResult {
             // Use default config
           }
         }
-        setActiveProvider(provider)
+        return provider
       }
-    } else {
-      // Default to first provider (Ollama)
-      setActiveProvider(providers[0] || null)
     }
-  }, [])
+
+    // Default to first provider (Ollama)
+    return providers[0] || null
+  })
 
   const switchProvider = (providerId: string) => {
     const provider = availableProviders.find((p) => p.id === providerId)

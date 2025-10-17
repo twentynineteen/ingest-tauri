@@ -4,26 +4,27 @@
  * Purpose: Main page orchestration for AI-powered autocue script formatting
  */
 
-import React, { useState, useEffect } from 'react'
 import { useBreadcrumb } from '@hooks/index'
-import { FileText, Sparkles, Download, AlertCircle } from 'lucide-react'
-
+import { AlertCircle, Download, FileText, Sparkles } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 // Hooks
-import { useDocxParser } from '../../../hooks/useDocxParser'
-import { useDocxGenerator } from '../../../hooks/useDocxGenerator'
-import { useAIProvider } from '../../../hooks/useAIProvider'
 import { useAIModels } from '../../../hooks/useAIModels'
+import { useAIProvider } from '../../../hooks/useAIProvider'
+import { useDocxGenerator } from '../../../hooks/useDocxGenerator'
+import { useDocxParser } from '../../../hooks/useDocxParser'
 import { useScriptProcessor } from '../../../hooks/useScriptProcessor'
-
-// Components
-import { FileUploader } from './FileUploader'
-import { ProviderSelector } from './ProviderSelector'
-import { ModelSelector } from './ModelSelector'
-import { DiffEditor } from './DiffEditor'
-
 // Types
-import type { ScriptDocument, ProcessedOutput } from '../../../types/scriptFormatter'
-import { STORAGE_KEYS } from '../../../types/scriptFormatter'
+import {
+  STORAGE_KEYS,
+  type ProcessedOutput,
+  type ProviderConfiguration,
+  type ScriptDocument
+} from '../../../types/scriptFormatter'
+// Components
+import { DiffEditor } from './DiffEditor'
+import { FileUploader } from './FileUploader'
+import { ModelSelector } from './ModelSelector'
+import { ProviderSelector } from './ProviderSelector'
 
 type WorkflowStep = 'upload' | 'select-model' | 'processing' | 'review' | 'download'
 
@@ -31,7 +32,7 @@ const ScriptFormatter: React.FC = () => {
   // Breadcrumb
   useBreadcrumb([
     { label: 'AI tools', href: '/ai-tools/script-formatter' },
-    { label: 'Autocue script formatter' },
+    { label: 'Autocue script formatter' }
   ])
 
   // State
@@ -44,23 +45,16 @@ const ScriptFormatter: React.FC = () => {
   // Hooks
   const { parseFile, isLoading: isParsing, error: parseError } = useDocxParser()
   const { generateFile, isGenerating, error: generateError } = useDocxGenerator()
-  const {
-    activeProvider,
-    availableProviders,
-    switchProvider,
-    validateProvider,
-  } = useAIProvider()
+  const { activeProvider, availableProviders, switchProvider, validateProvider } =
+    useAIProvider()
 
-  const {
-    models,
-    isLoading: isLoadingModels,
-  } = useAIModels({
+  const { models, isLoading: isLoadingModels } = useAIModels({
     providerId: activeProvider?.id || '',
     configuration: activeProvider?.configuration || {
       serviceUrl: '',
-      connectionStatus: 'not-configured',
+      connectionStatus: 'not-configured'
     },
-    enabled: !!activeProvider && activeProvider.status === 'configured',
+    enabled: !!activeProvider && activeProvider.status === 'configured'
   })
 
   const {
@@ -68,11 +62,11 @@ const ScriptFormatter: React.FC = () => {
     isProcessing,
     progress,
     error: processingError,
-    cancel: cancelProcessing,
+    cancel: cancelProcessing
   } = useScriptProcessor()
 
-  // FR-022: Restore session data from localStorage
-  useEffect(() => {
+  // FR-022: Restore session data from localStorage (initialize state)
+  const [initialLoadDone] = useState(() => {
     const savedOutput = localStorage.getItem(STORAGE_KEYS.PROCESSED_OUTPUT)
     if (savedOutput) {
       try {
@@ -84,7 +78,11 @@ const ScriptFormatter: React.FC = () => {
         // Invalid data, ignore
       }
     }
-  }, [])
+    return true
+  })
+
+  // Suppress unused variable warning
+  void initialLoadDone
 
   // FR-023: Warn before navigation with unsaved work
   useEffect(() => {
@@ -110,15 +108,26 @@ const ScriptFormatter: React.FC = () => {
     }
   }
 
-  const handleProviderValidate = async (providerId: string, config: any) => {
+  const handleProviderValidate = async (
+    providerId: string,
+    config: ProviderConfiguration
+  ) => {
     await validateProvider(providerId, config)
   }
 
   const handleFormatScript = async () => {
-    console.log('handleFormatScript called', { document, selectedModelId, activeProvider })
+    console.log('handleFormatScript called', {
+      document,
+      selectedModelId,
+      activeProvider
+    })
 
     if (!document || !selectedModelId || !activeProvider) {
-      console.warn('Missing required data:', { document, selectedModelId, activeProvider })
+      console.warn('Missing required data:', {
+        document,
+        selectedModelId,
+        activeProvider
+      })
       return
     }
 
@@ -131,7 +140,7 @@ const ScriptFormatter: React.FC = () => {
         modelId: selectedModelId,
         providerId: activeProvider.id,
         configuration: activeProvider.configuration,
-        onProgress: (prog) => console.log(`Progress: ${prog}%`),
+        onProgress: prog => console.log(`Progress: ${prog}%`)
       })
 
       console.log('Processing completed successfully:', output)
@@ -162,9 +171,9 @@ const ScriptFormatter: React.FC = () => {
             type: 'manual',
             changeDescription: 'Manual edit',
             previousValue: processedOutput.formattedText,
-            newValue: value,
-          },
-        ],
+            newValue: value
+          }
+        ]
       })
     }
   }
@@ -174,7 +183,28 @@ const ScriptFormatter: React.FC = () => {
 
     try {
       const filename = document.filename.replace('.docx', '_formatted.docx')
-      await generateFile(`<p>${modifiedText}</p>`, filename)
+
+      // Convert markdown formatting to HTML
+      const convertMarkdownToHtml = (text: string): string => {
+        // Bold: **text** or __text__ -> <strong>text</strong>
+        text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        text = text.replace(/__(.+?)__/g, '<strong>$1</strong>')
+
+        // Italic: *text* or _text_ -> <em>text</em>
+        text = text.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
+        text = text.replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '<em>$1</em>')
+
+        return text
+      }
+
+      // Convert plain text with line breaks to HTML paragraphs
+      const htmlContent = modifiedText
+        .split('\n')
+        .filter(line => line.trim()) // Remove empty lines
+        .map(line => `<p>${convertMarkdownToHtml(line)}</p>`)
+        .join('')
+
+      await generateFile(htmlContent, filename)
       setCurrentStep('download')
 
       // Clear localStorage after successful download
@@ -184,36 +214,55 @@ const ScriptFormatter: React.FC = () => {
     }
   }
 
+  const handleStartOver = () => {
+    setCurrentStep('upload')
+    setDocument(null)
+    setProcessedOutput(null)
+    setModifiedText('')
+    setSelectedModelId(null)
+    localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
+  }
+
   return (
     <div className="px-6 space-y-6">
       {/* Header */}
-      <div className="w-full pb-4 border-b mb-4">
+      <div className="w-full pb-4 border-b mb-4 flex items-center justify-between">
         <h2 className="px-4 text-2xl font-semibold flex flex-row gap-4 items-center">
           <FileText />
           Autocue Script Formatter
         </h2>
+        {currentStep !== 'upload' && (
+          <button
+            onClick={handleStartOver}
+            className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
+          >
+            Start Over
+          </button>
+        )}
       </div>
 
       {/* Workflow Steps Indicator */}
       <div className="flex items-center justify-between max-w-4xl mx-auto">
-        {['upload', 'select-model', 'processing', 'review', 'download'].map((step, idx) => (
-          <div
-            key={step}
-            className={`flex items-center ${
-              currentStep === step ? 'text-blue-600 font-medium' : 'text-gray-400'
-            }`}
-          >
+        {['upload', 'select-model', 'processing', 'review', 'download'].map(
+          (step, idx) => (
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                currentStep === step ? 'bg-blue-600 text-white' : 'bg-gray-300'
+              key={step}
+              className={`flex items-center ${
+                currentStep === step ? 'text-blue-600 font-medium' : 'text-gray-400'
               }`}
             >
-              {idx + 1}
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  currentStep === step ? 'bg-blue-600 text-white' : 'bg-gray-300'
+                }`}
+              >
+                {idx + 1}
+              </div>
+              <span className="ml-2 text-sm capitalize">{step.replace('-', ' ')}</span>
+              {idx < 4 && <div className="w-12 h-0.5 bg-gray-300 mx-4" />}
             </div>
-            <span className="ml-2 text-sm capitalize">{step.replace('-', ' ')}</span>
-            {idx < 4 && <div className="w-12 h-0.5 bg-gray-300 mx-4" />}
-          </div>
-        ))}
+          )
+        )}
       </div>
 
       {/* Step 1: Upload File */}
@@ -232,7 +281,8 @@ const ScriptFormatter: React.FC = () => {
         <div className="max-w-2xl mx-auto space-y-6">
           <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-sm text-green-800">
-              ✓ File uploaded: <strong>{document?.filename}</strong> ({document?.fileSize} bytes)
+              ✓ File uploaded: <strong>{document?.filename}</strong> ({document?.fileSize}{' '}
+              bytes)
             </p>
           </div>
 
@@ -255,7 +305,7 @@ const ScriptFormatter: React.FC = () => {
               {selectedModelId && (
                 <button
                   type="button"
-                  onClick={(e) => {
+                  onClick={e => {
                     e.preventDefault()
                     handleFormatScript()
                   }}
@@ -285,10 +335,10 @@ const ScriptFormatter: React.FC = () => {
             <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
               <div
                 className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style={{ width: `${progress}%` }}
+                style={{ width: `${Math.round(progress)}%` }}
               />
             </div>
-            <p className="text-xs text-gray-500">{progress}% complete</p>
+            <p className="text-xs text-gray-500">{Math.round(progress)}% complete</p>
 
             <button
               onClick={cancelProcessing}
@@ -354,7 +404,9 @@ const ScriptFormatter: React.FC = () => {
         <div className="max-w-2xl mx-auto">
           <div className="p-8 bg-green-50 border border-green-200 rounded-lg text-center">
             <Download className="h-16 w-16 text-green-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Download Complete! (FR-020)</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              Download Complete! (FR-020)
+            </h3>
             <p className="text-sm text-gray-600 mb-4">
               Your formatted script has been saved successfully.
             </p>

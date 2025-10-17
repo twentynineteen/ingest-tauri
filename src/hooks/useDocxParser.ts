@@ -6,11 +6,9 @@
 
 import { useState } from 'react'
 import mammoth from 'mammoth'
-import { invoke } from '@tauri-apps/api/core'
 import type {
   ScriptDocument,
   FormattingMetadata,
-  ValidationResult,
 } from '../types/scriptFormatter'
 
 interface UseDocxParserResult {
@@ -53,7 +51,7 @@ export function useDocxParser(): UseDocxParserResult {
             'i => em',
             'u => u',
           ],
-          convertImage: mammoth.images.inline(() => {
+          convertImage: mammoth.images.imgElement(async () => {
             // Skip images for autocue scripts
             return { src: '' }
           }),
@@ -61,7 +59,14 @@ export function useDocxParser(): UseDocxParserResult {
       )
 
       const htmlContent = result.value
-      const plainText = htmlContent.replace(/<[^>]*>/g, '').trim() // Strip HTML tags
+
+      // Convert HTML to plain text while preserving paragraph structure
+      const plainText = htmlContent
+        .replace(/<\/p>/gi, '\n') // Convert closing </p> tags to newlines
+        .replace(/<\/h[1-6]>/gi, '\n') // Convert closing heading tags to newlines
+        .replace(/<br\s*\/?>/gi, '\n') // Convert <br> tags to newlines
+        .replace(/<[^>]*>/g, '') // Strip remaining HTML tags
+        .trim()
 
       // Check if document is empty (FR-006)
       if (!plainText || plainText.length === 0) {

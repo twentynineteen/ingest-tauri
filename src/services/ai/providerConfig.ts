@@ -5,7 +5,7 @@
  * Follows Vercel AI SDK v5 pattern for custom provider integration
  */
 
-import { createOpenAI } from '@ai-sdk/openai'
+// import { createOpenAI } from '@ai-sdk/openai' // Commented out for Phase 1
 import { createOllama } from 'ollama-ai-provider-v2'
 import type { LanguageModel } from 'ai'
 import type { ProviderAdapter, ProviderRegistry, ModelInfo } from './types'
@@ -22,8 +22,11 @@ const ollamaAdapter: ProviderAdapter = {
 
   createModel(modelId: string, config: ProviderConfiguration): LanguageModel {
     // Create Ollama provider instance with baseURL
+    // Note: ollama-ai-provider-v2 expects baseURL WITHOUT /api suffix
+    const baseUrl = (config.serviceUrl || 'http://localhost:11434').replace(/\/api$/, '')
+
     const ollama = createOllama({
-      baseURL: config.serviceUrl || 'http://localhost:11434',
+      baseURL: `${baseUrl}/api`,
     })
 
     // Return the model instance
@@ -75,12 +78,12 @@ const ollamaAdapter: ProviderAdapter = {
         throw new Error(`Failed to fetch models: HTTP ${response.status}`)
       }
 
-      const data = await response.json()
+      const data = (await response.json()) as { models?: Array<{ name: string; size: number; details?: { parameter_size?: number } }> }
 
-      return (data.models || []).map((model: any) => ({
+      return (data.models || []).map((model) => ({
         id: model.name,
         name: model.name.replace(':latest', ''),
-        size: model.size,
+        size: String(model.size),
         contextLength: model.details?.parameter_size || 4096,
         // Tool calling support detection
         supportsToolCalling: ['llama3', 'mistral', 'qwen'].some((name) =>
@@ -100,7 +103,8 @@ const ollamaAdapter: ProviderAdapter = {
 // OpenAI Provider Adapter (Future Phase 2)
 // ============================================================================
 
-const openaiAdapter: ProviderAdapter = {
+// Commented out for Phase 1 - will be enabled in Phase 2
+/* const openaiAdapter: ProviderAdapter = {
   id: 'openai',
   type: 'openai',
   displayName: 'OpenAI',
@@ -181,7 +185,7 @@ const openaiAdapter: ProviderAdapter = {
       )
     }
   },
-}
+} */
 
 // ============================================================================
 // Provider Registry Implementation

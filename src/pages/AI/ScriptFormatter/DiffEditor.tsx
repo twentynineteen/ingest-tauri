@@ -4,9 +4,9 @@
  * Purpose: Monaco Editor diff viewer with editable output
  */
 
-import React, { useRef, useEffect } from 'react'
 import { DiffEditor as MonacoDiffEditor } from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
+import React, { useRef } from 'react'
 
 interface DiffEditorProps {
   original: string
@@ -19,7 +19,7 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({
   original,
   modified,
   onModifiedChange,
-  height = '600px',
+  height = '600px'
 }) => {
   const editorRef = useRef<editor.IStandaloneDiffEditor | null>(null)
 
@@ -43,7 +43,7 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({
           <span className="text-sm font-medium text-gray-700">Formatted (Editable)</span>
         </div>
         <span className="text-xs text-gray-500">
-          GitHub-style diff • Use right panel to edit
+          Script diff editor • Use right panel to edit
         </span>
       </div>
 
@@ -61,13 +61,14 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({
           readOnly: false, // Editable modified (right side) - FR-018
           enableSplitViewResizing: true, // Allow resizing panes
           renderOverviewRuler: true, // Show overview ruler
-          wordWrap: 'on', // Wrap long lines
+          wordWrap: 'bounded', // Wrap at viewport width
+          wrappingStrategy: 'advanced', // Better wrapping algorithm
           minimap: { enabled: true },
           scrollBeyondLastLine: false,
           fontSize: 14,
           lineNumbers: 'on',
           glyphMargin: true,
-          folding: true,
+          folding: true
         }}
         theme="vs-light"
       />

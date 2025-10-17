@@ -125,7 +125,7 @@ pub fn parse_docx_file(file_path: String) -> Result<ParseResult, String> {
  */
 #[command]
 pub fn generate_docx_file(
-    content: String,
+    _content: String,
     default_filename: String,
 ) -> Result<DownloadPath, String> {
     // NOTE: Actual .docx generation is done in frontend using docx npm package
