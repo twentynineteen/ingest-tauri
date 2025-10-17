@@ -6,7 +6,7 @@
  */
 
 import { createOpenAI } from '@ai-sdk/openai'
-import { ollama } from 'ollama-ai-provider'
+import { createOllama } from 'ollama-ai-provider-v2'
 import type { LanguageModel } from 'ai'
 import type { ProviderAdapter, ProviderRegistry, ModelInfo } from './types'
 import type { ProviderConfiguration } from '../../types/scriptFormatter'
@@ -21,11 +21,13 @@ const ollamaAdapter: ProviderAdapter = {
   displayName: 'Ollama (Local)',
 
   createModel(modelId: string, config: ProviderConfiguration): LanguageModel {
-    // Use ollama provider with custom base URL
-    const provider = ollama
-    return provider(modelId, {
-      // Ollama-specific options can go here
+    // Create Ollama provider instance with baseURL
+    const ollama = createOllama({
+      baseURL: config.serviceUrl || 'http://localhost:11434',
     })
+
+    // Return the model instance
+    return ollama(modelId)
   },
 
   async validateConnection(config: ProviderConfiguration) {

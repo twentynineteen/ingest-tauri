@@ -115,8 +115,14 @@ const ScriptFormatter: React.FC = () => {
   }
 
   const handleFormatScript = async () => {
-    if (!document || !selectedModelId || !activeProvider) return
+    console.log('handleFormatScript called', { document, selectedModelId, activeProvider })
 
+    if (!document || !selectedModelId || !activeProvider) {
+      console.warn('Missing required data:', { document, selectedModelId, activeProvider })
+      return
+    }
+
+    console.log('Setting step to processing...')
     setCurrentStep('processing')
 
     try {
@@ -128,6 +134,7 @@ const ScriptFormatter: React.FC = () => {
         onProgress: (prog) => console.log(`Progress: ${prog}%`),
       })
 
+      console.log('Processing completed successfully:', output)
       setProcessedOutput(output)
       setModifiedText(output.formattedText)
       setCurrentStep('review')
@@ -135,8 +142,9 @@ const ScriptFormatter: React.FC = () => {
       // FR-022: Save to localStorage
       localStorage.setItem(STORAGE_KEYS.PROCESSED_OUTPUT, JSON.stringify(output))
     } catch (error) {
-      console.error('Processing failed:', error)
-      setCurrentStep('select-model')
+      console.error('Processing failed with error:', error)
+      // Stay on processing step to show the error instead of going back
+      // The processingError state from useScriptProcessor will be displayed
     }
   }
 
@@ -246,7 +254,11 @@ const ScriptFormatter: React.FC = () => {
 
               {selectedModelId && (
                 <button
-                  onClick={handleFormatScript}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    handleFormatScript()
+                  }}
                   className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
                 >
                   <Sparkles className="h-5 w-5" />
@@ -287,12 +299,20 @@ const ScriptFormatter: React.FC = () => {
           </div>
 
           {processingError && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
-              <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-              <div>
-                <p className="text-sm font-medium text-red-800">Processing Error</p>
-                <p className="text-sm text-red-700 mt-1">{processingError.message}</p>
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="flex items-start gap-2 mb-3">
+                <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-medium text-red-800">Processing Error</p>
+                  <p className="text-sm text-red-700 mt-1">{processingError.message}</p>
+                </div>
               </div>
+              <button
+                onClick={() => setCurrentStep('select-model')}
+                className="w-full px-4 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+              >
+                Try Again
+              </button>
             </div>
           )}
         </div>
