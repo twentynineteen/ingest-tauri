@@ -61,6 +61,10 @@ const Settings: React.FC = () => {
     state => state.setDefaultBackgroundFolder
   )
 
+  // Ollama URL setting
+  const ollamaUrl = useAppStore(state => state.ollamaUrl)
+  const setOllamaUrl = useAppStore(state => state.setOllamaUrl)
+
   const handleSelectDefaultBackgroundFolder = async () => {
     const folder = await openPath({
       directory: true,
@@ -77,6 +81,16 @@ const Settings: React.FC = () => {
       alert('Default background folder saved!')
     } catch (error) {
       alert('Failed to save default background folder')
+      console.error('Save error:', error)
+    }
+  }
+
+  const handleSaveOllamaUrl = async () => {
+    try {
+      await saveApiKeysMutation.mutateAsync({ ollamaUrl })
+      alert('Ollama URL saved successfully!')
+    } catch (error) {
+      alert('Failed to save Ollama URL')
       console.error('Save error:', error)
     }
   }
@@ -134,6 +148,11 @@ const Settings: React.FC = () => {
     }
   }
 
+  const handleOllamaUrlChange = (newUrl: string) => {
+    setOllamaUrl(newUrl)
+    setLocalApiKeys({ ...localApiKeys, ollamaUrl: newUrl })
+  }
+
   return (
     <div className="w-full pb-4 border-b mb-4">
       <h2 className="px-4 text-2xl font-semibold mb-4">Settings</h2>
@@ -171,6 +190,19 @@ const Settings: React.FC = () => {
               setLocalApiKeys({ ...localApiKeys, trelloToken: newKey })
             }
             onSave={handleSaveTrelloToken}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-2">
+            Ollama URL
+            <span className="text-xs text-gray-500 ml-2">
+              (Default: http://localhost:11434)
+            </span>
+          </label>
+          <ApiKeyInput
+            apiKey={ollamaUrl || 'http://localhost:11434'}
+            setApiKey={handleOllamaUrlChange}
+            onSave={handleSaveOllamaUrl}
           />
         </div>
         <div>

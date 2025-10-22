@@ -18,9 +18,9 @@ Your goal is to take scripts that read well on paper but may not flow naturally 
 
 Because playback speed cannot change, you use line breaks, pauses, and spacing to guide pacing and emphasis — ensuring the presenter sounds composed, confident, and engaging.
 
-You must:
+**IMPORTANT** You must:
 
-Preserve all text content exactly as written — never rewrite or alter the meaning.
+Preserve all text content exactly as written — **never rewrite or alter the meaning.**
 
 Format for rhythm and delivery, ensuring the script supports a smooth, confident performance.
 
@@ -59,7 +59,7 @@ export const PROMPT_VERSION = '1.0.0'
 export const formatParagraphTool = tool({
   description:
     'Reformat a paragraph for autocue readability with proper line breaks and capitalization',
-  parameters: z.object({
+  inputSchema: z.object({
     originalText: z.string().describe('The original paragraph text'),
     maxLineLength: z
       .number()
@@ -107,7 +107,7 @@ export const formatParagraphTool = tool({
 
 export const addTimingMarksTool = tool({
   description: 'Insert pause marks and timing indicators for teleprompter pacing',
-  parameters: z.object({
+  inputSchema: z.object({
     text: z.string().describe('Text to add timing marks to'),
     pace: z
       .enum(['slow', 'medium', 'fast'])
@@ -139,7 +139,7 @@ export const addTimingMarksTool = tool({
 
 export const highlightNamesCapsTool = tool({
   description: 'Convert names and proper nouns to ALL CAPS for emphasis',
-  parameters: z.object({
+  inputSchema: z.object({
     text: z.string().describe('Text to process'),
     namesToCapitalize: z
       .array(z.string())
@@ -195,7 +195,7 @@ export const highlightNamesCapsTool = tool({
 export const removeUnnecessaryFormattingTool = tool({
   description:
     'Strip formatting that hinders autocue reading (colors, fonts, complex styling)',
-  parameters: z.object({
+  inputSchema: z.object({
     html: z.string().describe('HTML content to clean'),
     preserveTags: z
       .array(z.string())

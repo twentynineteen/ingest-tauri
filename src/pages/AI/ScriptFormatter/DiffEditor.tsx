@@ -54,7 +54,7 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({
         modified={modified}
         onMount={handleEditorDidMount}
         options={{
-          renderSideBySide: true, // GitHub-style side-by-side
+          renderSideBySide: true, // use true for GitHub-style side-by-side
           renderIndicators: true, // Show +/- indicators
           renderMarginRevertIcon: true, // Gutter icons to revert changes
           originalEditable: false, // Read-only original (left side)

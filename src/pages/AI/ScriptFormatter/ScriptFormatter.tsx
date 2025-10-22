@@ -41,6 +41,7 @@ const ScriptFormatter: React.FC = () => {
   const [selectedModelId, setSelectedModelId] = useState<string | null>(null)
   const [processedOutput, setProcessedOutput] = useState<ProcessedOutput | null>(null)
   const [modifiedText, setModifiedText] = useState<string>('')
+  const [markdownText, setMarkdownText] = useState<string>('') // Keep markdown version for download
 
   // Hooks
   const { parseFile, isLoading: isParsing, error: parseError } = useDocxParser()
@@ -72,7 +73,16 @@ const ScriptFormatter: React.FC = () => {
       try {
         const output = JSON.parse(savedOutput)
         setProcessedOutput(output)
-        setModifiedText(output.formattedText)
+        setMarkdownText(output.formattedText) // Keep markdown version
+
+        // Strip markdown for display
+        const displayText = output.formattedText
+          .replace(/\*\*(.+?)\*\*/g, '$1')
+          .replace(/__(.+?)__/g, '$1')
+          .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '$1')
+          .replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '$1')
+
+        setModifiedText(displayText)
         setCurrentStep('review')
       } catch {
         // Invalid data, ignore
@@ -144,8 +154,19 @@ const ScriptFormatter: React.FC = () => {
       })
 
       console.log('Processing completed successfully:', output)
+
+      // Store original markdown text for download
+      setMarkdownText(output.formattedText)
+
+      // Strip markdown syntax for display in editor
+      const displayText = output.formattedText
+        .replace(/\*\*(.+?)\*\*/g, '$1') // Remove bold markers
+        .replace(/__(.+?)__/g, '$1')     // Remove bold markers (alternative)
+        .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '$1') // Remove italic markers
+        .replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '$1')       // Remove italic markers (alternative)
+
       setProcessedOutput(output)
-      setModifiedText(output.formattedText)
+      setModifiedText(displayText)
       setCurrentStep('review')
 
       // FR-022: Save to localStorage
@@ -157,8 +178,11 @@ const ScriptFormatter: React.FC = () => {
     }
   }
 
-  const handleModifiedChange = (value: string) => {
+  const const handleModifiedChange = (value: string) => {
     setModifiedText(value)
+    // Also update markdown text so manual edits are included in download
+    setMarkdownText(value)
+    
     if (processedOutput) {
       setProcessedOutput({
         ...processedOutput,
@@ -179,7 +203,7 @@ const ScriptFormatter: React.FC = () => {
   }
 
   const handleDownload = async () => {
-    if (!document || !modifiedText) return
+    if (!document || !markdownText) return
 
     try {
       const filename = document.filename.replace('.docx', '_formatted.docx')
@@ -198,7 +222,8 @@ const ScriptFormatter: React.FC = () => {
       }
 
       // Convert plain text with line breaks to HTML paragraphs
-      const htmlContent = modifiedText
+      // Use markdownText for download to preserve bold formatting
+      const htmlContent = markdownText
         .split('\n')
         .filter(line => line.trim()) // Remove empty lines
         .map(line => `<p>${convertMarkdownToHtml(line)}</p>`)
@@ -219,6 +244,7 @@ const ScriptFormatter: React.FC = () => {
     setDocument(null)
     setProcessedOutput(null)
     setModifiedText('')
+    setMarkdownText('')
     setSelectedModelId(null)
     localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
   }
@@ -416,6 +442,7 @@ const ScriptFormatter: React.FC = () => {
                 setDocument(null)
                 setProcessedOutput(null)
                 setModifiedText('')
+                setMarkdownText('')
                 setSelectedModelId(null)
               }}
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"

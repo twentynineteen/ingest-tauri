@@ -15,6 +15,8 @@ interface AppState {
   setDefaultBackgroundFolder: (path: string | null) => void
   latestSproutUpload: SproutUploadResponse | null
   setLatestSproutUpload: (upload: SproutUploadResponse | null) => void
+  ollamaUrl: string
+  setOllamaUrl: (url: string) => void
 }
 
 // Create the Zustand store
@@ -30,7 +32,9 @@ export const useAppStore = create<AppState>(set => ({
   defaultBackgroundFolder: null,
   setDefaultBackgroundFolder: path => set({ defaultBackgroundFolder: path }),
   latestSproutUpload: null,
-  setLatestSproutUpload: upload => set({ latestSproutUpload: upload })
+  setLatestSproutUpload: upload => set({ latestSproutUpload: upload }),
+  ollamaUrl: 'http://localhost:11434',
+  setOllamaUrl: url => set({ ollamaUrl: url })
 }))
 
 export const appStore = useAppStore

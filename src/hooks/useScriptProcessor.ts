@@ -71,7 +71,7 @@ export function useScriptProcessor(): UseScriptProcessorResult {
             { role: 'system', content: AUTOCUE_PROMPT },
             {
               role: 'user',
-              content: `Format this script for autocue/teleprompter reading. Preserve all line breaks and paragraph structure:\n\n${options.text}`,
+              content: `Format this script for autocue/teleprompter reading. Output ONLY the formatted script with no preamble, introduction, or explanation.\n\n${options.text}`,
             },
           ],
           temperature: 0.7,

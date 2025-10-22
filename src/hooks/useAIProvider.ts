@@ -11,6 +11,7 @@ import type {
   ProviderConfiguration,
 } from '../types/scriptFormatter'
 import { STORAGE_KEYS } from '../types/scriptFormatter'
+import { useAppStore } from '../store/useAppStore'
 
 interface UseAIProviderResult {
   activeProvider: AIProvider | null
@@ -24,16 +25,25 @@ interface UseAIProviderResult {
 }
 
 export function useAIProvider(): UseAIProviderResult {
+  const ollamaUrl = useAppStore(state => state.ollamaUrl)
+
   // Initialize providers immediately
   const [availableProviders, setAvailableProviders] = useState<AIProvider[]>(() => {
     const adapters = providerRegistry.list()
-    return adapters.map((adapter) => ({
-      id: adapter.id,
-      displayName: adapter.displayName,
-      type: adapter.type,
-      status: 'not-configured',
-      configuration: getDefaultConfig(adapter.id),
-    }))
+    return adapters.map((adapter) => {
+      const config = getDefaultConfig(adapter.id)
+      // Use stored Ollama URL if this is the Ollama provider
+      if (adapter.id === 'ollama' && ollamaUrl) {
+        config.serviceUrl = ollamaUrl
+      }
+      return {
+        id: adapter.id,
+        displayName: adapter.displayName,
+        type: adapter.type,
+        status: 'not-configured',
+        configuration: config,
+      }
+    })
   })
 
   // Initialize active provider from localStorage or default
@@ -41,13 +51,20 @@ export function useAIProvider(): UseAIProviderResult {
     const savedProviderId = localStorage.getItem(STORAGE_KEYS.ACTIVE_PROVIDER)
     const savedConfig = localStorage.getItem(STORAGE_KEYS.PROVIDER_CONFIG)
 
-    const providers = providerRegistry.list().map((adapter) => ({
-      id: adapter.id,
-      displayName: adapter.displayName,
-      type: adapter.type,
-      status: 'not-configured' as const,
-      configuration: getDefaultConfig(adapter.id),
-    }))
+    const providers = providerRegistry.list().map((adapter) => {
+      const config = getDefaultConfig(adapter.id)
+      // Use stored Ollama URL if this is the Ollama provider
+      if (adapter.id === 'ollama' && ollamaUrl) {
+        config.serviceUrl = ollamaUrl
+      }
+      return {
+        id: adapter.id,
+        displayName: adapter.displayName,
+        type: adapter.type,
+        status: 'not-configured' as const,
+        configuration: config,
+      }
+    })
 
     if (savedProviderId) {
       const provider = providers.find((p) => p.id === savedProviderId)

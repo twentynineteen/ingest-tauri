@@ -22,8 +22,13 @@ const ollamaAdapter: ProviderAdapter = {
 
   createModel(modelId: string, config: ProviderConfiguration): LanguageModel {
     // Create Ollama provider instance with baseURL
-    // Note: ollama-ai-provider-v2 expects baseURL WITHOUT /api suffix
-    const baseUrl = (config.serviceUrl || 'http://localhost:11434').replace(/\/api$/, '')
+    // Note: ollama-ai-provider-v2 expects baseURL WITH /api suffix
+    let baseUrl = config.serviceUrl || 'http://localhost:11434'
+
+    // Normalize URL: remove trailing slashes and ensure no /api suffix
+    baseUrl = baseUrl.replace(/\/+$/, '').replace(/\/api$/, '')
+
+    console.log('[Ollama] Creating model with baseURL:', `${baseUrl}/api`)
 
     const ollama = createOllama({
       baseURL: `${baseUrl}/api`,
@@ -37,15 +42,23 @@ const ollamaAdapter: ProviderAdapter = {
     const start = Date.now()
 
     try {
-      const response = await fetch(`${config.serviceUrl}/api/tags`, {
+      // Normalize URL
+      let baseUrl = config.serviceUrl || 'http://localhost:11434'
+      baseUrl = baseUrl.replace(/\/+$/, '').replace(/\/api$/, '')
+      const apiUrl = `${baseUrl}/api/tags`
+
+      console.log('[Ollama] Validating connection to:', apiUrl)
+
+      const response = await fetch(apiUrl, {
         method: 'GET',
         signal: AbortSignal.timeout(config.timeout || 5000),
       })
 
       if (!response.ok) {
+        console.error('[Ollama] Validation failed:', response.status, response.statusText)
         return {
           success: false,
-          errorMessage: `HTTP ${response.status}: ${response.statusText}`,
+          errorMessage: `HTTP ${response.status}: ${response.statusText}. Check if Ollama is running at ${baseUrl}`,
           modelsFound: 0,
           latencyMs: Date.now() - start,
         }
@@ -53,12 +66,15 @@ const ollamaAdapter: ProviderAdapter = {
 
       const data = await response.json()
 
+      console.log('[Ollama] Validation successful. Models found:', data.models?.length || 0)
+
       return {
         success: true,
         modelsFound: data.models?.length || 0,
         latencyMs: Date.now() - start,
       }
     } catch (error) {
+      console.error('[Ollama] Validation error:', error)
       return {
         success: false,
         errorMessage: error instanceof Error ? error.message : 'Unknown error',
@@ -70,15 +86,24 @@ const ollamaAdapter: ProviderAdapter = {
 
   async listModels(config: ProviderConfiguration): Promise<ModelInfo[]> {
     try {
-      const response = await fetch(`${config.serviceUrl}/api/tags`, {
+      // Normalize URL
+      let baseUrl = config.serviceUrl || 'http://localhost:11434'
+      baseUrl = baseUrl.replace(/\/+$/, '').replace(/\/api$/, '')
+      const apiUrl = `${baseUrl}/api/tags`
+
+      console.log('[Ollama] Fetching models from:', apiUrl)
+
+      const response = await fetch(apiUrl, {
         signal: AbortSignal.timeout(config.timeout || 5000),
       })
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch models: HTTP ${response.status}`)
+        throw new Error(`Failed to fetch models: HTTP ${response.status}. Check if Ollama is running at ${baseUrl}`)
       }
 
       const data = (await response.json()) as { models?: Array<{ name: string; size: number; details?: { parameter_size?: number } }> }
+
+      console.log('[Ollama] Models fetched:', data.models?.length || 0)
 
       return (data.models || []).map((model) => ({
         id: model.name,
@@ -92,6 +117,7 @@ const ollamaAdapter: ProviderAdapter = {
         supportsStreaming: true, // All Ollama models support streaming
       }))
     } catch (error) {
+      console.error('[Ollama] Failed to list models:', error)
       throw new Error(
         `Failed to list Ollama models: ${error instanceof Error ? error.message : 'Unknown error'}`
       )
