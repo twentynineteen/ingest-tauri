@@ -161,9 +161,9 @@ const ScriptFormatter: React.FC = () => {
       // Strip markdown syntax for display in editor
       const displayText = output.formattedText
         .replace(/\*\*(.+?)\*\*/g, '$1') // Remove bold markers
-        .replace(/__(.+?)__/g, '$1')     // Remove bold markers (alternative)
+        .replace(/__(.+?)__/g, '$1') // Remove bold markers (alternative)
         .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '$1') // Remove italic markers
-        .replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '$1')       // Remove italic markers (alternative)
+        .replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '$1') // Remove italic markers (alternative)
 
       setProcessedOutput(output)
       setModifiedText(displayText)
@@ -178,11 +178,11 @@ const ScriptFormatter: React.FC = () => {
     }
   }
 
-  const const handleModifiedChange = (value: string) => {
+  const handleModifiedChange = (value: string) => {
     setModifiedText(value)
     // Also update markdown text so manual edits are included in download
     setMarkdownText(value)
-    
+
     if (processedOutput) {
       setProcessedOutput({
         ...processedOutput,
