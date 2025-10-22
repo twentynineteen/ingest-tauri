@@ -1,77 +1,87 @@
 /**
  * DiffEditor Component
  * Feature: 006-i-wish-to (T046)
- * Purpose: Monaco Editor diff viewer with editable output
+ * Purpose: Monaco Editor for viewing and editing formatted output
  */
 
-import { DiffEditor as MonacoDiffEditor } from '@monaco-editor/react'
+import Editor from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 
 interface DiffEditorProps {
-  original: string
+  original: string // Kept for compatibility but not displayed
   modified: string
   onModifiedChange: (value: string) => void
   height?: string
 }
 
-export const DiffEditor: React.FC<DiffEditorProps> = ({
-  original,
-  modified,
-  onModifiedChange,
-  height = '600px'
-}) => {
-  const editorRef = useRef<editor.IStandaloneDiffEditor | null>(null)
+export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChange }) => {
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  const handleEditorDidMount = (editor: editor.IStandaloneDiffEditor) => {
-    editorRef.current = editor
-
-    // FR-018: Listen to modifications on the modified (right) side
-    const modifiedEditor = editor.getModifiedEditor()
-    modifiedEditor.onDidChangeModelContent(() => {
-      const newValue = modifiedEditor.getValue()
-      onModifiedChange(newValue)
-    })
+  const handleEditorChange = (value: string | undefined) => {
+    if (value !== undefined) {
+      onModifiedChange(value)
+    }
   }
 
+  const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
+    editorRef.current = editor
+
+    // Force layout after mount
+    setTimeout(() => {
+      editor.layout()
+    }, 100)
+  }
+
+  // Re-layout editor when window resizes
+  useEffect(() => {
+    const handleResize = () => {
+      if (editorRef.current) {
+        editorRef.current.layout()
+      }
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
   return (
-    <div className="border border-gray-300 rounded-lg overflow-hidden">
+    <div className="border border-gray-300 rounded-lg overflow-hidden mb-2">
       <div className="bg-gray-100 px-4 py-2 border-b border-gray-300 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <span className="text-sm font-medium text-gray-700">Original</span>
-          <span className="text-gray-400">↔</span>
-          <span className="text-sm font-medium text-gray-700">Formatted (Editable)</span>
-        </div>
-        <span className="text-xs text-gray-500">
-          Script diff editor • Use right panel to edit
+        <span className="text-sm font-medium text-gray-700">
+          Formatted Script (Editable)
         </span>
+        <span className="text-xs text-gray-500">Edit your script before downloading</span>
       </div>
 
-      <MonacoDiffEditor
-        height={height}
-        language="markdown"
-        original={original}
-        modified={modified}
-        onMount={handleEditorDidMount}
-        options={{
-          renderSideBySide: true, // use true for GitHub-style side-by-side
-          renderIndicators: true, // Show +/- indicators
-          renderMarginRevertIcon: true, // Gutter icons to revert changes
-          originalEditable: false, // Read-only original (left side)
-          readOnly: false, // Editable modified (right side) - FR-018
-          enableSplitViewResizing: true, // Allow resizing panes
-          renderOverviewRuler: true, // Show overview ruler
-          wordWrap: 'bounded', // Wrap at viewport width
-          wrappingStrategy: 'advanced', // Better wrapping algorithm
-          minimap: { enabled: true },
-          scrollBeyondLastLine: false,
-          fontSize: 14,
-          lineNumbers: 'on',
-          glyphMargin: true,
-          folding: true
-        }}
-        theme="vs-light"
-      />
+      <div ref={containerRef} style={{ height: '70vh', minHeight: '600px' }}>
+        <Editor
+          height="100%"
+          language="markdown"
+          value={modified}
+          onChange={handleEditorChange}
+          onMount={handleEditorDidMount}
+          options={{
+            wordWrap: 'bounded',
+            wrappingStrategy: 'advanced',
+            minimap: { enabled: true },
+            scrollBeyondLastLine: false,
+            fontSize: 14,
+            lineNumbers: 'on',
+            glyphMargin: true,
+            folding: true,
+            readOnly: false,
+            automaticLayout: true,
+            unicodeHighlight: {
+              ambiguousCharacters: false,
+              invisibleCharacters: false,
+              nonBasicASCII: false
+            }
+          }}
+          theme="vs-light"
+        />
+      </div>
     </div>
   )
 }

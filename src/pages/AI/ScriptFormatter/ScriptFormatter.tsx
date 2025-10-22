@@ -60,7 +60,6 @@ const ScriptFormatter: React.FC = () => {
 
   const {
     processScript,
-    isProcessing,
     progress,
     error: processingError,
     cancel: cancelProcessing
