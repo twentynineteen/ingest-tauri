@@ -72,16 +72,8 @@ const ScriptFormatter: React.FC = () => {
       try {
         const output = JSON.parse(savedOutput)
         setProcessedOutput(output)
-        setMarkdownText(output.formattedText) // Keep markdown version
-
-        // Strip markdown for display
-        const displayText = output.formattedText
-          .replace(/\*\*(.+?)\*\*/g, '$1')
-          .replace(/__(.+?)__/g, '$1')
-          .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '$1')
-          .replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '$1')
-
-        setModifiedText(displayText)
+        setMarkdownText(output.formattedText)
+        setModifiedText(output.formattedText)
         setCurrentStep('review')
       } catch {
         // Invalid data, ignore
@@ -154,18 +146,10 @@ const ScriptFormatter: React.FC = () => {
 
       console.log('Processing completed successfully:', output)
 
-      // Store original markdown text for download
+      // Store markdown text (decorations will hide asterisks and show bold)
       setMarkdownText(output.formattedText)
-
-      // Strip markdown syntax for display in editor
-      const displayText = output.formattedText
-        .replace(/\*\*(.+?)\*\*/g, '$1') // Remove bold markers
-        .replace(/__(.+?)__/g, '$1') // Remove bold markers (alternative)
-        .replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '$1') // Remove italic markers
-        .replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '$1') // Remove italic markers (alternative)
-
+      setModifiedText(output.formattedText)
       setProcessedOutput(output)
-      setModifiedText(displayText)
       setCurrentStep('review')
 
       // FR-022: Save to localStorage
