@@ -51,7 +51,7 @@ export function useScriptProcessor(): UseScriptProcessorResult {
     // Create abort controller for cancellation
     abortControllerRef.current = new AbortController()
 
-    const maxRetries = 3 // FR-014: 3 retry attempts
+    const maxRetries = 3
     let attempt = 0
 
     while (attempt < maxRetries) {
@@ -63,7 +63,7 @@ export function useScriptProcessor(): UseScriptProcessorResult {
           configuration: options.configuration,
         })
 
-        // Stream text with AI SDK (FR-011: streaming responses)
+        // Stream text with AI SDK
         // Note: Removed tools for Phase 1 - direct text formatting is simpler
         const streamResult = streamText({
           model,
@@ -140,7 +140,7 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         }
 
         if (attempt >= maxRetries) {
-          // Final failure after retries (FR-015)
+          // Final failure after retries
           const finalError =
             err instanceof Error ? err : new Error('Failed to process script')
           setError(finalError)

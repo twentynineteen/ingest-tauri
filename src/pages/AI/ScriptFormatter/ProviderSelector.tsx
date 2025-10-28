@@ -53,7 +53,7 @@ export const ProviderSelector: React.FC<ProviderSelectorProps> = ({
                 </div>
               </div>
 
-              {/* FR-024: Connection status indicator */}
+              {/* Connection status indicator */}
               <div className="flex items-center gap-2">
                 {provider.status === 'configured' && (
                   <div className="flex items-center gap-1 text-green-600">
@@ -83,7 +83,7 @@ export const ProviderSelector: React.FC<ProviderSelectorProps> = ({
         ))}
       </div>
 
-      {/* FR-025: Validation button */}
+      {/* Validation button */}
       {activeProvider && (
         <button
           onClick={handleValidate}

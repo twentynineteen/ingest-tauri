@@ -42,7 +42,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
   return (
     <div className="space-y-4">
-      <label className="block text-sm font-medium text-gray-700">Select Model (FR-007)</label>
+      <label className="block text-sm font-medium text-gray-700">Select Model</label>
 
       <div className="space-y-2">
         {models.map((model) => (

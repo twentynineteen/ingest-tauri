@@ -65,7 +65,7 @@ const ScriptFormatter: React.FC = () => {
     cancel: cancelProcessing
   } = useScriptProcessor()
 
-  // FR-022: Restore session data from localStorage (initialize state)
+  // Restore session data from localStorage (initialize state)
   const [initialLoadDone] = useState(() => {
     const savedOutput = localStorage.getItem(STORAGE_KEYS.PROCESSED_OUTPUT)
     if (savedOutput) {
@@ -85,7 +85,7 @@ const ScriptFormatter: React.FC = () => {
   // Suppress unused variable warning
   void initialLoadDone
 
-  // FR-023: Warn before navigation with unsaved work
+  // Warn before navigation with unsaved work
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (processedOutput && !processedOutput.isEdited && currentStep === 'review') {
@@ -152,7 +152,7 @@ const ScriptFormatter: React.FC = () => {
       setProcessedOutput(output)
       setCurrentStep('review')
 
-      // FR-022: Save to localStorage
+      // Save to localStorage
       localStorage.setItem(STORAGE_KEYS.PROCESSED_OUTPUT, JSON.stringify(output))
     } catch (error) {
       console.error('Processing failed with error:', error)
@@ -338,7 +338,7 @@ const ScriptFormatter: React.FC = () => {
               Formatting your script...
             </h3>
             <p className="text-sm text-gray-600 mb-4">
-              Using AI to optimize for autocue readability (FR-011)
+              Using AI to optimize for autocue readability
             </p>
 
             <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
@@ -382,7 +382,7 @@ const ScriptFormatter: React.FC = () => {
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-medium text-gray-900">
-              Review and Edit (FR-016, FR-017, FR-018)
+              Review and Edit
             </h3>
             <button
               onClick={handleDownload}
@@ -414,7 +414,7 @@ const ScriptFormatter: React.FC = () => {
           <div className="p-8 bg-green-50 border border-green-200 rounded-lg text-center">
             <Download className="h-16 w-16 text-green-600 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Download Complete! (FR-020)
+              Download Complete!
             </h3>
             <p className="text-sm text-gray-600 mb-4">
               Your formatted script has been saved successfully.

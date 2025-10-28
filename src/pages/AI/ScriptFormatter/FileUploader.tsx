@@ -24,7 +24,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
 
   const handleUploadClick = async () => {
     try {
-      // FR-002: Trigger Tauri file dialog
+      // Trigger Tauri file dialog
       const selected = await open({
         filters: [
           {
@@ -39,7 +39,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
         return
       }
 
-      // FR-003: Validate .docx extension
+      // Validate .docx extension
       if (!selected.toLowerCase().endsWith('.docx')) {
         throw new Error('File must be a .docx document')
       }
@@ -48,7 +48,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
       const bytes = await readFile(selected)
       const filename = selected.split('/').pop() || 'document.docx'
 
-      // FR-005: Check file size (1GB limit)
+      // Check file size (1GB limit)
       if (bytes.length > 1024 * 1024 * 1024) {
         throw new Error('File size exceeds 1GB limit')
       }
@@ -105,7 +105,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
         </button>
       </div>
 
-      {/* FR-006: Display validation errors */}
+      {/* Display validation errors */}
       {error && (
         <div className="flex items-start gap-2 p-4 bg-red-50 border border-red-200 rounded-lg">
           <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />

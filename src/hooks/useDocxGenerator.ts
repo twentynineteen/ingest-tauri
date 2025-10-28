@@ -46,7 +46,7 @@ export function useDocxGenerator(): UseDocxGeneratorResult {
       // Step 3: Generate blob
       const blob = await Packer.toBlob(doc)
 
-      // Step 4: Trigger Tauri save dialog (FR-020)
+      // Step 4: Trigger Tauri save dialog
       const savePath = await save({
         filters: [
           {
@@ -79,7 +79,7 @@ export function useDocxGenerator(): UseDocxGeneratorResult {
   return { generateFile, isGenerating, error }
 }
 
-// Convert HTML to docx Paragraph array (FR-017: preserve formatting)
+// Convert HTML to docx Paragraph array with formatting preservation
 function htmlToDocxParagraphs(html: string): Paragraph[] {
   const parser = new DOMParser()
   const doc = parser.parseFromString(html, 'text/html')

@@ -48,7 +48,7 @@ export function useAIModels({
         id: info.id,
         displayName: info.name,
         modelId: info.id,
-        availabilityStatus: 'online', // FR-007: Only show available models
+        availabilityStatus: 'online',
         lastHealthCheck: new Date(),
         size: info.size,
         capabilities: {
@@ -61,7 +61,7 @@ export function useAIModels({
       return aiModels
     },
     enabled,
-    refetchInterval: 30000, // Refresh every 30 seconds while active (FR-008)
+    refetchInterval: 30000, // Refresh every 30 seconds while active
     staleTime: 20000, // Consider data stale after 20 seconds
     retry: 2, // Retry failed requests
   })

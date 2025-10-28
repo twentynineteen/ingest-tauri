@@ -26,7 +26,7 @@ export function useDocxParser(): UseDocxParserResult {
     setError(null)
 
     try {
-      // Step 1: Client-side validation (FR-003, FR-005)
+      // Step 1: Client-side validation
       // Validate file extension
       if (!file.name.toLowerCase().endsWith('.docx')) {
         throw new Error('File must be a .docx document')
@@ -68,7 +68,7 @@ export function useDocxParser(): UseDocxParserResult {
         .replace(/<[^>]*>/g, '') // Strip remaining HTML tags
         .trim()
 
-      // Check if document is empty (FR-006)
+      // Check if document is empty
       if (!plainText || plainText.length === 0) {
         throw new Error('Document is empty or corrupted')
       }
