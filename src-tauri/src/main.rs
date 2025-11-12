@@ -76,7 +76,11 @@ fn main() {
             generate_docx_file,
             validate_docx_file,
             validate_provider_connection,
-            validate_provider_with_auth
+            validate_provider_with_auth,
+            // Feature 006 RAG: Vector search for script examples
+            search_similar_scripts,
+            get_example_by_id,
+            get_all_examples
         ])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");

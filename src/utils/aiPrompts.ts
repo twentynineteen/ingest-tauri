@@ -7,6 +7,7 @@
 
 import { tool } from 'ai'
 import { z } from 'zod'
+import type { SimilarExample } from '../hooks/useScriptRetrieval'
 
 // ============================================================================
 // Autocue Prompt (v1.0.0)
@@ -260,3 +261,70 @@ export const TOOL_DEFINITIONS = [
     enabled: true
   }
 ]
+
+// ============================================================================
+// RAG-Enhanced Prompt Builder
+// ============================================================================
+
+/**
+ * Build an enhanced prompt with similar example scripts (RAG)
+ * @param userScript - The script to be formatted
+ * @param examples - Similar example scripts from vector database
+ * @returns Enhanced system prompt with examples
+ */
+export function buildRAGPrompt(
+  userScript: string,
+  examples: SimilarExample[]
+): string {
+  // If no relevant examples found, use standard prompt
+  if (examples.length === 0) {
+    console.log('[buildRAGPrompt] No examples provided, using standard prompt')
+    return AUTOCUE_PROMPT
+  }
+
+  console.log(`[buildRAGPrompt] Building prompt with ${examples.length} examples`)
+
+  // Build examples section
+  const exampleSection = examples
+    .map((ex, i) => {
+      const similarityPercent = Math.round(ex.similarity * 100)
+      return `
+### Example ${i + 1}: ${ex.title}
+**Category**: ${ex.category} | **Similarity**: ${similarityPercent}%
+
+**Original Script:**
+${ex.before_text}
+
+**Formatted for Autocue:**
+${ex.after_text}
+`
+    })
+    .join('\n\n---\n\n')
+
+  // Build enhanced prompt
+  return `${AUTOCUE_PROMPT}
+
+═══════════════════════════════════════════════════════════════════════
+## REFERENCE EXAMPLES
+
+I've retrieved ${examples.length} similar script${examples.length > 1 ? 's' : ''} from our database that demonstrate excellent autocue formatting. Study these examples carefully and apply the SAME formatting principles to the user's script.
+
+Pay special attention to:
+- How line breaks are used for pacing
+- Where [PAUSE] markers are placed
+- Which words/phrases are **bolded** for emphasis
+- How blank lines create breathing space
+- The overall rhythm and flow
+
+${exampleSection}
+
+═══════════════════════════════════════════════════════════════════════
+
+## YOUR TASK
+
+Now format the user's script following the EXACT SAME principles demonstrated in the examples above. Match their style for line breaks, pause placement, bold emphasis, and spacing.
+
+**User's Script to Format:**
+${userScript}`
+}
+

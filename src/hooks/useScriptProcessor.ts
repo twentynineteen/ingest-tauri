@@ -2,12 +2,16 @@
  * useScriptProcessor Hook
  * Feature: 006-i-wish-to (T042)
  * Purpose: AI script processing with streaming, retry, and tool calling
+ * Enhanced with RAG (Retrieval-Augmented Generation)
  */
 
 import { useState, useRef } from 'react'
 import { streamText } from 'ai'
+import { invoke } from '@tauri-apps/api/core'
 import { ModelFactory } from '../services/ai/modelFactory'
-import { AUTOCUE_PROMPT } from '../utils/aiPrompts'
+import { buildRAGPrompt } from '../utils/aiPrompts'
+import { useEmbedding } from './useEmbedding'
+import type { SimilarExample } from './useScriptRetrieval'
 import type {
   ProcessedOutput,
   ProviderConfiguration,
@@ -41,6 +45,9 @@ export function useScriptProcessor(): UseScriptProcessorResult {
   const abortControllerRef = useRef<AbortController | null>(null)
   const lastOptionsRef = useRef<ProcessScriptOptions | null>(null)
 
+  // Use embedding hook for RAG
+  const { embed, isReady: isEmbeddingReady } = useEmbedding()
+
   const processScript = async (options: ProcessScriptOptions): Promise<ProcessedOutput> => {
     lastOptionsRef.current = options
     setIsProcessing(true)
@@ -56,22 +63,56 @@ export function useScriptProcessor(): UseScriptProcessorResult {
 
     while (attempt < maxRetries) {
       try {
-        // Create model using ModelFactory (provider-agnostic)
+        // Step 1: Retrieve similar examples using RAG (10% progress)
+        console.log('[useScriptProcessor] Step 1: Retrieving similar examples...')
+        setProgress(5)
+        options.onProgress?.(5)
+
+        let examples: SimilarExample[] = []
+        if (isEmbeddingReady && options.text.length > 50) {
+          try {
+            // Generate embedding for query
+            const queryEmbedding = await embed(options.text)
+
+            // Search for similar scripts
+            examples = await invoke<SimilarExample[]>('search_similar_scripts', {
+              queryEmbedding,
+              topK: 3,
+              minSimilarity: 0.65
+            })
+            console.log(`[useScriptProcessor] Found ${examples.length} similar examples`)
+          } catch (ragError) {
+            console.warn('[useScriptProcessor] RAG retrieval failed, continuing without examples:', ragError)
+            // Continue without examples - don't fail the whole process
+          }
+        } else {
+          console.log('[useScriptProcessor] Skipping RAG (embedding not ready or text too short)')
+        }
+
+        setProgress(15)
+        options.onProgress?.(15)
+
+        // Step 2: Build enhanced prompt with examples (20% progress)
+        console.log('[useScriptProcessor] Step 2: Building prompt...')
+        const systemPrompt = buildRAGPrompt(options.text, examples)
+        setProgress(20)
+        options.onProgress?.(20)
+
+        // Step 3: Create model and stream (20-95% progress)
+        console.log('[useScriptProcessor] Step 3: Processing with AI...')
         const model = ModelFactory.createModel({
           providerId: options.providerId,
           modelId: options.modelId,
           configuration: options.configuration,
         })
 
-        // Stream text with AI SDK
-        // Note: Removed tools for Phase 1 - direct text formatting is simpler
         const streamResult = streamText({
           model,
           messages: [
-            { role: 'system', content: AUTOCUE_PROMPT },
+            { role: 'system', content: systemPrompt },
             {
               role: 'user',
-              content: `Format this script for autocue/teleprompter reading. Output ONLY the formatted script with no preamble, introduction, or explanation.\n\n${options.text}`,
+              content: `Format this script for autocue/teleprompter reading. Output ONLY the formatted script with no preamble, introduction, or explanation.`,
             },
           ],
           temperature: 0.7,
@@ -86,10 +127,10 @@ export function useScriptProcessor(): UseScriptProcessorResult {
           formattedText += chunk
           chunkCount++
 
-          // Update progress (approximate)
-          const estimatedProgress = Math.min(95, (chunkCount / 100) * 95)
-          setProgress(estimatedProgress)
-          options.onProgress?.(estimatedProgress)
+          // Update progress (20-95%)
+          const streamProgress = 20 + Math.min(75, (chunkCount / 100) * 75)
+          setProgress(streamProgress)
+          options.onProgress?.(streamProgress)
         }
 
         // Complete processing
