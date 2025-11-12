@@ -20,7 +20,7 @@ interface UseAIProviderResult {
   validateProvider: (
     providerId: string,
     config: ProviderConfiguration
-  ) => Promise<{ success: boolean; latencyMs?: number; errorMessage?: string }>
+  ) => Promise<{ success: boolean; latencyMs?: number; errorMessage?: string; modelsFound?: number }>
   updateProviderConfig: (providerId: string, config: ProviderConfiguration) => void
 }
 

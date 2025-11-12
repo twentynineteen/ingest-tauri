@@ -9,12 +9,23 @@ import ApiKeyInput from 'utils/ApiKeyInput'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
 import { ApiKeys, loadApiKeys, saveApiKeys } from '../utils/storage'
+import { useAIProvider } from '../hooks/useAIProvider'
+import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
 
 const Settings: React.FC = () => {
   const queryClient = useQueryClient()
 
   // Local state for form inputs (separate from cached data)
   const [localApiKeys, setLocalApiKeys] = useState<Partial<ApiKeys>>({})
+
+  // AI Provider state for testing connection
+  const { validateProvider } = useAIProvider()
+  const [connectionStatus, setConnectionStatus] = useState<{
+    status: 'idle' | 'testing' | 'success' | 'error'
+    message?: string
+    modelsFound?: number
+    latencyMs?: number
+  }>({ status: 'idle' })
 
   // Page label - shadcn breadcrumb component
   useBreadcrumb([{ label: 'Settings', href: '/settings/general' }, { label: 'General' }])
@@ -151,84 +162,174 @@ const Settings: React.FC = () => {
   const handleOllamaUrlChange = (newUrl: string) => {
     setOllamaUrl(newUrl)
     setLocalApiKeys({ ...localApiKeys, ollamaUrl: newUrl })
+    // Reset connection status when URL changes
+    setConnectionStatus({ status: 'idle' })
+  }
+
+  const handleTestConnection = async () => {
+    const testUrl = ollamaUrl || 'http://localhost:11434'
+    setConnectionStatus({ status: 'testing' })
+
+    const result = await validateProvider('ollama', {
+      serviceUrl: testUrl,
+      connectionStatus: 'not-configured',
+      timeout: 5000,
+    })
+
+    if (result.success) {
+      const modelsFound = result.modelsFound ?? 0
+      setConnectionStatus({
+        status: 'success',
+        message: `Connected successfully! Found ${modelsFound} model${modelsFound !== 1 ? 's' : ''}.`,
+        modelsFound,
+        latencyMs: result.latencyMs,
+      })
+    } else {
+      setConnectionStatus({
+        status: 'error',
+        message: result.errorMessage || 'Connection failed. Please check if Ollama is running.',
+      })
+    }
   }
 
   return (
-    <div className="w-full pb-4 border-b mb-4">
-      <h2 className="px-4 text-2xl font-semibold mb-4">Settings</h2>
+    <div className="w-full pb-4">
+      <h2 className="px-4 text-2xl font-semibold mb-6">Settings</h2>
 
-      <div className="px-4 mx-4 space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">SproutVideo API Key</label>
-          <ApiKeyInput
-            apiKey={localApiKeys.sproutVideo || ''}
-            setApiKey={(newKey: string) =>
-              setLocalApiKeys({ ...localApiKeys, sproutVideo: newKey })
-            }
-            onSave={handleSaveSproutKey}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">Trello API Key</label>
-          <ApiKeyInput
-            apiKey={localApiKeys.trello || ''}
-            setApiKey={(newKey: string) =>
-              setLocalApiKeys({ ...localApiKeys, trello: newKey })
-            }
-            onSave={handleSaveTrelloKey}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">Trello Auth</label>
-          <Button onClick={handleAuthorizeWithTrello}>Authorize with Trello</Button>
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">Trello API Token</label>
-          <ApiKeyInput
-            apiKey={localApiKeys.trelloToken || ''}
-            setApiKey={(newKey: string) =>
-              setLocalApiKeys({ ...localApiKeys, trelloToken: newKey })
-            }
-            onSave={handleSaveTrelloToken}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Ollama URL
-            <span className="text-xs text-gray-500 ml-2">
-              (Default: http://localhost:11434)
-            </span>
-          </label>
-          <ApiKeyInput
-            apiKey={ollamaUrl || 'http://localhost:11434'}
-            setApiKey={handleOllamaUrlChange}
-            onSave={handleSaveOllamaUrl}
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Default Background Folder
-          </label>
-          <div className="flex gap-2 items-center">
-            <Button
-              onClick={handleSelectDefaultBackgroundFolder}
-              className="px-3 py-1 border rounded"
-            >
-              Choose Folder
-            </Button>
-            <Button
-              onClick={handleSaveDefaultBackground}
-              className="px-3 py-1 border rounded"
-            >
-              Save
-            </Button>
+      <div className="px-4 mx-4 space-y-8">
+        {/* AI Models Section */}
+        <section className="space-y-4 border border-gray-300 rounded-lg p-6">
+          <div className="border-b pb-2">
+            <h3 className="text-lg font-semibold text-gray-900">AI Models</h3>
+            <p className="text-sm text-gray-500">Configure AI provider settings for script formatting</p>
           </div>
-          {defaultBackgroundFolder && (
-            <p className="text-sm mt-1 text-muted-foreground">
-              {defaultBackgroundFolder}
-            </p>
-          )}
-        </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Ollama URL
+              <span className="text-xs text-gray-500 ml-2">
+                (Default: http://localhost:11434)
+              </span>
+            </label>
+            <div className="space-y-2">
+              <ApiKeyInput
+                apiKey={ollamaUrl || 'http://localhost:11434'}
+                setApiKey={handleOllamaUrlChange}
+                onSave={handleSaveOllamaUrl}
+              />
+              <div className="flex gap-2 items-center">
+                <Button
+                  onClick={handleTestConnection}
+                  disabled={connectionStatus.status === 'testing'}
+                  className="px-3 py-1 border rounded flex items-center gap-2"
+                >
+                  {connectionStatus.status === 'testing' && (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  )}
+                  {connectionStatus.status === 'testing' ? 'Testing...' : 'Test Connection'}
+                </Button>
+
+                {connectionStatus.status === 'success' && (
+                  <div className="flex items-center gap-2 text-green-600 text-sm">
+                    <CheckCircle className="h-4 w-4" />
+                    <span>{connectionStatus.message}</span>
+                    {connectionStatus.latencyMs && (
+                      <span className="text-gray-500">({connectionStatus.latencyMs}ms)</span>
+                    )}
+                  </div>
+                )}
+
+                {connectionStatus.status === 'error' && (
+                  <div className="flex items-center gap-2 text-red-600 text-sm">
+                    <XCircle className="h-4 w-4" />
+                    <span>{connectionStatus.message}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Trello Section */}
+        <section className="space-y-4 border border-gray-300 rounded-lg p-6">
+          <div className="border-b pb-2">
+            <h3 className="text-lg font-semibold text-gray-900">Trello</h3>
+            <p className="text-sm text-gray-500">Configure Trello API integration for project management</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Trello API Key</label>
+            <ApiKeyInput
+              apiKey={localApiKeys.trello || ''}
+              setApiKey={(newKey: string) =>
+                setLocalApiKeys({ ...localApiKeys, trello: newKey })
+              }
+              onSave={handleSaveTrelloKey}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Trello Auth</label>
+            <Button onClick={handleAuthorizeWithTrello}>Authorize with Trello</Button>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">Trello API Token</label>
+            <ApiKeyInput
+              apiKey={localApiKeys.trelloToken || ''}
+              setApiKey={(newKey: string) =>
+                setLocalApiKeys({ ...localApiKeys, trelloToken: newKey })
+              }
+              onSave={handleSaveTrelloToken}
+            />
+          </div>
+        </section>
+
+        {/* SproutVideo Section */}
+        <section className="space-y-4 border border-gray-300 rounded-lg p-6">
+          <div className="border-b pb-2">
+            <h3 className="text-lg font-semibold text-gray-900">SproutVideo</h3>
+            <p className="text-sm text-gray-500">Configure SproutVideo API for video hosting</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">SproutVideo API Key</label>
+            <ApiKeyInput
+              apiKey={localApiKeys.sproutVideo || ''}
+              setApiKey={(newKey: string) =>
+                setLocalApiKeys({ ...localApiKeys, sproutVideo: newKey })
+              }
+              onSave={handleSaveSproutKey}
+            />
+          </div>
+        </section>
+
+        {/* Backgrounds Section */}
+        <section className="space-y-4 border border-gray-300 rounded-lg p-6">
+          <div className="border-b pb-2">
+            <h3 className="text-lg font-semibold text-gray-900">Backgrounds</h3>
+            <p className="text-sm text-gray-500">Set default folder for background assets</p>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">
+              Default Background Folder
+            </label>
+            <div className="flex gap-2 items-center">
+              <Button
+                onClick={handleSelectDefaultBackgroundFolder}
+                className="px-3 py-1 border rounded"
+              >
+                Choose Folder
+              </Button>
+              <Button
+                onClick={handleSaveDefaultBackground}
+                className="px-3 py-1 border rounded"
+              >
+                Save
+              </Button>
+            </div>
+            {defaultBackgroundFolder && (
+              <p className="text-sm mt-1 text-muted-foreground">
+                {defaultBackgroundFolder}
+              </p>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   )
