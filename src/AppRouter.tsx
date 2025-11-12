@@ -8,6 +8,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 // subsequent components are loaded within the page window via the Outlet component.
 
 import Page from './app/dashboard/page'
+import { ExampleEmbeddings } from './pages/AI/ExampleEmbeddings/ExampleEmbeddings'
 import ScriptFormatter from './pages/AI/ScriptFormatter/ScriptFormatter'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
@@ -94,6 +95,7 @@ export const AppRouter: React.FC = () => {
             </Route>
             <Route path="ai-tools">
               <Route path="script-formatter" element={<ScriptFormatter />} />
+              <Route path="example-embeddings" element={<ExampleEmbeddings />} />
             </Route>
             <Route path="upload">
               <Route path="sprout" element={<UploadSprout />} />

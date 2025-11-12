@@ -80,7 +80,12 @@ fn main() {
             // Feature 006 RAG: Vector search for script examples
             search_similar_scripts,
             get_example_by_id,
-            get_all_examples
+            get_all_examples,
+            // Feature 007: Example embedding management
+            get_all_examples_with_metadata,
+            upload_example,
+            replace_example,
+            delete_example
         ])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");

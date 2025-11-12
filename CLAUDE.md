@@ -110,6 +110,21 @@ All file operations go through Tauri backend with progress tracking. Key pattern
 
 ### Recent Features
 
+#### Phase 007: AI Script Example Embedding Management (Branch: 007-frontend-script-example)
+- **Status**: Implementation Complete
+- **Summary**: Frontend interface for managing script examples used in RAG-powered autocue script formatting
+- **Key Features**:
+  - View all example embeddings (bundled and user-uploaded)
+  - Upload custom script examples with automatic embedding generation
+  - Replace existing user-uploaded examples
+  - Delete user-uploaded examples (bundled examples are protected)
+  - Filter examples by source (All, Bundled, Uploaded)
+  - Seamless integration with existing RAG system
+- **Components**: See `src/pages/AI/ExampleEmbeddings/`
+- **Hooks**: `useExampleManagement`, `useScriptFileUpload`
+- **Backend Commands**: `get_all_examples_with_metadata`, `upload_example`, `replace_example`, `delete_example`
+- **Database**: SQLite with `source` column to distinguish bundled vs user-uploaded examples
+
 #### Phase 004: Multiple Video Links and Trello Cards (Branch: 004-embed-multiple-video)
 - **Status**: Phase 1 Design Complete (data models, contracts, tests planned)
 - **Summary**: Enhanced breadcrumbs.json to support arrays of video links and Trello cards instead of single values

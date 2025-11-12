@@ -15,3 +15,6 @@ pub use premiere::*;
 pub use rag::*;
 pub use sprout_upload::*;
 pub use system::*;
+
+#[cfg(test)]
+mod tests;
