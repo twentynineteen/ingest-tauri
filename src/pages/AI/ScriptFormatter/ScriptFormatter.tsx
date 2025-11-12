@@ -71,13 +71,21 @@ const ScriptFormatter: React.FC = () => {
     if (savedOutput) {
       try {
         const output = JSON.parse(savedOutput)
+        console.log('[ScriptFormatter] Restored cached result:', {
+          formattedTextPreview: output.formattedText.substring(0, 100),
+          timestamp: output.generationTimestamp
+        })
         setProcessedOutput(output)
         setMarkdownText(output.formattedText)
         setModifiedText(output.formattedText)
         setCurrentStep('review')
-      } catch {
+      } catch (err) {
         // Invalid data, ignore
+        console.warn('[ScriptFormatter] Failed to restore cached result:', err)
+        localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
       }
+    } else {
+      console.log('[ScriptFormatter] No cached result found')
     }
     return true
   })
@@ -132,10 +140,21 @@ const ScriptFormatter: React.FC = () => {
       return
     }
 
+    // CRITICAL: Clear any cached results before processing new script
+    localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
+    setProcessedOutput(null)
+    setModifiedText('')
+    setMarkdownText('')
+
     console.log('Setting step to processing...')
     setCurrentStep('processing')
 
     try {
+      console.log(
+        'Processing script with user input:',
+        document.textContent.substring(0, 200) + '...'
+      )
+
       const output = await processScript({
         text: document.textContent,
         modelId: selectedModelId,
@@ -145,6 +164,7 @@ const ScriptFormatter: React.FC = () => {
       })
 
       console.log('Processing completed successfully:', output)
+      console.log('Output preview:', output.formattedText.substring(0, 200) + '...')
 
       // Store markdown text (decorations will hide asterisks and show bold)
       setMarkdownText(output.formattedText)
@@ -381,9 +401,7 @@ const ScriptFormatter: React.FC = () => {
       {currentStep === 'review' && processedOutput && (
         <div className="max-w-6xl mx-auto space-y-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">
-              Review and Edit
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900">Review and Edit</h3>
             <button
               onClick={handleDownload}
               disabled={isGenerating}
@@ -413,9 +431,7 @@ const ScriptFormatter: React.FC = () => {
         <div className="max-w-2xl mx-auto">
           <div className="p-8 bg-green-50 border border-green-200 rounded-lg text-center">
             <Download className="h-16 w-16 text-green-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Download Complete!
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Download Complete!</h3>
             <p className="text-sm text-gray-600 mb-4">
               Your formatted script has been saved successfully.
             </p>

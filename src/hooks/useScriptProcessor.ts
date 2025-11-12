@@ -5,17 +5,14 @@
  * Enhanced with RAG (Retrieval-Augmented Generation)
  */
 
-import { useState, useRef } from 'react'
-import { streamText } from 'ai'
 import { invoke } from '@tauri-apps/api/core'
+import { streamText } from 'ai'
+import { useRef, useState } from 'react'
 import { ModelFactory } from '../services/ai/modelFactory'
+import type { ProcessedOutput, ProviderConfiguration } from '../types/scriptFormatter'
 import { buildRAGPrompt } from '../utils/aiPrompts'
 import { useEmbedding } from './useEmbedding'
 import type { SimilarExample } from './useScriptRetrieval'
-import type {
-  ProcessedOutput,
-  ProviderConfiguration,
-} from '../types/scriptFormatter'
 
 interface ProcessScriptOptions {
   text: string
@@ -48,7 +45,9 @@ export function useScriptProcessor(): UseScriptProcessorResult {
   // Use embedding hook for RAG
   const { embed, isReady: isEmbeddingReady } = useEmbedding()
 
-  const processScript = async (options: ProcessScriptOptions): Promise<ProcessedOutput> => {
+  const processScript = async (
+    options: ProcessScriptOptions
+  ): Promise<ProcessedOutput> => {
     lastOptionsRef.current = options
     setIsProcessing(true)
     setProgress(0)
@@ -69,7 +68,11 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         options.onProgress?.(5)
 
         let examples: SimilarExample[] = []
-        if (isEmbeddingReady && options.text.length > 50) {
+
+        // IMPORTANT: Only use RAG if explicitly enabled - disable for now due to embedding issues
+        const enableRAG = false // TODO: Set to true once Ollama embedding is fixed
+
+        if (enableRAG && isEmbeddingReady && options.text.length > 50) {
           try {
             // Generate embedding for query
             const queryEmbedding = await embed(options.text)
@@ -82,11 +85,16 @@ export function useScriptProcessor(): UseScriptProcessorResult {
             })
             console.log(`[useScriptProcessor] Found ${examples.length} similar examples`)
           } catch (ragError) {
-            console.warn('[useScriptProcessor] RAG retrieval failed, continuing without examples:', ragError)
+            console.warn(
+              '[useScriptProcessor] RAG retrieval failed, continuing without examples:',
+              ragError
+            )
             // Continue without examples - don't fail the whole process
           }
         } else {
-          console.log('[useScriptProcessor] Skipping RAG (embedding not ready or text too short)')
+          console.log(
+            '[useScriptProcessor] RAG disabled or not ready - processing without examples'
+          )
         }
 
         setProgress(15)
@@ -103,7 +111,7 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         const model = ModelFactory.createModel({
           providerId: options.providerId,
           modelId: options.modelId,
-          configuration: options.configuration,
+          configuration: options.configuration
         })
 
         const streamResult = streamText({
@@ -112,11 +120,14 @@ export function useScriptProcessor(): UseScriptProcessorResult {
             { role: 'system', content: systemPrompt },
             {
               role: 'user',
-              content: `Format this script for autocue/teleprompter reading. Output ONLY the formatted script with no preamble, introduction, or explanation.`,
-            },
+              content: `Format this script for autocue/teleprompter reading. Preserve ALL the original words and content exactly as written - DO NOT rewrite, paraphrase, or change the meaning. ONLY add formatting (line breaks, bold, pauses). Output ONLY the formatted script with no preamble, introduction, or explanation.
+
+SCRIPT TO FORMAT:
+${options.text}`
+            }
           ],
-          temperature: 0.7,
-          abortSignal: abortControllerRef.current.signal,
+          temperature: 0.3,
+          abortSignal: abortControllerRef.current.signal
         })
 
         // Collect streamed text
@@ -138,15 +149,18 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         options.onProgress?.(100)
 
         // Debug logging
-        console.log('Formatted text preview (first 200 chars):', formattedText.substring(0, 200))
+        console.log(
+          'Formatted text preview (first 200 chars):',
+          formattedText.substring(0, 200)
+        )
         console.log('Line breaks found:', formattedText.split('\n').length)
 
         // Create ProcessedOutput
         // Convert line breaks to proper HTML paragraphs
         const htmlContent = formattedText
           .split('\n')
-          .filter((line) => line.trim().length > 0)
-          .map((line) => `<p>${line}</p>`)
+          .filter(line => line.trim().length > 0)
+          .map(line => `<p>${line}</p>`)
           .join('\n')
 
         const output: ProcessedOutput = {
@@ -159,11 +173,11 @@ export function useScriptProcessor(): UseScriptProcessorResult {
             deletions: [],
             modifications: [],
             originalLineCount: options.text.split('\n').length,
-            modifiedLineCount: formattedText.split('\n').length,
+            modifiedLineCount: formattedText.split('\n').length
           },
           editHistory: [],
           generationTimestamp: new Date(),
-          isEdited: false,
+          isEdited: false
         }
 
         setResult(output)
@@ -192,7 +206,7 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         // Retry with exponential backoff
         options.onRetry?.(attempt)
         const backoffDelay = Math.pow(2, attempt) * 1000 // 1s, 2s, 4s
-        await new Promise((resolve) => setTimeout(resolve, backoffDelay))
+        await new Promise(resolve => setTimeout(resolve, backoffDelay))
       }
     }
 
@@ -216,6 +230,6 @@ export function useScriptProcessor(): UseScriptProcessorResult {
     result,
     error,
     retry,
-    cancel,
+    cancel
   }
 }
