@@ -8,6 +8,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 // subsequent components are loaded within the page window via the Outlet component.
 
 import Page from './app/dashboard/page'
+import ScriptFormatter from './pages/AI/ScriptFormatter/ScriptFormatter'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
 import Baker from './pages/Baker/Baker'
@@ -90,6 +91,9 @@ export const AppRouter: React.FC = () => {
               <Route path="history" element={<IngestHistory />} />
               <Route path="build" element={<BuildProject />} />
               <Route path="baker" element={<Baker />} />
+            </Route>
+            <Route path="ai-tools">
+              <Route path="script-formatter" element={<ScriptFormatter />} />
             </Route>
             <Route path="upload">
               <Route path="sprout" element={<UploadSprout />} />

@@ -70,7 +70,17 @@ fn main() {
             baker_remove_trello_card,
             baker_fetch_trello_card_details,
             // Feature 004 Phase 2: Sprout Video URL auto-fetch
-            fetch_sprout_video_details
+            fetch_sprout_video_details,
+            // Feature 006: AI-Powered Autocue Script Formatter
+            parse_docx_file,
+            generate_docx_file,
+            validate_docx_file,
+            validate_provider_connection,
+            validate_provider_with_auth,
+            // Feature 006 RAG: Vector search for script examples
+            search_similar_scripts,
+            get_example_by_id,
+            get_all_examples
         ])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");

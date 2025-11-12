@@ -6,6 +6,7 @@ const setSproutVideoApiKey = (state: string) =>
   appStore.getState().setSproutVideoApiKey(state)
 const setTrelloApiKey = (state: string) => appStore.getState().setTrelloApiKey(state)
 const setTrelloApiToken = (state: string) => appStore.getState().setTrelloApiToken(state)
+const setOllamaUrl = (state: string) => appStore.getState().setOllamaUrl(state)
 
 // Define an interface for multiple API keys.
 export interface ApiKeys {
@@ -14,6 +15,7 @@ export interface ApiKeys {
   trelloToken?: string
   // Add more services as needed.
   defaultBackgroundFolder?: string
+  ollamaUrl?: string
 }
 
 const API_KEYS_FILE = 'api_keys.json' // New file for storing API keys as JSON
@@ -35,6 +37,7 @@ export const saveApiKeys = async (apiKeys: ApiKeys): Promise<void> => {
     setTrelloApiKey(apiKeys.trello)
     setTrelloApiToken(apiKeys.trelloToken)
     setDefaultBackgroundFolder(apiKeys.defaultBackgroundFolder)
+    if (apiKeys.ollamaUrl) setOllamaUrl(apiKeys.ollamaUrl)
 
     const filePath = await getFilePath()
     const data = JSON.stringify(apiKeys, null, 2) // Pretty-print JSON for readability.
@@ -57,6 +60,7 @@ export const loadApiKeys = async (): Promise<ApiKeys> => {
     setTrelloApiKey(result.trello)
     setTrelloApiToken(result.trelloToken)
     setDefaultBackgroundFolder(result.defaultBackgroundFolder)
+    if (result.ollamaUrl) setOllamaUrl(result.ollamaUrl)
 
     return result
   } catch (error) {

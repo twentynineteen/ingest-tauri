@@ -11,7 +11,7 @@ import {
 import { useAuth } from 'hooks/useAuth'
 import { useUpdateManager } from 'hooks/useUpdateManager'
 import { useUsername } from 'hooks/useUsername'
-import { Clapperboard, HardDriveUpload, Save, Settings } from 'lucide-react'
+import { Clapperboard, FileText, HardDriveUpload, Save, Settings } from 'lucide-react'
 import * as React from 'react'
 
 // This is sample data. User data is located just before function return statement
@@ -42,6 +42,22 @@ const data = {
         //   title: 'History',
         //   // url: '/ingest/history'
         //   url: '#'
+        // }
+      ]
+    },
+    {
+      title: 'AI tools',
+      url: '/ai-tools/script-formatter',
+      icon: FileText,
+      isActive: false,
+      items: [
+        {
+          title: 'Autocue script formatter',
+          url: '/ai-tools/script-formatter'
+        }
+        // {
+        //   title: 'Image Generation',
+        //   url: '/ingest/ai-tools/image-generation'
         // }
       ]
     },

@@ -44,7 +44,10 @@
   },
   "bundle": {
     "createUpdaterArtifacts": true,
-    "resources": { "assets/*": "resources/" },
+    "resources": {
+      "assets/*": "resources/",
+      "resources/embeddings/*": "embeddings/"
+    },
     "active": true,
     "targets": "all",
     "icon": [
