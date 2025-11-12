@@ -43,7 +43,10 @@ export function ViewExampleDialog({ open, example, onClose }: ViewExampleDialogP
               {example.wordCount && ` • ${example.wordCount} words`}
               {example.qualityScore && ` • Quality: ${example.qualityScore}/5`}
             </DialogDescription>
-            <Badge variant={isUserUploaded ? 'default' : 'secondary'} className="shrink-0">
+            <Badge
+              variant={isUserUploaded ? 'default' : 'secondary'}
+              className="shrink-0"
+            >
               {isUserUploaded ? 'Uploaded' : 'Bundled'}
             </Badge>
           </div>
@@ -65,10 +68,7 @@ export function ViewExampleDialog({ open, example, onClose }: ViewExampleDialogP
             <TabsTrigger value="after">Formatted Script</TabsTrigger>
           </TabsList>
 
-          <TabsContent
-            value="before"
-            className="flex-1 overflow-y-auto mt-4 pr-4"
-          >
+          <TabsContent value="before" className="flex-1 overflow-y-auto mt-4">
             <div className="rounded-md border bg-muted/50 p-4">
               <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
                 {example.beforeText}
@@ -76,10 +76,7 @@ export function ViewExampleDialog({ open, example, onClose }: ViewExampleDialogP
             </div>
           </TabsContent>
 
-          <TabsContent
-            value="after"
-            className="flex-1 overflow-y-auto mt-4 pr-4"
-          >
+          <TabsContent value="after" className="flex-1 overflow-y-auto mt-4">
             <div className="rounded-md border bg-muted/50 p-4">
               <pre className="whitespace-pre-wrap font-mono text-sm leading-relaxed">
                 {example.afterText}
