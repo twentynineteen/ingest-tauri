@@ -16,6 +16,7 @@ interface ExampleListProps {
   onDelete: (id: string) => void
   onReplace: (id: string) => void
   onView: (id: string) => void
+  onDownload: (id: string) => void
 }
 
 export function ExampleList({
@@ -23,7 +24,8 @@ export function ExampleList({
   isLoading,
   onDelete,
   onReplace,
-  onView
+  onView,
+  onDownload
 }: ExampleListProps) {
   // Loading state
   if (isLoading) {
@@ -67,6 +69,7 @@ export function ExampleList({
           onDelete={onDelete}
           onReplace={onReplace}
           onView={onView}
+          onDownload={onDownload}
         />
       ))}
     </div>

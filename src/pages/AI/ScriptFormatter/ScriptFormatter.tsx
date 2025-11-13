@@ -421,7 +421,8 @@ const ScriptFormatter: React.FC = () => {
             )}
             {isEmbeddingReady && (
               <p className="text-sm text-green-600">
-                ✓ RAG system ready (Ollama) - will use similar examples to improve formatting
+                ✓ RAG system ready (Ollama) - will use similar examples to improve
+                formatting
               </p>
             )}
             {embeddingError && (
@@ -443,7 +444,7 @@ const ScriptFormatter: React.FC = () => {
           {/* Two-column grid for provider and model selection */}
           <div className="grid grid-cols-2 gap-6">
             {/* Left column: AI Provider */}
-            <div className="p-6 border border-gray-300 rounded-lg max-h-[300px] overflow-y-auto">
+            <div className="p-6 border border-gray-300 rounded-lg max-h-[200px] overflow-y-auto">
               <ProviderSelector
                 providers={availableProviders}
                 activeProvider={activeProvider}
@@ -454,7 +455,7 @@ const ScriptFormatter: React.FC = () => {
             </div>
 
             {/* Right column: Model Selector */}
-            <div className="p-6 border border-gray-300 rounded-lg max-h-[300px] overflow-y-auto">
+            <div className="p-6 border border-gray-300 rounded-lg max-h-[200px] overflow-y-auto">
               {activeProvider?.status === 'configured' ? (
                 <ModelSelector
                   models={models}
@@ -550,32 +551,38 @@ const ScriptFormatter: React.FC = () => {
       {/* Step 4: Review & Edit */}
       {currentStep === 'review' && processedOutput && (
         <div className="w-full space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
               <h3 className="text-lg font-medium text-gray-900">Review and Edit</h3>
               {examplesCount > 0 && (
-                <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs text-blue-800">
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-full text-xs text-blue-800">
                   <Database className="h-3 w-3" />
-                  <span>Enhanced with {examplesCount} example{examplesCount > 1 ? 's' : ''}</span>
+                  <span className="hidden sm:inline">
+                    Enhanced with {examplesCount} example{examplesCount > 1 ? 's' : ''}
+                  </span>
+                  <span className="sm:hidden">{examplesCount} ex.</span>
                 </div>
               )}
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setShowSaveDialog(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                className="flex-1 lg:flex-initial px-3 py-2 bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
                 title="Save this script as an example for future RAG-enhanced formatting"
               >
                 <Save className="h-4 w-4" />
-                Save as Example
+                <span className="hidden md:inline">Save as Example</span>
               </button>
               <button
                 onClick={handleDownload}
                 disabled={isGenerating}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
+                className="flex-1 lg:flex-initial px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
               >
                 <Download className="h-4 w-4" />
-                {isGenerating ? 'Downloading...' : 'Download Formatted Script'}
+                <span className="hidden md:inline">
+                  {isGenerating ? 'Downloading...' : 'Download Formatted Script'}
+                </span>
+                <span className="md:hidden">Download</span>
               </button>
             </div>
           </div>

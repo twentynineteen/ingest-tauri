@@ -16,16 +16,17 @@ import {
   CardTitle
 } from '@/components/ui/card'
 import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
-import { RefreshCw, Trash2 } from 'lucide-react'
+import { Download, RefreshCw, Trash2 } from 'lucide-react'
 
 interface ExampleCardProps {
   example: ExampleWithMetadata
   onDelete: (id: string) => void
   onReplace: (id: string) => void
   onView: (id: string) => void
+  onDownload: (id: string) => void
 }
 
-export function ExampleCard({ example, onDelete, onReplace, onView }: ExampleCardProps) {
+export function ExampleCard({ example, onDelete, onReplace, onView, onDownload }: ExampleCardProps) {
   const isUserUploaded = example.source === 'user-uploaded'
 
   // Truncate preview text to ~200 chars
@@ -36,7 +37,7 @@ export function ExampleCard({ example, onDelete, onReplace, onView }: ExampleCar
 
   return (
     <Card
-      className="flex flex-col cursor-pointer hover:bg-accent/50 transition-colors"
+      className="flex flex-col cursor-pointer hover:bg-accent/50 transition-colors @container"
       onClick={() => onView(example.id)}
     >
       <CardHeader>
@@ -70,34 +71,51 @@ export function ExampleCard({ example, onDelete, onReplace, onView }: ExampleCar
         </div>
       </CardContent>
 
-      {isUserUploaded && (
-        <CardFooter className="gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={e => {
-              e.stopPropagation()
-              onReplace(example.id)
-            }}
-            className="flex-1"
-          >
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Replace
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={e => {
-              e.stopPropagation()
-              onDelete(example.id)
-            }}
-            className="flex-1"
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
-          </Button>
-        </CardFooter>
-      )}
+      <CardFooter className="gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={e => {
+            e.stopPropagation()
+            onDownload(example.id)
+          }}
+          className="flex-1"
+          title="Download"
+        >
+          <Download className="h-4 w-4 @[380px]:mr-2" />
+          <span className="hidden @[380px]:inline">Download</span>
+        </Button>
+        {isUserUploaded && (
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={e => {
+                e.stopPropagation()
+                onReplace(example.id)
+              }}
+              className="flex-1"
+              title="Replace"
+            >
+              <RefreshCw className="h-4 w-4 @[380px]:mr-2" />
+              <span className="hidden @[380px]:inline">Replace</span>
+            </Button>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={e => {
+                e.stopPropagation()
+                onDelete(example.id)
+              }}
+              className="flex-1"
+              title="Delete"
+            >
+              <Trash2 className="h-4 w-4 @[380px]:mr-2" />
+              <span className="hidden @[380px]:inline">Delete</span>
+            </Button>
+          </>
+        )}
+      </CardFooter>
     </Card>
   )
 }
