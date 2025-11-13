@@ -14,10 +14,7 @@ interface ScanResultsProps {
   isScanning: boolean
 }
 
-export const ScanResults: React.FC<ScanResultsProps> = ({
-  scanResult,
-  isScanning
-}) => {
+export const ScanResults: React.FC<ScanResultsProps> = ({ scanResult, isScanning }) => {
   if (!scanResult) return null
 
   // Show progress during scan
@@ -47,14 +44,15 @@ export const ScanResults: React.FC<ScanResultsProps> = ({
           <p className="text-sm text-gray-500">Folders Scanned</p>
         </div>
         <div>
-          <p className="text-2xl font-bold text-green-600">
-            {scanResult.validProjects}
-          </p>
+          <p className="text-2xl font-bold text-green-600">{scanResult.validProjects}</p>
           <p className="text-sm text-gray-500">Valid Projects</p>
         </div>
         <div>
           <p className="text-2xl font-bold text-blue-600">
-            {scanResult.projects.filter(p => p.hasBreadcrumbs && !p.invalidBreadcrumbs).length}
+            {
+              scanResult.projects.filter(p => p.hasBreadcrumbs && !p.invalidBreadcrumbs)
+                .length
+            }
           </p>
           <p className="text-sm text-gray-500">Valid Breadcrumbs</p>
         </div>
@@ -71,9 +69,7 @@ export const ScanResults: React.FC<ScanResultsProps> = ({
           <p className="text-sm text-gray-500">Total Size</p>
         </div>
         <div>
-          <p className="text-2xl font-bold text-orange-600">
-            {scanResult.errors.length}
-          </p>
+          <p className="text-2xl font-bold text-orange-600">{scanResult.errors.length}</p>
           <p className="text-sm text-gray-500">Errors</p>
         </div>
       </div>

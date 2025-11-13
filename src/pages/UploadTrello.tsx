@@ -243,8 +243,10 @@ const UploadTrello = () => {
                               )
                             } catch (error) {
                               // You may want to replace this with a toast or notification
-                              alert("Failed to save breadcrumbs: " + (error?.message || error));
-                              console.error("Failed to write breadcrumbs file:", error);
+                              alert(
+                                'Failed to save breadcrumbs: ' + (error?.message || error)
+                              )
+                              console.error('Failed to write breadcrumbs file:', error)
                             }
                           }
 

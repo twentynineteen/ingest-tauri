@@ -3,8 +3,7 @@
  * Feature: 004-embed-multiple-video
  */
 
-import { useState, useEffect } from 'react'
-import { Plus, AlertCircle, Loader2, Upload as UploadIcon } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -17,21 +16,25 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { VideoLinkCard } from './VideoLinkCard'
-import { TrelloCardUpdateDialog } from './TrelloCardUpdateDialog'
-import { useBreadcrumbsVideoLinks } from '../../hooks/useBreadcrumbsVideoLinks'
-import { useBreadcrumbsTrelloCards } from '../../hooks/useBreadcrumbsTrelloCards'
-import { useSproutVideoApi } from '../../hooks/useSproutVideoApi'
-import { useSproutVideoApiKey, useTrelloApiKeys } from '../../hooks/useApiKeys'
-import { useFileUpload } from '../../hooks/useFileUpload'
-import { useUploadEvents } from '../../hooks/useUploadEvents'
-import { useSproutVideoProcessor } from '../../hooks/useSproutVideoProcessor'
-import { validateVideoLink } from '../../utils/validation'
-import { generateBreadcrumbsBlock, updateTrelloCardWithBreadcrumbs } from '../../hooks/useAppendBreadcrumbs'
 import { invoke } from '@tauri-apps/api/core'
-import type { VideoLink, BreadcrumbsFile } from '../../types/baker'
+import { AlertCircle, Loader2, Plus, Upload as UploadIcon } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { useSproutVideoApiKey, useTrelloApiKeys } from '../../hooks/useApiKeys'
+import {
+  generateBreadcrumbsBlock,
+  updateTrelloCardWithBreadcrumbs
+} from '../../hooks/useAppendBreadcrumbs'
+import { useBreadcrumbsTrelloCards } from '../../hooks/useBreadcrumbsTrelloCards'
+import { useBreadcrumbsVideoLinks } from '../../hooks/useBreadcrumbsVideoLinks'
+import { useFileUpload } from '../../hooks/useFileUpload'
+import { useSproutVideoApi } from '../../hooks/useSproutVideoApi'
+import { useSproutVideoProcessor } from '../../hooks/useSproutVideoProcessor'
+import { useUploadEvents } from '../../hooks/useUploadEvents'
+import type { BreadcrumbsFile, VideoLink } from '../../types/baker'
+import { validateVideoLink } from '../../utils/validation'
+import { TrelloCardUpdateDialog } from './TrelloCardUpdateDialog'
+import { VideoLinkCard } from './VideoLinkCard'
 
 interface VideoLinksManagerProps {
   projectPath: string
@@ -76,7 +79,7 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
     selectedFile,
     uploading,
     enabled: addMode === 'upload',
-    onVideoReady: (videoLink) => {
+    onVideoReady: videoLink => {
       addVideoLink(videoLink)
       // Don't reset upload state here - keep the success UI showing
       // Don't auto-close - let user see success and close manually
@@ -86,7 +89,7 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
         setIsTrelloDialogOpen(true)
       }
     },
-    onError: (error) => {
+    onError: error => {
       setValidationErrors([error])
       setUploadSuccess(false)
     }
@@ -198,7 +201,7 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
     const breadcrumbsBlock = generateBreadcrumbsBlock(breadcrumbsData)
 
     // Update selected cards
-    const updatePromises = selectedCardIndexes.map(async (index) => {
+    const updatePromises = selectedCardIndexes.map(async index => {
       const card = trelloCards[index]
       // Fetch full card details from Trello API to get current description
       const response = await fetch(
@@ -264,7 +267,8 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Failed to load video links: {error instanceof Error ? error.message : String(error)}
+          Failed to load video links:{' '}
+          {error instanceof Error ? error.message : String(error)}
         </AlertDescription>
       </Alert>
     )
@@ -277,7 +281,8 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Video Links</h3>
           <p className="text-sm text-gray-500">
-            {videoLinks.length} {videoLinks.length === 1 ? 'video' : 'videos'} • Sprout Video uploads
+            {videoLinks.length} {videoLinks.length === 1 ? 'video' : 'videos'} • Sprout
+            Video uploads
           </p>
         </div>
 
@@ -304,98 +309,102 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
 
               {/* URL Entry Tab */}
               <TabsContent value="url" className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="video-url">Video URL *</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="video-url"
-                    placeholder="https://sproutvideo.com/videos/..."
-                    value={formData.url}
-                    onChange={(e) => {
-                      setFormData({ ...formData, url: e.target.value })
-                      setFetchError(null)
-                    }}
-                    className="flex-1"
-                  />
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={handleFetchVideoDetails}
-                    disabled={!formData.url || !apiKey || isFetchingVideo}
-                  >
-                    {isFetchingVideo ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      'Fetch Details'
-                    )}
-                  </Button>
+                <div className="space-y-2">
+                  <Label htmlFor="video-url">Video URL *</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="video-url"
+                      placeholder="https://sproutvideo.com/videos/..."
+                      value={formData.url}
+                      onChange={e => {
+                        setFormData({ ...formData, url: e.target.value })
+                        setFetchError(null)
+                      }}
+                      className="flex-1"
+                    />
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={handleFetchVideoDetails}
+                      disabled={!formData.url || !apiKey || isFetchingVideo}
+                    >
+                      {isFetchingVideo ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        'Fetch Details'
+                      )}
+                    </Button>
+                  </div>
+                  {!apiKey && formData.url && (
+                    <p className="text-xs text-amber-600">
+                      Sprout Video API key not configured. Go to Settings to add it.
+                    </p>
+                  )}
                 </div>
-                {!apiKey && formData.url && (
-                  <p className="text-xs text-amber-600">
-                    Sprout Video API key not configured. Go to Settings to add it.
-                  </p>
+
+                {fetchError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{fetchError}</AlertDescription>
+                  </Alert>
                 )}
-              </div>
 
-              {fetchError && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{fetchError}</AlertDescription>
-                </Alert>
-              )}
+                <div className="space-y-2">
+                  <Label htmlFor="video-title">Title *</Label>
+                  <Input
+                    id="video-title"
+                    placeholder="Video title"
+                    value={formData.title}
+                    onChange={e => setFormData({ ...formData, title: e.target.value })}
+                    maxLength={200}
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="video-title">Title *</Label>
-                <Input
-                  id="video-title"
-                  placeholder="Video title"
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  maxLength={200}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="sprout-id">Sprout Video ID</Label>
+                  <Input
+                    id="sprout-id"
+                    placeholder="abc123xyz"
+                    value={formData.sproutVideoId}
+                    onChange={e =>
+                      setFormData({ ...formData, sproutVideoId: e.target.value })
+                    }
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="sprout-id">Sprout Video ID</Label>
-                <Input
-                  id="sprout-id"
-                  placeholder="abc123xyz"
-                  value={formData.sproutVideoId}
-                  onChange={(e) => setFormData({ ...formData, sproutVideoId: e.target.value })}
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="thumbnail-url">Thumbnail URL</Label>
+                  <Input
+                    id="thumbnail-url"
+                    placeholder="https://..."
+                    value={formData.thumbnailUrl}
+                    onChange={e =>
+                      setFormData({ ...formData, thumbnailUrl: e.target.value })
+                    }
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="thumbnail-url">Thumbnail URL</Label>
-                <Input
-                  id="thumbnail-url"
-                  placeholder="https://..."
-                  value={formData.thumbnailUrl}
-                  onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
-                />
-              </div>
+                {validationErrors.length > 0 && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      <ul className="list-disc pl-4 space-y-1">
+                        {validationErrors.map((err, i) => (
+                          <li key={i}>{err}</li>
+                        ))}
+                      </ul>
+                    </AlertDescription>
+                  </Alert>
+                )}
 
-              {validationErrors.length > 0 && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    <ul className="list-disc pl-4 space-y-1">
-                      {validationErrors.map((err, i) => (
-                        <li key={i}>{err}</li>
-                      ))}
-                    </ul>
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {addError && (
-                <Alert variant="destructive">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    {addError instanceof Error ? addError.message : String(addError)}
-                  </AlertDescription>
-                </Alert>
-              )}
+                {addError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      {addError instanceof Error ? addError.message : String(addError)}
+                    </AlertDescription>
+                  </Alert>
+                )}
               </TabsContent>
 
               {/* Upload File Tab */}
@@ -417,7 +426,10 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
                     </div>
                     {selectedFile && (
                       <p className="text-sm text-gray-600">
-                        Selected: <span className="font-medium">{selectedFile.split('/').pop()}</span>
+                        Selected:{' '}
+                        <span className="font-medium">
+                          {selectedFile.split('/').pop()}
+                        </span>
                       </p>
                     )}
                   </div>
@@ -450,7 +462,13 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
                   )}
 
                   {message && !uploading && (
-                    <Alert variant={typeof message === 'string' && message.includes('failed') ? 'destructive' : 'default'}>
+                    <Alert
+                      variant={
+                        typeof message === 'string' && message.includes('failed')
+                          ? 'destructive'
+                          : 'default'
+                      }
+                    >
                       <AlertCircle className="h-4 w-4" />
                       <AlertDescription>{String(message)}</AlertDescription>
                     </Alert>

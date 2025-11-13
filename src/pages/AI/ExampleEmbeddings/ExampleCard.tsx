@@ -5,11 +5,18 @@
  * Displays a single script example with metadata and actions
  */
 
-import { RefreshCw, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
 import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
+import { RefreshCw, Trash2 } from 'lucide-react'
 
 interface ExampleCardProps {
   example: ExampleWithMetadata
@@ -28,7 +35,10 @@ export function ExampleCard({ example, onDelete, onReplace, onView }: ExampleCar
       : example.beforeText
 
   return (
-    <Card className="flex flex-col cursor-pointer hover:bg-accent/50 transition-colors" onClick={() => onView(example.id)}>
+    <Card
+      className="flex flex-col cursor-pointer hover:bg-accent/50 transition-colors"
+      onClick={() => onView(example.id)}
+    >
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1">
@@ -65,7 +75,7 @@ export function ExampleCard({ example, onDelete, onReplace, onView }: ExampleCar
           <Button
             variant="outline"
             size="sm"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation()
               onReplace(example.id)
             }}
@@ -77,7 +87,7 @@ export function ExampleCard({ example, onDelete, onReplace, onView }: ExampleCar
           <Button
             variant="destructive"
             size="sm"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation()
               onDelete(example.id)
             }}

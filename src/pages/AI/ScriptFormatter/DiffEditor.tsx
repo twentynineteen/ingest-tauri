@@ -47,43 +47,41 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
   }, [])
 
   return (
-    <div className="border border-gray-300 rounded-lg overflow-hidden mb-2">
-      <div className="bg-gray-100 px-4 py-2 border-b border-gray-300 flex items-center justify-between">
+    <div className="border border-gray-300 rounded-lg overflow-hidden mb-2 flex flex-col h-[calc(100vh-300px)]">
+      <div className="bg-gray-100 px-4 py-2 border-b border-gray-300 flex items-center justify-between shrink-0">
         <span className="text-sm font-medium text-gray-700">
           Formatted Script (Editable)
         </span>
-        <span className="text-xs text-gray-500">
-          Use **text** for bold formatting
-        </span>
+        <span className="text-xs text-gray-500">Use **text** for bold formatting</span>
       </div>
 
-        <div ref={containerRef} style={{ height: '70vh', minHeight: '600px' }}>
-          <Editor
-            height="100%"
-            language="markdown"
-            value={modified}
-            onChange={handleEditorChange}
-            onMount={handleEditorDidMount}
-            options={{
-              wordWrap: 'bounded',
-              wrappingStrategy: 'advanced',
-              minimap: { enabled: true },
-              scrollBeyondLastLine: false,
-              fontSize: 14,
-              lineNumbers: 'on',
-              glyphMargin: true,
-              folding: true,
-              readOnly: false,
-              automaticLayout: true,
-              unicodeHighlight: {
-                ambiguousCharacters: false,
-                invisibleCharacters: false,
-                nonBasicASCII: false
-              }
-            }}
-            theme="vs-light"
-          />
-        </div>
+      <div ref={containerRef} className="flex-1">
+        <Editor
+          height="100%"
+          language="markdown"
+          value={modified}
+          onChange={handleEditorChange}
+          onMount={handleEditorDidMount}
+          options={{
+            wordWrap: 'bounded',
+            wrappingStrategy: 'advanced',
+            minimap: { enabled: true },
+            scrollBeyondLastLine: false,
+            fontSize: 14,
+            lineNumbers: 'on',
+            glyphMargin: true,
+            folding: true,
+            readOnly: false,
+            automaticLayout: true,
+            unicodeHighlight: {
+              ambiguousCharacters: false,
+              invisibleCharacters: false,
+              nonBasicASCII: false
+            }
+          }}
+          theme="vs-light"
+        />
+      </div>
     </div>
   )
 }

@@ -77,7 +77,7 @@ export function generateBreadcrumbsBlock(breadcrumbsData: Breadcrumb): string {
   const humanReadableSummary = formatBreadcrumbsForHumans(breadcrumbsData)
   const breadcrumbMarker = '```json\n// BREADCRUMBS'
   const technicalBlock = `${breadcrumbMarker}\n${JSON.stringify(breadcrumbsData, null, 2)}\n\`\`\``
-  
+
   return `${humanReadableSummary}\n\n---\n*Technical details for Bucket app below:*\n${technicalBlock}`
 }
 
@@ -168,11 +168,16 @@ export function useAppendBreadcrumbs(
   } = {}
 ): {
   getBreadcrumbsBlock: (card: LegacyTrelloCard | null) => Promise<string | null>
-  applyBreadcrumbsToCard: (card: LegacyTrelloCard, breadcrumbsBlock: string) => Promise<void>
+  applyBreadcrumbsToCard: (
+    card: LegacyTrelloCard,
+    breadcrumbsBlock: string
+  ) => Promise<void>
 } {
   const queryClient = useQueryClient()
 
-  async function getBreadcrumbsBlock(card: LegacyTrelloCard | null): Promise<string | null> {
+  async function getBreadcrumbsBlock(
+    card: LegacyTrelloCard | null
+  ): Promise<string | null> {
     if (!card || !apiKey || !token) return null
 
     try {

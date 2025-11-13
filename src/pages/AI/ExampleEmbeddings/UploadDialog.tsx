@@ -275,7 +275,9 @@ export function UploadDialog({ open, onClose, onUpload }: UploadDialogProps) {
             <div className="space-y-4 py-4">
               <div className="rounded-md border border-green-200 bg-green-50 p-4">
                 <p className="text-sm font-medium text-green-900">Uploaded Example</p>
-                <p className="text-lg font-semibold text-green-700 mt-1">{uploadedTitle}</p>
+                <p className="text-lg font-semibold text-green-700 mt-1">
+                  {uploadedTitle}
+                </p>
               </div>
 
               <div className="space-y-2">
@@ -306,159 +308,178 @@ export function UploadDialog({ open, onClose, onUpload }: UploadDialogProps) {
             <DialogHeader>
               <DialogTitle>Upload Script Example</DialogTitle>
               <DialogDescription>
-                Add a new script example to improve AI formatting suggestions. Supports .txt and
-                .docx files.
+                Add a new script example to improve AI formatting suggestions. Supports
+                .txt and .docx files.
               </DialogDescription>
             </DialogHeader>
 
             <form onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            {/* Model availability status */}
-            <div
-              className={`rounded-md border p-3 ${
-                isCheckingModel
-                  ? 'border-blue-200 bg-blue-50'
-                  : isModelReady
-                    ? 'border-green-200 bg-green-50'
-                    : 'border-red-200 bg-red-50'
-              }`}
-            >
-              <div className="flex items-center gap-2">
-                {isCheckingModel ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                    <span className="text-sm text-blue-700">Checking embedding model...</span>
-                  </>
-                ) : isModelReady ? (
-                  <>
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm text-green-700">
-                      Embedding model ready: <code className="font-mono">{modelName}</code>
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <AlertCircle className="h-4 w-4 text-red-600" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-red-700">Embedding model not available</p>
-                      {modelError && (
-                        <p className="text-xs text-red-600 mt-1">{modelError.message}</p>
-                      )}
-                    </div>
-                  </>
-                )}
+              <div className="space-y-4">
+                {/* Model availability status */}
+                <div
+                  className={`rounded-md border p-3 ${
+                    isCheckingModel
+                      ? 'border-blue-200 bg-blue-50'
+                      : isModelReady
+                        ? 'border-green-200 bg-green-50'
+                        : 'border-red-200 bg-red-50'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {isCheckingModel ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+                        <span className="text-sm text-blue-700">
+                          Checking embedding model...
+                        </span>
+                      </>
+                    ) : isModelReady ? (
+                      <>
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                        <span className="text-sm text-green-700">
+                          Embedding model ready:{' '}
+                          <code className="font-mono">{modelName}</code>
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <AlertCircle className="h-4 w-4 text-red-600" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-red-700">
+                            Embedding model not available
+                          </p>
+                          {modelError && (
+                            <p className="text-xs text-red-600 mt-1">
+                              {modelError.message}
+                            </p>
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+                {/* Before file picker */}
+                <div>
+                  <Label htmlFor="before-file">Original Script (.txt or .docx)</Label>
+                  <Input
+                    id="before-file"
+                    type="file"
+                    accept=".txt,.docx"
+                    onChange={handleBeforeFileChange}
+                    disabled={isLoading}
+                  />
+                  {beforeFile && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Selected: {beforeFile.name} ({(beforeFile.size / 1024).toFixed(1)}{' '}
+                      KB)
+                    </p>
+                  )}
+                  {errors.beforeFile && (
+                    <p className="text-sm text-destructive mt-1">{errors.beforeFile}</p>
+                  )}
+                </div>
+
+                {/* After file picker */}
+                <div>
+                  <Label htmlFor="after-file">Formatted Script (.txt or .docx)</Label>
+                  <Input
+                    id="after-file"
+                    type="file"
+                    accept=".txt,.docx"
+                    onChange={handleAfterFileChange}
+                    disabled={isLoading}
+                  />
+                  {afterFile && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Selected: {afterFile.name} ({(afterFile.size / 1024).toFixed(1)} KB)
+                    </p>
+                  )}
+                  {errors.afterFile && (
+                    <p className="text-sm text-destructive mt-1">{errors.afterFile}</p>
+                  )}
+                </div>
+
+                {/* Title input */}
+                <div>
+                  <Label htmlFor="title">Title</Label>
+                  <Input
+                    id="title"
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                    placeholder="e.g., Tech Conference Keynote"
+                    disabled={isLoading}
+                  />
+                  {errors.title && (
+                    <p className="text-sm text-destructive mt-1">{errors.title}</p>
+                  )}
+                </div>
+
+                {/* Category select */}
+                <div>
+                  <Label htmlFor="category">Category</Label>
+                  <Select
+                    value={category}
+                    onValueChange={value => setCategory(value as ExampleCategory)}
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={ExampleCategory.EDUCATIONAL}>
+                        Educational
+                      </SelectItem>
+                      <SelectItem value={ExampleCategory.BUSINESS}>Business</SelectItem>
+                      <SelectItem value={ExampleCategory.NARRATIVE}>Narrative</SelectItem>
+                      <SelectItem value={ExampleCategory.INTERVIEW}>Interview</SelectItem>
+                      <SelectItem value={ExampleCategory.DOCUMENTARY}>
+                        Documentary
+                      </SelectItem>
+                      <SelectItem value={ExampleCategory.USER_CUSTOM}>Custom</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Tags input */}
+                <div>
+                  <Label htmlFor="tags">Tags (optional, comma-separated)</Label>
+                  <Input
+                    id="tags"
+                    value={tags.join(', ')}
+                    onChange={e => handleTagsChange(e.target.value)}
+                    placeholder="technical, formal, presentation"
+                    disabled={isLoading}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Separate tags with commas (max 10 tags)
+                  </p>
+                </div>
+
+                {/* Quality score */}
+                <div>
+                  <Label htmlFor="quality">Quality Score (1-5)</Label>
+                  <Input
+                    id="quality"
+                    type="number"
+                    min={1}
+                    max={5}
+                    value={qualityScore}
+                    onChange={e => setQualityScore(Number(e.target.value))}
+                    disabled={isLoading}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Higher scores will prioritize this example in AI suggestions
+                  </p>
+                </div>
               </div>
-            </div>
-            {/* Before file picker */}
-            <div>
-              <Label htmlFor="before-file">Original Script (.txt or .docx)</Label>
-              <Input
-                id="before-file"
-                type="file"
-                accept=".txt,.docx"
-                onChange={handleBeforeFileChange}
-                disabled={isLoading}
-              />
-              {beforeFile && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  Selected: {beforeFile.name} ({(beforeFile.size / 1024).toFixed(1)} KB)
-                </p>
-              )}
-              {errors.beforeFile && (
-                <p className="text-sm text-destructive mt-1">{errors.beforeFile}</p>
-              )}
-            </div>
-
-            {/* After file picker */}
-            <div>
-              <Label htmlFor="after-file">Formatted Script (.txt or .docx)</Label>
-              <Input
-                id="after-file"
-                type="file"
-                accept=".txt,.docx"
-                onChange={handleAfterFileChange}
-                disabled={isLoading}
-              />
-              {afterFile && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  Selected: {afterFile.name} ({(afterFile.size / 1024).toFixed(1)} KB)
-                </p>
-              )}
-              {errors.afterFile && (
-                <p className="text-sm text-destructive mt-1">{errors.afterFile}</p>
-              )}
-            </div>
-
-            {/* Title input */}
-            <div>
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={e => setTitle(e.target.value)}
-                placeholder="e.g., Tech Conference Keynote"
-                disabled={isLoading}
-              />
-              {errors.title && <p className="text-sm text-destructive mt-1">{errors.title}</p>}
-            </div>
-
-            {/* Category select */}
-            <div>
-              <Label htmlFor="category">Category</Label>
-              <Select
-                value={category}
-                onValueChange={value => setCategory(value as ExampleCategory)}
-                disabled={isLoading}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ExampleCategory.EDUCATIONAL}>Educational</SelectItem>
-                  <SelectItem value={ExampleCategory.BUSINESS}>Business</SelectItem>
-                  <SelectItem value={ExampleCategory.NARRATIVE}>Narrative</SelectItem>
-                  <SelectItem value={ExampleCategory.INTERVIEW}>Interview</SelectItem>
-                  <SelectItem value={ExampleCategory.DOCUMENTARY}>Documentary</SelectItem>
-                  <SelectItem value={ExampleCategory.USER_CUSTOM}>Custom</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Tags input */}
-            <div>
-              <Label htmlFor="tags">Tags (optional, comma-separated)</Label>
-              <Input
-                id="tags"
-                value={tags.join(', ')}
-                onChange={e => handleTagsChange(e.target.value)}
-                placeholder="technical, formal, presentation"
-                disabled={isLoading}
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Separate tags with commas (max 10 tags)
-              </p>
-            </div>
-
-            {/* Quality score */}
-            <div>
-              <Label htmlFor="quality">Quality Score (1-5)</Label>
-              <Input
-                id="quality"
-                type="number"
-                min={1}
-                max={5}
-                value={qualityScore}
-                onChange={e => setQualityScore(Number(e.target.value))}
-                disabled={isLoading}
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Higher scores will prioritize this example in AI suggestions
-              </p>
-            </div>
-          </div>
 
               <DialogFooter className="mt-6">
-                <Button type="button" variant="outline" onClick={handleClose} disabled={isLoading}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleClose}
+                  disabled={isLoading}
+                >
                   Cancel
                 </Button>
                 <Button type="submit" disabled={!canUpload}>

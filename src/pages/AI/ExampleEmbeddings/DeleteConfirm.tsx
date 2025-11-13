@@ -5,7 +5,6 @@
  * Confirmation dialog for deleting script examples
  */
 
-import { Loader2 } from 'lucide-react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,6 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
+import { Loader2 } from 'lucide-react'
 
 interface DeleteConfirmProps {
   open: boolean
@@ -38,8 +38,8 @@ export function DeleteConfirm({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Example?</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete <strong>{exampleTitle}</strong>? This action cannot be
-            undone and will permanently remove this example from your library.
+            Are you sure you want to delete <strong>{exampleTitle}</strong>? This action
+            cannot be undone and will permanently remove this example from your library.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

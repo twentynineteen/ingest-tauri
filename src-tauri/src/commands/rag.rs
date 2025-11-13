@@ -114,10 +114,13 @@ pub async fn search_similar_scripts(
     let conn = Connection::open(&db_path)
         .map_err(|e| format!("Failed to open database at {}: {}", db_path.display(), e))?;
 
+    println!("[RAG] Query embedding dimensions: {}", query_embedding.len());
+    println!("[RAG] Top K: {}, Min similarity: {:?}", top_k, min_similarity);
+
     // Fetch all examples with embeddings
     let mut stmt = conn
         .prepare(
-            "SELECT e.script_id, s.title, s.category, s.before_text, s.after_text, e.embedding
+            "SELECT e.script_id, s.title, s.category, s.before_text, s.after_text, e.embedding, e.dimension
              FROM embeddings e
              JOIN example_scripts s ON e.script_id = s.id
              WHERE s.quality_score >= 4
@@ -136,23 +139,35 @@ pub async fn search_similar_scripts(
                 row.get::<_, String>(3)?,   // before_text
                 row.get::<_, String>(4)?,   // after_text
                 row.get::<_, Vec<u8>>(5)?,  // embedding
+                row.get::<_, i32>(6)?,      // dimension
             ))
         })
         .map_err(|e| format!("Failed to query database: {}", e))?;
 
+    let mut total_examples = 0;
+    let mut skipped_by_threshold = 0;
+
     for row_result in rows {
-        let (id, title, category, before_text, after_text, embedding_blob) =
+        let (id, title, category, before_text, after_text, embedding_blob, stored_dimension) =
             row_result.map_err(|e| format!("Failed to read row: {}", e))?;
+
+        total_examples += 1;
 
         // Convert blob to vector
         let embedding = blob_to_vec_f32(&embedding_blob);
 
+        println!("[RAG] Comparing with example '{}' (stored dim: {}, actual dim: {})",
+                 title, stored_dimension, embedding.len());
+
         // Calculate similarity
         let similarity = cosine_similarity(&query_embedding, &embedding);
+        println!("[RAG]   Similarity score: {:.4}", similarity);
 
         // Apply minimum similarity threshold
         if let Some(min_sim) = min_similarity {
             if similarity < min_sim {
+                skipped_by_threshold += 1;
+                println!("[RAG]   Skipped (below threshold {:.2})", min_sim);
                 continue;
             }
         }
@@ -169,6 +184,9 @@ pub async fn search_similar_scripts(
 
     // Sort by similarity (descending)
     results.sort_by(|a, b| b.similarity.partial_cmp(&a.similarity).unwrap());
+
+    println!("[RAG] Summary: {} total examples, {} passed threshold, returning top {} results",
+             total_examples, total_examples - skipped_by_threshold, top_k.min(results.len()));
 
     // Return top K results
     results.truncate(top_k);
@@ -486,7 +504,7 @@ pub async fn upload_example(
     // Insert embedding
     conn.execute(
         "INSERT INTO embeddings (script_id, embedding, dimension) VALUES (?, ?, ?)",
-        params![&new_id, &embedding_bytes, 384],
+        params![&new_id, &embedding_bytes, request.embedding.len()],
     )
     .map_err(|e| format!("Failed to insert embedding: {}", e))?;
 

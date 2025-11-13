@@ -43,9 +43,7 @@ export const BakerPreferences: React.FC<BakerPreferencesProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Baker Preferences</DialogTitle>
-          <DialogDescription>
-            Configure scanning and update behavior
-          </DialogDescription>
+          <DialogDescription>Configure scanning and update behavior</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <label className="flex items-center justify-between">
@@ -79,9 +77,7 @@ export const BakerPreferences: React.FC<BakerPreferencesProps> = ({
               min="1"
               max="20"
               value={preferences.maxDepth}
-              onChange={e =>
-                onUpdatePreferences({ maxDepth: parseInt(e.target.value) })
-              }
+              onChange={e => onUpdatePreferences({ maxDepth: parseInt(e.target.value) })}
               className="w-full"
             />
           </div>

@@ -6,7 +6,8 @@
  */
 
 // Import and re-export media types for convenience
-import type { VideoLink, TrelloCard } from './media'
+import type { TrelloCard, VideoLink } from './media'
+
 export type { VideoLink, TrelloCard }
 
 export interface ProjectFolder {

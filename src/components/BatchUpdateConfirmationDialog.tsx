@@ -8,16 +8,16 @@
 import {
   AlertTriangle,
   CheckCircle,
+  ChevronDown,
+  ChevronUp,
   Clock,
   Edit,
+  Eye,
+  EyeOff,
   HardDrive,
   Minus,
   Plus,
-  User,
-  ChevronDown,
-  ChevronUp,
-  Eye,
-  EyeOff
+  User
 } from 'lucide-react'
 import React, { useState } from 'react'
 import type { BreadcrumbsPreview } from '../types/baker'
@@ -74,7 +74,7 @@ export const BatchUpdateConfirmationDialog: React.FC<
   const [showDetailedChanges, setShowDetailedChanges] = useState(false)
   const [showMaintenanceChanges, setShowMaintenanceChanges] = useState(false)
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set())
-  
+
   const toggleProjectExpanded = (projectPath: string) => {
     const newExpanded = new Set(expandedProjects)
     if (newExpanded.has(projectPath)) {
@@ -84,12 +84,16 @@ export const BatchUpdateConfirmationDialog: React.FC<
     }
     setExpandedProjects(newExpanded)
   }
-  
+
   const expandAllProjects = () => {
-    const allPaths = previews.map(p => selectedProjects.find(sp => sp === (p.detailedChanges?.projectPath || ''))).filter(Boolean) as string[]
+    const allPaths = previews
+      .map(p =>
+        selectedProjects.find(sp => sp === (p.detailedChanges?.projectPath || ''))
+      )
+      .filter(Boolean) as string[]
     setExpandedProjects(new Set(allPaths))
   }
-  
+
   const collapseAllProjects = () => {
     setExpandedProjects(new Set())
   }
@@ -290,7 +294,7 @@ export const BatchUpdateConfirmationDialog: React.FC<
                   </div>
                 </div>
               )}
-              
+
               {/* Detailed Changes Toggle */}
               <div className="border rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
@@ -315,7 +319,7 @@ export const BatchUpdateConfirmationDialog: React.FC<
                     </Button>
                   </div>
                 </div>
-                
+
                 {showDetailedChanges && (
                   <>
                     {/* Controls */}
@@ -324,7 +328,11 @@ export const BatchUpdateConfirmationDialog: React.FC<
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={expandedProjects.size === 0 ? expandAllProjects : collapseAllProjects}
+                          onClick={
+                            expandedProjects.size === 0
+                              ? expandAllProjects
+                              : collapseAllProjects
+                          }
                         >
                           {expandedProjects.size === 0 ? (
                             <>
@@ -341,24 +349,27 @@ export const BatchUpdateConfirmationDialog: React.FC<
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => setShowMaintenanceChanges(!showMaintenanceChanges)}
+                          onClick={() =>
+                            setShowMaintenanceChanges(!showMaintenanceChanges)
+                          }
                         >
                           {showMaintenanceChanges ? 'Hide' : 'Show'} Maintenance
                         </Button>
                       </div>
                       <span className="text-sm text-gray-600">
-                        {previews.filter(p => p.detailedChanges?.hasChanges).length} projects with changes
+                        {previews.filter(p => p.detailedChanges?.hasChanges).length}{' '}
+                        projects with changes
                       </span>
                     </div>
-                    
+
                     {/* Project Details */}
                     <div className="space-y-3 max-h-96 overflow-y-auto">
                       {previews.map((preview, index) => {
                         if (!preview.detailedChanges) return null
-                        
+
                         const projectPath = preview.detailedChanges.projectPath
                         const isExpanded = expandedProjects.has(projectPath)
-                        
+
                         return (
                           <ProjectChangeDetailView
                             key={`${projectPath}-${index}`}

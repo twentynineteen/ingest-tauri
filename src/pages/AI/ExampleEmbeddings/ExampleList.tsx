@@ -5,9 +5,9 @@
  * Grid display of script examples with loading and empty states
  */
 
-import { FileText } from 'lucide-react'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
+import { FileText } from 'lucide-react'
 import { ExampleCard } from './ExampleCard'
 
 interface ExampleListProps {
@@ -18,7 +18,13 @@ interface ExampleListProps {
   onView: (id: string) => void
 }
 
-export function ExampleList({ examples, isLoading, onDelete, onReplace, onView }: ExampleListProps) {
+export function ExampleList({
+  examples,
+  isLoading,
+  onDelete,
+  onReplace,
+  onView
+}: ExampleListProps) {
   // Loading state
   if (isLoading) {
     return (

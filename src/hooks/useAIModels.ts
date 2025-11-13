@@ -6,8 +6,11 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { providerRegistry } from '../services/ai/providerConfig'
-import type { AIModel, ProviderConfiguration } from '../types/scriptFormatter'
-import { queryKeys } from '../types/scriptFormatter'
+import {
+  queryKeys,
+  type AIModel,
+  type ProviderConfiguration
+} from '../types/scriptFormatter'
 
 interface UseAIModelsOptions {
   providerId: string
@@ -25,13 +28,13 @@ interface UseAIModelsResult {
 export function useAIModels({
   providerId,
   configuration,
-  enabled = true,
+  enabled = true
 }: UseAIModelsOptions): UseAIModelsResult {
   const {
     data: models = [],
     isLoading,
     error,
-    refetch,
+    refetch
   } = useQuery({
     queryKey: queryKeys.providerModels(providerId, configuration.serviceUrl),
     queryFn: async () => {
@@ -44,7 +47,7 @@ export function useAIModels({
       const modelInfoList = await adapter.listModels(configuration)
 
       // Convert to AIModel format
-      const aiModels: AIModel[] = modelInfoList.map((info) => ({
+      const aiModels: AIModel[] = modelInfoList.map(info => ({
         id: info.id,
         displayName: info.name,
         modelId: info.id,
@@ -54,8 +57,8 @@ export function useAIModels({
         capabilities: {
           supportsToolCalling: info.supportsToolCalling,
           supportsStreaming: info.supportsStreaming,
-          maxTokens: info.contextLength || 4096,
-        },
+          maxTokens: info.contextLength || 4096
+        }
       }))
 
       return aiModels
@@ -63,7 +66,7 @@ export function useAIModels({
     enabled,
     refetchInterval: 30000, // Refresh every 30 seconds while active
     staleTime: 20000, // Consider data stale after 20 seconds
-    retry: 2, // Retry failed requests
+    retry: 2 // Retry failed requests
   })
 
   return {
@@ -72,6 +75,6 @@ export function useAIModels({
     error: error as Error | null,
     refetch: () => {
       refetch()
-    },
+    }
   }
 }

@@ -4,8 +4,8 @@
  * Purpose: Retrieve similar autocue script examples using vector search
  */
 
-import { invoke } from '@tauri-apps/api/core'
 import { useQuery } from '@tanstack/react-query'
+import { invoke } from '@tauri-apps/api/core'
 import { useEmbedding } from './useEmbedding'
 
 export interface SimilarExample {
@@ -63,7 +63,7 @@ export function useScriptRetrieval(
     },
     enabled: enabled && isReady && scriptText.length > 50,
     staleTime: 10 * 60 * 1000, // Cache for 10 minutes
-    gcTime: 15 * 60 * 1000, // Keep in cache for 15 minutes
+    gcTime: 15 * 60 * 1000 // Keep in cache for 15 minutes
   })
 
   return {

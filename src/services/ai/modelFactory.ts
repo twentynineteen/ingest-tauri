@@ -26,7 +26,7 @@ export class ModelFactory {
       throw new Error(
         `Provider "${providerId}" not found. Available providers: ${providerRegistry
           .list()
-          .map((p) => p.id)
+          .map(p => p.id)
           .join(', ')}`
       )
     }
@@ -51,7 +51,10 @@ export class ModelFactory {
   /**
    * Validates if a provider is available and configured
    */
-  static async validateProvider(providerId: string, configuration: any): Promise<boolean> {
+  static async validateProvider(
+    providerId: string,
+    configuration: any
+  ): Promise<boolean> {
     const adapter = providerRegistry.get(providerId)
 
     if (!adapter) {
@@ -97,8 +100,8 @@ export function createOllamaModel(
     modelId,
     configuration: {
       serviceUrl,
-      connectionStatus: 'configured',
-    },
+      connectionStatus: 'configured'
+    }
   })
 }
 
@@ -112,7 +115,7 @@ export function createOpenAIModel(modelId: string, apiKey: string): LanguageMode
     configuration: {
       serviceUrl: 'https://api.openai.com',
       apiKey,
-      connectionStatus: 'configured',
-    },
+      connectionStatus: 'configured'
+    }
   })
 }

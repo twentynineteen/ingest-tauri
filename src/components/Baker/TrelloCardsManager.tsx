@@ -3,8 +3,7 @@
  * Feature: 004-embed-multiple-video
  */
 
-import { useState, useMemo } from 'react'
-import { Plus, AlertCircle, Loader2, Search } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -17,14 +16,15 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TrelloCardItem } from './TrelloCardItem'
+import { AlertCircle, Loader2, Plus, Search } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { useFuzzySearch, useTrelloBoard } from '../../hooks'
 import { useBreadcrumbsTrelloCards } from '../../hooks/useBreadcrumbsTrelloCards'
-import { useTrelloBoard, useFuzzySearch } from '../../hooks'
-import TrelloCardList from '../../utils/trello/TrelloCardList'
-import { validateTrelloCard, extractTrelloCardId } from '../../utils/validation'
 import type { TrelloCard } from '../../types/baker'
+import TrelloCardList from '../../utils/trello/TrelloCardList'
+import { extractTrelloCardId, validateTrelloCard } from '../../utils/validation'
+import { TrelloCardItem } from './TrelloCardItem'
 
 interface TrelloCardsManagerProps {
   projectPath: string
@@ -75,8 +75,9 @@ export function TrelloCardsManager({
       const breadcrumbsData = JSON.parse(breadcrumbsContent)
 
       // Import utility functions
-      const { generateBreadcrumbsBlock, updateTrelloCardWithBreadcrumbs } =
-        await import('../../hooks/useAppendBreadcrumbs')
+      const { generateBreadcrumbsBlock, updateTrelloCardWithBreadcrumbs } = await import(
+        '../../hooks/useAppendBreadcrumbs'
+      )
 
       // Convert breadcrumbs TrelloCard to API TrelloCard format
       const apiCard = {
@@ -328,7 +329,8 @@ export function TrelloCardsManager({
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Failed to load Trello cards: {error instanceof Error ? error.message : String(error)}
+          Failed to load Trello cards:{' '}
+          {error instanceof Error ? error.message : String(error)}
         </AlertDescription>
       </Alert>
     )
@@ -341,7 +343,8 @@ export function TrelloCardsManager({
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Trello Cards</h3>
           <p className="text-sm text-gray-500">
-            {trelloCards.length} {trelloCards.length === 1 ? 'card' : 'cards'} • Project management
+            {trelloCards.length} {trelloCards.length === 1 ? 'card' : 'cards'} • Project
+            management
           </p>
         </div>
 
@@ -362,7 +365,7 @@ export function TrelloCardsManager({
               </DialogDescription>
             </DialogHeader>
 
-            <Tabs value={addMode} onValueChange={(v) => setAddMode(v as 'url' | 'select')}>
+            <Tabs value={addMode} onValueChange={v => setAddMode(v as 'url' | 'select')}>
               {trelloApiKey && trelloApiToken && (
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="select">Select from Board</TabsTrigger>
@@ -386,7 +389,7 @@ export function TrelloCardsManager({
                           id="search"
                           placeholder="Search by name or description..."
                           value={searchTerm}
-                          onChange={(e) => setSearchTerm(e.target.value)}
+                          onChange={e => setSearchTerm(e.target.value)}
                           className="pl-10"
                         />
                       </div>
@@ -396,10 +399,15 @@ export function TrelloCardsManager({
                       {isFetchingCard ? (
                         <div className="flex items-center justify-center py-8">
                           <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                          <span className="ml-2 text-sm text-gray-500">Adding card...</span>
+                          <span className="ml-2 text-sm text-gray-500">
+                            Adding card...
+                          </span>
                         </div>
                       ) : (
-                        <TrelloCardList grouped={filteredGrouped} onSelect={handleSelectCard} />
+                        <TrelloCardList
+                          grouped={filteredGrouped}
+                          onSelect={handleSelectCard}
+                        />
                       )}
                     </div>
                   </>
@@ -413,7 +421,7 @@ export function TrelloCardsManager({
                     id="card-url"
                     placeholder="https://trello.com/c/abc12345/card-name"
                     value={cardUrl}
-                    onChange={(e) => setCardUrl(e.target.value)}
+                    onChange={e => setCardUrl(e.target.value)}
                   />
                   <p className="text-xs text-gray-500">
                     {trelloApiKey && trelloApiToken
@@ -500,9 +508,7 @@ export function TrelloCardsManager({
               trelloCard={card}
               onRemove={() => handleRemove(index)}
               onRefresh={
-                trelloApiKey && trelloApiToken
-                  ? () => handleRefresh(index)
-                  : undefined
+                trelloApiKey && trelloApiToken ? () => handleRefresh(index) : undefined
               }
             />
           ))}

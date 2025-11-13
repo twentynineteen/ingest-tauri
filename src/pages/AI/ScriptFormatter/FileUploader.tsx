@@ -4,10 +4,10 @@
  * Purpose: Upload .docx files with validation
  */
 
-import React, { useState } from 'react'
 import { open } from '@tauri-apps/plugin-dialog'
 import { readFile } from '@tauri-apps/plugin-fs'
-import { Upload, FileText, AlertCircle } from 'lucide-react'
+import { AlertCircle, FileText, Upload } from 'lucide-react'
+import React, { useState } from 'react'
 
 interface FileUploaderProps {
   onFileSelect: (file: File) => void
@@ -18,7 +18,7 @@ interface FileUploaderProps {
 export const FileUploader: React.FC<FileUploaderProps> = ({
   onFileSelect,
   isLoading = false,
-  error = null,
+  error = null
 }) => {
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null)
 
@@ -29,10 +29,10 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
         filters: [
           {
             name: 'Word Documents',
-            extensions: ['docx'],
-          },
+            extensions: ['docx']
+          }
         ],
-        multiple: false,
+        multiple: false
       })
 
       if (!selected || typeof selected !== 'string') {
@@ -55,7 +55,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
 
       // Create File object
       const file = new File([bytes], filename, {
-        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
       })
 
       setSelectedFileName(filename)
@@ -76,7 +76,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
         >
           {isLoading ? (
             <>
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500" />
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black" />
               <p className="text-sm text-gray-600">Processing file...</p>
             </>
           ) : (
@@ -85,8 +85,12 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                 <>
                   <FileText className="h-12 w-12 text-green-500" />
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{selectedFileName}</p>
-                    <p className="text-xs text-gray-500 mt-1">Click to select a different file</p>
+                    <p className="text-sm font-medium text-gray-900">
+                      {selectedFileName}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Click to select a different file
+                    </p>
                   </div>
                 </>
               ) : (

@@ -69,7 +69,12 @@ export function ExampleEmbeddings() {
   const handleUpload = async (data: {
     beforeContent: string
     afterContent: string
-    metadata: { title: string; category: ExampleCategory; tags?: string[]; qualityScore?: number }
+    metadata: {
+      title: string
+      category: ExampleCategory
+      tags?: string[]
+      qualityScore?: number
+    }
     embedding: number[]
   }) => {
     await uploadExample.mutateAsync({

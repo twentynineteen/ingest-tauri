@@ -207,7 +207,7 @@ export const STORAGE_KEYS = {
   PROCESSING_REQUEST: 'autocue:processing-request',
   PROCESSED_OUTPUT: 'autocue:processed-output',
   SESSION_ID: 'autocue:session-id',
-  ACTIVE_PROVIDER: 'autocue:active-provider',
+  ACTIVE_PROVIDER: 'autocue:active-provider'
 } as const
 
 // ============================================================================
@@ -215,10 +215,12 @@ export const STORAGE_KEYS = {
 // ============================================================================
 
 export const queryKeys = {
-  providerModels: (providerId: string, url: string) => ['provider', providerId, 'models', url] as const,
+  providerModels: (providerId: string, url: string) =>
+    ['provider', providerId, 'models', url] as const,
   processingRequest: (id: string) => ['processing', 'request', id] as const,
   documentValidation: (filename: string) => ['document', 'validation', filename] as const,
-  providerConnection: (providerId: string, url: string) => ['provider', providerId, 'connection', url] as const,
+  providerConnection: (providerId: string, url: string) =>
+    ['provider', providerId, 'connection', url] as const
 }
 
 // ============================================================================

@@ -4,7 +4,7 @@
  * Purpose: Generate embeddings using Ollama's nomic-embed-text model
  */
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 interface UseOllamaEmbeddingResult {
   embed: (text: string) => Promise<number[]>
@@ -43,10 +43,15 @@ export function useOllamaEmbedding(): UseOllamaEmbeddingResult {
         const data = await tagsResponse.json()
         const models = data.models || []
 
-        console.log('[useOllamaEmbedding] Available models:', models.map((m: any) => m.name))
+        console.log(
+          '[useOllamaEmbedding] Available models:',
+          models.map((m: any) => m.name)
+        )
 
         // Check if nomic-embed-text is installed
-        const hasEmbeddingModel = models.some((m: any) => m.name.includes(EMBEDDING_MODEL))
+        const hasEmbeddingModel = models.some((m: any) =>
+          m.name.includes(EMBEDDING_MODEL)
+        )
 
         if (!hasEmbeddingModel) {
           throw new Error(
@@ -106,7 +111,9 @@ export function useOllamaEmbedding(): UseOllamaEmbeddingResult {
       }
 
       const embedding = data.embedding as number[]
-      console.log(`[useOllamaEmbedding] Embedding generated (${embedding.length} dimensions)`)
+      console.log(
+        `[useOllamaEmbedding] Embedding generated (${embedding.length} dimensions)`
+      )
 
       return embedding
     } catch (err) {

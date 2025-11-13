@@ -5,7 +5,7 @@
  */
 
 import { pipeline } from '@xenova/transformers'
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 // Singleton instance to avoid reloading the model
 let embedderInstance: any = null
@@ -43,7 +43,9 @@ export function useEmbedding(): UseEmbeddingResult {
           }
         } catch (err) {
           if (isMountedRef.current) {
-            setError(err instanceof Error ? err : new Error('Failed to load embedding model'))
+            setError(
+              err instanceof Error ? err : new Error('Failed to load embedding model')
+            )
           }
         }
         return
@@ -54,19 +56,27 @@ export function useEmbedding(): UseEmbeddingResult {
       loadingPromise = pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2')
 
       try {
-        console.log('[useEmbedding] Loading embedding model...')
+        console.log('[useEmbedding] Starting to load Xenova embedding model...')
+        console.log('[useEmbedding] Model: Xenova/all-MiniLM-L6-v2')
         embedderInstance = await loadingPromise
-        console.log('[useEmbedding] Embedding model loaded successfully')
+        console.log('[useEmbedding] ✓ Embedding model loaded successfully!')
 
         if (isMountedRef.current) {
           setIsReady(true)
           setIsLoading(false)
+          console.log('[useEmbedding] ✓ State updated - RAG is ready')
         }
       } catch (err) {
-        console.error('[useEmbedding] Failed to load embedding model:', err)
+        console.error('[useEmbedding] ✗ FAILED to load embedding model:', err)
+        console.error('[useEmbedding] Error type:', err instanceof Error ? 'Error' : typeof err)
+        console.error('[useEmbedding] Error details:', JSON.stringify(err, null, 2))
         if (isMountedRef.current) {
-          setError(err instanceof Error ? err : new Error('Failed to load embedding model'))
+          const errorMessage = err instanceof Error
+            ? `Failed to load embedding model: ${err.message}`
+            : 'Failed to load embedding model (unknown error)'
+          setError(new Error(errorMessage))
           setIsLoading(false)
+          console.log('[useEmbedding] ✗ State updated - RAG failed')
         }
       } finally {
         loadingPromise = null
@@ -90,7 +100,9 @@ export function useEmbedding(): UseEmbeddingResult {
     }
 
     try {
-      console.log(`[useEmbedding] Generating embedding for text (${text.length} chars)...`)
+      console.log(
+        `[useEmbedding] Generating embedding for text (${text.length} chars)...`
+      )
 
       const output = await embedderInstance(text, {
         pooling: 'mean',
