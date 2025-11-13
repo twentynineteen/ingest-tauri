@@ -69,8 +69,9 @@ export function useScriptProcessor(): UseScriptProcessorResult {
 
         let examples: SimilarExample[] = []
 
-        // IMPORTANT: Only use RAG if explicitly enabled - disable for now due to embedding issues
-        const enableRAG = false // TODO: Set to true once Ollama embedding is fixed
+        // IMPORTANT: RAG provides example scripts to guide formatting style
+        // Disabled by default to avoid embedding errors - enable if Ollama embeddings work
+        const enableRAG = true // Set to true once Ollama embedding model is configured (e.g., nomic-embed-text)
 
         if (enableRAG && isEmbeddingReady && options.text.length > 50) {
           try {
