@@ -48,7 +48,12 @@ export function useScriptProcessor(): UseScriptProcessorResult {
   const lastOptionsRef = useRef<ProcessScriptOptions | null>(null)
 
   // Use embedding hook for RAG - using Ollama for Tauri compatibility
-  const { embed, isReady: isEmbeddingReady, isLoading: isEmbeddingLoading, error: embeddingError } = useOllamaEmbedding()
+  const {
+    embed,
+    isReady: isEmbeddingReady,
+    isLoading: isEmbeddingLoading,
+    error: embeddingError
+  } = useOllamaEmbedding()
 
   const processScript = async (
     options: ProcessScriptOptions
@@ -84,7 +89,9 @@ export function useScriptProcessor(): UseScriptProcessorResult {
             // Generate embedding for query
             console.log('[useScriptProcessor] Generating embedding for query text...')
             const queryEmbedding = await embed(options.text)
-            console.log(`[useScriptProcessor] Query embedding generated: ${queryEmbedding.length} dimensions`)
+            console.log(
+              `[useScriptProcessor] Query embedding generated: ${queryEmbedding.length} dimensions`
+            )
 
             // Search for similar scripts
             console.log('[useScriptProcessor] Searching database for similar examples...')
@@ -94,44 +101,61 @@ export function useScriptProcessor(): UseScriptProcessorResult {
               minSimilarity: 0.4
             })
 
-            const allSimilarExamples = await invoke<SimilarExample[]>('search_similar_scripts', {
-              queryEmbedding,
-              topK: 10, // Get more candidates for filtering
-              minSimilarity: 0.4 // Lower threshold - we're matching formatting patterns, not exact content
-            })
+            const allSimilarExamples = await invoke<SimilarExample[]>(
+              'search_similar_scripts',
+              {
+                queryEmbedding,
+                topK: 10, // Get more candidates for filtering
+                minSimilarity: 0.4 // Lower threshold - we're matching formatting patterns, not exact content
+              }
+            )
 
             // Filter by enabled example IDs if provided
             if (options.enabledExampleIds && options.enabledExampleIds.size > 0) {
-              examples = allSimilarExamples.filter(ex => options.enabledExampleIds!.has(ex.id)).slice(0, 3)
-              console.log(`[useScriptProcessor] Filtered ${allSimilarExamples.length} examples to ${examples.length} enabled examples`)
+              examples = allSimilarExamples
+                .filter(ex => options.enabledExampleIds!.has(ex.id))
+                .slice(0, 3)
+              console.log(
+                `[useScriptProcessor] Filtered ${allSimilarExamples.length} examples to ${examples.length} enabled examples`
+              )
             } else {
               examples = allSimilarExamples.slice(0, 3)
             }
 
-            console.log(`[useScriptProcessor] Search complete: Using ${examples.length} similar examples`)
+            console.log(
+              `[useScriptProcessor] Search complete: Using ${examples.length} similar examples`
+            )
 
             if (examples.length > 0) {
-              console.log('[useScriptProcessor] Example details:', examples.map(ex => ({
-                id: ex.id,
-                title: ex.title,
-                similarity: ex.similarity,
-                category: ex.category
-              })))
-              options.onRAGUpdate?.(`Using ${examples.length} similar example${examples.length > 1 ? 's' : ''} to improve formatting`, examples.length)
+              console.log(
+                '[useScriptProcessor] Example details:',
+                examples.map(ex => ({
+                  id: ex.id,
+                  title: ex.title,
+                  similarity: ex.similarity,
+                  category: ex.category
+                }))
+              )
+              options.onRAGUpdate?.(
+                `Using ${examples.length} similar example${examples.length > 1 ? 's' : ''} to improve formatting`,
+                examples.length
+              )
             } else {
-              const reason = options.enabledExampleIds && options.enabledExampleIds.size === 0
-                ? 'All examples disabled'
-                : 'No similar examples found (try enabling more examples or lowering similarity threshold)'
+              const reason =
+                options.enabledExampleIds && options.enabledExampleIds.size === 0
+                  ? 'All examples disabled'
+                  : 'No similar examples found (try enabling more examples or lowering similarity threshold)'
               console.log(`[useScriptProcessor] ${reason}`)
               options.onRAGUpdate?.(reason, 0)
             }
           } catch (ragError) {
-            console.error(
-              '[useScriptProcessor] RAG retrieval failed:',
-              ragError
-            )
+            console.error('[useScriptProcessor] RAG retrieval failed:', ragError)
             console.error('[useScriptProcessor] Error details:', ragError)
-            options.onRAGUpdate?.('RAG search failed: ' + (ragError instanceof Error ? ragError.message : String(ragError)), 0)
+            options.onRAGUpdate?.(
+              'RAG search failed: ' +
+                (ragError instanceof Error ? ragError.message : String(ragError)),
+              0
+            )
             // Continue without examples - don't fail the whole process
           }
         } else {

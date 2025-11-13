@@ -68,12 +68,16 @@ export function useEmbedding(): UseEmbeddingResult {
         }
       } catch (err) {
         console.error('[useEmbedding] ✗ FAILED to load embedding model:', err)
-        console.error('[useEmbedding] Error type:', err instanceof Error ? 'Error' : typeof err)
+        console.error(
+          '[useEmbedding] Error type:',
+          err instanceof Error ? 'Error' : typeof err
+        )
         console.error('[useEmbedding] Error details:', JSON.stringify(err, null, 2))
         if (isMountedRef.current) {
-          const errorMessage = err instanceof Error
-            ? `Failed to load embedding model: ${err.message}`
-            : 'Failed to load embedding model (unknown error)'
+          const errorMessage =
+            err instanceof Error
+              ? `Failed to load embedding model: ${err.message}`
+              : 'Failed to load embedding model (unknown error)'
           setError(new Error(errorMessage))
           setIsLoading(false)
           console.log('[useEmbedding] ✗ State updated - RAG failed')

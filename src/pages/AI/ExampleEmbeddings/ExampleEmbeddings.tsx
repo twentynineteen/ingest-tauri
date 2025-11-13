@@ -17,6 +17,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { DeleteConfirm } from './DeleteConfirm'
 import { ExampleList } from './ExampleList'
+import { ReplaceDialog } from './ReplaceDialog'
 import { UploadDialog } from './UploadDialog'
 import { ViewExampleDialog } from './ViewExampleDialog'
 
@@ -27,13 +28,15 @@ export function ExampleEmbeddings() {
     { label: 'Example Embeddings', href: '/ai-tools/example-embeddings' }
   ])
 
-  const { examples, isLoading, deleteExample, uploadExample } = useExampleManagement()
+  const { examples, isLoading, deleteExample, uploadExample, replaceExample } =
+    useExampleManagement()
 
   // Local state
   const [filterSource, setFilterSource] = useState<ExampleSource | 'all'>('all')
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [selectedExampleId, setSelectedExampleId] = useState<string | null>(null)
   const [uploadDialogOpen, setUploadDialogOpen] = useState(false)
+  const [replaceDialogOpen, setReplaceDialogOpen] = useState(false)
   const [viewDialogOpen, setViewDialogOpen] = useState(false)
 
   // Filter examples by source
@@ -92,11 +95,25 @@ export function ExampleEmbeddings() {
     })
   }
 
-  // Handle replace (TODO: implement)
+  // Handle replace
   const handleReplaceClick = (id: string) => {
-    console.log('Replace example:', id)
-    toast.info('Coming soon', {
-      description: 'Replace functionality will be implemented in a future update.'
+    setSelectedExampleId(id)
+    setReplaceDialogOpen(true)
+  }
+
+  const handleReplace = async (data: {
+    id: string
+    beforeContent: string
+    afterContent: string
+    embedding: number[]
+  }) => {
+    await replaceExample.mutateAsync({
+      id: data.id,
+      request: {
+        beforeContent: data.beforeContent,
+        afterContent: data.afterContent,
+        embedding: data.embedding
+      }
     })
   }
 
@@ -275,6 +292,17 @@ export function ExampleEmbeddings() {
           setViewDialogOpen(false)
           setSelectedExampleId(null)
         }}
+      />
+
+      {/* Replace example dialog */}
+      <ReplaceDialog
+        open={replaceDialogOpen}
+        example={selectedExample || null}
+        onClose={() => {
+          setReplaceDialogOpen(false)
+          setSelectedExampleId(null)
+        }}
+        onReplace={handleReplace}
       />
 
       {/* Delete confirmation dialog */}

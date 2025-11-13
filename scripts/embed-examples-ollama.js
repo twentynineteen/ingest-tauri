@@ -114,6 +114,12 @@ async function embedExamples() {
       FOREIGN KEY(script_id) REFERENCES example_scripts(id)
     );
 
+    CREATE TABLE IF NOT EXISTS db_metadata (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL,
+      updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE INDEX IF NOT EXISTS idx_category ON example_scripts(category);
     CREATE INDEX IF NOT EXISTS idx_quality ON example_scripts(quality_score);
     CREATE INDEX IF NOT EXISTS idx_source ON example_scripts(source);
@@ -200,7 +206,20 @@ async function embedExamples() {
 
   // Print statistics
   const stats = db.prepare('SELECT COUNT(*) as count FROM example_scripts').get()
+  const bundledCount = db
+    .prepare("SELECT COUNT(*) as count FROM example_scripts WHERE source = 'bundled'")
+    .get()
   const dbSize = fs.statSync(dbPath).size
+
+  // Store metadata for version tracking and merge detection
+  const timestamp = new Date().toISOString()
+  db.prepare(
+    `INSERT OR REPLACE INTO db_metadata (key, value, updated_at) VALUES (?, ?, ?)`
+  ).run('bundled_version', timestamp, timestamp)
+
+  db.prepare(
+    `INSERT OR REPLACE INTO db_metadata (key, value, updated_at) VALUES (?, ?, ?)`
+  ).run('bundled_count', bundledCount.count.toString(), timestamp)
 
   console.log('═══════════════════════════════════════')
   console.log('📊 Embedding Summary')
@@ -208,8 +227,10 @@ async function embedExamples() {
   console.log(`✅ Successfully processed: ${successCount}`)
   console.log(`❌ Errors: ${errorCount}`)
   console.log(`💾 Total examples in DB: ${stats.count}`)
+  console.log(`📦 Bundled examples: ${bundledCount.count}`)
   console.log(`📦 Database size: ${(dbSize / 1024).toFixed(2)} KB`)
   console.log(`🔢 Embedding dimensions: 768 (nomic-embed-text)`)
+  console.log(`🏷️  Version: ${timestamp}`)
   console.log('═══════════════════════════════════════\n')
 
   db.close()

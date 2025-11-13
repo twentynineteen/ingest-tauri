@@ -83,7 +83,11 @@ const ScriptFormatter: React.FC = () => {
     embeddingError
   } = useScriptProcessor()
 
-  const { uploadExample, examples: allExamples, isLoading: isLoadingExamples } = useExampleManagement()
+  const {
+    uploadExample,
+    examples: allExamples,
+    isLoading: isLoadingExamples
+  } = useExampleManagement()
   const { embed: embedForSaving } = useOllamaEmbedding()
 
   // Initialize enabled examples when examples are loaded (all enabled by default)

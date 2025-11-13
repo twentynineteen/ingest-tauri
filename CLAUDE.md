@@ -120,10 +120,15 @@ All file operations go through Tauri backend with progress tracking. Key pattern
   - Delete user-uploaded examples (bundled examples are protected)
   - Filter examples by source (All, Bundled, Uploaded)
   - Seamless integration with existing RAG system
+  - **Database persistence across app updates** (user examples preserved)
 - **Components**: See `src/pages/AI/ExampleEmbeddings/`
 - **Hooks**: `useExampleManagement`, `useScriptFileUpload`
 - **Backend Commands**: `get_all_examples_with_metadata`, `upload_example`, `replace_example`, `delete_example`
-- **Database**: SQLite with `source` column to distinguish bundled vs user-uploaded examples
+- **Database**:
+  - SQLite with `source` column to distinguish bundled vs user-uploaded examples
+  - Stored in `app_data_dir()` instead of `resource_dir()` to persist across updates
+  - Bundled database copied to app data on first run
+  - See [database-persistence.md](specs/007-frontend-script-example/database-persistence.md)
 
 #### Phase 004: Multiple Video Links and Trello Cards (Branch: 004-embed-multiple-video)
 - **Status**: Phase 1 Design Complete (data models, contracts, tests planned)

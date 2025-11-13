@@ -60,7 +60,6 @@ export interface UploadRequest {
  * Request payload for replacing an existing example
  */
 export interface ReplaceRequest {
-  id: string
   beforeContent: string
   afterContent: string
   embedding: number[]

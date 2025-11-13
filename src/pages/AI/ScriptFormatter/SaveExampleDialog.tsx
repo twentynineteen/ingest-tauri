@@ -10,7 +10,11 @@ import { ExampleCategory } from '../../../types/exampleEmbeddings'
 interface SaveExampleDialogProps {
   isOpen: boolean
   onClose: () => void
-  onSave: (title: string, category: ExampleCategory, qualityScore: number) => Promise<void>
+  onSave: (
+    title: string,
+    category: ExampleCategory,
+    qualityScore: number
+  ) => Promise<void>
   defaultTitle: string
 }
 
@@ -74,7 +78,10 @@ export function SaveExampleDialog({
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Title Input */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Title <span className="text-red-500">*</span>
               </label>
               <input
@@ -92,7 +99,10 @@ export function SaveExampleDialog({
 
             {/* Category Select */}
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="category"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Category <span className="text-red-500">*</span>
               </label>
               <select
@@ -113,7 +123,10 @@ export function SaveExampleDialog({
 
             {/* Quality Score */}
             <div>
-              <label htmlFor="quality" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="quality"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Quality Score
               </label>
               <div className="flex items-center gap-2">
@@ -147,8 +160,9 @@ export function SaveExampleDialog({
             {/* Info Message */}
             <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
               <p className="text-xs text-blue-800">
-                This will save both the original and formatted versions of your script. The
-                formatted version will be used to match similar content in future RAG searches.
+                This will save both the original and formatted versions of your script.
+                The formatted version will be used to match similar content in future RAG
+                searches.
               </p>
             </div>
 

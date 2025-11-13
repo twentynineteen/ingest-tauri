@@ -6,6 +6,8 @@
 
 use rusqlite::{params, Connection, Result};
 use serde::{Deserialize, Serialize};
+use std::fs;
+use std::path::PathBuf;
 use tauri::Manager;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -64,6 +66,302 @@ pub struct ReplaceExampleRequest {
     pub embedding: Vec<f32>,
 }
 
+// ============================================================================
+// Database Initialization & Migration
+// ============================================================================
+
+/// Get the database path in app data directory (persists across app updates)
+/// If database doesn't exist, copies bundled version from resources
+fn get_or_initialize_database(app: &tauri::AppHandle) -> Result<PathBuf, String> {
+    // Get app data directory (persists across updates)
+    let app_data_dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("Failed to get app data dir: {}", e))?;
+
+    // Ensure embeddings directory exists
+    let embeddings_dir = app_data_dir.join("embeddings");
+    fs::create_dir_all(&embeddings_dir)
+        .map_err(|e| format!("Failed to create embeddings directory: {}", e))?;
+
+    let db_path = embeddings_dir.join("examples.db");
+
+    // If database doesn't exist, copy from bundled resources
+    if !db_path.exists() {
+        println!("[RAG] Database not found in app data dir, initializing from bundled resources");
+
+        // Get bundled database from resources
+        let resource_path = app
+            .path()
+            .resource_dir()
+            .map_err(|e| format!("Failed to get resource dir: {}", e))?;
+
+        let bundled_db_path = resource_path.join("embeddings/examples.db");
+
+        if !bundled_db_path.exists() {
+            return Err(format!(
+                "Bundled database not found at: {}. Run 'npm run embed:examples' first.",
+                bundled_db_path.display()
+            ));
+        }
+
+        // Copy bundled database to app data directory
+        fs::copy(&bundled_db_path, &db_path).map_err(|e| {
+            format!(
+                "Failed to copy database from {} to {}: {}",
+                bundled_db_path.display(),
+                db_path.display(),
+                e
+            )
+        })?;
+
+        println!(
+            "[RAG] Database initialized at: {}",
+            db_path.display()
+        );
+    } else {
+        println!("[RAG] Using existing database at: {}", db_path.display());
+
+        // Merge new bundled examples if available
+        if let Err(e) = merge_bundled_examples(app, &db_path) {
+            println!("[RAG] Warning: Failed to merge bundled examples: {}", e);
+            // Don't fail initialization if merge fails
+        }
+    }
+
+    Ok(db_path)
+}
+
+/// Merge new bundled examples into the active database
+/// This runs on app startup after updates to add new bundled examples
+fn merge_bundled_examples(app: &tauri::AppHandle, active_db_path: &PathBuf) -> Result<(), String> {
+    // Get bundled database path
+    let resource_path = app
+        .path()
+        .resource_dir()
+        .map_err(|e| format!("Failed to get resource dir: {}", e))?;
+    let bundled_db_path = resource_path.join("embeddings/examples.db");
+
+    if !bundled_db_path.exists() {
+        return Ok(()); // No bundled database, nothing to merge
+    }
+
+    // Open both databases
+    let bundled_conn = Connection::open(&bundled_db_path)
+        .map_err(|e| format!("Failed to open bundled database: {}", e))?;
+    let active_conn = Connection::open(active_db_path)
+        .map_err(|e| format!("Failed to open active database: {}", e))?;
+
+    // Get bundled version from bundled database
+    let bundled_version: Option<String> = bundled_conn
+        .query_row(
+            "SELECT value FROM db_metadata WHERE key = 'bundled_version'",
+            [],
+            |row| row.get(0),
+        )
+        .ok();
+
+    // Get active bundled version from active database
+    let active_bundled_version: Option<String> = active_conn
+        .query_row(
+            "SELECT value FROM db_metadata WHERE key = 'bundled_version'",
+            [],
+            |row| row.get(0),
+        )
+        .ok();
+
+    // Check if merge is needed
+    match (bundled_version, active_bundled_version) {
+        (Some(bundled_ver), Some(active_ver)) if bundled_ver == active_ver => {
+            println!("[RAG] Bundled examples up to date (version: {})", bundled_ver);
+            return Ok(());
+        }
+        (Some(bundled_ver), active_ver_opt) => {
+            println!(
+                "[RAG] Merging bundled examples (bundled: {}, active: {:?})",
+                bundled_ver, active_ver_opt
+            );
+        }
+        _ => {
+            println!("[RAG] No version metadata, checking for new bundled examples");
+        }
+    }
+
+    // Query bundled examples
+    let mut stmt = bundled_conn
+        .prepare(
+            "SELECT id, title, category, before_text, after_text, tags, word_count, quality_score
+             FROM example_scripts
+             WHERE source = 'bundled'",
+        )
+        .map_err(|e| format!("Failed to query bundled examples: {}", e))?;
+
+    let bundled_examples = stmt
+        .query_map([], |row| {
+            Ok((
+                row.get::<_, String>(0)?,  // id
+                row.get::<_, String>(1)?,  // title
+                row.get::<_, String>(2)?,  // category
+                row.get::<_, String>(3)?,  // before_text
+                row.get::<_, String>(4)?,  // after_text
+                row.get::<_, Option<String>>(5)?,  // tags
+                row.get::<_, Option<i32>>(6)?,  // word_count
+                row.get::<_, Option<i32>>(7)?,  // quality_score
+            ))
+        })
+        .map_err(|e| format!("Failed to read bundled examples: {}", e))?
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|e| format!("Failed to collect bundled examples: {}", e))?;
+
+    let mut added_count = 0;
+    let mut updated_count = 0;
+    let mut skipped_count = 0;
+
+    // Begin transaction on active database
+    active_conn
+        .execute("BEGIN TRANSACTION", [])
+        .map_err(|e| format!("Failed to begin transaction: {}", e))?;
+
+    for (id, title, category, before_text, after_text, tags, word_count, quality_score) in
+        bundled_examples
+    {
+        // Check if example exists in active database
+        let exists_query = active_conn.query_row(
+            "SELECT source FROM example_scripts WHERE id = ?",
+            params![&id],
+            |row| row.get::<_, String>(0),
+        );
+
+        match exists_query {
+            Ok(source) => {
+                if source == "bundled" {
+                    // Update bundled example (allow bundled updates)
+                    active_conn
+                        .execute(
+                            "UPDATE example_scripts
+                             SET title=?, category=?, before_text=?, after_text=?, tags=?, word_count=?, quality_score=?
+                             WHERE id=?",
+                            params![
+                                &title,
+                                &category,
+                                &before_text,
+                                &after_text,
+                                &tags,
+                                &word_count,
+                                &quality_score,
+                                &id
+                            ],
+                        )
+                        .map_err(|e| format!("Failed to update bundled example: {}", e))?;
+
+                    // Also update embedding
+                    let embedding_blob: Vec<u8> = bundled_conn
+                        .query_row(
+                            "SELECT embedding FROM embeddings WHERE script_id = ?",
+                            params![&id],
+                            |row| row.get(0),
+                        )
+                        .map_err(|e| format!("Failed to get bundled embedding: {}", e))?;
+
+                    active_conn
+                        .execute(
+                            "UPDATE embeddings SET embedding=? WHERE script_id=?",
+                            params![&embedding_blob, &id],
+                        )
+                        .map_err(|e| format!("Failed to update embedding: {}", e))?;
+
+                    updated_count += 1;
+                    println!("[RAG]   Updated bundled example: {}", title);
+                } else {
+                    // User-uploaded example with same ID, skip
+                    skipped_count += 1;
+                    println!("[RAG]   Skipped user-uploaded example: {}", title);
+                }
+            }
+            Err(_) => {
+                // Example doesn't exist, insert it
+                active_conn
+                    .execute(
+                        "INSERT INTO example_scripts (id, title, category, before_text, after_text, tags, word_count, quality_score, source)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'bundled')",
+                        params![
+                            &id,
+                            &title,
+                            &category,
+                            &before_text,
+                            &after_text,
+                            &tags,
+                            &word_count,
+                            &quality_score
+                        ],
+                    )
+                    .map_err(|e| format!("Failed to insert bundled example: {}", e))?;
+
+                // Insert embedding
+                let embedding_blob: Vec<u8> = bundled_conn
+                    .query_row(
+                        "SELECT embedding, dimension FROM embeddings WHERE script_id = ?",
+                        params![&id],
+                        |row| Ok((row.get::<_, Vec<u8>>(0)?, row.get::<_, i32>(1)?)),
+                    )
+                    .map_err(|e| format!("Failed to get bundled embedding: {}", e))?
+                    .0;
+
+                let dimension = bundled_conn
+                    .query_row(
+                        "SELECT dimension FROM embeddings WHERE script_id = ?",
+                        params![&id],
+                        |row| row.get::<_, i32>(0),
+                    )
+                    .map_err(|e| format!("Failed to get embedding dimension: {}", e))?;
+
+                active_conn
+                    .execute(
+                        "INSERT INTO embeddings (script_id, embedding, dimension) VALUES (?, ?, ?)",
+                        params![&id, &embedding_blob, dimension],
+                    )
+                    .map_err(|e| format!("Failed to insert embedding: {}", e))?;
+
+                added_count += 1;
+                println!("[RAG]   Added new bundled example: {}", title);
+            }
+        }
+    }
+
+    // Update version metadata in active database
+    if let Some(bundled_ver) = bundled_conn
+        .query_row(
+            "SELECT value FROM db_metadata WHERE key = 'bundled_version'",
+            [],
+            |row| row.get::<_, String>(0),
+        )
+        .ok()
+    {
+        active_conn
+            .execute(
+                "INSERT OR REPLACE INTO db_metadata (key, value, updated_at) VALUES (?, ?, datetime('now'))",
+                params!["bundled_version", bundled_ver],
+            )
+            .map_err(|e| format!("Failed to update bundled version: {}", e))?;
+    }
+
+    // Commit transaction
+    active_conn
+        .execute("COMMIT", [])
+        .map_err(|e| format!("Failed to commit merge transaction: {}", e))?;
+
+    println!(
+        "[RAG] Merge complete: {} added, {} updated, {} skipped",
+        added_count, updated_count, skipped_count
+    );
+
+    Ok(())
+}
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
+
 /// Calculate cosine similarity between two vectors
 fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
     if a.len() != b.len() {
@@ -95,20 +393,8 @@ pub async fn search_similar_scripts(
     top_k: usize,
     min_similarity: Option<f32>,
 ) -> Result<Vec<SimilarExample>, String> {
-    // Get database path from resources
-    let resource_path = app
-        .path()
-        .resource_dir()
-        .map_err(|e| format!("Failed to get resource dir: {}", e))?;
-
-    let db_path = resource_path.join("embeddings/examples.db");
-
-    if !db_path.exists() {
-        return Err(format!(
-            "Database not found at: {}. Run 'npm run embed:examples' first.",
-            db_path.display()
-        ));
-    }
+    // Get or initialize database (persists across updates)
+    let db_path = get_or_initialize_database(&app)?;
 
     // Open database connection
     let conn = Connection::open(&db_path)
@@ -196,20 +482,8 @@ pub async fn search_similar_scripts(
 
 #[tauri::command]
 pub async fn get_example_by_id(app: tauri::AppHandle, id: String) -> Result<SimilarExample, String> {
-    // Get database path from resources
-    let resource_path = app
-        .path()
-        .resource_dir()
-        .map_err(|e| format!("Failed to get resource dir: {}", e))?;
-
-    let db_path = resource_path.join("embeddings/examples.db");
-
-    if !db_path.exists() {
-        return Err(format!(
-            "Database not found at: {}",
-            db_path.display()
-        ));
-    }
+    // Get or initialize database (persists across updates)
+    let db_path = get_or_initialize_database(&app)?;
 
     // Open database connection
     let conn = Connection::open(&db_path)
@@ -242,20 +516,8 @@ pub async fn get_example_by_id(app: tauri::AppHandle, id: String) -> Result<Simi
 
 #[tauri::command]
 pub async fn get_all_examples(app: tauri::AppHandle) -> Result<Vec<SimilarExample>, String> {
-    // Get database path from resources
-    let resource_path = app
-        .path()
-        .resource_dir()
-        .map_err(|e| format!("Failed to get resource dir: {}", e))?;
-
-    let db_path = resource_path.join("embeddings/examples.db");
-
-    if !db_path.exists() {
-        return Err(format!(
-            "Database not found at: {}",
-            db_path.display()
-        ));
-    }
+    // Get or initialize database (persists across updates)
+    let db_path = get_or_initialize_database(&app)?;
 
     // Open database connection
     let conn = Connection::open(&db_path)
@@ -293,20 +555,8 @@ pub async fn get_all_examples(app: tauri::AppHandle) -> Result<Vec<SimilarExampl
 pub async fn get_all_examples_with_metadata(
     app: tauri::AppHandle,
 ) -> Result<Vec<ExampleWithMetadata>, String> {
-    // Get database path from resources
-    let resource_path = app
-        .path()
-        .resource_dir()
-        .map_err(|e| format!("Failed to get resource dir: {}", e))?;
-
-    let db_path = resource_path.join("embeddings/examples.db");
-
-    if !db_path.exists() {
-        return Err(format!(
-            "Database not found at: {}",
-            db_path.display()
-        ));
-    }
+    // Get or initialize database (persists across updates)
+    let db_path = get_or_initialize_database(&app)?;
 
     // Open database connection
     let conn = Connection::open(&db_path)
@@ -455,12 +705,8 @@ pub async fn upload_example(
     // Calculate word count
     let word_count = calculate_word_count(&request.before_content);
 
-    // Get database path
-    let resource_path = app
-        .path()
-        .resource_dir()
-        .map_err(|e| format!("Failed to get resource dir: {}", e))?;
-    let db_path = resource_path.join("embeddings/examples.db");
+    // Get or initialize database (persists across updates)
+    let db_path = get_or_initialize_database(&app)?;
 
     // Open database connection
     let conn = Connection::open(&db_path)
@@ -530,12 +776,8 @@ pub async fn replace_example(
     validate_text_content(&request.after_content, "After content")?;
     validate_embedding_dimensions(&request.embedding)?;
 
-    // Get database path
-    let resource_path = app
-        .path()
-        .resource_dir()
-        .map_err(|e| format!("Failed to get resource dir: {}", e))?;
-    let db_path = resource_path.join("embeddings/examples.db");
+    // Get or initialize database (persists across updates)
+    let db_path = get_or_initialize_database(&app)?;
 
     // Open database connection
     let conn = Connection::open(&db_path)
@@ -600,12 +842,8 @@ pub async fn replace_example(
 
 #[tauri::command]
 pub async fn delete_example(app: tauri::AppHandle, id: String) -> Result<(), String> {
-    // Get database path
-    let resource_path = app
-        .path()
-        .resource_dir()
-        .map_err(|e| format!("Failed to get resource dir: {}", e))?;
-    let db_path = resource_path.join("embeddings/examples.db");
+    // Get or initialize database (persists across updates)
+    let db_path = get_or_initialize_database(&app)?;
 
     // Open database connection
     let conn = Connection::open(&db_path)

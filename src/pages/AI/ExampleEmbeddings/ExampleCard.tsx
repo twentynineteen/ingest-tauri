@@ -26,7 +26,13 @@ interface ExampleCardProps {
   onDownload: (id: string) => void
 }
 
-export function ExampleCard({ example, onDelete, onReplace, onView, onDownload }: ExampleCardProps) {
+export function ExampleCard({
+  example,
+  onDelete,
+  onReplace,
+  onView,
+  onDownload
+}: ExampleCardProps) {
   const isUserUploaded = example.source === 'user-uploaded'
 
   // Truncate preview text to ~200 chars

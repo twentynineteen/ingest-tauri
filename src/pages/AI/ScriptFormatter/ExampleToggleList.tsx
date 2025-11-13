@@ -44,14 +44,18 @@ export function ExampleToggleList({
         </span>
         <div className="flex gap-2">
           <button
-            onClick={() => examples.forEach(ex => !enabledIds.has(ex.id) && onToggle(ex.id))}
+            onClick={() =>
+              examples.forEach(ex => !enabledIds.has(ex.id) && onToggle(ex.id))
+            }
             className="text-xs text-blue-600 hover:text-blue-700"
             disabled={enabledCount === totalCount}
           >
             Enable All
           </button>
           <button
-            onClick={() => examples.forEach(ex => enabledIds.has(ex.id) && onToggle(ex.id))}
+            onClick={() =>
+              examples.forEach(ex => enabledIds.has(ex.id) && onToggle(ex.id))
+            }
             className="text-xs text-gray-600 hover:text-gray-700"
             disabled={enabledCount === 0}
           >
