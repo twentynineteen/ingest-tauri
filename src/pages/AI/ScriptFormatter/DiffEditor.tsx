@@ -4,16 +4,9 @@
  * Purpose: Monaco Editor for viewing and editing formatted output
  */
 
-import Editor, { loader } from '@monaco-editor/react'
+import Editor from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
 import React, { useEffect, useRef, useState } from 'react'
-
-// Configure loader to use CDN (faster than bundling)
-loader.config({
-  paths: {
-    vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.53.0/min/vs'
-  }
-})
 
 interface DiffEditorProps {
   original: string // Kept for compatibility but not displayed
@@ -27,6 +20,12 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
   const containerRef = useRef<HTMLDivElement>(null)
   const [isEditorReady, setIsEditorReady] = useState(false)
 
+  // Debug: Log the modified value
+  useEffect(() => {
+    console.log('[DiffEditor] Modified text length:', modified?.length || 0)
+    console.log('[DiffEditor] Modified text preview:', modified?.substring(0, 100))
+  }, [modified])
+
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
       onModifiedChange(value)
@@ -34,6 +33,7 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
   }
 
   const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
+    console.log('[DiffEditor] Editor mounted successfully')
     editorRef.current = editor
     setIsEditorReady(true)
 
@@ -41,6 +41,14 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
     setTimeout(() => {
       editor.layout()
     }, 100)
+  }
+
+  const handleBeforeMount = () => {
+    console.log('[DiffEditor] Editor about to mount')
+  }
+
+  const handleValidate = (markers: editor.IMarker[]) => {
+    console.log('[DiffEditor] Validation markers:', markers.length)
   }
 
   // Re-layout editor when window resizes
@@ -76,15 +84,22 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
         )}
         <Editor
           height="100%"
+          width="100%"
           language="markdown"
-          value={modified}
+          value={modified || ''}
+          defaultValue={modified || ''}
           onChange={handleEditorChange}
           onMount={handleEditorDidMount}
+          beforeMount={handleBeforeMount}
+          onValidate={handleValidate}
           loading={
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
                 <p className="text-sm text-gray-600">Loading Monaco Editor...</p>
+                <p className="text-xs text-gray-500 mt-2">
+                  If this persists, check browser console for errors
+                </p>
               </div>
             </div>
           }
@@ -99,6 +114,8 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
             folding: true,
             readOnly: false,
             automaticLayout: true,
+            renderWhitespace: 'selection',
+            tabSize: 2,
             unicodeHighlight: {
               ambiguousCharacters: false,
               invisibleCharacters: false,
