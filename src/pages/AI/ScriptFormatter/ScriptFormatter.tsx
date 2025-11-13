@@ -4,6 +4,12 @@
  * Purpose: Main page orchestration for AI-powered autocue script formatting
  */
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@/components/ui/accordion'
 import { useBreadcrumb } from '@hooks/index'
 import { AlertCircle, Database, Download, FileText, Save, Sparkles } from 'lucide-react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
@@ -434,58 +440,74 @@ const ScriptFormatter: React.FC = () => {
             </p>
           </div>
 
-          {/* RAG/Embedding Status */}
-          <div className="p-4 border rounded-lg">
-            <div className="flex items-center gap-2 mb-2">
-              <Database className="h-4 w-4" />
-              <span className="text-sm font-medium">RAG Enhancement Status</span>
-            </div>
-            {isEmbeddingLoading && (
-              <p className="text-sm text-blue-600">
-                Checking Ollama embedding model availability...
-              </p>
-            )}
-            {isEmbeddingReady && (
-              <p className="text-sm text-green-600">
-                ✓ RAG system ready (Ollama) - will use similar examples to improve
-                formatting
-              </p>
-            )}
-            {embeddingError && (
-              <div className="text-sm text-red-600">
-                <p className="font-medium">⚠ RAG system not available</p>
-                <p className="text-xs mt-1">{embeddingError.message}</p>
-                <p className="text-xs mt-1 text-gray-600">
-                  Will format without example guidance.
-                </p>
-              </div>
-            )}
-            {!isEmbeddingLoading && !isEmbeddingReady && !embeddingError && (
-              <p className="text-sm text-gray-600">
-                RAG system not available - will format without example guidance
-              </p>
-            )}
-          </div>
+          {/* RAG/Embedding Status & Example Selection - Accordion */}
+          <Accordion
+            type="multiple"
+            defaultValue={['rag-status', 'example-selection']}
+            className="space-y-4"
+          >
+            {/* RAG/Embedding Status */}
+            <AccordionItem value="rag-status" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <div className="flex items-center gap-2">
+                  <Database className="h-4 w-4" />
+                  <span className="text-sm font-medium">RAG Enhancement Status</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                {isEmbeddingLoading && (
+                  <p className="text-sm text-blue-600">
+                    Checking Ollama embedding model availability...
+                  </p>
+                )}
+                {isEmbeddingReady && (
+                  <p className="text-sm text-green-600">
+                    ✓ RAG system ready (Ollama) - will use similar examples to improve
+                    formatting
+                  </p>
+                )}
+                {embeddingError && (
+                  <div className="text-sm text-red-600">
+                    <p className="font-medium">⚠ RAG system not available</p>
+                    <p className="text-xs mt-1">{embeddingError.message}</p>
+                    <p className="text-xs mt-1 text-gray-600">
+                      Will format without example guidance.
+                    </p>
+                  </div>
+                )}
+                {!isEmbeddingLoading && !isEmbeddingReady && !embeddingError && (
+                  <p className="text-sm text-gray-600">
+                    RAG system not available - will format without example guidance
+                  </p>
+                )}
+              </AccordionContent>
+            </AccordionItem>
 
-          {/* Example Selection */}
-          {isEmbeddingReady && allExamples.length > 0 && (
-            <div className="p-4 border rounded-lg">
-              <div className="flex items-center gap-2 mb-3">
-                <Database className="h-4 w-4" />
-                <span className="text-sm font-medium">Select Examples to Use</span>
-              </div>
-              <p className="text-xs text-gray-600 mb-3">
-                Choose which examples the AI should reference when formatting your script.
-                The system will automatically select the most relevant enabled examples.
-              </p>
-              <ExampleToggleList
-                examples={allExamples}
-                enabledIds={enabledExampleIds}
-                onToggle={handleExampleToggle}
-                isLoading={isLoadingExamples}
-              />
-            </div>
-          )}
+            {/* Example Selection */}
+            {isEmbeddingReady && allExamples.length > 0 && (
+              <AccordionItem value="example-selection" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <div className="flex items-center gap-2">
+                    <Database className="h-4 w-4" />
+                    <span className="text-sm font-medium">Select Examples to Use</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <p className="text-xs text-gray-600 mb-3">
+                    Choose which examples the AI should reference when formatting your
+                    script. The system will automatically select the most relevant enabled
+                    examples.
+                  </p>
+                  <ExampleToggleList
+                    examples={allExamples}
+                    enabledIds={enabledExampleIds}
+                    onToggle={handleExampleToggle}
+                    isLoading={isLoadingExamples}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+            )}
+          </Accordion>
 
           {/* Two-column grid for provider and model selection */}
           <div className="grid grid-cols-2 gap-6">
@@ -527,7 +549,7 @@ const ScriptFormatter: React.FC = () => {
                 e.preventDefault()
                 handleFormatScript()
               }}
-              className="w-full px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 flex items-center justify-center gap-2"
+              className="w-full px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 flex items-center justify-center gap-2 mb-3"
             >
               <Sparkles className="h-5 w-5" />
               Format Script with AI

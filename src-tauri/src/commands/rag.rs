@@ -152,6 +152,18 @@ fn merge_bundled_examples(app: &tauri::AppHandle, active_db_path: &PathBuf) -> R
     let active_conn = Connection::open(active_db_path)
         .map_err(|e| format!("Failed to open active database: {}", e))?;
 
+    // Ensure db_metadata table exists in active database (migration for old databases)
+    active_conn
+        .execute(
+            "CREATE TABLE IF NOT EXISTS db_metadata (
+                key TEXT PRIMARY KEY,
+                value TEXT NOT NULL,
+                updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+            )",
+            [],
+        )
+        .map_err(|e| format!("Failed to create db_metadata table: {}", e))?;
+
     // Get bundled version from bundled database
     let bundled_version: Option<String> = bundled_conn
         .query_row(
