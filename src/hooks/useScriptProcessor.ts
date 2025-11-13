@@ -19,6 +19,7 @@ interface ProcessScriptOptions {
   modelId: string
   providerId: string
   configuration: ProviderConfiguration
+  enabledExampleIds?: Set<string>
   onProgress?: (progress: number) => void
   onRetry?: (attempt: number) => void
   onRAGUpdate?: (status: string, examplesCount: number) => void
@@ -89,28 +90,40 @@ export function useScriptProcessor(): UseScriptProcessorResult {
             console.log('[useScriptProcessor] Searching database for similar examples...')
             console.log('[useScriptProcessor] Search params:', {
               embeddingDimensions: queryEmbedding.length,
-              topK: 3,
+              topK: 10,
               minSimilarity: 0.4
             })
 
-            examples = await invoke<SimilarExample[]>('search_similar_scripts', {
+            const allSimilarExamples = await invoke<SimilarExample[]>('search_similar_scripts', {
               queryEmbedding,
-              topK: 3,
+              topK: 10, // Get more candidates for filtering
               minSimilarity: 0.4 // Lower threshold - we're matching formatting patterns, not exact content
             })
 
-            console.log(`[useScriptProcessor] Search complete: Found ${examples.length} similar examples`)
+            // Filter by enabled example IDs if provided
+            if (options.enabledExampleIds && options.enabledExampleIds.size > 0) {
+              examples = allSimilarExamples.filter(ex => options.enabledExampleIds!.has(ex.id)).slice(0, 3)
+              console.log(`[useScriptProcessor] Filtered ${allSimilarExamples.length} examples to ${examples.length} enabled examples`)
+            } else {
+              examples = allSimilarExamples.slice(0, 3)
+            }
+
+            console.log(`[useScriptProcessor] Search complete: Using ${examples.length} similar examples`)
 
             if (examples.length > 0) {
               console.log('[useScriptProcessor] Example details:', examples.map(ex => ({
+                id: ex.id,
                 title: ex.title,
                 similarity: ex.similarity,
                 category: ex.category
               })))
               options.onRAGUpdate?.(`Using ${examples.length} similar example${examples.length > 1 ? 's' : ''} to improve formatting`, examples.length)
             } else {
-              console.log('[useScriptProcessor] No examples met the similarity threshold of 0.65')
-              options.onRAGUpdate?.('No similar examples found (try lowering similarity threshold)', 0)
+              const reason = options.enabledExampleIds && options.enabledExampleIds.size === 0
+                ? 'All examples disabled'
+                : 'No similar examples found (try enabling more examples or lowering similarity threshold)'
+              console.log(`[useScriptProcessor] ${reason}`)
+              options.onRAGUpdate?.(reason, 0)
             }
           } catch (ragError) {
             console.error(

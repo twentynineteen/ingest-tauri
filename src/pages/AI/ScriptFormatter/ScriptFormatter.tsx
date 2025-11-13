@@ -29,6 +29,7 @@ import {
 } from '../../../types/scriptFormatter'
 // Components
 import { DiffEditor } from './DiffEditor'
+import { ExampleToggleList } from './ExampleToggleList'
 import { FileUploader } from './FileUploader'
 import { ModelSelector } from './ModelSelector'
 import { ProviderSelector } from './ProviderSelector'
@@ -53,6 +54,7 @@ const ScriptFormatter: React.FC = () => {
   const [examplesCount, setExamplesCount] = useState<number>(0)
   const [ragStatus, setRagStatus] = useState<string>('')
   const [showSaveDialog, setShowSaveDialog] = useState(false)
+  const [enabledExampleIds, setEnabledExampleIds] = useState<Set<string>>(new Set())
   const validatedProviderRef = useRef<string | null>(null)
 
   // Hooks
@@ -81,8 +83,15 @@ const ScriptFormatter: React.FC = () => {
     embeddingError
   } = useScriptProcessor()
 
-  const { uploadExample } = useExampleManagement()
+  const { uploadExample, examples: allExamples, isLoading: isLoadingExamples } = useExampleManagement()
   const { embed: embedForSaving } = useOllamaEmbedding()
+
+  // Initialize enabled examples when examples are loaded (all enabled by default)
+  useEffect(() => {
+    if (allExamples.length > 0 && enabledExampleIds.size === 0) {
+      setEnabledExampleIds(new Set(allExamples.map(ex => ex.id)))
+    }
+  }, [allExamples, enabledExampleIds.size])
 
   // Restore session data from localStorage (initialize state)
   const [initialLoadDone] = useState(() => {
@@ -173,6 +182,7 @@ const ScriptFormatter: React.FC = () => {
         modelId: selectedModelId,
         providerId: activeProvider.id,
         configuration: activeProvider.configuration,
+        enabledExampleIds: enabledExampleIds,
         onProgress: prog => console.log(`Progress: ${prog}%`),
         onRAGUpdate: (status, count) => {
           setRagStatus(status)
@@ -310,6 +320,18 @@ const ScriptFormatter: React.FC = () => {
     localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
   }
 
+  const handleExampleToggle = (exampleId: string) => {
+    setEnabledExampleIds(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(exampleId)) {
+        newSet.delete(exampleId)
+      } else {
+        newSet.add(exampleId)
+      }
+      return newSet
+    })
+  }
+
   // Auto-validate provider when step changes to select-model
   useEffect(() => {
     if (currentStep === 'select-model' && activeProvider) {
@@ -440,6 +462,26 @@ const ScriptFormatter: React.FC = () => {
               </p>
             )}
           </div>
+
+          {/* Example Selection */}
+          {isEmbeddingReady && allExamples.length > 0 && (
+            <div className="p-4 border rounded-lg">
+              <div className="flex items-center gap-2 mb-3">
+                <Database className="h-4 w-4" />
+                <span className="text-sm font-medium">Select Examples to Use</span>
+              </div>
+              <p className="text-xs text-gray-600 mb-3">
+                Choose which examples the AI should reference when formatting your script.
+                The system will automatically select the most relevant enabled examples.
+              </p>
+              <ExampleToggleList
+                examples={allExamples}
+                enabledIds={enabledExampleIds}
+                onToggle={handleExampleToggle}
+                isLoading={isLoadingExamples}
+              />
+            </div>
+          )}
 
           {/* Two-column grid for provider and model selection */}
           <div className="grid grid-cols-2 gap-6">
