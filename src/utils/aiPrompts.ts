@@ -19,19 +19,19 @@ Your goal is to take scripts that read well on paper but may not flow naturally 
 
 Because playback speed cannot change, you use line breaks, pauses, and spacing to guide pacing and emphasis — ensuring the presenter sounds composed, confident, and engaging.
 
-**IMPORTANT** You must:
+**CRITICAL RULES - YOU MUST FOLLOW THESE:**
 
-Preserve all text content exactly as written — **never rewrite or alter the meaning.**
+1. **NEVER REWRITE THE CONTENT** - Use the EXACT words from the original script
+2. **NEVER ADD NEW INFORMATION** - Do not create, invent, or add content
+3. **NEVER REMOVE CONTENT** - Keep all original sentences and ideas
+4. **NEVER PARAPHRASE** - Use the exact wording from the input
+5. **ONLY ADD FORMATTING** - Line breaks, bold, [PAUSE], and [END] markers
 
-Format for rhythm and delivery, ensuring the script supports a smooth, confident performance.
-
-Highlight important keywords that help guide tone and emphasis.
-
-Structure line breaks and spacing so the script feels balanced and readable on-screen. Ensure that line breaks are double spaced for the autocue to read the gap appropriately.
+Your ONLY job is to add formatting to improve readability. Think of yourself as a typesetter, not a writer.
 
 Formatting Guidelines:
 
-Use bold to highlight key words or short phrases for emphasis.
+Use bold (**text**) to highlight key words or short phrases for emphasis.
 
 Insert [PAUSE] for natural or dramatic pauses.
 
@@ -49,7 +49,9 @@ Aim for clarity, confidence, and conversational flow.
 
 Imagine the presenter is addressing a live audience — formatting should help them sound natural and in control.
 
-Avoid overusing bold or pause cues; use them strategically for rhythm and energy.`
+Avoid overusing bold or pause cues; use them strategically for rhythm and energy.
+
+REMEMBER: You are ONLY formatting the script, not rewriting it. Every word in your output must be from the original script.`
 
 export const PROMPT_VERSION = '1.0.0'
 
@@ -272,10 +274,7 @@ export const TOOL_DEFINITIONS = [
  * @param examples - Similar example scripts from vector database
  * @returns Enhanced system prompt with examples
  */
-export function buildRAGPrompt(
-  userScript: string,
-  examples: SimilarExample[]
-): string {
+export function buildRAGPrompt(userScript: string, examples: SimilarExample[]): string {
   // If no relevant examples found, use standard prompt
   if (examples.length === 0) {
     console.log('[buildRAGPrompt] No examples provided, using standard prompt')
@@ -324,7 +323,5 @@ ${exampleSection}
 
 Now format the user's script following the EXACT SAME principles demonstrated in the examples above. Match their style for line breaks, pause placement, bold emphasis, and spacing.
 
-**User's Script to Format:**
-${userScript}`
+IMPORTANT: The user will provide their script in the next message. DO NOT make up content - only format what they provide.`
 }
-

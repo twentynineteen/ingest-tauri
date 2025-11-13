@@ -4,8 +4,8 @@
  * Purpose: Select AI model with capabilities display
  */
 
-import React from 'react'
 import { Brain, Loader2, Wrench, Zap } from 'lucide-react'
+import React from 'react'
 import type { AIModel } from '../../../types/scriptFormatter'
 
 interface ModelSelectorProps {
@@ -19,7 +19,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   models,
   selectedModel,
   onSelect,
-  isLoading = false,
+  isLoading = false
 }) => {
   if (isLoading) {
     return (
@@ -45,12 +45,12 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       <label className="block text-sm font-medium text-gray-700">Select Model</label>
 
       <div className="space-y-2">
-        {models.map((model) => (
+        {models.map(model => (
           <div
             key={model.id}
             className={`p-4 border rounded-lg cursor-pointer transition-all ${
               selectedModel === model.id
-                ? 'border-blue-500 bg-blue-50'
+                ? 'border-black bg-gray-50'
                 : 'border-gray-200 hover:border-gray-300'
             }`}
             onClick={() => onSelect(model.id)}
@@ -73,7 +73,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                       </div>
                     )}
                     {model.capabilities.supportsStreaming && (
-                      <div className="flex items-center gap-1 text-blue-600">
+                      <div className="flex items-center gap-1 text-black">
                         <Zap className="h-3 w-3" />
                         <span className="text-xs">Streaming</span>
                       </div>
@@ -95,7 +95,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
       {selectedModel && (
         <p className="text-xs text-gray-500">
-          Selected: {models.find((m) => m.id === selectedModel)?.displayName}
+          Selected: {models.find(m => m.id === selectedModel)?.displayName}
         </p>
       )}
     </div>

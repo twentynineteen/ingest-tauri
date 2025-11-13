@@ -23,10 +23,13 @@ import {
 } from 'lucide-react'
 import React from 'react'
 import type { BreadcrumbsViewerProps, FieldChange } from '../types/baker'
-import { formatFieldValue, formatBreadcrumbDateSimple } from '../utils/breadcrumbsComparison'
-import { Button } from './ui/button'
-import { VideoLinksManager } from './Baker/VideoLinksManager'
+import {
+  formatBreadcrumbDateSimple,
+  formatFieldValue
+} from '../utils/breadcrumbsComparison'
 import { TrelloCardsManager } from './Baker/TrelloCardsManager'
+import { VideoLinksManager } from './Baker/VideoLinksManager'
+import { Button } from './ui/button'
 
 export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
   breadcrumbs,

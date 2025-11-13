@@ -5,7 +5,7 @@
  */
 
 import type { LanguageModel } from 'ai'
-import type { ProviderType, ProviderConfiguration } from '../../types/scriptFormatter'
+import type { ProviderConfiguration, ProviderType } from '../../types/scriptFormatter'
 
 // ============================================================================
 // Provider Interface
@@ -16,7 +16,9 @@ export interface ProviderAdapter {
   type: ProviderType
   displayName: string
   createModel: (modelId: string, config: ProviderConfiguration) => LanguageModel
-  validateConnection: (config: ProviderConfiguration) => Promise<ConnectionValidationResult>
+  validateConnection: (
+    config: ProviderConfiguration
+  ) => Promise<ConnectionValidationResult>
   listModels: (config: ProviderConfiguration) => Promise<ModelInfo[]>
 }
 

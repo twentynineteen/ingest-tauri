@@ -94,7 +94,7 @@ export function useLiveBreadcrumbsReader(): UseLiveBreadcrumbsReaderResult {
         const rawContent = await invoke<string | null>('baker_read_raw_breadcrumbs', {
           projectPath
         })
-        
+
         if (rawContent) {
           // We have a corrupted breadcrumbs file - try to get file system data as fallback
           let actualFiles: FileInfo[] = []
@@ -105,7 +105,7 @@ export function useLiveBreadcrumbsReader(): UseLiveBreadcrumbsReaderResult {
           } catch {
             // Ignore file scan errors
           }
-          
+
           const projectName = projectPath.split('/').pop() || 'Unknown Project'
           const fallbackBreadcrumbs: BreadcrumbsFile = {
             projectTitle: projectName,
@@ -115,9 +115,11 @@ export function useLiveBreadcrumbsReader(): UseLiveBreadcrumbsReaderResult {
             createdBy: 'Baker (recovered from file system)',
             creationDateTime: new Date().toISOString()
           }
-          
+
           setBreadcrumbs(fallbackBreadcrumbs)
-          setError(`Warning: Breadcrumbs file is corrupted. Showing data recovered from file system. Raw content: ${rawContent.substring(0, RAW_CONTENT_PREVIEW_LIMIT)}${rawContent.length > RAW_CONTENT_PREVIEW_LIMIT ? '...' : ''}`)
+          setError(
+            `Warning: Breadcrumbs file is corrupted. Showing data recovered from file system. Raw content: ${rawContent.substring(0, RAW_CONTENT_PREVIEW_LIMIT)}${rawContent.length > RAW_CONTENT_PREVIEW_LIMIT ? '...' : ''}`
+          )
           return
         }
       } catch {

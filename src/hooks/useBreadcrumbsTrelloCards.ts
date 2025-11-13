@@ -5,14 +5,17 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
-import type { TrelloCard, BreadcrumbsFile } from '../types/baker'
+import type { BreadcrumbsFile, TrelloCard } from '../types/baker'
 
 interface UseBreadcrumbsTrelloCardsOptions {
   projectPath: string
   enabled?: boolean
 }
 
-export function useBreadcrumbsTrelloCards({ projectPath, enabled = true }: UseBreadcrumbsTrelloCardsOptions) {
+export function useBreadcrumbsTrelloCards({
+  projectPath,
+  enabled = true
+}: UseBreadcrumbsTrelloCardsOptions) {
   const queryClient = useQueryClient()
 
   // Query: Get Trello cards
@@ -37,7 +40,9 @@ export function useBreadcrumbsTrelloCards({ projectPath, enabled = true }: UseBr
       })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['breadcrumbs', 'trelloCards', projectPath] })
+      queryClient.invalidateQueries({
+        queryKey: ['breadcrumbs', 'trelloCards', projectPath]
+      })
       queryClient.invalidateQueries({ queryKey: ['breadcrumbs', projectPath] })
     }
   })
@@ -51,7 +56,9 @@ export function useBreadcrumbsTrelloCards({ projectPath, enabled = true }: UseBr
       })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['breadcrumbs', 'trelloCards', projectPath] })
+      queryClient.invalidateQueries({
+        queryKey: ['breadcrumbs', 'trelloCards', projectPath]
+      })
       queryClient.invalidateQueries({ queryKey: ['breadcrumbs', projectPath] })
     }
   })

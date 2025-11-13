@@ -3,9 +3,9 @@
  * Feature: 004-embed-multiple-video
  */
 
-import { ExternalLink, Trash2, ChevronUp, ChevronDown, Video } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { openUrl } from '@tauri-apps/plugin-opener'
+import { ChevronDown, ChevronUp, ExternalLink, Trash2, Video } from 'lucide-react'
 import type { VideoLink } from '../../types/baker'
 
 interface VideoLinkCardProps {
@@ -28,7 +28,11 @@ export function VideoLinkCard({
   const formatDate = (isoDate?: string) => {
     if (!isoDate) return null
     const date = new Date(isoDate)
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    })
   }
 
   const openInBrowser = async () => {

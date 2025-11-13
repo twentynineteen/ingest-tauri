@@ -3,14 +3,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { open as openPath } from '@tauri-apps/plugin-dialog'
 import { open } from '@tauri-apps/plugin-shell'
 import { useBreadcrumb } from 'hooks/useBreadcrumb'
+import { CheckCircle, Loader2, XCircle } from 'lucide-react'
 import React, { useState } from 'react'
 import { useAppStore } from 'store/useAppStore'
 import ApiKeyInput from 'utils/ApiKeyInput'
+import { useAIProvider } from '../hooks/useAIProvider'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
 import { ApiKeys, loadApiKeys, saveApiKeys } from '../utils/storage'
-import { useAIProvider } from '../hooks/useAIProvider'
-import { CheckCircle, XCircle, Loader2 } from 'lucide-react'
 
 const Settings: React.FC = () => {
   const queryClient = useQueryClient()
@@ -173,7 +173,7 @@ const Settings: React.FC = () => {
     const result = await validateProvider('ollama', {
       serviceUrl: testUrl,
       connectionStatus: 'not-configured',
-      timeout: 5000,
+      timeout: 5000
     })
 
     if (result.success) {
@@ -182,12 +182,13 @@ const Settings: React.FC = () => {
         status: 'success',
         message: `Connected successfully! Found ${modelsFound} model${modelsFound !== 1 ? 's' : ''}.`,
         modelsFound,
-        latencyMs: result.latencyMs,
+        latencyMs: result.latencyMs
       })
     } else {
       setConnectionStatus({
         status: 'error',
-        message: result.errorMessage || 'Connection failed. Please check if Ollama is running.',
+        message:
+          result.errorMessage || 'Connection failed. Please check if Ollama is running.'
       })
     }
   }
@@ -201,7 +202,9 @@ const Settings: React.FC = () => {
         <section className="space-y-4 border border-gray-300 rounded-lg p-6">
           <div className="border-b pb-2">
             <h3 className="text-lg font-semibold text-gray-900">AI Models</h3>
-            <p className="text-sm text-gray-500">Configure AI provider settings for script formatting</p>
+            <p className="text-sm text-gray-500">
+              Configure AI provider settings for script formatting
+            </p>
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">
@@ -225,7 +228,9 @@ const Settings: React.FC = () => {
                   {connectionStatus.status === 'testing' && (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   )}
-                  {connectionStatus.status === 'testing' ? 'Testing...' : 'Test Connection'}
+                  {connectionStatus.status === 'testing'
+                    ? 'Testing...'
+                    : 'Test Connection'}
                 </Button>
 
                 {connectionStatus.status === 'success' && (
@@ -233,7 +238,9 @@ const Settings: React.FC = () => {
                     <CheckCircle className="h-4 w-4" />
                     <span>{connectionStatus.message}</span>
                     {connectionStatus.latencyMs && (
-                      <span className="text-gray-500">({connectionStatus.latencyMs}ms)</span>
+                      <span className="text-gray-500">
+                        ({connectionStatus.latencyMs}ms)
+                      </span>
                     )}
                   </div>
                 )}
@@ -253,7 +260,9 @@ const Settings: React.FC = () => {
         <section className="space-y-4 border border-gray-300 rounded-lg p-6">
           <div className="border-b pb-2">
             <h3 className="text-lg font-semibold text-gray-900">Trello</h3>
-            <p className="text-sm text-gray-500">Configure Trello API integration for project management</p>
+            <p className="text-sm text-gray-500">
+              Configure Trello API integration for project management
+            </p>
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">Trello API Key</label>
@@ -285,7 +294,9 @@ const Settings: React.FC = () => {
         <section className="space-y-4 border border-gray-300 rounded-lg p-6">
           <div className="border-b pb-2">
             <h3 className="text-lg font-semibold text-gray-900">SproutVideo</h3>
-            <p className="text-sm text-gray-500">Configure SproutVideo API for video hosting</p>
+            <p className="text-sm text-gray-500">
+              Configure SproutVideo API for video hosting
+            </p>
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">SproutVideo API Key</label>
@@ -303,7 +314,9 @@ const Settings: React.FC = () => {
         <section className="space-y-4 border border-gray-300 rounded-lg p-6">
           <div className="border-b pb-2">
             <h3 className="text-lg font-semibold text-gray-900">Backgrounds</h3>
-            <p className="text-sm text-gray-500">Set default folder for background assets</p>
+            <p className="text-sm text-gray-500">
+              Set default folder for background assets
+            </p>
           </div>
           <div>
             <label className="block text-sm font-medium mb-2">

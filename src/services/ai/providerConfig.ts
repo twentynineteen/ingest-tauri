@@ -6,10 +6,10 @@
  */
 
 // import { createOpenAI } from '@ai-sdk/openai' // Commented out for Phase 1
-import { createOllama } from 'ollama-ai-provider-v2'
 import type { LanguageModel } from 'ai'
-import type { ProviderAdapter, ProviderRegistry, ModelInfo } from './types'
+import { createOllama } from 'ollama-ai-provider-v2'
 import type { ProviderConfiguration } from '../../types/scriptFormatter'
+import type { ModelInfo, ProviderAdapter, ProviderRegistry } from './types'
 
 // ============================================================================
 // Ollama Provider Adapter
@@ -31,7 +31,7 @@ const ollamaAdapter: ProviderAdapter = {
     console.log('[Ollama] Creating model with baseURL:', `${baseUrl}/api`)
 
     const ollama = createOllama({
-      baseURL: `${baseUrl}/api`,
+      baseURL: `${baseUrl}/api`
     })
 
     // Return the model instance
@@ -51,7 +51,7 @@ const ollamaAdapter: ProviderAdapter = {
 
       const response = await fetch(apiUrl, {
         method: 'GET',
-        signal: AbortSignal.timeout(config.timeout || 5000),
+        signal: AbortSignal.timeout(config.timeout || 5000)
       })
 
       if (!response.ok) {
@@ -60,18 +60,21 @@ const ollamaAdapter: ProviderAdapter = {
           success: false,
           errorMessage: `HTTP ${response.status}: ${response.statusText}. Check if Ollama is running at ${baseUrl}`,
           modelsFound: 0,
-          latencyMs: Date.now() - start,
+          latencyMs: Date.now() - start
         }
       }
 
       const data = await response.json()
 
-      console.log('[Ollama] Validation successful. Models found:', data.models?.length || 0)
+      console.log(
+        '[Ollama] Validation successful. Models found:',
+        data.models?.length || 0
+      )
 
       return {
         success: true,
         modelsFound: data.models?.length || 0,
-        latencyMs: Date.now() - start,
+        latencyMs: Date.now() - start
       }
     } catch (error) {
       console.error('[Ollama] Validation error:', error)
@@ -79,7 +82,7 @@ const ollamaAdapter: ProviderAdapter = {
         success: false,
         errorMessage: error instanceof Error ? error.message : 'Unknown error',
         modelsFound: 0,
-        latencyMs: Date.now() - start,
+        latencyMs: Date.now() - start
       }
     }
   },
@@ -94,27 +97,35 @@ const ollamaAdapter: ProviderAdapter = {
       console.log('[Ollama] Fetching models from:', apiUrl)
 
       const response = await fetch(apiUrl, {
-        signal: AbortSignal.timeout(config.timeout || 5000),
+        signal: AbortSignal.timeout(config.timeout || 5000)
       })
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch models: HTTP ${response.status}. Check if Ollama is running at ${baseUrl}`)
+        throw new Error(
+          `Failed to fetch models: HTTP ${response.status}. Check if Ollama is running at ${baseUrl}`
+        )
       }
 
-      const data = (await response.json()) as { models?: Array<{ name: string; size: number; details?: { parameter_size?: number } }> }
+      const data = (await response.json()) as {
+        models?: Array<{
+          name: string
+          size: number
+          details?: { parameter_size?: number }
+        }>
+      }
 
       console.log('[Ollama] Models fetched:', data.models?.length || 0)
 
-      return (data.models || []).map((model) => ({
+      return (data.models || []).map(model => ({
         id: model.name,
         name: model.name.replace(':latest', ''),
         size: String(model.size),
         contextLength: model.details?.parameter_size || 4096,
         // Tool calling support detection
-        supportsToolCalling: ['llama3', 'mistral', 'qwen'].some((name) =>
+        supportsToolCalling: ['llama3', 'mistral', 'qwen'].some(name =>
           model.name.toLowerCase().includes(name)
         ),
-        supportsStreaming: true, // All Ollama models support streaming
+        supportsStreaming: true // All Ollama models support streaming
       }))
     } catch (error) {
       console.error('[Ollama] Failed to list models:', error)
@@ -122,7 +133,7 @@ const ollamaAdapter: ProviderAdapter = {
         `Failed to list Ollama models: ${error instanceof Error ? error.message : 'Unknown error'}`
       )
     }
-  },
+  }
 }
 
 // ============================================================================
@@ -253,13 +264,13 @@ export const DEFAULT_PROVIDER_CONFIGS: Record<string, Partial<ProviderConfigurat
   ollama: {
     serviceUrl: 'http://localhost:11434',
     connectionStatus: 'not-configured',
-    timeout: 5000,
+    timeout: 5000
   },
   openai: {
     serviceUrl: 'https://api.openai.com',
     connectionStatus: 'not-configured',
-    timeout: 30000,
-  },
+    timeout: 30000
+  }
 }
 
 // ============================================================================
@@ -272,7 +283,7 @@ export function getDefaultConfig(providerId: string): ProviderConfiguration {
     serviceUrl: defaults.serviceUrl || '',
     connectionStatus: 'not-configured',
     timeout: defaults.timeout || 5000,
-    ...defaults,
+    ...defaults
   } as ProviderConfiguration
 }
 

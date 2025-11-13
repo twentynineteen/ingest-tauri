@@ -5,14 +5,17 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
-import type { VideoLink, BreadcrumbsFile } from '../types/baker'
+import type { BreadcrumbsFile, VideoLink } from '../types/baker'
 
 interface UseBreadcrumbsVideoLinksOptions {
   projectPath: string
   enabled?: boolean
 }
 
-export function useBreadcrumbsVideoLinks({ projectPath, enabled = true }: UseBreadcrumbsVideoLinksOptions) {
+export function useBreadcrumbsVideoLinks({
+  projectPath,
+  enabled = true
+}: UseBreadcrumbsVideoLinksOptions) {
   const queryClient = useQueryClient()
 
   // Query: Get video links
@@ -37,7 +40,9 @@ export function useBreadcrumbsVideoLinks({ projectPath, enabled = true }: UseBre
       })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['breadcrumbs', 'videoLinks', projectPath] })
+      queryClient.invalidateQueries({
+        queryKey: ['breadcrumbs', 'videoLinks', projectPath]
+      })
       queryClient.invalidateQueries({ queryKey: ['breadcrumbs', projectPath] })
     }
   })
@@ -51,14 +56,22 @@ export function useBreadcrumbsVideoLinks({ projectPath, enabled = true }: UseBre
       })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['breadcrumbs', 'videoLinks', projectPath] })
+      queryClient.invalidateQueries({
+        queryKey: ['breadcrumbs', 'videoLinks', projectPath]
+      })
       queryClient.invalidateQueries({ queryKey: ['breadcrumbs', projectPath] })
     }
   })
 
   // Mutation: Update video link
   const updateVideoLink = useMutation({
-    mutationFn: async ({ videoIndex, updatedLink }: { videoIndex: number; updatedLink: VideoLink }) => {
+    mutationFn: async ({
+      videoIndex,
+      updatedLink
+    }: {
+      videoIndex: number
+      updatedLink: VideoLink
+    }) => {
       return await invoke<BreadcrumbsFile>('baker_update_video_link', {
         projectPath,
         videoIndex,
@@ -66,14 +79,22 @@ export function useBreadcrumbsVideoLinks({ projectPath, enabled = true }: UseBre
       })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['breadcrumbs', 'videoLinks', projectPath] })
+      queryClient.invalidateQueries({
+        queryKey: ['breadcrumbs', 'videoLinks', projectPath]
+      })
       queryClient.invalidateQueries({ queryKey: ['breadcrumbs', projectPath] })
     }
   })
 
   // Mutation: Reorder video links
   const reorderVideoLinks = useMutation({
-    mutationFn: async ({ fromIndex, toIndex }: { fromIndex: number; toIndex: number }) => {
+    mutationFn: async ({
+      fromIndex,
+      toIndex
+    }: {
+      fromIndex: number
+      toIndex: number
+    }) => {
       return await invoke<BreadcrumbsFile>('baker_reorder_video_links', {
         projectPath,
         fromIndex,
@@ -81,7 +102,9 @@ export function useBreadcrumbsVideoLinks({ projectPath, enabled = true }: UseBre
       })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['breadcrumbs', 'videoLinks', projectPath] })
+      queryClient.invalidateQueries({
+        queryKey: ['breadcrumbs', 'videoLinks', projectPath]
+      })
       queryClient.invalidateQueries({ queryKey: ['breadcrumbs', projectPath] })
     }
   })

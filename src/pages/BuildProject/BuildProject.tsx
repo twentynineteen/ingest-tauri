@@ -6,10 +6,10 @@ import {
   useCreateProject,
   useUsername
 } from 'hooks'
+import { useTrelloApiKeys } from 'hooks/useApiKeys'
 import { FootageFile } from 'hooks/useCameraAutoRemap'
 import React, { useState } from 'react'
 import { TrelloCardsManager } from '../../components/Baker/TrelloCardsManager'
-import { useTrelloApiKeys } from 'hooks/useApiKeys'
 import FolderSelector from './FolderSelector'
 import ProgressBar from './ProgressBar'
 import ProjectActions from './ProjectActions'
@@ -27,7 +27,6 @@ const BuildProject: React.FC = () => {
 
   const [loading, setLoading] = useState(false)
   const [, setMessage] = useState('')
-
 
   // Track if title was sanitized to show warning
   const [titleSanitized, setTitleSanitized] = useState(false)
@@ -176,7 +175,6 @@ const BuildProject: React.FC = () => {
           )}
         </div>
       </div>
-
     </div>
   )
 }

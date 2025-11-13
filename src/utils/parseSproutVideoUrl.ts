@@ -31,7 +31,9 @@ export function parseSproutVideoUrl(url: string): string | null {
   // Pattern 1: Public video page URL
   // Matches: https://sproutvideo.com/videos/{VIDEO_ID}
   // Also matches http:// (non-secure)
-  const publicMatch = trimmedUrl.match(/(?:https?:\/\/)?sproutvideo\.com\/videos\/([a-zA-Z0-9]+)/)
+  const publicMatch = trimmedUrl.match(
+    /(?:https?:\/\/)?sproutvideo\.com\/videos\/([a-zA-Z0-9]+)/
+  )
   if (publicMatch && publicMatch[1]) {
     return publicMatch[1]
   }
@@ -39,7 +41,9 @@ export function parseSproutVideoUrl(url: string): string | null {
   // Pattern 2: Embed URL
   // Matches: https://videos.sproutvideo.com/embed/{VIDEO_ID}/...
   // Video ID may be followed by token, query params, or nothing
-  const embedMatch = trimmedUrl.match(/(?:https?:\/\/)?videos\.sproutvideo\.com\/embed\/([a-zA-Z0-9]+)/)
+  const embedMatch = trimmedUrl.match(
+    /(?:https?:\/\/)?videos\.sproutvideo\.com\/embed\/([a-zA-Z0-9]+)/
+  )
   if (embedMatch && embedMatch[1]) {
     return embedMatch[1]
   }

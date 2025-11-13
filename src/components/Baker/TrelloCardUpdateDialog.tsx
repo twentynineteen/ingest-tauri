@@ -3,7 +3,8 @@
  * Feature: 004-embed-multiple-video
  */
 
-import { useState } from 'react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   Dialog,
@@ -13,9 +14,8 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertCircle, Loader2 } from 'lucide-react'
+import { useState } from 'react'
 import type { TrelloCard } from '../../types/baker'
 
 interface TrelloCardUpdateDialogProps {
@@ -82,7 +82,8 @@ export function TrelloCardUpdateDialog({
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Add a Trello card to automatically sync video links with your project management workflow.
+              Add a Trello card to automatically sync video links with your project
+              management workflow.
             </AlertDescription>
           </Alert>
 
@@ -124,7 +125,9 @@ export function TrelloCardUpdateDialog({
               />
               <div className="flex-1">
                 <p className="font-medium">{card.title}</p>
-                {card.boardName && <p className="text-sm text-gray-500">{card.boardName}</p>}
+                {card.boardName && (
+                  <p className="text-sm text-gray-500">{card.boardName}</p>
+                )}
               </div>
             </div>
           ))}
@@ -138,7 +141,11 @@ export function TrelloCardUpdateDialog({
         )}
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => handleDialogChange(false)} disabled={updating}>
+          <Button
+            variant="outline"
+            onClick={() => handleDialogChange(false)}
+            disabled={updating}
+          >
             Cancel
           </Button>
           <Button

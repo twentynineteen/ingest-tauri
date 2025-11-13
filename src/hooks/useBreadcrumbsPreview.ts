@@ -8,7 +8,10 @@
 import { invoke } from '@tauri-apps/api/core'
 import { useCallback, useState } from 'react'
 import type { BreadcrumbsFile, BreadcrumbsPreview, ProjectFolder } from '../types/baker'
-import { generateBreadcrumbsPreview, compareBreadcrumbsMeaningful } from '../utils/breadcrumbsComparison'
+import {
+  compareBreadcrumbsMeaningful,
+  generateBreadcrumbsPreview
+} from '../utils/breadcrumbsComparison'
 
 interface UseBreadcrumbsPreviewResult {
   // State
@@ -128,8 +131,11 @@ export function useBreadcrumbsPreview(): UseBreadcrumbsPreviewResult {
             }
           } else {
             // Add new change entry
-            const changeType = !currentBreadcrumbs?.folderSizeBytes ? 'added' :
-                              currentBreadcrumbs.folderSizeBytes !== currentFolderSize ? 'modified' : 'unchanged'
+            const changeType = !currentBreadcrumbs?.folderSizeBytes
+              ? 'added'
+              : currentBreadcrumbs.folderSizeBytes !== currentFolderSize
+                ? 'modified'
+                : 'unchanged'
 
             preview.diff.changes.push({
               type: changeType,
@@ -150,9 +156,11 @@ export function useBreadcrumbsPreview(): UseBreadcrumbsPreviewResult {
           }
 
           // Also regenerate meaningful diff with the updated folder size
-          const meaningfulDiff = compareBreadcrumbsMeaningful(currentBreadcrumbs, preview.updated)
+          const meaningfulDiff = compareBreadcrumbsMeaningful(
+            currentBreadcrumbs,
+            preview.updated
+          )
           preview.meaningfulDiff = meaningfulDiff
-
         } catch (sizeError) {
           console.warn(`Failed to calculate folder size for ${projectPath}:`, sizeError)
         }

@@ -5,25 +5,24 @@
  * Enhanced with RAG (Retrieval-Augmented Generation)
  */
 
-import { useState, useRef } from 'react'
-import { streamText } from 'ai'
 import { invoke } from '@tauri-apps/api/core'
+import { streamText } from 'ai'
+import { useRef, useState } from 'react'
 import { ModelFactory } from '../services/ai/modelFactory'
+import type { ProcessedOutput, ProviderConfiguration } from '../types/scriptFormatter'
 import { buildRAGPrompt } from '../utils/aiPrompts'
-import { useEmbedding } from './useEmbedding'
+import { useOllamaEmbedding } from './useOllamaEmbedding'
 import type { SimilarExample } from './useScriptRetrieval'
-import type {
-  ProcessedOutput,
-  ProviderConfiguration,
-} from '../types/scriptFormatter'
 
 interface ProcessScriptOptions {
   text: string
   modelId: string
   providerId: string
   configuration: ProviderConfiguration
+  enabledExampleIds?: Set<string>
   onProgress?: (progress: number) => void
   onRetry?: (attempt: number) => void
+  onRAGUpdate?: (status: string, examplesCount: number) => void
 }
 
 interface UseScriptProcessorResult {
@@ -34,6 +33,9 @@ interface UseScriptProcessorResult {
   error: Error | null
   retry: () => Promise<void>
   cancel: () => void
+  isEmbeddingReady: boolean
+  isEmbeddingLoading: boolean
+  embeddingError: Error | null
 }
 
 export function useScriptProcessor(): UseScriptProcessorResult {
@@ -45,10 +47,17 @@ export function useScriptProcessor(): UseScriptProcessorResult {
   const abortControllerRef = useRef<AbortController | null>(null)
   const lastOptionsRef = useRef<ProcessScriptOptions | null>(null)
 
-  // Use embedding hook for RAG
-  const { embed, isReady: isEmbeddingReady } = useEmbedding()
+  // Use embedding hook for RAG - using Ollama for Tauri compatibility
+  const {
+    embed,
+    isReady: isEmbeddingReady,
+    isLoading: isEmbeddingLoading,
+    error: embeddingError
+  } = useOllamaEmbedding()
 
-  const processScript = async (options: ProcessScriptOptions): Promise<ProcessedOutput> => {
+  const processScript = async (
+    options: ProcessScriptOptions
+  ): Promise<ProcessedOutput> => {
     lastOptionsRef.current = options
     setIsProcessing(true)
     setProgress(0)
@@ -69,24 +78,92 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         options.onProgress?.(5)
 
         let examples: SimilarExample[] = []
-        if (isEmbeddingReady && options.text.length > 50) {
+
+        // RAG enabled for retrieval-augmented generation
+        const enableRAG = true
+
+        if (enableRAG && isEmbeddingReady && options.text.length > 50) {
           try {
+            options.onRAGUpdate?.('Searching for similar examples...', 0)
+
             // Generate embedding for query
+            console.log('[useScriptProcessor] Generating embedding for query text...')
             const queryEmbedding = await embed(options.text)
+            console.log(
+              `[useScriptProcessor] Query embedding generated: ${queryEmbedding.length} dimensions`
+            )
 
             // Search for similar scripts
-            examples = await invoke<SimilarExample[]>('search_similar_scripts', {
-              queryEmbedding,
-              topK: 3,
-              minSimilarity: 0.65
+            console.log('[useScriptProcessor] Searching database for similar examples...')
+            console.log('[useScriptProcessor] Search params:', {
+              embeddingDimensions: queryEmbedding.length,
+              topK: 10,
+              minSimilarity: 0.4
             })
-            console.log(`[useScriptProcessor] Found ${examples.length} similar examples`)
+
+            const allSimilarExamples = await invoke<SimilarExample[]>(
+              'search_similar_scripts',
+              {
+                queryEmbedding,
+                topK: 10, // Get more candidates for filtering
+                minSimilarity: 0.4 // Lower threshold - we're matching formatting patterns, not exact content
+              }
+            )
+
+            // Filter by enabled example IDs if provided
+            if (options.enabledExampleIds && options.enabledExampleIds.size > 0) {
+              examples = allSimilarExamples
+                .filter(ex => options.enabledExampleIds!.has(ex.id))
+                .slice(0, 3)
+              console.log(
+                `[useScriptProcessor] Filtered ${allSimilarExamples.length} examples to ${examples.length} enabled examples`
+              )
+            } else {
+              examples = allSimilarExamples.slice(0, 3)
+            }
+
+            console.log(
+              `[useScriptProcessor] Search complete: Using ${examples.length} similar examples`
+            )
+
+            if (examples.length > 0) {
+              console.log(
+                '[useScriptProcessor] Example details:',
+                examples.map(ex => ({
+                  id: ex.id,
+                  title: ex.title,
+                  similarity: ex.similarity,
+                  category: ex.category
+                }))
+              )
+              options.onRAGUpdate?.(
+                `Using ${examples.length} similar example${examples.length > 1 ? 's' : ''} to improve formatting`,
+                examples.length
+              )
+            } else {
+              const reason =
+                options.enabledExampleIds && options.enabledExampleIds.size === 0
+                  ? 'All examples disabled'
+                  : 'No similar examples found (try enabling more examples or lowering similarity threshold)'
+              console.log(`[useScriptProcessor] ${reason}`)
+              options.onRAGUpdate?.(reason, 0)
+            }
           } catch (ragError) {
-            console.warn('[useScriptProcessor] RAG retrieval failed, continuing without examples:', ragError)
+            console.error('[useScriptProcessor] RAG retrieval failed:', ragError)
+            console.error('[useScriptProcessor] Error details:', ragError)
+            options.onRAGUpdate?.(
+              'RAG search failed: ' +
+                (ragError instanceof Error ? ragError.message : String(ragError)),
+              0
+            )
             // Continue without examples - don't fail the whole process
           }
         } else {
-          console.log('[useScriptProcessor] Skipping RAG (embedding not ready or text too short)')
+          console.log(
+            '[useScriptProcessor] RAG disabled or not ready - processing without examples',
+            { enableRAG, isEmbeddingReady, textLength: options.text.length }
+          )
+          options.onRAGUpdate?.('RAG not available', 0)
         }
 
         setProgress(15)
@@ -103,7 +180,7 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         const model = ModelFactory.createModel({
           providerId: options.providerId,
           modelId: options.modelId,
-          configuration: options.configuration,
+          configuration: options.configuration
         })
 
         const streamResult = streamText({
@@ -112,11 +189,14 @@ export function useScriptProcessor(): UseScriptProcessorResult {
             { role: 'system', content: systemPrompt },
             {
               role: 'user',
-              content: `Format this script for autocue/teleprompter reading. Output ONLY the formatted script with no preamble, introduction, or explanation.`,
-            },
+              content: `Format this script for autocue/teleprompter reading. Preserve ALL the original words and content exactly as written - DO NOT rewrite, paraphrase, or change the meaning. ONLY add formatting (line breaks, bold, pauses). Output ONLY the formatted script with no preamble, introduction, or explanation.
+
+SCRIPT TO FORMAT:
+${options.text}`
+            }
           ],
-          temperature: 0.7,
-          abortSignal: abortControllerRef.current.signal,
+          temperature: 0.3,
+          abortSignal: abortControllerRef.current.signal
         })
 
         // Collect streamed text
@@ -138,15 +218,18 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         options.onProgress?.(100)
 
         // Debug logging
-        console.log('Formatted text preview (first 200 chars):', formattedText.substring(0, 200))
+        console.log(
+          'Formatted text preview (first 200 chars):',
+          formattedText.substring(0, 200)
+        )
         console.log('Line breaks found:', formattedText.split('\n').length)
 
         // Create ProcessedOutput
         // Convert line breaks to proper HTML paragraphs
         const htmlContent = formattedText
           .split('\n')
-          .filter((line) => line.trim().length > 0)
-          .map((line) => `<p>${line}</p>`)
+          .filter(line => line.trim().length > 0)
+          .map(line => `<p>${line}</p>`)
           .join('\n')
 
         const output: ProcessedOutput = {
@@ -159,11 +242,11 @@ export function useScriptProcessor(): UseScriptProcessorResult {
             deletions: [],
             modifications: [],
             originalLineCount: options.text.split('\n').length,
-            modifiedLineCount: formattedText.split('\n').length,
+            modifiedLineCount: formattedText.split('\n').length
           },
           editHistory: [],
           generationTimestamp: new Date(),
-          isEdited: false,
+          isEdited: false
         }
 
         setResult(output)
@@ -192,7 +275,7 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         // Retry with exponential backoff
         options.onRetry?.(attempt)
         const backoffDelay = Math.pow(2, attempt) * 1000 // 1s, 2s, 4s
-        await new Promise((resolve) => setTimeout(resolve, backoffDelay))
+        await new Promise(resolve => setTimeout(resolve, backoffDelay))
       }
     }
 
@@ -217,5 +300,8 @@ export function useScriptProcessor(): UseScriptProcessorResult {
     error,
     retry,
     cancel,
+    isEmbeddingReady,
+    isEmbeddingLoading,
+    embeddingError
   }
 }

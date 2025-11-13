@@ -53,7 +53,7 @@ export const FolderSelector: React.FC<FolderSelectorProps> = ({
       <p className="text-sm text-gray-600">
         Choose a root directory to scan for BuildProject-compatible folders
       </p>
-      
+
       <div className="flex space-x-2">
         <Input
           placeholder="No folder selected"
@@ -61,8 +61,8 @@ export const FolderSelector: React.FC<FolderSelectorProps> = ({
           readOnly
           className="flex-1"
         />
-        <Button 
-          onClick={handleSelectFolder} 
+        <Button
+          onClick={handleSelectFolder}
           variant="outline"
           disabled={disabled || isScanning}
         >
@@ -70,7 +70,7 @@ export const FolderSelector: React.FC<FolderSelectorProps> = ({
           Browse
         </Button>
       </div>
-      
+
       <div className="flex space-x-2">
         <Button
           onClick={onStartScan}
@@ -89,14 +89,14 @@ export const FolderSelector: React.FC<FolderSelectorProps> = ({
             </>
           )}
         </Button>
-        
+
         {isScanning && (
           <Button onClick={onCancelScan} variant="outline">
             <Square className="h-4 w-4 mr-2" />
             Cancel
           </Button>
         )}
-        
+
         {hasResults && (
           <Button onClick={onClearResults} variant="outline">
             Clear Results

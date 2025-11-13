@@ -4,16 +4,10 @@
  * Purpose: Generate .docx files from HTML using docx package
  */
 
-import { useState } from 'react'
-import {
-  Document,
-  Paragraph,
-  TextRun,
-  HeadingLevel,
-  Packer,
-} from 'docx'
 import { save } from '@tauri-apps/plugin-dialog'
 import { writeFile } from '@tauri-apps/plugin-fs'
+import { Document, HeadingLevel, Packer, Paragraph, TextRun } from 'docx'
+import { useState } from 'react'
 
 interface UseDocxGeneratorResult {
   generateFile: (html: string, defaultFilename: string) => Promise<void>
@@ -38,9 +32,9 @@ export function useDocxGenerator(): UseDocxGeneratorResult {
         sections: [
           {
             properties: {},
-            children: paragraphs,
-          },
-        ],
+            children: paragraphs
+          }
+        ]
       })
 
       // Step 3: Generate blob
@@ -51,10 +45,10 @@ export function useDocxGenerator(): UseDocxGeneratorResult {
         filters: [
           {
             name: 'Word Document',
-            extensions: ['docx'],
-          },
+            extensions: ['docx']
+          }
         ],
-        defaultPath: defaultFilename,
+        defaultPath: defaultFilename
       })
 
       if (!savePath) {
@@ -86,7 +80,7 @@ function htmlToDocxParagraphs(html: string): Paragraph[] {
   const paragraphs: Paragraph[] = []
 
   // Process each element in the body
-  doc.body.childNodes.forEach((node) => {
+  doc.body.childNodes.forEach(node => {
     if (node.nodeType === Node.ELEMENT_NODE) {
       const element = node as Element
 
@@ -99,13 +93,13 @@ function htmlToDocxParagraphs(html: string): Paragraph[] {
           HeadingLevel.HEADING_3,
           HeadingLevel.HEADING_4,
           HeadingLevel.HEADING_5,
-          HeadingLevel.HEADING_6,
+          HeadingLevel.HEADING_6
         ][level - 1]
 
         paragraphs.push(
           new Paragraph({
             text: element.textContent || '',
-            heading: headingLevel,
+            heading: headingLevel
           })
         )
       }
@@ -131,7 +125,7 @@ function htmlToDocxParagraphs(html: string): Paragraph[] {
 function parseTextRuns(element: Element): TextRun[] {
   const runs: TextRun[] = []
 
-  element.childNodes.forEach((child) => {
+  element.childNodes.forEach(child => {
     if (child.nodeType === Node.TEXT_NODE) {
       const text = child.textContent || ''
       if (text.trim()) {
@@ -153,7 +147,7 @@ function parseTextRuns(element: Element): TextRun[] {
           text,
           bold: isBold,
           italics: isItalic,
-          underline: isUnderline ? {} : undefined,
+          underline: isUnderline ? {} : undefined
         })
       )
     }

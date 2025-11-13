@@ -4,16 +4,29 @@
  * Purpose: Main page orchestration for AI-powered autocue script formatting
  */
 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@/components/ui/accordion'
 import { useBreadcrumb } from '@hooks/index'
-import { AlertCircle, Download, FileText, Sparkles } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { AlertCircle, Database, Download, FileText, Save, Sparkles } from 'lucide-react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 // Hooks
 import { useAIModels } from '../../../hooks/useAIModels'
 import { useAIProvider } from '../../../hooks/useAIProvider'
 import { useDocxGenerator } from '../../../hooks/useDocxGenerator'
 import { useDocxParser } from '../../../hooks/useDocxParser'
+import { useExampleManagement } from '../../../hooks/useExampleManagement'
+import { useOllamaEmbedding } from '../../../hooks/useOllamaEmbedding'
 import { useScriptProcessor } from '../../../hooks/useScriptProcessor'
 // Types
+import {
+  ExampleCategory,
+  type ExampleMetadata,
+  type UploadRequest
+} from '../../../types/exampleEmbeddings'
 import {
   STORAGE_KEYS,
   type ProcessedOutput,
@@ -22,9 +35,11 @@ import {
 } from '../../../types/scriptFormatter'
 // Components
 import { DiffEditor } from './DiffEditor'
+import { ExampleToggleList } from './ExampleToggleList'
 import { FileUploader } from './FileUploader'
 import { ModelSelector } from './ModelSelector'
 import { ProviderSelector } from './ProviderSelector'
+import { SaveExampleDialog } from './SaveExampleDialog'
 
 type WorkflowStep = 'upload' | 'select-model' | 'processing' | 'review' | 'download'
 
@@ -42,12 +57,18 @@ const ScriptFormatter: React.FC = () => {
   const [processedOutput, setProcessedOutput] = useState<ProcessedOutput | null>(null)
   const [modifiedText, setModifiedText] = useState<string>('')
   const [markdownText, setMarkdownText] = useState<string>('') // Keep markdown version for download
+  const [examplesCount, setExamplesCount] = useState<number>(0)
+  const [ragStatus, setRagStatus] = useState<string>('')
+  const [showSaveDialog, setShowSaveDialog] = useState(false)
+  const [enabledExampleIds, setEnabledExampleIds] = useState<Set<string>>(new Set())
+  const validatedProviderRef = useRef<string | null>(null)
 
   // Hooks
   const { parseFile, isLoading: isParsing, error: parseError } = useDocxParser()
   const { generateFile, isGenerating, error: generateError } = useDocxGenerator()
   const { activeProvider, availableProviders, switchProvider, validateProvider } =
     useAIProvider()
+  const [isValidatingProvider, setIsValidatingProvider] = useState(false)
 
   const { models, isLoading: isLoadingModels } = useAIModels({
     providerId: activeProvider?.id || '',
@@ -62,8 +83,25 @@ const ScriptFormatter: React.FC = () => {
     processScript,
     progress,
     error: processingError,
-    cancel: cancelProcessing
+    cancel: cancelProcessing,
+    isEmbeddingReady,
+    isEmbeddingLoading,
+    embeddingError
   } = useScriptProcessor()
+
+  const {
+    uploadExample,
+    examples: allExamples,
+    isLoading: isLoadingExamples
+  } = useExampleManagement()
+  const { embed: embedForSaving } = useOllamaEmbedding()
+
+  // Initialize enabled examples when examples are loaded (all enabled by default)
+  useEffect(() => {
+    if (allExamples.length > 0 && enabledExampleIds.size === 0) {
+      setEnabledExampleIds(new Set(allExamples.map(ex => ex.id)))
+    }
+  }, [allExamples, enabledExampleIds.size])
 
   // Restore session data from localStorage (initialize state)
   const [initialLoadDone] = useState(() => {
@@ -71,32 +109,27 @@ const ScriptFormatter: React.FC = () => {
     if (savedOutput) {
       try {
         const output = JSON.parse(savedOutput)
+        console.log('[ScriptFormatter] Restored cached result:', {
+          formattedTextPreview: output.formattedText.substring(0, 100),
+          timestamp: output.generationTimestamp
+        })
         setProcessedOutput(output)
         setMarkdownText(output.formattedText)
         setModifiedText(output.formattedText)
         setCurrentStep('review')
-      } catch {
+      } catch (err) {
         // Invalid data, ignore
+        console.warn('[ScriptFormatter] Failed to restore cached result:', err)
+        localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
       }
+    } else {
+      console.log('[ScriptFormatter] No cached result found')
     }
     return true
   })
 
   // Suppress unused variable warning
   void initialLoadDone
-
-  // Warn before navigation with unsaved work
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (processedOutput && !processedOutput.isEdited && currentStep === 'review') {
-        e.preventDefault()
-        e.returnValue = ''
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [processedOutput, currentStep])
 
   // Handlers
   const handleFileSelect = async (file: File) => {
@@ -109,12 +142,17 @@ const ScriptFormatter: React.FC = () => {
     }
   }
 
-  const handleProviderValidate = async (
-    providerId: string,
-    config: ProviderConfiguration
-  ) => {
-    await validateProvider(providerId, config)
-  }
+  const handleProviderValidate = useCallback(
+    async (providerId: string, config: ProviderConfiguration) => {
+      setIsValidatingProvider(true)
+      try {
+        await validateProvider(providerId, config)
+      } finally {
+        setIsValidatingProvider(false)
+      }
+    },
+    [validateProvider]
+  )
 
   const handleFormatScript = async () => {
     console.log('handleFormatScript called', {
@@ -132,19 +170,38 @@ const ScriptFormatter: React.FC = () => {
       return
     }
 
+    // CRITICAL: Clear any cached results before processing new script
+    localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
+    setProcessedOutput(null)
+    setModifiedText('')
+    setMarkdownText('')
+    setRagStatus('')
+    setExamplesCount(0)
+
     console.log('Setting step to processing...')
     setCurrentStep('processing')
 
     try {
+      console.log(
+        'Processing script with user input:',
+        document.textContent.substring(0, 200) + '...'
+      )
+
       const output = await processScript({
         text: document.textContent,
         modelId: selectedModelId,
         providerId: activeProvider.id,
         configuration: activeProvider.configuration,
-        onProgress: prog => console.log(`Progress: ${prog}%`)
+        enabledExampleIds: enabledExampleIds,
+        onProgress: prog => console.log(`Progress: ${prog}%`),
+        onRAGUpdate: (status, count) => {
+          setRagStatus(status)
+          setExamplesCount(count)
+        }
       })
 
       console.log('Processing completed successfully:', output)
+      console.log('Output preview:', output.formattedText.substring(0, 200) + '...')
 
       // Store markdown text (decorations will hide asterisks and show bold)
       setMarkdownText(output.formattedText)
@@ -222,6 +279,44 @@ const ScriptFormatter: React.FC = () => {
     }
   }
 
+  const handleSaveAsExample = async (
+    title: string,
+    category: ExampleCategory,
+    qualityScore: number
+  ) => {
+    if (!document || !modifiedText) {
+      throw new Error('Missing document or formatted text')
+    }
+
+    try {
+      // Generate embedding from the formatted (after) text
+      console.log('[SaveExample] Generating embedding from formatted text...')
+      const embedding = await embedForSaving(modifiedText)
+      console.log(`[SaveExample] Embedding generated: ${embedding.length} dimensions`)
+
+      const metadata: ExampleMetadata = {
+        title,
+        category,
+        tags: [],
+        qualityScore
+      }
+
+      const request: UploadRequest = {
+        beforeContent: document.textContent,
+        afterContent: modifiedText,
+        metadata,
+        embedding
+      }
+
+      await uploadExample.mutateAsync(request)
+
+      console.log('[SaveExample] Example saved successfully!')
+    } catch (error) {
+      console.error('[SaveExample] Failed to save example:', error)
+      throw error
+    }
+  }
+
   const handleStartOver = () => {
     setCurrentStep('upload')
     setDocument(null)
@@ -229,8 +324,58 @@ const ScriptFormatter: React.FC = () => {
     setModifiedText('')
     setMarkdownText('')
     setSelectedModelId(null)
+    setRagStatus('')
+    setExamplesCount(0)
+    validatedProviderRef.current = null
     localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
   }
+
+  const handleExampleToggle = (exampleId: string) => {
+    setEnabledExampleIds(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(exampleId)) {
+        newSet.delete(exampleId)
+      } else {
+        newSet.add(exampleId)
+      }
+      return newSet
+    })
+  }
+
+  // Auto-validate provider when step changes to select-model
+  useEffect(() => {
+    if (currentStep === 'select-model' && activeProvider) {
+      // Only validate if not already validated in this session
+      if (
+        activeProvider.status !== 'configured' &&
+        validatedProviderRef.current !== activeProvider.id
+      ) {
+        validatedProviderRef.current = activeProvider.id
+        handleProviderValidate(activeProvider.id, activeProvider.configuration)
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep, activeProvider?.id])
+
+  // Auto-select first model when models become available
+  useEffect(() => {
+    if (models.length > 0 && !selectedModelId && currentStep === 'select-model') {
+      setSelectedModelId(models[0].id)
+    }
+  }, [models, selectedModelId, currentStep])
+
+  // Warn before navigation with unsaved work
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (processedOutput && !processedOutput.isEdited && currentStep === 'review') {
+        e.preventDefault()
+        e.returnValue = ''
+      }
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+  }, [processedOutput, currentStep])
 
   return (
     <div className="px-6 space-y-6">
@@ -257,12 +402,12 @@ const ScriptFormatter: React.FC = () => {
             <div
               key={step}
               className={`flex items-center ${
-                currentStep === step ? 'text-blue-600 font-medium' : 'text-gray-400'
+                currentStep === step ? 'text-black font-medium' : 'text-gray-400'
               }`}
             >
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  currentStep === step ? 'bg-blue-600 text-white' : 'bg-gray-300'
+                  currentStep === step ? 'bg-black text-white' : 'bg-gray-300'
                 }`}
               >
                 {idx + 1}
@@ -287,7 +432,7 @@ const ScriptFormatter: React.FC = () => {
 
       {/* Step 2: Select Model */}
       {currentStep === 'select-model' && (
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="max-w-6xl mx-auto space-y-6">
           <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
             <p className="text-sm text-green-800">
               ✓ File uploaded: <strong>{document?.filename}</strong> ({document?.fileSize}{' '}
@@ -295,36 +440,120 @@ const ScriptFormatter: React.FC = () => {
             </p>
           </div>
 
-          <ProviderSelector
-            providers={availableProviders}
-            activeProvider={activeProvider}
-            onSelect={switchProvider}
-            onValidate={handleProviderValidate}
-          />
+          {/* RAG/Embedding Status & Example Selection - Accordion */}
+          <Accordion
+            type="multiple"
+            defaultValue={['rag-status', 'example-selection']}
+            className="space-y-4"
+          >
+            {/* RAG/Embedding Status */}
+            <AccordionItem value="rag-status" className="border rounded-lg px-4">
+              <AccordionTrigger className="hover:no-underline py-4">
+                <div className="flex items-center gap-2">
+                  <Database className="h-4 w-4" />
+                  <span className="text-sm font-medium">RAG Enhancement Status</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pb-4">
+                {isEmbeddingLoading && (
+                  <p className="text-sm text-blue-600">
+                    Checking Ollama embedding model availability...
+                  </p>
+                )}
+                {isEmbeddingReady && (
+                  <p className="text-sm text-green-600">
+                    ✓ RAG system ready (Ollama) - will use similar examples to improve
+                    formatting
+                  </p>
+                )}
+                {embeddingError && (
+                  <div className="text-sm text-red-600">
+                    <p className="font-medium">⚠ RAG system not available</p>
+                    <p className="text-xs mt-1">{embeddingError.message}</p>
+                    <p className="text-xs mt-1 text-gray-600">
+                      Will format without example guidance.
+                    </p>
+                  </div>
+                )}
+                {!isEmbeddingLoading && !isEmbeddingReady && !embeddingError && (
+                  <p className="text-sm text-gray-600">
+                    RAG system not available - will format without example guidance
+                  </p>
+                )}
+              </AccordionContent>
+            </AccordionItem>
 
-          {activeProvider?.status === 'configured' && (
-            <>
-              <ModelSelector
-                models={models}
-                selectedModel={selectedModelId}
-                onSelect={setSelectedModelId}
-                isLoading={isLoadingModels}
+            {/* Example Selection */}
+            {isEmbeddingReady && allExamples.length > 0 && (
+              <AccordionItem value="example-selection" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline py-4">
+                  <div className="flex items-center gap-2">
+                    <Database className="h-4 w-4" />
+                    <span className="text-sm font-medium">Select Examples to Use</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pb-4">
+                  <p className="text-xs text-gray-600 mb-3">
+                    Choose which examples the AI should reference when formatting your
+                    script. The system will automatically select the most relevant enabled
+                    examples.
+                  </p>
+                  <ExampleToggleList
+                    examples={allExamples}
+                    enabledIds={enabledExampleIds}
+                    onToggle={handleExampleToggle}
+                    isLoading={isLoadingExamples}
+                  />
+                </AccordionContent>
+              </AccordionItem>
+            )}
+          </Accordion>
+
+          {/* Two-column grid for provider and model selection */}
+          <div className="grid grid-cols-2 gap-6">
+            {/* Left column: AI Provider */}
+            <div className="p-6 border border-gray-300 rounded-lg max-h-[200px] overflow-y-auto">
+              <ProviderSelector
+                providers={availableProviders}
+                activeProvider={activeProvider}
+                onSelect={switchProvider}
+                onValidate={handleProviderValidate}
+                isValidating={isValidatingProvider}
               />
+            </div>
 
-              {selectedModelId && (
-                <button
-                  type="button"
-                  onClick={e => {
-                    e.preventDefault()
-                    handleFormatScript()
-                  }}
-                  className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
-                >
-                  <Sparkles className="h-5 w-5" />
-                  Format Script with AI
-                </button>
+            {/* Right column: Model Selector */}
+            <div className="p-6 border border-gray-300 rounded-lg max-h-[200px] overflow-y-auto">
+              {activeProvider?.status === 'configured' ? (
+                <ModelSelector
+                  models={models}
+                  selectedModel={selectedModelId}
+                  onSelect={setSelectedModelId}
+                  isLoading={isLoadingModels}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full text-gray-400">
+                  <p className="text-sm">
+                    Select and validate an AI provider to see models
+                  </p>
+                </div>
               )}
-            </>
+            </div>
+          </div>
+
+          {/* Format button below the grid */}
+          {selectedModelId && activeProvider?.status === 'configured' && (
+            <button
+              type="button"
+              onClick={e => {
+                e.preventDefault()
+                handleFormatScript()
+              }}
+              className="w-full px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 flex items-center justify-center gap-2 mb-3"
+            >
+              <Sparkles className="h-5 w-5" />
+              Format Script with AI
+            </button>
           )}
         </div>
       )}
@@ -333,7 +562,7 @@ const ScriptFormatter: React.FC = () => {
       {currentStep === 'processing' && (
         <div className="max-w-2xl mx-auto space-y-6">
           <div className="p-8 border border-gray-300 rounded-lg text-center">
-            <Sparkles className="h-16 w-16 text-blue-500 mx-auto mb-4 animate-pulse" />
+            <Sparkles className="h-16 w-16 text-black mx-auto mb-4 animate-pulse" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
               Formatting your script...
             </h3>
@@ -341,9 +570,19 @@ const ScriptFormatter: React.FC = () => {
               Using AI to optimize for autocue readability
             </p>
 
+            {/* RAG Status */}
+            {ragStatus && (
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="flex items-center justify-center gap-2 text-sm text-blue-800">
+                  <Database className="h-4 w-4" />
+                  <span>{ragStatus}</span>
+                </div>
+              </div>
+            )}
+
             <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                className="bg-black h-2 rounded-full transition-all duration-300"
                 style={{ width: `${Math.round(progress)}%` }}
               />
             </div>
@@ -379,19 +618,41 @@ const ScriptFormatter: React.FC = () => {
 
       {/* Step 4: Review & Edit */}
       {currentStep === 'review' && processedOutput && (
-        <div className="max-w-6xl mx-auto space-y-6">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-medium text-gray-900">
-              Review and Edit
-            </h3>
-            <button
-              onClick={handleDownload}
-              disabled={isGenerating}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center gap-2"
-            >
-              <Download className="h-4 w-4" />
-              {isGenerating ? 'Downloading...' : 'Download Formatted Script'}
-            </button>
+        <div className="w-full space-y-6">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <h3 className="text-lg font-medium text-gray-900">Review and Edit</h3>
+              {examplesCount > 0 && (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 border border-blue-200 rounded-full text-xs text-blue-800">
+                  <Database className="h-3 w-3" />
+                  <span className="hidden sm:inline">
+                    Enhanced with {examplesCount} example{examplesCount > 1 ? 's' : ''}
+                  </span>
+                  <span className="sm:hidden">{examplesCount} ex.</span>
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowSaveDialog(true)}
+                className="flex-1 lg:flex-initial px-3 py-2 bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
+                title="Save this script as an example for future RAG-enhanced formatting"
+              >
+                <Save className="h-4 w-4" />
+                <span className="hidden md:inline">Save as Example</span>
+              </button>
+              <button
+                onClick={handleDownload}
+                disabled={isGenerating}
+                className="flex-1 lg:flex-initial px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden md:inline">
+                  {isGenerating ? 'Downloading...' : 'Download Formatted Script'}
+                </span>
+                <span className="md:hidden">Download</span>
+              </button>
+            </div>
           </div>
 
           <DiffEditor
@@ -413,9 +674,7 @@ const ScriptFormatter: React.FC = () => {
         <div className="max-w-2xl mx-auto">
           <div className="p-8 bg-green-50 border border-green-200 rounded-lg text-center">
             <Download className="h-16 w-16 text-green-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Download Complete!
-            </h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Download Complete!</h3>
             <p className="text-sm text-gray-600 mb-4">
               Your formatted script has been saved successfully.
             </p>
@@ -427,14 +686,24 @@ const ScriptFormatter: React.FC = () => {
                 setModifiedText('')
                 setMarkdownText('')
                 setSelectedModelId(null)
+                setRagStatus('')
+                setExamplesCount(0)
               }}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
             >
               Format Another Script
             </button>
           </div>
         </div>
       )}
+
+      {/* Save Example Dialog */}
+      <SaveExampleDialog
+        isOpen={showSaveDialog}
+        onClose={() => setShowSaveDialog(false)}
+        onSave={handleSaveAsExample}
+        defaultTitle={document?.filename.replace('.docx', '') || 'Untitled Script'}
+      />
     </div>
   )
 }

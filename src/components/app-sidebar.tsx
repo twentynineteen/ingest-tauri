@@ -54,11 +54,11 @@ const data = {
         {
           title: 'Autocue script formatter',
           url: '/ai-tools/script-formatter'
+        },
+        {
+          title: 'Example embeddings',
+          url: '/ai-tools/example-embeddings'
         }
-        // {
-        //   title: 'Image Generation',
-        //   url: '/ingest/ai-tools/image-generation'
-        // }
       ]
     },
     {

@@ -8,7 +8,11 @@ import { BreadcrumbsViewerEnhanced } from '@components/BreadcrumbsViewerEnhanced
 import { Button } from '@components/ui/button'
 import { AlertTriangle, Eye, RefreshCw } from 'lucide-react'
 import React from 'react'
-import type { BreadcrumbsFile, BreadcrumbsPreview, ProjectFolder } from '../../types/baker'
+import type {
+  BreadcrumbsFile,
+  BreadcrumbsPreview,
+  ProjectFolder
+} from '../../types/baker'
 
 interface ProjectListProps {
   projects: ProjectFolder[]
@@ -51,9 +55,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
 
   return (
     <div className="border rounded-lg p-6 space-y-4">
-      <h3 className="text-lg font-medium">
-        Found Projects ({projects.length})
-      </h3>
+      <h3 className="text-lg font-medium">Found Projects ({projects.length})</h3>
       <div className="space-y-2 max-h-96 overflow-y-auto">
         {projects.map((project: ProjectFolder) => (
           <div key={project.path} className="border rounded">
@@ -62,9 +64,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                 <input
                   type="checkbox"
                   checked={selectedProjects.includes(project.path)}
-                  onChange={e =>
-                    onProjectSelection(project.path, e.target.checked)
-                  }
+                  onChange={e => onProjectSelection(project.path, e.target.checked)}
                 />
                 <div>
                   <p className="font-medium">{project.name}</p>
@@ -82,18 +82,18 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                   </span>
                   <span
                     className={`px-2 py-1 rounded ${
-                      project.invalidBreadcrumbs 
+                      project.invalidBreadcrumbs
                         ? 'bg-red-100 text-red-800'
-                        : project.hasBreadcrumbs 
-                        ? 'bg-blue-100 text-blue-800' 
-                        : 'bg-gray-100 text-gray-800'
+                        : project.hasBreadcrumbs
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-gray-100 text-gray-800'
                     }`}
                   >
-                    {project.invalidBreadcrumbs 
+                    {project.invalidBreadcrumbs
                       ? 'Invalid breadcrumbs'
                       : project.hasBreadcrumbs
-                      ? 'Has breadcrumbs'
-                      : 'Missing breadcrumbs'}
+                        ? 'Has breadcrumbs'
+                        : 'Missing breadcrumbs'}
                   </span>
                   {project.hasBreadcrumbs && (
                     <span
@@ -114,7 +114,11 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                     className="ml-2"
                   >
                     <Eye className="h-4 w-4 mr-1" />
-                    {expandedProject === project.path ? 'Hide' : project.invalidBreadcrumbs ? 'View (Corrupted)' : 'View'}
+                    {expandedProject === project.path
+                      ? 'Hide'
+                      : project.invalidBreadcrumbs
+                        ? 'View (Corrupted)'
+                        : 'View'}
                   </Button>
                 )}
               </div>
@@ -126,9 +130,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                 {isLoadingBreadcrumbs ? (
                   <div className="flex items-center justify-center py-4">
                     <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                    <span className="text-sm text-gray-500">
-                      Loading breadcrumbs...
-                    </span>
+                    <span className="text-sm text-gray-500">Loading breadcrumbs...</span>
                   </div>
                 ) : breadcrumbsError ? (
                   <div className="flex items-center justify-center py-4 text-red-600">

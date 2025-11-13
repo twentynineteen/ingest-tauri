@@ -4,17 +4,17 @@
  * Tests T002-T008: Component behavior for video upload toggle enhancement
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom'
-import { VideoLinksManager } from './VideoLinksManager'
-import * as useBreadcrumbsVideoLinksModule from '../../hooks/useBreadcrumbsVideoLinks'
-import * as useSproutVideoApiModule from '../../hooks/useSproutVideoApi'
 import * as useApiKeysModule from '../../hooks/useApiKeys'
+import * as useBreadcrumbsVideoLinksModule from '../../hooks/useBreadcrumbsVideoLinks'
 import * as useFileUploadModule from '../../hooks/useFileUpload'
-import * as useUploadEventsModule from '../../hooks/useUploadEvents'
+import * as useSproutVideoApiModule from '../../hooks/useSproutVideoApi'
 import * as useSproutVideoProcessorModule from '../../hooks/useSproutVideoProcessor'
+import * as useUploadEventsModule from '../../hooks/useUploadEvents'
+import { VideoLinksManager } from './VideoLinksManager'
 
 // Mock hooks
 vi.mock('../../hooks/useBreadcrumbsVideoLinks')
@@ -83,40 +83,50 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     })
 
     // Mock useSproutVideoProcessor - implement callback behavior
-    vi.mocked(useSproutVideoProcessorModule.useSproutVideoProcessor).mockImplementation((options) => {
-      // Simulate auto-processing when enabled and valid response provided
-      if (options.enabled && options.response && !options.uploading && options.selectedFile) {
-        const response = options.response
+    vi.mocked(useSproutVideoProcessorModule.useSproutVideoProcessor).mockImplementation(
+      options => {
+        // Simulate auto-processing when enabled and valid response provided
+        if (
+          options.enabled &&
+          options.response &&
+          !options.uploading &&
+          options.selectedFile
+        ) {
+          const response = options.response
 
-        // Check if upload failed
-        if (response.state === 'failed') {
-          options.onError('Upload failed: Sprout Video could not process the video. Please check the file format and try again.')
-        }
-        // Check if we have a valid embedded_url (video is ready)
-        else if (response.embedded_url) {
-          const filename = options.selectedFile.split('/').pop()?.split('.')[0] || 'Untitled'
-          const sourceFilename = options.selectedFile.split('/').pop() || ''
-
-          const videoLink = {
-            url: response.embedded_url,
-            sproutVideoId: response.id,
-            title: response.title || filename,
-            thumbnailUrl: response.assets?.poster_frames?.[0] || undefined,
-            uploadDate: response.created_at,
-            sourceRenderFile: sourceFilename
+          // Check if upload failed
+          if (response.state === 'failed') {
+            options.onError(
+              'Upload failed: Sprout Video could not process the video. Please check the file format and try again.'
+            )
           }
+          // Check if we have a valid embedded_url (video is ready)
+          else if (response.embedded_url) {
+            const filename =
+              options.selectedFile.split('/').pop()?.split('.')[0] || 'Untitled'
+            const sourceFilename = options.selectedFile.split('/').pop() || ''
 
-          // Trigger callback on next tick to simulate async processing
-          setTimeout(() => options.onVideoReady(videoLink), 0)
+            const videoLink = {
+              url: response.embedded_url,
+              sproutVideoId: response.id,
+              title: response.title || filename,
+              thumbnailUrl: response.assets?.poster_frames?.[0] || undefined,
+              uploadDate: response.created_at,
+              sourceRenderFile: sourceFilename
+            }
+
+            // Trigger callback on next tick to simulate async processing
+            setTimeout(() => options.onVideoReady(videoLink), 0)
+          }
+        }
+
+        return {
+          isProcessing: false,
+          error: null,
+          reset: mockVideoProcessorReset
         }
       }
-
-      return {
-        isProcessing: false,
-        error: null,
-        reset: mockVideoProcessorReset
-      }
-    })
+    )
   })
 
   afterEach(() => {

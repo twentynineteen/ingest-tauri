@@ -5,13 +5,13 @@
  */
 
 import { useState } from 'react'
-import { providerRegistry, getDefaultConfig } from '../services/ai/providerConfig'
-import type {
-  AIProvider,
-  ProviderConfiguration,
-} from '../types/scriptFormatter'
-import { STORAGE_KEYS } from '../types/scriptFormatter'
+import { getDefaultConfig, providerRegistry } from '../services/ai/providerConfig'
 import { useAppStore } from '../store/useAppStore'
+import {
+  STORAGE_KEYS,
+  type AIProvider,
+  type ProviderConfiguration
+} from '../types/scriptFormatter'
 
 interface UseAIProviderResult {
   activeProvider: AIProvider | null
@@ -20,7 +20,12 @@ interface UseAIProviderResult {
   validateProvider: (
     providerId: string,
     config: ProviderConfiguration
-  ) => Promise<{ success: boolean; latencyMs?: number; errorMessage?: string; modelsFound?: number }>
+  ) => Promise<{
+    success: boolean
+    latencyMs?: number
+    errorMessage?: string
+    modelsFound?: number
+  }>
   updateProviderConfig: (providerId: string, config: ProviderConfiguration) => void
 }
 
@@ -30,7 +35,7 @@ export function useAIProvider(): UseAIProviderResult {
   // Initialize providers immediately
   const [availableProviders, setAvailableProviders] = useState<AIProvider[]>(() => {
     const adapters = providerRegistry.list()
-    return adapters.map((adapter) => {
+    return adapters.map(adapter => {
       const config = getDefaultConfig(adapter.id)
       // Use stored Ollama URL if this is the Ollama provider
       if (adapter.id === 'ollama' && ollamaUrl) {
@@ -41,7 +46,7 @@ export function useAIProvider(): UseAIProviderResult {
         displayName: adapter.displayName,
         type: adapter.type,
         status: 'not-configured',
-        configuration: config,
+        configuration: config
       }
     })
   })
@@ -51,7 +56,7 @@ export function useAIProvider(): UseAIProviderResult {
     const savedProviderId = localStorage.getItem(STORAGE_KEYS.ACTIVE_PROVIDER)
     const savedConfig = localStorage.getItem(STORAGE_KEYS.PROVIDER_CONFIG)
 
-    const providers = providerRegistry.list().map((adapter) => {
+    const providers = providerRegistry.list().map(adapter => {
       const config = getDefaultConfig(adapter.id)
       // Use stored Ollama URL if this is the Ollama provider
       if (adapter.id === 'ollama' && ollamaUrl) {
@@ -62,12 +67,12 @@ export function useAIProvider(): UseAIProviderResult {
         displayName: adapter.displayName,
         type: adapter.type,
         status: 'not-configured' as const,
-        configuration: config,
+        configuration: config
       }
     })
 
     if (savedProviderId) {
-      const provider = providers.find((p) => p.id === savedProviderId)
+      const provider = providers.find(p => p.id === savedProviderId)
       if (provider) {
         if (savedConfig) {
           try {
@@ -85,31 +90,28 @@ export function useAIProvider(): UseAIProviderResult {
   })
 
   const switchProvider = (providerId: string) => {
-    const provider = availableProviders.find((p) => p.id === providerId)
+    const provider = availableProviders.find(p => p.id === providerId)
     if (provider) {
       setActiveProvider(provider)
       localStorage.setItem(STORAGE_KEYS.ACTIVE_PROVIDER, providerId)
     }
   }
 
-  const validateProvider = async (
-    providerId: string,
-    config: ProviderConfiguration
-  ) => {
+  const validateProvider = async (providerId: string, config: ProviderConfiguration) => {
     try {
       const adapter = providerRegistry.get(providerId)
       if (!adapter) {
         return {
           success: false,
-          errorMessage: `Provider "${providerId}" not found`,
+          errorMessage: `Provider "${providerId}" not found`
         }
       }
 
       const result = await adapter.validateConnection(config)
 
       // Update provider status
-      setAvailableProviders((prev) =>
-        prev.map((p) =>
+      setAvailableProviders(prev =>
+        prev.map(p =>
           p.id === providerId
             ? {
                 ...p,
@@ -122,9 +124,9 @@ export function useAIProvider(): UseAIProviderResult {
                     success: result.success,
                     errorMessage: result.errorMessage,
                     modelsFound: result.modelsFound,
-                    latencyMs: result.latencyMs,
-                  },
-                },
+                    latencyMs: result.latencyMs
+                  }
+                }
               }
             : p
         )
@@ -134,14 +136,14 @@ export function useAIProvider(): UseAIProviderResult {
     } catch (error) {
       return {
         success: false,
-        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        errorMessage: error instanceof Error ? error.message : 'Unknown error'
       }
     }
   }
 
   const updateProviderConfig = (providerId: string, config: ProviderConfiguration) => {
-    setAvailableProviders((prev) =>
-      prev.map((p) => (p.id === providerId ? { ...p, configuration: config } : p))
+    setAvailableProviders(prev =>
+      prev.map(p => (p.id === providerId ? { ...p, configuration: config } : p))
     )
 
     // Save to localStorage
@@ -155,6 +157,6 @@ export function useAIProvider(): UseAIProviderResult {
     availableProviders,
     switchProvider,
     validateProvider,
-    updateProviderConfig,
+    updateProviderConfig
   }
 }

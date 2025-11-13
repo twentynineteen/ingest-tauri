@@ -78,10 +78,11 @@ const getImpactColor = (impact: string) => {
 
 const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) => {
   // Use neutral styling for unchanged fields, impact-based styling for actual changes
-  const containerClass = change.type === 'unchanged' 
-    ? 'text-gray-700 bg-gray-50 border-gray-200'
-    : getImpactColor(change.impact)
-    
+  const containerClass =
+    change.type === 'unchanged'
+      ? 'text-gray-700 bg-gray-50 border-gray-200'
+      : getImpactColor(change.impact)
+
   return (
     <div className={`border rounded-lg p-3 ${containerClass}`}>
       <div className="flex items-start justify-between mb-2">
@@ -92,18 +93,20 @@ const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) 
         </div>
         {/* Only show impact badge for actual changes, not unchanged fields */}
         {change.type !== 'unchanged' && (
-          <span className={`text-xs px-2 py-1 rounded-full font-medium ${
-            change.impact === 'high' 
-              ? 'bg-red-100 text-red-800' 
-              : change.impact === 'medium' 
-              ? 'bg-orange-100 text-orange-800' 
-              : 'bg-gray-100 text-gray-800'
-          }`}>
+          <span
+            className={`text-xs px-2 py-1 rounded-full font-medium ${
+              change.impact === 'high'
+                ? 'bg-red-100 text-red-800'
+                : change.impact === 'medium'
+                  ? 'bg-orange-100 text-orange-800'
+                  : 'bg-gray-100 text-gray-800'
+            }`}
+          >
             {change.impact}
           </span>
         )}
       </div>
-      
+
       {change.type === 'added' && (
         <div className="text-sm">
           <span className="text-gray-600">New value: </span>
@@ -112,7 +115,7 @@ const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) 
           </span>
         </div>
       )}
-      
+
       {change.type === 'removed' && (
         <div className="text-sm">
           <span className="text-gray-600">Removed value: </span>
@@ -121,7 +124,7 @@ const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) 
           </span>
         </div>
       )}
-      
+
       {change.type === 'modified' && (
         <div className="text-sm space-y-1">
           <div className="flex items-center space-x-2">
@@ -141,7 +144,7 @@ const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) 
           </div>
         </div>
       )}
-      
+
       {change.type === 'unchanged' && (
         <div className="text-sm">
           <span className="text-gray-600">Current value: </span>
@@ -161,9 +164,9 @@ const CategorySection: React.FC<{
   colorClass: string
 }> = ({ title, changes, icon, colorClass }) => {
   const [isExpanded, setIsExpanded] = useState(true)
-  
+
   if (changes.length === 0) return null
-  
+
   return (
     <div className="border rounded-lg overflow-hidden">
       <button
@@ -177,11 +180,13 @@ const CategorySection: React.FC<{
             {changes.length}
           </span>
         </div>
-        <div className={`transform transition-transform ${isExpanded ? 'rotate-90' : 'rotate-0'}`}>
+        <div
+          className={`transform transition-transform ${isExpanded ? 'rotate-90' : 'rotate-0'}`}
+        >
           <ArrowRight className="h-4 w-4" />
         </div>
       </button>
-      
+
       {isExpanded && (
         <div className="p-4 space-y-3 bg-white">
           {changes.map((change, index) => (
@@ -235,7 +240,7 @@ export const ProjectChangeDetailView: React.FC<ProjectChangeDetailViewProps> = (
             )}
           </div>
         </div>
-        
+
         {/* Summary Pills */}
         <div className="flex items-center space-x-2 mt-2">
           {changeDetail.summary.contentChanges > 0 && (
@@ -265,14 +270,14 @@ export const ProjectChangeDetailView: React.FC<ProjectChangeDetailViewProps> = (
             icon={<AlertCircle className="h-4 w-4" />}
             colorClass="bg-red-100 text-red-800"
           />
-          
+
           <CategorySection
             title="Metadata Changes"
             changes={changeDetail.changeCategories.metadata}
             icon={<Info className="h-4 w-4" />}
             colorClass="bg-orange-100 text-orange-800"
           />
-          
+
           {showMaintenanceChanges && (
             <CategorySection
               title="Maintenance Changes"

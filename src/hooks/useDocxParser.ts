@@ -4,12 +4,9 @@
  * Purpose: Parse .docx files using mammoth.js with validation
  */
 
-import { useState } from 'react'
 import mammoth from 'mammoth'
-import type {
-  ScriptDocument,
-  FormattingMetadata,
-} from '../types/scriptFormatter'
+import { useState } from 'react'
+import type { FormattingMetadata, ScriptDocument } from '../types/scriptFormatter'
 
 interface UseDocxParserResult {
   parseFile: (file: File) => Promise<ScriptDocument>
@@ -49,12 +46,12 @@ export function useDocxParser(): UseDocxParserResult {
             "p[style-name='Heading 3'] => h3:fresh",
             'b => strong',
             'i => em',
-            'u => u',
+            'u => u'
           ],
           convertImage: mammoth.images.imgElement(async () => {
             // Skip images for autocue scripts
             return { src: '' }
-          }),
+          })
         }
       )
 
@@ -85,7 +82,7 @@ export function useDocxParser(): UseDocxParserResult {
         textContent: plainText,
         htmlContent,
         formattingMetadata,
-        validationStatus: 'valid',
+        validationStatus: 'valid'
       }
 
       setIsLoading(false)
@@ -101,9 +98,11 @@ export function useDocxParser(): UseDocxParserResult {
 
       // Provide more helpful error messages
       if (errorMessage.includes('arrayBuffer')) {
-        errorMessage = 'Unable to read file. Please ensure the file is a valid .docx document.'
+        errorMessage =
+          'Unable to read file. Please ensure the file is a valid .docx document.'
       } else if (errorMessage.includes('convertToHtml')) {
-        errorMessage = 'Failed to parse .docx file. The file may be corrupted or in an unsupported format.'
+        errorMessage =
+          'Failed to parse .docx file. The file may be corrupted or in an unsupported format.'
       }
 
       const error = new Error(errorMessage)
@@ -124,7 +123,7 @@ function extractFormattingMetadata(html: string): FormattingMetadata {
     underlineRanges: [],
     headings: [],
     lists: [],
-    paragraphs: [],
+    paragraphs: []
   }
 
   // Guard against empty HTML
@@ -138,68 +137,68 @@ function extractFormattingMetadata(html: string): FormattingMetadata {
 
     let currentPosition = 0
 
-  // Extract bold ranges
-  doc.querySelectorAll('strong, b').forEach((element) => {
-    const text = element.textContent || ''
-    metadata.boldRanges.push({
-      start: currentPosition,
-      end: currentPosition + text.length,
-      text,
-    })
-  })
-
-  // Extract italic ranges
-  doc.querySelectorAll('em, i').forEach((element) => {
-    const text = element.textContent || ''
-    metadata.italicRanges.push({
-      start: currentPosition,
-      end: currentPosition + text.length,
-      text,
-    })
-  })
-
-  // Extract underline ranges
-  doc.querySelectorAll('u').forEach((element) => {
-    const text = element.textContent || ''
-    metadata.underlineRanges.push({
-      start: currentPosition,
-      end: currentPosition + text.length,
-      text,
-    })
-  })
-
-  // Extract headings
-  doc.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach((element) => {
-    const level = parseInt(element.tagName[1]) as 1 | 2 | 3 | 4 | 5 | 6
-    const text = element.textContent || ''
-    metadata.headings.push({
-      level,
-      text,
-      position: currentPosition,
-    })
-  })
-
-  // Extract lists
-  doc.querySelectorAll('ul, ol').forEach((listElement) => {
-    const isOrdered = listElement.tagName === 'OL'
-    listElement.querySelectorAll('li').forEach((item) => {
-      const text = item.textContent || ''
-      metadata.lists.push({
-        type: isOrdered ? 'ordered' : 'unordered',
-        text,
-        level: 1, // TODO: Calculate nesting level
-        position: currentPosition,
+    // Extract bold ranges
+    doc.querySelectorAll('strong, b').forEach(element => {
+      const text = element.textContent || ''
+      metadata.boldRanges.push({
+        start: currentPosition,
+        end: currentPosition + text.length,
+        text
       })
     })
-  })
+
+    // Extract italic ranges
+    doc.querySelectorAll('em, i').forEach(element => {
+      const text = element.textContent || ''
+      metadata.italicRanges.push({
+        start: currentPosition,
+        end: currentPosition + text.length,
+        text
+      })
+    })
+
+    // Extract underline ranges
+    doc.querySelectorAll('u').forEach(element => {
+      const text = element.textContent || ''
+      metadata.underlineRanges.push({
+        start: currentPosition,
+        end: currentPosition + text.length,
+        text
+      })
+    })
+
+    // Extract headings
+    doc.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(element => {
+      const level = parseInt(element.tagName[1]) as 1 | 2 | 3 | 4 | 5 | 6
+      const text = element.textContent || ''
+      metadata.headings.push({
+        level,
+        text,
+        position: currentPosition
+      })
+    })
+
+    // Extract lists
+    doc.querySelectorAll('ul, ol').forEach(listElement => {
+      const isOrdered = listElement.tagName === 'OL'
+      listElement.querySelectorAll('li').forEach(item => {
+        const text = item.textContent || ''
+        metadata.lists.push({
+          type: isOrdered ? 'ordered' : 'unordered',
+          text,
+          level: 1, // TODO: Calculate nesting level
+          position: currentPosition
+        })
+      })
+    })
 
     // Extract paragraphs
-    doc.querySelectorAll('p').forEach((element) => {
+    doc.querySelectorAll('p').forEach(element => {
       const text = element.textContent || ''
       metadata.paragraphs.push({
         text,
         start: currentPosition,
-        end: currentPosition + text.length,
+        end: currentPosition + text.length
       })
       currentPosition += text.length
     })

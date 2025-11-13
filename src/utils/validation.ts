@@ -3,7 +3,7 @@
  * Feature: 004-embed-multiple-video
  */
 
-import type { VideoLink, TrelloCard } from '../types/media'
+import type { TrelloCard, VideoLink } from '../types/media'
 
 /**
  * Validates a VideoLink object

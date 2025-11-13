@@ -41,6 +41,7 @@ async function embedExamples() {
       tags TEXT,
       word_count INTEGER,
       quality_score INTEGER,
+      source TEXT DEFAULT 'bundled',
       created_at TEXT DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -53,6 +54,7 @@ async function embedExamples() {
 
     CREATE INDEX IF NOT EXISTS idx_category ON example_scripts(category);
     CREATE INDEX IF NOT EXISTS idx_quality ON example_scripts(quality_score);
+    CREATE INDEX IF NOT EXISTS idx_source ON example_scripts(source);
   `)
 
   console.log('✅ Database tables created\n')
@@ -103,8 +105,8 @@ async function embedExamples() {
 
       // Insert into database
       const insertScript = db.prepare(`
-        INSERT INTO example_scripts (id, title, category, before_text, after_text, tags, word_count, quality_score)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO example_scripts (id, title, category, before_text, after_text, tags, word_count, quality_score, source)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `)
 
       insertScript.run(
@@ -115,7 +117,8 @@ async function embedExamples() {
         after,
         JSON.stringify(metadata.tags),
         before.split(/\s+/).length,
-        metadata.qualityScore
+        metadata.qualityScore,
+        'bundled'
       )
 
       // Store embedding as binary
