@@ -4,9 +4,39 @@
  * Purpose: Monaco Editor for viewing and editing formatted output
  */
 
-import Editor from '@monaco-editor/react'
+import Editor, { loader } from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
+import * as monaco from 'monaco-editor'
 import React, { useEffect, useRef, useState } from 'react'
+
+// Configure Monaco Editor workers for Tauri environment
+// This must be done before any editor instance is created
+if (typeof window !== 'undefined') {
+  // Use self-hosted workers instead of CDN to avoid CSP issues in Tauri
+  loader.config({ monaco })
+
+  // @ts-expect-error - MonacoEnvironment is a global
+  self.MonacoEnvironment = {
+    getWorker(_: string, _label: string) {
+      // For Tauri, we need to use blob URLs to avoid path resolution issues
+      const getWorkerBlob = (worker: string) => {
+        const blob = new Blob([worker], { type: 'application/javascript' })
+        return URL.createObjectURL(blob)
+      }
+
+      // Return a simple worker that just processes text
+      // This avoids complex worker file loading in Tauri
+      const simpleWorker = `
+        self.onmessage = function(e) {
+          // Echo back for now - Monaco will handle language features
+          self.postMessage(e.data);
+        };
+      `
+
+      return new Worker(getWorkerBlob(simpleWorker))
+    }
+  }
+}
 
 interface DiffEditorProps {
   original: string // Kept for compatibility but not displayed
@@ -20,12 +50,6 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
   const containerRef = useRef<HTMLDivElement>(null)
   const [isEditorReady, setIsEditorReady] = useState(false)
 
-  // Debug: Log the modified value
-  useEffect(() => {
-    console.log('[DiffEditor] Modified text length:', modified?.length || 0)
-    console.log('[DiffEditor] Modified text preview:', modified?.substring(0, 100))
-  }, [modified])
-
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
       onModifiedChange(value)
@@ -33,7 +57,6 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
   }
 
   const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
-    console.log('[DiffEditor] Editor mounted successfully')
     editorRef.current = editor
     setIsEditorReady(true)
 
@@ -41,14 +64,6 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
     setTimeout(() => {
       editor.layout()
     }, 100)
-  }
-
-  const handleBeforeMount = () => {
-    console.log('[DiffEditor] Editor about to mount')
-  }
-
-  const handleValidate = (markers: editor.IMarker[]) => {
-    console.log('[DiffEditor] Validation markers:', markers.length)
   }
 
   // Re-layout editor when window resizes
@@ -90,8 +105,6 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
           defaultValue={modified || ''}
           onChange={handleEditorChange}
           onMount={handleEditorDidMount}
-          beforeMount={handleBeforeMount}
-          onValidate={handleValidate}
           loading={
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
