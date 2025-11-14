@@ -32,7 +32,7 @@ export function ExampleToggleList({
     )
   }
 
-  const enabledCount = enabledIds.size
+  const enabledCount = examples.filter(ex => enabledIds.has(ex.id)).length
   const totalCount = examples.length
 
   return (

@@ -114,7 +114,6 @@ export function useScriptProcessor(): UseScriptProcessorResult {
             if (options.enabledExampleIds && options.enabledExampleIds.size > 0) {
               examples = allSimilarExamples
                 .filter(ex => options.enabledExampleIds!.has(ex.id))
-                .slice(0, 3)
               console.log(
                 `[useScriptProcessor] Filtered ${allSimilarExamples.length} examples to ${examples.length} enabled examples`
               )
@@ -217,6 +216,13 @@ ${options.text}`
         setProgress(100)
         options.onProgress?.(100)
 
+        // Validate that we got actual output
+        if (!formattedText || formattedText.trim().length === 0) {
+          throw new Error(
+            'AI processing failed: No output received. The model may have timed out or encountered an error. Please try again.'
+          )
+        }
+
         // Debug logging
         console.log(
           'Formatted text preview (first 200 chars):',
@@ -246,7 +252,8 @@ ${options.text}`
           },
           editHistory: [],
           generationTimestamp: new Date(),
-          isEdited: false
+          isEdited: false,
+          examplesCount: examples.length
         }
 
         setResult(output)

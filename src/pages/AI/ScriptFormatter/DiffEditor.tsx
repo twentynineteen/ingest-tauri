@@ -6,37 +6,14 @@
 
 import Editor, { loader } from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
-import * as monaco from 'monaco-editor'
 import React, { useEffect, useRef, useState } from 'react'
 
-// Configure Monaco Editor workers for Tauri environment
-// This must be done before any editor instance is created
-if (typeof window !== 'undefined') {
-  // Use self-hosted workers instead of CDN to avoid CSP issues in Tauri
-  loader.config({ monaco })
-
-  // @ts-expect-error - MonacoEnvironment is a global
-  self.MonacoEnvironment = {
-    getWorker(_: string, _label: string) {
-      // For Tauri, we need to use blob URLs to avoid path resolution issues
-      const getWorkerBlob = (worker: string) => {
-        const blob = new Blob([worker], { type: 'application/javascript' })
-        return URL.createObjectURL(blob)
-      }
-
-      // Return a simple worker that just processes text
-      // This avoids complex worker file loading in Tauri
-      const simpleWorker = `
-        self.onmessage = function(e) {
-          // Echo back for now - Monaco will handle language features
-          self.postMessage(e.data);
-        };
-      `
-
-      return new Worker(getWorkerBlob(simpleWorker))
-    }
+// Configure loader to use CDN
+loader.config({
+  paths: {
+    vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.53.0/min/vs'
   }
-}
+})
 
 interface DiffEditorProps {
   original: string // Kept for compatibility but not displayed
