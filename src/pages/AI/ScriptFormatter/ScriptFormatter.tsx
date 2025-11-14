@@ -111,11 +111,16 @@ const ScriptFormatter: React.FC = () => {
         const output = JSON.parse(savedOutput)
         console.log('[ScriptFormatter] Restored cached result:', {
           formattedTextPreview: output.formattedText.substring(0, 100),
-          timestamp: output.generationTimestamp
+          timestamp: output.generationTimestamp,
+          examplesCount: output.examplesCount
         })
         setProcessedOutput(output)
         setMarkdownText(output.formattedText)
         setModifiedText(output.formattedText)
+        // Restore examples count if available
+        if (output.examplesCount !== undefined) {
+          setExamplesCount(output.examplesCount)
+        }
         setCurrentStep('review')
       } catch (err) {
         // Invalid data, ignore
@@ -209,7 +214,7 @@ const ScriptFormatter: React.FC = () => {
       setProcessedOutput(output)
       setCurrentStep('review')
 
-      // Save to localStorage
+      // Save to localStorage (includes examplesCount from output)
       localStorage.setItem(STORAGE_KEYS.PROCESSED_OUTPUT, JSON.stringify(output))
     } catch (error) {
       console.error('Processing failed with error:', error)

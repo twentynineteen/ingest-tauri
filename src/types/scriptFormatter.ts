@@ -131,6 +131,7 @@ export interface ProcessedOutput {
   editHistory: Edit[]
   generationTimestamp: Date
   isEdited: boolean
+  examplesCount?: number // Number of similar examples used for RAG enhancement
 }
 
 export interface DiffData {

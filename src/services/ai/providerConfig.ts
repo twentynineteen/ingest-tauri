@@ -30,8 +30,28 @@ const ollamaAdapter: ProviderAdapter = {
 
     console.log('[Ollama] Creating model with baseURL:', `${baseUrl}/api`)
 
+    // Custom fetch with extended timeout for AI generation (5 minutes)
+    const customFetch = async (url: RequestInfo | URL, init?: RequestInit) => {
+      const timeout = 300000 // 5 minutes for AI generation
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), timeout)
+
+      try {
+        const response = await fetch(url, {
+          ...init,
+          signal: controller.signal
+        })
+        clearTimeout(timeoutId)
+        return response
+      } catch (error) {
+        clearTimeout(timeoutId)
+        throw error
+      }
+    }
+
     const ollama = createOllama({
-      baseURL: `${baseUrl}/api`
+      baseURL: `${baseUrl}/api`,
+      fetch: customFetch
     })
 
     // Return the model instance
