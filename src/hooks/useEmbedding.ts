@@ -4,12 +4,15 @@
  * Purpose: Client-side text embedding using Xenova Transformers
  */
 
-import { pipeline } from '@xenova/transformers'
+import { pipeline, type Pipeline } from '@xenova/transformers'
 import { useEffect, useRef, useState } from 'react'
 
+// Xenova feature extraction pipeline type
+type FeatureExtractionPipeline = Pipeline
+
 // Singleton instance to avoid reloading the model
-let embedderInstance: any = null
-let loadingPromise: Promise<any> | null = null
+let embedderInstance: FeatureExtractionPipeline | null = null
+let loadingPromise: Promise<FeatureExtractionPipeline> | null = null
 
 interface UseEmbeddingResult {
   embed: (text: string) => Promise<number[]>

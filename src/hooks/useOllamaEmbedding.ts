@@ -14,6 +14,22 @@ interface UseOllamaEmbeddingResult {
   modelName: string
 }
 
+interface OllamaModel {
+  name: string
+  modified_at: string
+  size: number
+  digest: string
+  details?: {
+    format?: string
+    family?: string
+    parameter_size?: string
+  }
+}
+
+interface OllamaTagsResponse {
+  models: OllamaModel[]
+}
+
 const OLLAMA_BASE_URL = 'http://localhost:11434'
 const EMBEDDING_MODEL = 'nomic-embed-text'
 
@@ -40,18 +56,16 @@ export function useOllamaEmbedding(): UseOllamaEmbeddingResult {
           throw new Error('Ollama is not running. Please start Ollama.')
         }
 
-        const data = await tagsResponse.json()
+        const data = (await tagsResponse.json()) as OllamaTagsResponse
         const models = data.models || []
 
         console.log(
           '[useOllamaEmbedding] Available models:',
-          models.map((m: any) => m.name)
+          models.map(m => m.name)
         )
 
         // Check if nomic-embed-text is installed
-        const hasEmbeddingModel = models.some((m: any) =>
-          m.name.includes(EMBEDDING_MODEL)
-        )
+        const hasEmbeddingModel = models.some(m => m.name.includes(EMBEDDING_MODEL))
 
         if (!hasEmbeddingModel) {
           throw new Error(

@@ -5,6 +5,7 @@
  */
 
 import type { LanguageModel } from 'ai'
+import type { ProviderConfiguration } from '../../types/scriptFormatter'
 import { providerRegistry } from './providerConfig'
 import type { ModelCreationOptions } from './types'
 
@@ -53,7 +54,7 @@ export class ModelFactory {
    */
   static async validateProvider(
     providerId: string,
-    configuration: any
+    configuration: ProviderConfiguration
   ): Promise<boolean> {
     const adapter = providerRegistry.get(providerId)
 

@@ -225,11 +225,23 @@ const ollamaAdapter: ProviderAdapter = {
         throw new Error(`Failed to fetch models: HTTP ${response.status}`)
       }
 
-      const data = await response.json()
+      interface OpenAIModel {
+        id: string
+        object: string
+        created: number
+        owned_by: string
+      }
+
+      interface OpenAIModelsResponse {
+        data: OpenAIModel[]
+        object: string
+      }
+
+      const data = await response.json() as OpenAIModelsResponse
 
       return (data.data || [])
-        .filter((model: any) => model.id.startsWith('gpt-')) // Only GPT models
-        .map((model: any) => ({
+        .filter((model) => model.id.startsWith('gpt-')) // Only GPT models
+        .map((model) => ({
           id: model.id,
           name: model.id,
           contextLength: 128000, // GPT-4 context

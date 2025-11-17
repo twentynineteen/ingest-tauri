@@ -10,8 +10,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import * as useApiKeysModule from '../../hooks/useApiKeys'
-import * as useBreadcrumbsVideoLinksModule from '../../hooks/useBreadcrumbsVideoLinks'
 import * as useBreadcrumbsTrelloCardsModule from '../../hooks/useBreadcrumbsTrelloCards'
+import * as useBreadcrumbsVideoLinksModule from '../../hooks/useBreadcrumbsVideoLinks'
 import * as useFileUploadModule from '../../hooks/useFileUpload'
 import * as useSproutVideoApiModule from '../../hooks/useSproutVideoApi'
 import * as useSproutVideoProcessorModule from '../../hooks/useSproutVideoProcessor'
@@ -44,12 +44,10 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
-        mutations: { retry: false },
-      },
+        mutations: { retry: false }
+      }
     })
-    return render(
-      <QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>
-    )
+    return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
   }
 
   beforeEach(() => {
