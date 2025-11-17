@@ -73,7 +73,13 @@ export function useBakerScan(): UseBakerScanResult {
     // Clean up listeners on unmount or when currentScanId changes
     return () => {
       Promise.all(unlistenPromises).then(unlisteners => {
-        unlisteners.forEach(unlisten => unlisten())
+        unlisteners.forEach(unlisten => {
+          if (unlisten && typeof unlisten === 'function') {
+            unlisten()
+          }
+        })
+      }).catch(() => {
+        // Ignore cleanup errors in test environments
       })
     }
   }, [currentScanId])

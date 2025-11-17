@@ -62,18 +62,27 @@ export function useCreateProject() {
     let unlistenComplete: (() => void) | null = null
 
     try {
-      await mkdir(projectFolder, { recursive: true })
+      // Create folder structure with proper error handling
+      try {
+        await mkdir(projectFolder, { recursive: true })
 
-      for (let cam = 1; cam <= numCameras; cam++) {
-        await mkdir(`${projectFolder}/Footage/Camera ${cam}`, { recursive: true })
+        for (let cam = 1; cam <= numCameras; cam++) {
+          await mkdir(`${projectFolder}/Footage/Camera ${cam}`, { recursive: true })
+        }
+
+        await Promise.all([
+          mkdir(`${projectFolder}/Graphics`, { recursive: true }),
+          mkdir(`${projectFolder}/Renders`, { recursive: true }),
+          mkdir(`${projectFolder}/Projects`, { recursive: true }),
+          mkdir(`${projectFolder}/Scripts`, { recursive: true })
+        ])
+      } catch (mkdirError) {
+        console.error('Error creating folders:', mkdirError)
+        alert('Error creating project: ' + mkdirError)
+        // Clean up listener if it was created
+        if (unlistenComplete) unlistenComplete()
+        return
       }
-
-      await Promise.all([
-        mkdir(`${projectFolder}/Graphics`, { recursive: true }),
-        mkdir(`${projectFolder}/Renders`, { recursive: true }),
-        mkdir(`${projectFolder}/Projects`, { recursive: true }),
-        mkdir(`${projectFolder}/Scripts`, { recursive: true })
-      ])
 
       setProgress?.(0)
       setCompleted?.(false)
@@ -166,10 +175,19 @@ export function useCreateProject() {
         }
       })
 
-      await invoke('move_files', {
-        files: filesToMove,
-        baseDest: projectFolder
-      })
+      // Move files with proper error handling
+      try {
+        await invoke('move_files', {
+          files: filesToMove,
+          baseDest: projectFolder
+        })
+      } catch (moveError) {
+        console.error('Error moving files:', moveError)
+        alert('Error creating project: ' + moveError)
+        // Clean up listener
+        if (unlistenComplete) unlistenComplete()
+        return
+      }
     } catch (error) {
       console.error('Error creating project:', error)
       alert('Error creating project: ' + error)

@@ -98,7 +98,9 @@ Before using the Script Formatter, download the following language models:
 ```bash
 # script formatting:
 ollama pull llama3.1:latest       # Fast, good quality (8B parameters)
-
+# script embedding:
+ollama pull nomic-embed-text:latest
+# Required for adding new scripts to database
 
 # List installed models:
 ollama list

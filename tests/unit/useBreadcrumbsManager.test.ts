@@ -101,23 +101,26 @@ describe('useBreadcrumbsManager Hook', () => {
 
     const { result } = renderHook(() => useBreadcrumbsManager())
 
-    // Start the update
-    const updateCall = act(async () => {
-      await result.current.updateBreadcrumbs(['/path/to/project'], {
+    // Start the update (don't await)
+    let updateCall: Promise<void>
+    act(() => {
+      updateCall = result.current.updateBreadcrumbs(['/path/to/project'], {
         createMissing: true,
         backupOriginals: false
-      })
+      }).catch(() => {})
     })
+
+    // Wait a tick
+    await new Promise(resolve => setTimeout(resolve, 0))
 
     // Should be updating now
     expect(result.current.isUpdating).toBe(true)
 
     // Complete the update
-    act(() => {
+    await act(async () => {
       resolveUpdate!(mockBatchResult)
+      await updateCall!
     })
-    
-    await updateCall
 
     // Should no longer be updating
     expect(result.current.isUpdating).toBe(false)
@@ -131,15 +134,12 @@ describe('useBreadcrumbsManager Hook', () => {
 
     // Empty project paths should throw error
     await act(async () => {
-      try {
-        await result.current.updateBreadcrumbs([], {
+      await expect(
+        result.current.updateBreadcrumbs([], {
           createMissing: true,
           backupOriginals: true
         })
-      } catch (error) {
-        expect(error).toBeInstanceOf(Error)
-        expect((error as Error).message).toContain('empty')
-      }
+      ).rejects.toThrow(/empty|cannot be empty/i)
     })
 
     expect(result.current.error).not.toBeNull()
@@ -175,24 +175,28 @@ describe('useBreadcrumbsManager Hook', () => {
 
   test('should prevent concurrent updates', async () => {
     const { invoke } = await import('@tauri-apps/api/core')
-    
+
     let resolveFirstUpdate: (value: BatchUpdateResult) => void
     const firstUpdatePromise = new Promise<BatchUpdateResult>((resolve) => {
       resolveFirstUpdate = resolve
     })
-    
+
     vi.mocked(invoke).mockReturnValueOnce(firstUpdatePromise)
     vi.mocked(invoke).mockResolvedValue(mockBatchResult)
 
     const { result } = renderHook(() => useBreadcrumbsManager())
 
-    // Start first update
-    const firstUpdate = act(async () => {
-      await result.current.updateBreadcrumbs(['/path/1'], {
+    // Start first update (don't await - it's still pending)
+    let firstUpdate: Promise<void>
+    act(() => {
+      firstUpdate = result.current.updateBreadcrumbs(['/path/1'], {
         createMissing: true,
         backupOriginals: false
-      })
+      }).catch(() => {}) // Catch to prevent unhandled rejection
     })
+
+    // Wait a tick to ensure the first update has started
+    await new Promise(resolve => setTimeout(resolve, 0))
 
     // Try to start second update while first is pending
     await act(async () => {
@@ -201,6 +205,8 @@ describe('useBreadcrumbsManager Hook', () => {
           createMissing: true,
           backupOriginals: false
         })
+        // Should not reach here
+        expect(true).toBe(false)
       } catch (error) {
         expect(error).toBeInstanceOf(Error)
         expect((error as Error).message).toContain('already')
@@ -208,11 +214,10 @@ describe('useBreadcrumbsManager Hook', () => {
     })
 
     // Complete first update
-    act(() => {
+    await act(async () => {
       resolveFirstUpdate!(mockBatchResult)
+      await firstUpdate!
     })
-    
-    await firstUpdate
 
     // Should have only called invoke once (first update)
     expect(invoke).toHaveBeenCalledTimes(1)

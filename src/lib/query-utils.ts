@@ -148,6 +148,48 @@ export const retryStrategies: Record<string, RetryConfiguration> = {
     attempts: 0,
     delay: () => 0,
     condition: () => false
+  },
+  system: {
+    attempts: 2,
+    delay: (attempt: number) => 500 * attempt,
+    condition: (error: Error) =>
+      error.message.includes('system') || error.message.includes('app version')
+  },
+  auth: {
+    attempts: 1,
+    delay: () => 1000,
+    condition: (error: Error) =>
+      error.message.includes('auth') || error.message.includes('unauthorized')
+  },
+  external: {
+    attempts: 3,
+    delay: (attempt: number) => Math.min(1000 * Math.pow(2, attempt), 10000),
+    condition: (error: Error) =>
+      error.name === 'NetworkError' || error.message.includes('network')
+  },
+  canvas: {
+    attempts: 2,
+    delay: (attempt: number) => 1000 * attempt,
+    condition: (error: Error) =>
+      error.message.includes('canvas') || error.message.includes('render')
+  },
+  settings: {
+    attempts: 1,
+    delay: () => 500,
+    condition: (error: Error) =>
+      error.message.includes('read') || error.message.includes('parse')
+  },
+  trello: {
+    attempts: 3,
+    delay: (attempt: number) => Math.min(1000 * Math.pow(2, attempt), 10000),
+    condition: (error: Error) =>
+      error.name === 'NetworkError' || error.message.includes('network')
+  },
+  sprout: {
+    attempts: 3,
+    delay: (attempt: number) => Math.min(1000 * Math.pow(2, attempt), 10000),
+    condition: (error: Error) =>
+      error.name === 'NetworkError' || error.message.includes('network')
   }
 }
 
@@ -157,6 +199,10 @@ export function shouldRetry(
   strategy: keyof typeof retryStrategies
 ): boolean {
   const config = retryStrategies[strategy]
+  if (!config) {
+    console.warn(`Unknown retry strategy: ${strategy}, using default`)
+    return attempt < 3 // Default to 3 attempts
+  }
   return attempt < config.attempts && config.condition(error)
 }
 
@@ -165,6 +211,10 @@ export function getRetryDelay(
   strategy: keyof typeof retryStrategies
 ): number {
   const config = retryStrategies[strategy]
+  if (!config) {
+    console.warn(`Unknown retry strategy: ${strategy}, using default delay`)
+    return Math.min(1000 * Math.pow(2, attempt), 10000) // Default exponential backoff
+  }
   return config.delay(attempt)
 }
 

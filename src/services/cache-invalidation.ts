@@ -46,7 +46,7 @@ export class CacheInvalidationService {
     } else {
       // Invalidate all Trello data
       await this.queryClient.invalidateQueries({
-        queryKey: queryKeys.trello.all()
+        queryKey: queryKeys.trello.all
       })
     }
   }
@@ -63,17 +63,19 @@ export class CacheInvalidationService {
     } else {
       // Invalidate all Sprout data
       await this.queryClient.invalidateQueries({
-        queryKey: queryKeys.sprout.all()
+        queryKey: queryKeys.sprout.all
       })
     }
   }
 
   /**
    * Invalidate system information queries
+   * Note: There is no dedicated 'system' query key domain in queryKeys.
+   * This method invalidates camera queries as a placeholder for system-level data.
    */
   async invalidateSystemInfo() {
     await this.queryClient.invalidateQueries({
-      queryKey: queryKeys.system.all()
+      queryKey: queryKeys.camera.all
     })
   }
 

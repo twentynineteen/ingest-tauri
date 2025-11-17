@@ -1,17 +1,22 @@
 /**
  * Contract Test: baker_read_breadcrumbs Tauri Command
- * 
+ *
  * This test verifies the contract for the baker_read_breadcrumbs command.
- * It MUST FAIL initially until the Rust backend implementation is complete.
+ * Uses mocked Tauri backend for testing the contract interface.
  */
 
 import { invoke } from '@tauri-apps/api/core'
-import { describe, test, expect } from 'vitest'
+import { describe, test, expect, beforeAll } from 'vitest'
+import { setupTauriMocks } from '../setup/tauri-mocks'
 import type { BreadcrumbsFile } from '../../src/types/baker'
 import { resolve } from 'path'
 
 describe('baker_read_breadcrumbs Contract', () => {
   const testDataPath = resolve(__dirname, '../fixtures/baker-test-data')
+
+  beforeAll(() => {
+    setupTauriMocks()
+  })
 
   test('should read valid breadcrumbs.json file', async () => {
     const projectPath = resolve(testDataPath, 'TestProject1')

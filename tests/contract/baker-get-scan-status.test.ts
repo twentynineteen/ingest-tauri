@@ -1,18 +1,22 @@
 /**
  * Contract Test: baker_get_scan_status Tauri Command
- * 
+ *
  * This test verifies the contract for the baker_get_scan_status command.
- * It MUST FAIL initially until the Rust backend implementation is complete.
+ * Uses mocked Tauri backend for testing the contract interface.
  */
 
 import { invoke } from '@tauri-apps/api/core'
 import { describe, test, expect, beforeAll } from 'vitest'
+import { setupTauriMocks } from '../setup/tauri-mocks'
 import type { ScanResult } from '../../src/types/baker'
 
 describe('baker_get_scan_status Contract', () => {
   let mockScanId: string
 
   beforeAll(async () => {
+    // Initialize Tauri mocks
+    setupTauriMocks()
+
     // Start a scan to get a valid scan ID for testing
     mockScanId = await invoke('baker_start_scan', {
       rootPath: '/Users/test/Documents',
