@@ -43,6 +43,46 @@ import { SaveExampleDialog } from './SaveExampleDialog'
 
 type WorkflowStep = 'upload' | 'select-model' | 'processing' | 'review' | 'download'
 
+/**
+ * Converts markdown formatting to HTML
+ */
+function convertMarkdownToHtml(text: string): string {
+  // Bold: **text** or __text__ -> <strong>text</strong>
+  let result = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  result = result.replace(/__(.+?)__/g, '<strong>$1</strong>')
+
+  // Italic: *text* or _text_ -> <em>text</em>
+  result = result.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
+  result = result.replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '<em>$1</em>')
+
+  return result
+}
+
+/**
+ * Restores cached output from localStorage
+ */
+function restoreCachedOutput(): ProcessedOutput | null {
+  const savedOutput = localStorage.getItem(STORAGE_KEYS.PROCESSED_OUTPUT)
+  if (!savedOutput) {
+    console.log('[ScriptFormatter] No cached result found')
+    return null
+  }
+
+  try {
+    const output = JSON.parse(savedOutput)
+    console.log('[ScriptFormatter] Restored cached result:', {
+      formattedTextPreview: output.formattedText.substring(0, 100),
+      timestamp: output.generationTimestamp,
+      examplesCount: output.examplesCount
+    })
+    return output
+  } catch (err) {
+    console.warn('[ScriptFormatter] Failed to restore cached result:', err)
+    localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
+    return null
+  }
+}
+
 const ScriptFormatter: React.FC = () => {
   // Breadcrumb
   useBreadcrumb([
@@ -105,30 +145,15 @@ const ScriptFormatter: React.FC = () => {
 
   // Restore session data from localStorage (initialize state)
   const [initialLoadDone] = useState(() => {
-    const savedOutput = localStorage.getItem(STORAGE_KEYS.PROCESSED_OUTPUT)
-    if (savedOutput) {
-      try {
-        const output = JSON.parse(savedOutput)
-        console.log('[ScriptFormatter] Restored cached result:', {
-          formattedTextPreview: output.formattedText.substring(0, 100),
-          timestamp: output.generationTimestamp,
-          examplesCount: output.examplesCount
-        })
-        setProcessedOutput(output)
-        setMarkdownText(output.formattedText)
-        setModifiedText(output.formattedText)
-        // Restore examples count if available
-        if (output.examplesCount !== undefined) {
-          setExamplesCount(output.examplesCount)
-        }
-        setCurrentStep('review')
-      } catch (err) {
-        // Invalid data, ignore
-        console.warn('[ScriptFormatter] Failed to restore cached result:', err)
-        localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
+    const cachedOutput = restoreCachedOutput()
+    if (cachedOutput) {
+      setProcessedOutput(cachedOutput)
+      setMarkdownText(cachedOutput.formattedText)
+      setModifiedText(cachedOutput.formattedText)
+      if (cachedOutput.examplesCount !== undefined) {
+        setExamplesCount(cachedOutput.examplesCount)
       }
-    } else {
-      console.log('[ScriptFormatter] No cached result found')
+      setCurrentStep('review')
     }
     return true
   })
@@ -253,24 +278,10 @@ const ScriptFormatter: React.FC = () => {
     try {
       const filename = document.filename.replace('.docx', '_formatted.docx')
 
-      // Convert markdown formatting to HTML
-      const convertMarkdownToHtml = (text: string): string => {
-        // Bold: **text** or __text__ -> <strong>text</strong>
-        text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        text = text.replace(/__(.+?)__/g, '<strong>$1</strong>')
-
-        // Italic: *text* or _text_ -> <em>text</em>
-        text = text.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
-        text = text.replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '<em>$1</em>')
-
-        return text
-      }
-
       // Convert plain text with line breaks to HTML paragraphs
-      // Use markdownText for download to preserve bold formatting
       const htmlContent = markdownText
         .split('\n')
-        .filter(line => line.trim()) // Remove empty lines
+        .filter(line => line.trim())
         .map(line => `<p>${convertMarkdownToHtml(line)}</p>`)
         .join('')
 

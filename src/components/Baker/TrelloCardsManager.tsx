@@ -33,6 +33,22 @@ interface TrelloCardsManagerProps {
   autoSyncToTrello?: boolean // Auto-update Trello card description with breadcrumbs after adding
 }
 
+/**
+ * Validates if a card can be added (checks limit and duplicates)
+ */
+function validateCardCanBeAdded(
+  trelloCards: TrelloCard[],
+  cardId: string
+): string | null {
+  if (trelloCards.length >= 10) {
+    return 'Maximum of 10 Trello cards per project reached'
+  }
+  if (trelloCards.some(card => card.cardId === cardId)) {
+    return 'This Trello card is already associated with the project'
+  }
+  return null
+}
+
 export function TrelloCardsManager({
   projectPath,
   trelloApiKey,
@@ -162,15 +178,10 @@ export function TrelloCardsManager({
   }, [searchTerm, filteredCards, grouped])
 
   const handleSelectCard = async (selectedCard: { id: string; name: string }) => {
-    // Check limit
-    if (trelloCards.length >= 10) {
-      setValidationErrors(['Maximum of 10 Trello cards per project reached'])
-      return
-    }
-
-    // Check for duplicate
-    if (trelloCards.some(card => card.cardId === selectedCard.id)) {
-      setValidationErrors(['This Trello card is already associated with the project'])
+    // Validate card can be added
+    const validationError = validateCardCanBeAdded(trelloCards, selectedCard.id)
+    if (validationError) {
+      setValidationErrors([validationError])
       return
     }
 
@@ -216,15 +227,10 @@ export function TrelloCardsManager({
       return
     }
 
-    // Check limit
-    if (trelloCards.length >= 10) {
-      setValidationErrors(['Maximum of 10 Trello cards per project reached'])
-      return
-    }
-
-    // Check for duplicate
-    if (trelloCards.some(card => card.cardId === cardId)) {
-      setValidationErrors(['This Trello card is already associated with the project'])
+    // Validate card can be added
+    const validationError = validateCardCanBeAdded(trelloCards, cardId)
+    if (validationError) {
+      setValidationErrors([validationError])
       return
     }
 

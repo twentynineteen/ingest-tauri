@@ -278,94 +278,7 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         setProgress(5)
         options.onProgress?.(5)
 
-        let examples: SimilarExample[] = []
-
-        // RAG enabled for retrieval-augmented generation
-        const enableRAG = true
-
-        if (enableRAG && isEmbeddingReady && options.text.length > 50) {
-          try {
-            options.onRAGUpdate?.('Searching for similar examples...', 0)
-
-            // Generate embedding for query
-            console.log('[useScriptProcessor] Generating embedding for query text...')
-            const queryEmbedding = await embed(options.text)
-            console.log(
-              `[useScriptProcessor] Query embedding generated: ${queryEmbedding.length} dimensions`
-            )
-
-            // Search for similar scripts
-            console.log('[useScriptProcessor] Searching database for similar examples...')
-            console.log('[useScriptProcessor] Search params:', {
-              embeddingDimensions: queryEmbedding.length,
-              topK: 10,
-              minSimilarity: 0.4
-            })
-
-            const allSimilarExamples = await invoke<SimilarExample[]>(
-              'search_similar_scripts',
-              {
-                queryEmbedding,
-                topK: 10, // Get more candidates for filtering
-                minSimilarity: 0.4 // Lower threshold - we're matching formatting patterns, not exact content
-              }
-            )
-
-            // Filter by enabled example IDs if provided
-            if (options.enabledExampleIds && options.enabledExampleIds.size > 0) {
-              examples = allSimilarExamples.filter(ex =>
-                options.enabledExampleIds!.has(ex.id)
-              )
-              console.log(
-                `[useScriptProcessor] Filtered ${allSimilarExamples.length} examples to ${examples.length} enabled examples`
-              )
-            } else {
-              examples = allSimilarExamples.slice(0, 3)
-            }
-
-            console.log(
-              `[useScriptProcessor] Search complete: Using ${examples.length} similar examples`
-            )
-
-            if (examples.length > 0) {
-              console.log(
-                '[useScriptProcessor] Example details:',
-                examples.map(ex => ({
-                  id: ex.id,
-                  title: ex.title,
-                  similarity: ex.similarity,
-                  category: ex.category
-                }))
-              )
-              options.onRAGUpdate?.(
-                `Using ${examples.length} similar example${examples.length > 1 ? 's' : ''} to improve formatting`,
-                examples.length
-              )
-            } else {
-              const reason =
-                options.enabledExampleIds && options.enabledExampleIds.size === 0
-                  ? 'All examples disabled'
-                  : 'No similar examples found (try enabling more examples or lowering similarity threshold)'
-              console.log(`[useScriptProcessor] ${reason}`)
-              options.onRAGUpdate?.(reason, 0)
-            }
-          } catch (ragError) {
-            console.error('[useScriptProcessor] RAG retrieval failed:', ragError)
-            console.error('[useScriptProcessor] Error details:', ragError)
-            options.onRAGUpdate?.(
-              'RAG search failed: ' +
-                (ragError instanceof Error ? ragError.message : String(ragError)),
-              0
-            )
-            // Continue without examples - don't fail the whole process
-          }
-        } else {
-          console.log(
-            '[useScriptProcessor] RAG disabled or not ready - processing without examples',
-            { enableRAG, isEmbeddingReady, textLength: options.text.length }
-          )
-          options.onRAGUpdate?.('RAG not available', 0)
-        }
+        const examples = await retrieveSimilarExamples(options, embed, isEmbeddingReady)
 
         setProgress(15)
         options.onProgress?.(15)
@@ -376,87 +289,20 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         setProgress(20)
         options.onProgress?.(20)
 
-        // Step 3: Create model and stream (20-95% progress)
-        console.log('[useScriptProcessor] Step 3: Processing with AI...')
-        const model = ModelFactory.createModel({
-          providerId: options.providerId,
-          modelId: options.modelId,
-          configuration: options.configuration
-        })
-
-        const streamResult = streamText({
-          model,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            {
-              role: 'user',
-              content: `Format this script for autocue/teleprompter reading. Preserve ALL the original words and content exactly as written - DO NOT rewrite, paraphrase, or change the meaning. ONLY add formatting (line breaks, bold, pauses). Output ONLY the formatted script with no preamble, introduction, or explanation.
-
-SCRIPT TO FORMAT:
-${options.text}`
-            }
-          ],
-          temperature: 0.3,
-          abortSignal: abortControllerRef.current.signal
-        })
-
-        // Collect streamed text
-        let formattedText = ''
-        let chunkCount = 0
-
-        for await (const chunk of streamResult.textStream) {
-          formattedText += chunk
-          chunkCount++
-
-          // Update progress (20-95%)
-          const streamProgress = 20 + Math.min(75, (chunkCount / 100) * 75)
-          setProgress(streamProgress)
-          options.onProgress?.(streamProgress)
-        }
+        // Step 3: Stream AI response (20-95% progress)
+        const formattedText = await streamAIResponse(
+          options,
+          systemPrompt,
+          abortControllerRef.current.signal
+        )
 
         // Complete processing
         setProgress(100)
         options.onProgress?.(100)
 
-        // Validate that we got actual output
-        if (!formattedText || formattedText.trim().length === 0) {
-          throw new Error(
-            'AI processing failed: No output received. The model may have timed out or encountered an error. Please try again.'
-          )
-        }
-
-        // Debug logging
-        console.log(
-          'Formatted text preview (first 200 chars):',
-          formattedText.substring(0, 200)
-        )
-        console.log('Line breaks found:', formattedText.split('\n').length)
-
-        // Create ProcessedOutput
-        // Convert line breaks to proper HTML paragraphs
-        const htmlContent = formattedText
-          .split('\n')
-          .filter(line => line.trim().length > 0)
-          .map(line => `<p>${line}</p>`)
-          .join('\n')
-
-        const output: ProcessedOutput = {
-          id: crypto.randomUUID(),
-          requestId: crypto.randomUUID(), // Create request ID
-          formattedHtml: htmlContent,
-          formattedText,
-          diffData: {
-            additions: [],
-            deletions: [],
-            modifications: [],
-            originalLineCount: options.text.split('\n').length,
-            modifiedLineCount: formattedText.split('\n').length
-          },
-          editHistory: [],
-          generationTimestamp: new Date(),
-          isEdited: false,
-          examplesCount: examples.length
-        }
+        // Step 4: Validate and create output
+        validateAIOutput(formattedText)
+        const output = createProcessedOutput(formattedText, options.text, examples.length)
 
         setResult(output)
         setIsProcessing(false)
