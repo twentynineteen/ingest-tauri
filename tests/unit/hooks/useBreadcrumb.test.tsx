@@ -271,9 +271,9 @@ describe('useBreadcrumb', () => {
       // Wait for any pending updates to settle
       await new Promise(resolve => setTimeout(resolve, 50))
 
-      // Get the update count before focus
+      // Get the fetch status before focus
       const queryStateBefore = queryClient.getQueryState(['user', 'breadcrumb'])
-      const updateCountBefore = queryStateBefore?.dataUpdateCount || 0
+      const fetchStatusBefore = queryStateBefore?.fetchStatus
 
       // Simulate window focus
       window.dispatchEvent(new Event('focus'))
@@ -281,13 +281,13 @@ describe('useBreadcrumb', () => {
       // Wait a bit to ensure no refetch happens
       await new Promise(resolve => setTimeout(resolve, 100))
 
-      // Query should not refetch after focus (count should remain the same)
+      // Query should not be fetching after focus (refetchOnWindowFocus: false)
       const queryStateAfter = queryClient.getQueryState(['user', 'breadcrumb'])
-      const updateCountAfter = queryStateAfter?.dataUpdateCount || 0
+      const fetchStatusAfter = queryStateAfter?.fetchStatus
 
-      // Allow for at most 1 additional update due to React Query internal behavior
-      // but definitely not a full refetch (which would add multiple updates)
-      expect(updateCountAfter - updateCountBefore).toBeLessThanOrEqual(1)
+      // The fetch status should remain idle (not fetching)
+      expect(fetchStatusBefore).toBe('idle')
+      expect(fetchStatusAfter).toBe('idle')
     })
   })
 

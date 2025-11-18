@@ -6,12 +6,12 @@
 
 ## Summary
 
-- **Total Debt Items:** 9 (3 resolved)
+- **Total Debt Items:** 9 (4 resolved)
 - **Critical:** 0
-- **High:** 2
+- **High:** 1
 - **Medium:** 4
 - **Low:** 3
-- **Estimated Total Effort:** 13-18 days
+- **Estimated Total Effort:** 8-12 days
 
 ---
 
@@ -54,76 +54,6 @@ Medium - Not blocking functionality but affects code quality. Can be addressed s
 
 ---
 
-### DEBT-002: Complex Functions with High Cyclomatic Complexity
-
-**Category:** Code Quality
-
-**Severity:** High
-
-**Created:** 2025-11-17
-
-**Location:**
-- ~~`hooks/useScriptProcessor.ts` - complexity 40 (214 lines)~~ ✅ Refactored to <15
-- ~~`pages/AI/ScriptFormatter/ScriptFormatter.tsx` - complexity 39 (717 lines)~~ ✅ Refactored to <15 (175 lines)
-- ~~`components/Baker/TrelloCardsManager.tsx` - complexity 30 (539 lines)~~ ✅ Refactored to <15 (165 lines)
-- ~~`components/Baker/VideoLinksManager.tsx` - complexity 29 (559 lines)~~ ✅ Refactored to <15 (169 lines)
-- ~~`components/BatchUpdateConfirmationDialog.tsx` - complexity 29 (423 lines)~~ ✅ Refactored to <15 (155 lines)
-- `pages/UploadTrello.tsx` - complexity 19
-- `components/BreadcrumbsViewerEnhanced.tsx` - complexity 18
-
-**Description:**
-Multiple functions exceed recommended cyclomatic complexity of 15, making them difficult to test, understand, and maintain. The highest complexity is in `ScriptFormatter.tsx` with complexity of 39.
-
-**Impact:**
-- **Business Impact:** Slower feature development, higher bug rate in these areas
-- **Technical Impact:** Difficult to test, high cognitive load, increased maintenance cost
-- **Risk:** Changes frequently introduce regressions
-
-**Root Cause:**
-Feature growth over time without refactoring. Functions accumulated responsibilities as requirements evolved.
-
-**Proposed Solution:**
-For each complex function:
-1. Extract sub-functions for distinct responsibilities
-2. Apply single responsibility principle
-3. Introduce early returns to reduce nesting
-4. Consider state machine pattern for complex conditional logic (especially useScriptProcessor)
-5. Add comprehensive unit tests after refactoring
-
-**Effort Estimate:** 5-7 days (1-1.5 days per major function)
-
-**Priority Justification:**
-High - These are high-churn areas that slow development and increase bug risk. Particularly useScriptProcessor and useCreateProject are critical business logic.
-
-**Dependencies:**
-- Related: DEBT-003 (deep nesting often correlates with complexity)
-
-**Status:** In Progress
-
-**Progress:**
-- ✅ `useScriptProcessor.ts` refactored from complexity 32 to <15 (2025-11-18)
-- ✅ `ScriptFormatter.tsx` refactored from complexity 39 to <15 (2025-11-18)
-  - Extracted state management to `useScriptFormatterState` hook
-  - Created step components: SelectModelStep, ProcessingStep, ReviewStep, DownloadCompleteStep, WorkflowIndicator
-  - Reduced from 717 lines to 175 lines (76% reduction)
-- ✅ `TrelloCardsManager.tsx` refactored from complexity 30 to <15 (2025-11-18)
-  - Extracted state management to `useTrelloCardsManager` hook
-  - Created `AddCardDialog` component for dialog logic
-  - Reduced from 539 lines to 165 lines (69% reduction)
-- ✅ `VideoLinksManager.tsx` refactored from complexity 29 to <15 (2025-11-18)
-  - Extracted state management to `useVideoLinksManager` hook
-  - Created `AddVideoDialog` component for dialog logic
-  - Reduced from 559 lines to 169 lines (70% reduction)
-- ✅ `BatchUpdateConfirmationDialog.tsx` refactored from complexity 29 to <15 (2025-11-18)
-  - Extracted summary calculation to `batchUpdateSummary.ts` utility
-  - Created sub-components: SummaryStats, ChangesSummary, CommonUpdates, DetailedChangesSection
-  - Reduced from 423 lines to 155 lines (63% reduction)
-- Remaining: 2 functions still above threshold
-
-**Target Resolution:** Sprint 2026-Q1
-
----
-
 ### DEBT-003: Deep Nesting (88 instances, 16 critical with depth 7-8)
 
 **Category:** Code Quality
@@ -136,7 +66,8 @@ High - These are high-churn areas that slow development and increase bug risk. P
 - `AppRouter.tsx` - depth 7-8
 - `utils/breadcrumbsValidation.ts` - depth 7-8
 - `hooks/useScriptProcessor.ts` - depth 7-8
-- `hooks/useUpdateMutation.ts` - depth 7-8
+- ~~`hooks/useUpdateMutation.ts` - depth 7-8~~ ✅ Refactored to depth ≤4
+- ~~`hooks/useBakerTrelloIntegration.ts` - depth 5~~ ✅ Refactored to depth ≤4
 - `hooks/useLiveBreadcrumbsReader.ts` - depth 7
 
 **Description:**
@@ -165,7 +96,16 @@ High - Directly impacts code maintainability and bug rate. These files are frequ
 **Dependencies:**
 - Related: DEBT-002 (complex functions often have deep nesting)
 
-**Status:** Open
+**Status:** In Progress
+
+**Progress:**
+- ✅ `useUpdateMutation.ts` refactored from depth 7-8 to ≤4 (2025-11-18)
+  - Extracted helper functions: `showErrorMessage`, `showInfoMessage`, `performUpdate`, `handleUpdateError`
+  - Used early returns to flatten logic
+- ✅ `useBakerTrelloIntegration.ts` refactored from depth 5 to ≤4 (2025-11-18)
+  - Extracted helper functions: `extractCardIdFromUrl`, `updateProjectTrelloCard`
+  - Used early returns to flatten conditional logic
+- Remaining: 4 files still exceed max-depth of 4
 
 **Target Resolution:** Sprint 2026-Q1
 
@@ -185,8 +125,8 @@ High - Directly impacts code maintainability and bug rate. These files are frequ
 - `utils/breadcrumbsComparison.ts` - 565 lines
 - ~~`components/Baker/VideoLinksManager.tsx` - 559 lines~~ ✅ Reduced to 169 lines
 - ~~`components/Baker/TrelloCardsManager.tsx` - 533 lines~~ ✅ Reduced to 165 lines
-- `components/BreadcrumbsViewerEnhanced.tsx` - 524 lines
-- `pages/AI/ExampleEmbeddings/UploadDialog.tsx` - 505 lines
+- ~~`components/BreadcrumbsViewerEnhanced.tsx` - 524 lines~~ ✅ Reduced to 75 lines
+- `pages/AI/ExampleEmbeddings/UploadDialog.tsx` - 504 lines
 
 **Description:**
 Four files exceed the recommended 500-line limit (down from 7), indicating potential violation of single responsibility principle.
@@ -219,7 +159,8 @@ Medium - Not immediately blocking but affects maintainability. Should be address
 - ✅ `ScriptFormatter.tsx` reduced from 717 to 175 lines (2025-11-18)
 - ✅ `TrelloCardsManager.tsx` reduced from 533 to 165 lines (2025-11-18)
 - ✅ `VideoLinksManager.tsx` reduced from 559 to 169 lines (2025-11-18)
-- Remaining: 4 files still exceed 500 lines
+- ✅ `BreadcrumbsViewerEnhanced.tsx` reduced from 524 to 75 lines (2025-11-18)
+- Remaining: 3 files still exceed 500 lines (sidebar.tsx, breadcrumbsComparison.ts, UploadDialog.tsx)
 
 **Target Resolution:** Q2 2026 (opportunistic refactoring)
 
@@ -431,6 +372,38 @@ Low - Current approach is overly cautious but not harmful. Can adjust incrementa
 
 ## Resolved Debt Items
 
+### DEBT-002: Complex Functions with High Cyclomatic Complexity ✅
+
+**Category:** Code Quality
+
+**Severity:** High
+
+**Created:** 2025-11-17
+
+**Resolved:** 2025-11-18
+
+**Location:**
+All functions previously identified have been refactored to complexity <15.
+
+**Description:**
+Multiple functions exceeded recommended cyclomatic complexity of 15, making them difficult to test, understand, and maintain.
+
+**Resolution:**
+Comprehensive refactoring across 7 components:
+- `useScriptProcessor.ts`: Extracted processing logic
+- `ScriptFormatter.tsx`: 717→175 lines (76% reduction)
+- `TrelloCardsManager.tsx`: 539→165 lines (69% reduction)
+- `VideoLinksManager.tsx`: 559→169 lines (70% reduction)
+- `BatchUpdateConfirmationDialog.tsx`: 423→155 lines (63% reduction)
+- `UploadTrello.tsx`: Extracted to hook + components (111 lines)
+- `BreadcrumbsViewerEnhanced.tsx`: 524→75 lines (86% reduction)
+
+All functions now pass ESLint complexity check with threshold of 15.
+
+**Effort Actual:** 3-4 days
+
+---
+
 ### DEBT-006: Critical BUG Comments (3 instances) ✅
 
 **Category:** Code Quality
@@ -521,7 +494,7 @@ _No items marked as won't fix yet._
 ## Debt Trends
 
 ### By Category
-- Code Quality: 5 items (DEBT-001, 002, 003, 008, 011)
+- Code Quality: 4 items (DEBT-001, 003, 008, 011)
 - Architecture: 1 item (DEBT-004)
 - Test: 2 items (DEBT-009, 010)
 - Documentation: 0 items
@@ -533,7 +506,7 @@ _No items marked as won't fix yet._
 
 ### By Severity
 - Critical: 0 items
-- High: 2 items (DEBT-002, 003)
+- High: 1 item (DEBT-003)
 - Medium: 4 items (DEBT-001, 004, 009, 010)
 - Low: 3 items (DEBT-008, 011, 012)
 
@@ -547,9 +520,10 @@ _No items marked as won't fix yet._
 ### Priority Actions
 1. ~~**Immediate**: Investigate BUG comments (DEBT-006)~~ ✅ Resolved
 2. ~~**Sprint Q1 2026**: Long parameter lists (DEBT-005)~~ ✅ Already using options pattern
-3. **Sprint Q1 2026**: Address high-priority complexity and nesting issues (DEBT-002, 003)
-4. **Sprint Q1 2026**: Implement E2E testing infrastructure (DEBT-009)
-5. **Q2 2026**: Opportunistic refactoring of large files and cleanup
+3. ~~**Sprint Q1 2026**: Complex functions (DEBT-002)~~ ✅ All functions now below complexity threshold
+4. **Sprint Q1 2026**: Address deep nesting issues (DEBT-003)
+5. **Sprint Q1 2026**: Implement E2E testing infrastructure (DEBT-009)
+6. **Q2 2026**: Opportunistic refactoring of large files and cleanup
 
 ---
 
@@ -567,17 +541,17 @@ _No items marked as won't fix yet._
    - [x] Review BUG comments (DEBT-006) - ✅ Resolved
    - [x] Fix TypeScript any usages (DEBT-007) - ✅ Resolved
    - [x] Add ESLint rules for max-complexity (15), max-depth (5), max-params (6) - ✅ Added as warnings
-   - [ ] Create tickets for top 3 high-priority items
+   - [x] Complete complexity reduction (DEBT-002) - ✅ All functions below threshold
+   - [ ] Create tickets for remaining high-priority items
 
 2. **Next Sprint:**
-   - [ ] Begin refactoring most complex functions (DEBT-002)
    - [ ] Implement no-console ESLint rule for production (DEBT-001)
    - [ ] Address deep nesting issues (DEBT-003)
 
 3. **Next Quarter:**
-   - [ ] Complete complexity reduction (DEBT-002, 003)
    - [ ] Set up E2E testing infrastructure (DEBT-009)
    - [ ] Rewrite BakerPage tests (DEBT-010)
+   - [ ] Refactor remaining large files (sidebar.tsx, breadcrumbsComparison.ts, UploadDialog.tsx)
 
 ---
 
@@ -595,10 +569,10 @@ _No items marked as won't fix yet._
 - Strong TypeScript usage (no `any` in production code) ✅
 - Modern tech stack (React 18, TanStack Query, Tauri 2.0)
 - Good parameter management using options interfaces ✅
-- 3 debt items resolved since initial register
+- 4 debt items resolved since initial register
 
 **Areas of Concern:**
-- High cyclomatic complexity in core business logic functions
-- Deep nesting making code hard to follow
-- 247 console statements need cleanup
-- Missing E2E test infrastructure
+- Deep nesting making code hard to follow (DEBT-003)
+- 247 console statements need cleanup (DEBT-001)
+- Missing E2E test infrastructure (DEBT-009)
+- 3 files still exceed 500 lines (DEBT-004)
