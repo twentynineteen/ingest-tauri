@@ -1,71 +1,249 @@
 /**
  * Component Test: BakerPage
  *
- * NOTE: These tests are temporarily skipped pending a comprehensive rewrite.
- * The BakerPage component has been significantly refactored with new hooks and
- * component structure. The component works correctly in production.
- *
- * TODO: Rewrite tests to match current component architecture:
- * - Update hook mocks to match new structure
- * - Update component selectors
- * - Add proper Tauri mocking for storage utilities
- * - Test actual rendered output rather than mock implementations
+ * Tests for the Baker page component which handles folder scanning
+ * and breadcrumbs management functionality.
  */
 
-import { describe, test } from 'vitest'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
+
+// Mock all the hooks used by BakerPage
+vi.mock('@hooks/useBakerScan', () => ({
+  useBakerScan: vi.fn(() => ({
+    scanResult: null,
+    isScanning: false,
+    error: null,
+    startScan: vi.fn(),
+    cancelScan: vi.fn(),
+    clearResults: vi.fn()
+  }))
+}))
+
+vi.mock('@hooks/useBreadcrumbsManager', () => ({
+  useBreadcrumbsManager: vi.fn(() => ({
+    updateBreadcrumbs: vi.fn(),
+    isUpdating: false,
+    lastUpdateResult: null,
+    clearResults: vi.fn()
+  }))
+}))
+
+vi.mock('@hooks/useBakerPreferences', () => ({
+  useBakerPreferences: vi.fn(() => ({
+    preferences: {
+      maxDepth: 3,
+      includeHidden: false,
+      createMissing: true,
+      backupOriginals: true
+    },
+    updatePreferences: vi.fn(),
+    resetToDefaults: vi.fn()
+  }))
+}))
+
+vi.mock('@hooks/useLiveBreadcrumbsReader', () => ({
+  useLiveBreadcrumbsReader: vi.fn(() => ({
+    breadcrumbs: null,
+    isLoading: false,
+    error: null,
+    readLiveBreadcrumbs: vi.fn(),
+    clearBreadcrumbs: vi.fn()
+  }))
+}))
+
+vi.mock('@hooks/useBreadcrumbsPreview', () => ({
+  useBreadcrumbsPreview: vi.fn(() => ({
+    generatePreview: vi.fn(),
+    generateBatchPreviews: vi.fn(),
+    clearPreviews: vi.fn(),
+    getPreview: vi.fn()
+  }))
+}))
+
+vi.mock('hooks/useTrelloBoard', () => ({
+  useTrelloBoard: vi.fn(() => ({
+    apiKey: 'test-api-key',
+    token: 'test-token',
+    grouped: {},
+    isLoading: false
+  }))
+}))
+
+vi.mock('@hooks/useBakerTrelloIntegration', () => ({
+  useBakerTrelloIntegration: vi.fn(() => ({
+    updateTrelloCards: vi.fn().mockResolvedValue([])
+  }))
+}))
+
+vi.mock('hooks/useBreadcrumb', () => ({
+  useBreadcrumb: vi.fn()
+}))
+
+// Mock Tauri APIs
+vi.mock('@tauri-apps/plugin-dialog', () => ({
+  open: vi.fn()
+}))
+
+// Import after mocks
+import { useBakerScan } from '@hooks/useBakerScan'
+import BakerPage from '../../src/pages/Baker/Baker'
+
+// Helper to render with providers
+function renderWithProviders(ui: React.ReactElement) {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: false
+      }
+    }
+  })
+
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>{ui}</MemoryRouter>
+    </QueryClientProvider>
+  )
+}
 
 describe('BakerPage Component', () => {
-  describe.skip('Rendering Tests', () => {
-    test('should render page title and main elements', () => {
-      // TODO: Implement with updated component structure
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  describe('Rendering Tests', () => {
+    test('should render page title', () => {
+      renderWithProviders(<BakerPage />)
+      expect(screen.getByText('Baker')).toBeInTheDocument()
     })
 
-    test('should set breadcrumbs correctly', () => {
-      // TODO: Implement with updated hooks
+    test('should render folder selector', () => {
+      renderWithProviders(<BakerPage />)
+      expect(screen.getByText(/select.*folder/i)).toBeInTheDocument()
     })
 
-    test('should handle folder selection', () => {
-      // TODO: Implement with FolderSelector component
+    test('should render scan button', () => {
+      renderWithProviders(<BakerPage />)
+      expect(screen.getByRole('button', { name: /scan/i })).toBeInTheDocument()
     })
   })
 
-  describe.skip('Scan Workflow Tests', () => {
-    test('should start scan when scan button is clicked', () => {
-      // TODO: Implement with useBakerScan hook
-    })
+  describe('Scan State Tests', () => {
+    test('should show cancel button when scanning', () => {
+      vi.mocked(useBakerScan).mockReturnValue({
+        scanResult: null,
+        isScanning: true,
+        error: null,
+        startScan: vi.fn(),
+        cancelScan: vi.fn(),
+        clearResults: vi.fn()
+      })
 
-    test('should disable scan button when scanning is in progress', () => {
-      // TODO: Implement scanning state tests
+      renderWithProviders(<BakerPage />)
+      expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument()
     })
 
     test('should show error message when scan fails', () => {
-      // TODO: Implement error handling tests
-    })
+      vi.mocked(useBakerScan).mockReturnValue({
+        scanResult: null,
+        isScanning: false,
+        error: 'Failed to scan folder',
+        startScan: vi.fn(),
+        cancelScan: vi.fn(),
+        clearResults: vi.fn()
+      })
 
-    test('should handle cancel scan operation', () => {
-      // TODO: Implement cancel functionality
-    })
-
-    test('should validate folder path before starting scan', () => {
-      // TODO: Implement validation tests
+      renderWithProviders(<BakerPage />)
+      expect(screen.getByText(/failed to scan folder/i)).toBeInTheDocument()
     })
   })
 
-  describe.skip('Results and Actions Tests', () => {
-    test('should display scan results when available', () => {
-      // TODO: Implement with ScanResults component
+  describe('Results Display Tests', () => {
+    test('should display project count when results available', () => {
+      vi.mocked(useBakerScan).mockReturnValue({
+        scanResult: {
+          projects: [
+            {
+              path: '/test/project1',
+              name: 'Project 1',
+              isValid: true,
+              hasBreadcrumbs: true,
+              staleBreadcrumbs: false,
+              invalidBreadcrumbs: false,
+              lastScanned: new Date().toISOString(),
+              cameraCount: 2,
+              validationErrors: []
+            },
+            {
+              path: '/test/project2',
+              name: 'Project 2',
+              isValid: true,
+              hasBreadcrumbs: false,
+              staleBreadcrumbs: false,
+              invalidBreadcrumbs: false,
+              lastScanned: new Date().toISOString(),
+              cameraCount: 1,
+              validationErrors: []
+            }
+          ],
+          startTime: new Date().toISOString(),
+          endTime: new Date().toISOString(),
+          rootPath: '/test',
+          totalFolders: 10,
+          validProjects: 2,
+          updatedBreadcrumbs: 0,
+          createdBreadcrumbs: 0,
+          totalFolderSize: 1024000,
+          errors: []
+        },
+        isScanning: false,
+        error: null,
+        startScan: vi.fn(),
+        cancelScan: vi.fn(),
+        clearResults: vi.fn()
+      })
+
+      renderWithProviders(<BakerPage />)
+      expect(screen.getByText(/2.*projects/i)).toBeInTheDocument()
     })
 
-    test('should handle project selection', () => {
-      // TODO: Implement with ProjectList component
-    })
+    test('should display project names in results', () => {
+      vi.mocked(useBakerScan).mockReturnValue({
+        scanResult: {
+          projects: [
+            {
+              path: '/test/project1',
+              name: 'Test Project Alpha',
+              isValid: true,
+              hasBreadcrumbs: true,
+              staleBreadcrumbs: false,
+              invalidBreadcrumbs: false,
+              lastScanned: new Date().toISOString(),
+              cameraCount: 2,
+              validationErrors: []
+            }
+          ],
+          startTime: new Date().toISOString(),
+          endTime: new Date().toISOString(),
+          rootPath: '/test',
+          totalFolders: 5,
+          validProjects: 1,
+          updatedBreadcrumbs: 0,
+          createdBreadcrumbs: 0,
+          totalFolderSize: 512000,
+          errors: []
+        },
+        isScanning: false,
+        error: null,
+        startScan: vi.fn(),
+        cancelScan: vi.fn(),
+        clearResults: vi.fn()
+      })
 
-    test('should handle batch operations', () => {
-      // TODO: Implement with BatchActions component
-    })
-
-    test('should show preferences dialog when settings button is clicked', () => {
-      // TODO: Implement with BakerPreferences component
+      renderWithProviders(<BakerPage />)
+      expect(screen.getByText('Test Project Alpha')).toBeInTheDocument()
     })
   })
 })
