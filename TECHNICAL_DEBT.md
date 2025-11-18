@@ -64,8 +64,8 @@ Medium - Not blocking functionality but affects code quality. Can be addressed s
 
 **Location:**
 - ~~`hooks/useScriptProcessor.ts` - complexity 40 (214 lines)~~ ✅ Refactored to <15
-- `pages/AI/ScriptFormatter/ScriptFormatter.tsx` - complexity 39
-- `components/Baker/TrelloCardsManager.tsx` - complexity 30
+- ~~`pages/AI/ScriptFormatter/ScriptFormatter.tsx` - complexity 39 (717 lines)~~ ✅ Refactored to <15 (175 lines)
+- ~~`components/Baker/TrelloCardsManager.tsx` - complexity 30 (539 lines)~~ ✅ Refactored to <15 (165 lines)
 - `components/Baker/VideoLinksManager.tsx` - complexity 29
 - `components/BatchUpdateConfirmationDialog.tsx` - complexity 29
 - `pages/UploadTrello.tsx` - complexity 19
@@ -102,7 +102,15 @@ High - These are high-churn areas that slow development and increase bug risk. P
 
 **Progress:**
 - ✅ `useScriptProcessor.ts` refactored from complexity 32 to <15 (2025-11-18)
-- Remaining: 6 functions still above threshold
+- ✅ `ScriptFormatter.tsx` refactored from complexity 39 to <15 (2025-11-18)
+  - Extracted state management to `useScriptFormatterState` hook
+  - Created step components: SelectModelStep, ProcessingStep, ReviewStep, DownloadCompleteStep, WorkflowIndicator
+  - Reduced from 717 lines to 175 lines (76% reduction)
+- ✅ `TrelloCardsManager.tsx` refactored from complexity 30 to <15 (2025-11-18)
+  - Extracted state management to `useTrelloCardsManager` hook
+  - Created `AddCardDialog` component for dialog logic
+  - Reduced from 539 lines to 165 lines (69% reduction)
+- Remaining: 4 functions still above threshold
 
 **Target Resolution:** Sprint 2026-Q1
 
@@ -155,7 +163,7 @@ High - Directly impacts code maintainability and bug rate. These files are frequ
 
 ---
 
-### DEBT-004: Large Files (7 files >500 lines)
+### DEBT-004: Large Files (5 files >500 lines)
 
 **Category:** Architecture
 
@@ -165,15 +173,15 @@ High - Directly impacts code maintainability and bug rate. These files are frequ
 
 **Location:**
 - `components/ui/sidebar.tsx` - 722 lines
-- `pages/AI/ScriptFormatter/ScriptFormatter.tsx` - 717 lines
+- ~~`pages/AI/ScriptFormatter/ScriptFormatter.tsx` - 717 lines~~ ✅ Reduced to 175 lines
 - `utils/breadcrumbsComparison.ts` - 565 lines
 - `components/Baker/VideoLinksManager.tsx` - 559 lines
-- `components/Baker/TrelloCardsManager.tsx` - 533 lines
+- ~~`components/Baker/TrelloCardsManager.tsx` - 533 lines~~ ✅ Reduced to 165 lines
 - `components/BreadcrumbsViewerEnhanced.tsx` - 524 lines
 - `pages/AI/ExampleEmbeddings/UploadDialog.tsx` - 505 lines
 
 **Description:**
-Seven files exceed the recommended 500-line limit, indicating potential violation of single responsibility principle.
+Five files exceed the recommended 500-line limit (down from 7), indicating potential violation of single responsibility principle.
 
 **Impact:**
 - **Business Impact:** Slower code reviews, harder to understand business logic
@@ -197,7 +205,12 @@ For each large file:
 **Priority Justification:**
 Medium - Not immediately blocking but affects maintainability. Should be addressed when working in these areas.
 
-**Status:** Open
+**Status:** In Progress
+
+**Progress:**
+- ✅ `ScriptFormatter.tsx` reduced from 717 to 175 lines (2025-11-18)
+- ✅ `TrelloCardsManager.tsx` reduced from 533 to 165 lines (2025-11-18)
+- Remaining: 5 files still exceed 500 lines
 
 **Target Resolution:** Q2 2026 (opportunistic refactoring)
 
