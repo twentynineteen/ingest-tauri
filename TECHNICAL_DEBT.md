@@ -67,7 +67,7 @@ Medium - Not blocking functionality but affects code quality. Can be addressed s
 - ~~`pages/AI/ScriptFormatter/ScriptFormatter.tsx` - complexity 39 (717 lines)~~ ✅ Refactored to <15 (175 lines)
 - ~~`components/Baker/TrelloCardsManager.tsx` - complexity 30 (539 lines)~~ ✅ Refactored to <15 (165 lines)
 - ~~`components/Baker/VideoLinksManager.tsx` - complexity 29 (559 lines)~~ ✅ Refactored to <15 (169 lines)
-- `components/BatchUpdateConfirmationDialog.tsx` - complexity 29
+- ~~`components/BatchUpdateConfirmationDialog.tsx` - complexity 29 (423 lines)~~ ✅ Refactored to <15 (155 lines)
 - `pages/UploadTrello.tsx` - complexity 19
 - `components/BreadcrumbsViewerEnhanced.tsx` - complexity 18
 
@@ -114,7 +114,11 @@ High - These are high-churn areas that slow development and increase bug risk. P
   - Extracted state management to `useVideoLinksManager` hook
   - Created `AddVideoDialog` component for dialog logic
   - Reduced from 559 lines to 169 lines (70% reduction)
-- Remaining: 3 functions still above threshold
+- ✅ `BatchUpdateConfirmationDialog.tsx` refactored from complexity 29 to <15 (2025-11-18)
+  - Extracted summary calculation to `batchUpdateSummary.ts` utility
+  - Created sub-components: SummaryStats, ChangesSummary, CommonUpdates, DetailedChangesSection
+  - Reduced from 423 lines to 155 lines (63% reduction)
+- Remaining: 2 functions still above threshold
 
 **Target Resolution:** Sprint 2026-Q1
 
