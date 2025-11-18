@@ -1,4 +1,6 @@
 import { mockIPC } from '@tauri-apps/api/mocks'
+import { dirname, resolve } from 'path'
+import { fileURLToPath } from 'url'
 import type { BreadcrumbsFile, VideoLink, TrelloCard } from '../../src/types/baker'
 
 export function setupTauriMocks() {
@@ -393,8 +395,10 @@ export function setupTauriMocks() {
   })
 
   // Initialize test data for Baker contract tests
-  const testDataPath = '/Users/danielmills/Documents/CODE/ingest-tauri/tests/fixtures/baker-test-data'
-  const testProject1Path = `${testDataPath}/TestProject1`
+  // Use fileURLToPath to get proper path format from import.meta.url
+  const currentDir = dirname(fileURLToPath(import.meta.url))
+  const testDataPath = resolve(currentDir, '../fixtures/baker-test-data')
+  const testProject1Path = resolve(testDataPath, 'TestProject1')
 
   // Set up TestProject1 with breadcrumbs
   mockBreadcrumbsStore.set(testProject1Path, {
