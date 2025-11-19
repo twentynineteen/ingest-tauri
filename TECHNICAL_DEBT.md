@@ -6,12 +6,12 @@
 
 ## Summary
 
-- **Total Debt Items:** 9 (6 resolved)
+- **Total Debt Items:** 9 (7 resolved)
 - **Critical:** 0
 - **High:** 0
-- **Medium:** 3
+- **Medium:** 2
 - **Low:** 3
-- **Estimated Total Effort:** 4-6 days
+- **Estimated Total Effort:** 3-5 days
 
 ---
 
@@ -65,58 +65,64 @@ Medium - Not blocking functionality but affects code quality. Can be addressed s
 
 ---
 
-### DEBT-004: Large Files (4 files >500 lines)
+### DEBT-004: Large Files (1 file >500 lines)
 
 **Category:** Architecture
 
-**Severity:** Medium
+**Severity:** Low
 
 **Created:** 2025-11-17
 
 **Location:**
-- `components/ui/sidebar.tsx` - 722 lines
+- `components/ui/sidebar.tsx` - 722 lines (shadcn/ui component - intentionally single-file)
 - ~~`pages/AI/ScriptFormatter/ScriptFormatter.tsx` - 717 lines~~ ✅ Reduced to 175 lines
-- `utils/breadcrumbsComparison.ts` - 565 lines
+- ~~`utils/breadcrumbsComparison.ts` - 565 lines~~ ✅ Reduced to 27 lines (re-export file)
 - ~~`components/Baker/VideoLinksManager.tsx` - 559 lines~~ ✅ Reduced to 169 lines
 - ~~`components/Baker/TrelloCardsManager.tsx` - 533 lines~~ ✅ Reduced to 165 lines
 - ~~`components/BreadcrumbsViewerEnhanced.tsx` - 524 lines~~ ✅ Reduced to 75 lines
-- `pages/AI/ExampleEmbeddings/UploadDialog.tsx` - 504 lines
+- ~~`pages/AI/ExampleEmbeddings/UploadDialog.tsx` - 504 lines~~ ✅ Reduced to 223 lines
 
 **Description:**
-Four files exceed the recommended 500-line limit (down from 7), indicating potential violation of single responsibility principle.
+Only one file exceeds the recommended 500-line limit (sidebar.tsx), but this is intentional as it's a shadcn/ui design system component that follows the single-file pattern.
 
 **Impact:**
-- **Business Impact:** Slower code reviews, harder to understand business logic
-- **Technical Impact:** Merge conflicts more likely, testing more difficult
-- **Risk:** Changes in one area unexpectedly affect another
+- **Business Impact:** Minimal - sidebar.tsx is a design system component with clear structure
+- **Technical Impact:** Low - well-organized with clear sections
+- **Risk:** Low - component is stable and rarely modified
 
 **Root Cause:**
 Feature additions over time without decomposition. UI components grew to include business logic, state management, and presentation.
 
 **Proposed Solution:**
 For each large file:
-1. **sidebar.tsx**: Extract sub-components, separate navigation logic
-2. **ScriptFormatter.tsx**: Extract processing logic to hooks/services, split UI into sub-components
-3. **breadcrumbsComparison.ts**: Split into comparison logic, diff calculation, and formatting
-4. **VideoLinksManager/TrelloCardsManager**: Extract dialog components, extract business logic to hooks
-5. **BreadcrumbsViewerEnhanced**: Split preview, comparison, and rendering concerns
-6. **UploadDialog**: Extract validation, form logic, and upload handling
+1. **sidebar.tsx**: ⚠️ Skip - shadcn/ui component follows single-file design pattern
+2. **ScriptFormatter.tsx**: ✅ Extracted processing logic to hooks/services
+3. **breadcrumbsComparison.ts**: ✅ Split into 6 focused modules (comparison, formatting, categorization, preview, date, debug)
+4. **VideoLinksManager/TrelloCardsManager**: ✅ Extracted dialog components and business logic to hooks
+5. **BreadcrumbsViewerEnhanced**: ✅ Split preview, comparison, and rendering concerns
+6. **UploadDialog**: ✅ Extracted form hook, model status indicator, success view, and file input field
 
 **Effort Estimate:** 4-5 days
 
 **Priority Justification:**
-Medium - Not immediately blocking but affects maintainability. Should be addressed when working in these areas.
+Low - Only one file remains (sidebar.tsx) and it's an intentional design choice for shadcn/ui components.
 
-**Status:** In Progress
+**Status:** Completed ✅
 
 **Progress:**
 - ✅ `ScriptFormatter.tsx` reduced from 717 to 175 lines (2025-11-18)
 - ✅ `TrelloCardsManager.tsx` reduced from 533 to 165 lines (2025-11-18)
 - ✅ `VideoLinksManager.tsx` reduced from 559 to 169 lines (2025-11-18)
 - ✅ `BreadcrumbsViewerEnhanced.tsx` reduced from 524 to 75 lines (2025-11-18)
-- Remaining: 3 files still exceed 500 lines (sidebar.tsx, breadcrumbsComparison.ts, UploadDialog.tsx)
+- ✅ `breadcrumbsComparison.ts` reduced from 565 to 27 lines (2025-11-19)
+  - Split into `src/utils/breadcrumbs/` module with 6 focused files
+  - Maintains backward compatibility via re-exports
+- ✅ `UploadDialog.tsx` reduced from 504 to 223 lines (2025-11-19)
+  - Extracted `useUploadDialogForm` hook (205 lines)
+  - Extracted `ModelStatusIndicator`, `UploadSuccessView`, `FileInputField` components
+- ⚠️ `sidebar.tsx` (722 lines) - Not refactored (shadcn/ui design pattern)
 
-**Target Resolution:** Q2 2026 (opportunistic refactoring)
+**Resolved:** 2025-11-19
 
 ---
 
@@ -479,7 +485,7 @@ _No items marked as won't fix yet._
 
 ### By Category
 - Code Quality: 3 items (DEBT-001, 008, 011)
-- Architecture: 1 item (DEBT-004)
+- Architecture: 0 items
 - Test: 1 item (DEBT-009)
 - Documentation: 0 items
 - Dependency: 1 item (DEBT-012)
@@ -491,7 +497,7 @@ _No items marked as won't fix yet._
 ### By Severity
 - Critical: 0 items
 - High: 0 items
-- Medium: 3 items (DEBT-001, 004, 009)
+- Medium: 2 items (DEBT-001, 009)
 - Low: 3 items (DEBT-008, 011, 012)
 
 ### Aging
@@ -535,7 +541,7 @@ _No items marked as won't fix yet._
 
 3. **Next Quarter:**
    - [x] Rewrite BakerPage tests (DEBT-010) - ✅ Completed
-   - [ ] Refactor remaining large files (sidebar.tsx, breadcrumbsComparison.ts, UploadDialog.tsx)
+   - [x] Refactor large files (DEBT-004) - ✅ Completed (sidebar.tsx skipped as shadcn/ui)
 
 ---
 
@@ -553,10 +559,10 @@ _No items marked as won't fix yet._
 - Strong TypeScript usage (no `any` in production code) ✅
 - Modern tech stack (React 18, TanStack Query, Tauri 2.0)
 - Good parameter management using options interfaces ✅
-- 6 debt items resolved since initial register
+- 7 debt items resolved since initial register
 - All high-severity items resolved ✅
+- All architecture debt resolved ✅
 
 **Areas of Concern:**
 - 247 console statements need cleanup (DEBT-001)
 - Missing E2E test infrastructure (DEBT-009)
-- 3 files still exceed 500 lines (DEBT-004)
