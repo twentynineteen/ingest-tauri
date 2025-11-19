@@ -13,6 +13,13 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+// Skip embedding generation in CI environments
+if (process.env.CI) {
+  console.log('⏭️  Skipping embedding generation in CI environment')
+  console.log('   Pre-built examples.db should be committed to the repository\n')
+  process.exit(0)
+}
+
 const OLLAMA_BASE_URL = 'http://localhost:11434'
 const EMBEDDING_MODEL = 'nomic-embed-text'
 
