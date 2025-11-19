@@ -26,7 +26,7 @@
     "test:e2e:debug": "playwright test --config tests/e2e/playwright.config.ts --debug",
     "test:e2e:report": "playwright show-report playwright-report"
   },
-  "license": "MIT",
+  "license": "UNLICENSED",
   "devDependencies": {
     "@ai-sdk/provider-utils": "^3.0.12",
     "@babel/core": "^7.28.4",
