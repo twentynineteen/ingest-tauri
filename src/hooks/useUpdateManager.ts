@@ -7,7 +7,10 @@ import { ask, message } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { relaunch } from '@tauri-apps/plugin-process'
 import { check } from '@tauri-apps/plugin-updater'
+import { createNamespacedLogger } from '../utils/logger'
 import { useVersionCheck } from './useVersionCheck'
+
+const log = createNamespacedLogger('UpdateManager')
 
 interface UpdateManagerOptions {
   onUserClick: boolean
@@ -76,7 +79,7 @@ export function useUpdateManager() {
         })
       }
     } catch (error) {
-      console.error('Update check error:', error)
+      console.error('[UpdateManager] Update check error:', error)
       await message(
         error.message || 'An unexpected error occurred during update check.',
         {
@@ -98,13 +101,13 @@ export function useUpdateManager() {
  */
 async function performUpdate(): Promise<void> {
   try {
-    console.log('Checking for updates using Tauri updater...')
+    log.info('Checking for updates using Tauri updater...')
 
     // Use Tauri's built-in check() function
     const update = await check()
 
     if (update) {
-      console.log('Update found:', {
+      log.info('Update found:', {
         version: update.version,
         date: update.date,
         body: update.body
@@ -119,11 +122,11 @@ async function performUpdate(): Promise<void> {
 
       // Use Tauri's built-in downloadAndInstall
       await update.downloadAndInstall(event => {
-        console.log('Update progress:', event)
+        log.debug('Update progress:', event)
         // Could add progress UI here if needed
       })
 
-      console.log('Update installed successfully')
+      log.info('Update installed successfully')
 
       // Ask user if they want to restart now or later
       const restartNow = await ask(
@@ -137,11 +140,11 @@ async function performUpdate(): Promise<void> {
       )
 
       if (restartNow) {
-        console.log('User chose to restart now')
+        log.info('User chose to restart now')
         try {
           await relaunch()
         } catch (restartError) {
-          console.error('Failed to restart automatically:', restartError)
+          console.error('[UpdateManager] Failed to restart automatically:', restartError)
           await message(
             'Automatic restart failed. Please close and reopen the app to complete the update.',
             {
@@ -152,7 +155,7 @@ async function performUpdate(): Promise<void> {
           )
         }
       } else {
-        console.log('User chose to restart later')
+        log.info('User chose to restart later')
         await message(
           'Update installed! Please restart the app when convenient to apply the changes.',
           {
@@ -166,7 +169,7 @@ async function performUpdate(): Promise<void> {
       throw new Error('No update available from Tauri updater')
     }
   } catch (error) {
-    console.error('Tauri updater error:', error)
+    console.error('[UpdateManager] Tauri updater error:', error)
 
     // Offer manual download as fallback
     const manualUpdate = await ask(

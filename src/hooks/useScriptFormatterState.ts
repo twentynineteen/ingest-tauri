@@ -23,6 +23,9 @@ import {
   type ProviderConfiguration,
   type ScriptDocument
 } from '../types/scriptFormatter'
+import { createNamespacedLogger } from '../utils/logger'
+
+const log = createNamespacedLogger('ScriptFormatterState')
 
 export type WorkflowStep = 'upload' | 'select-model' | 'processing' | 'review' | 'download'
 
@@ -43,20 +46,20 @@ function convertMarkdownToHtml(text: string): string {
 function restoreCachedOutput(): ProcessedOutput | null {
   const savedOutput = localStorage.getItem(STORAGE_KEYS.PROCESSED_OUTPUT)
   if (!savedOutput) {
-    console.log('[ScriptFormatter] No cached result found')
+    log.debug('No cached result found')
     return null
   }
 
   try {
     const output = JSON.parse(savedOutput)
-    console.log('[ScriptFormatter] Restored cached result:', {
+    log.debug('Restored cached result:', {
       formattedTextPreview: output.formattedText.substring(0, 100),
       timestamp: output.generationTimestamp,
       examplesCount: output.examplesCount
     })
     return output
   } catch (err) {
-    console.warn('[ScriptFormatter] Failed to restore cached result:', err)
+    console.warn('[ScriptFormatterState] Failed to restore cached result:', err)
     localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
     return null
   }
@@ -159,14 +162,14 @@ export function useScriptFormatterState() {
   )
 
   const handleFormatScript = useCallback(async () => {
-    console.log('handleFormatScript called', {
+    log.debug('handleFormatScript called', {
       document,
       selectedModelId,
       activeProvider
     })
 
     if (!document || !selectedModelId || !activeProvider) {
-      console.warn('Missing required data:', {
+      console.warn('[ScriptFormatterState] Missing required data:', {
         document,
         selectedModelId,
         activeProvider
@@ -182,11 +185,11 @@ export function useScriptFormatterState() {
     setRagStatus('')
     setExamplesCount(0)
 
-    console.log('Setting step to processing...')
+    log.debug('Setting step to processing...')
     setCurrentStep('processing')
 
     try {
-      console.log(
+      log.debug(
         'Processing script with user input:',
         document.textContent.substring(0, 200) + '...'
       )
@@ -197,15 +200,15 @@ export function useScriptFormatterState() {
         providerId: activeProvider.id,
         configuration: activeProvider.configuration,
         enabledExampleIds: enabledExampleIds,
-        onProgress: prog => console.log(`Progress: ${prog}%`),
+        onProgress: prog => log.debug(`Progress: ${prog}%`),
         onRAGUpdate: (status, count) => {
           setRagStatus(status)
           setExamplesCount(count)
         }
       })
 
-      console.log('Processing completed successfully:', output)
-      console.log('Output preview:', output.formattedText.substring(0, 200) + '...')
+      log.debug('Processing completed successfully:', output)
+      log.info('Output preview:', output.formattedText.substring(0, 200) + '...')
 
       setMarkdownText(output.formattedText)
       setModifiedText(output.formattedText)
@@ -214,7 +217,7 @@ export function useScriptFormatterState() {
 
       localStorage.setItem(STORAGE_KEYS.PROCESSED_OUTPUT, JSON.stringify(output))
     } catch (error) {
-      console.error('Processing failed with error:', error)
+      console.error('[ScriptFormatterState] Processing failed with error:', error)
     }
   }, [document, selectedModelId, activeProvider, enabledExampleIds, processScript])
 
@@ -270,9 +273,9 @@ export function useScriptFormatterState() {
       }
 
       try {
-        console.log('[SaveExample] Generating embedding from formatted text...')
+        log.info('Generating embedding from formatted text...')
         const embedding = await embedForSaving(modifiedText)
-        console.log(`[SaveExample] Embedding generated: ${embedding.length} dimensions`)
+        log.info(`Embedding generated: ${embedding.length} dimensions`)
 
         const metadata: ExampleMetadata = {
           title,
@@ -289,9 +292,9 @@ export function useScriptFormatterState() {
         }
 
         await uploadExample.mutateAsync(request)
-        console.log('[SaveExample] Example saved successfully!')
+        log.info('Example saved successfully!')
       } catch (error) {
-        console.error('[SaveExample] Failed to save example:', error)
+        console.error('[ScriptFormatterState] Failed to save example:', error)
         throw error
       }
     },

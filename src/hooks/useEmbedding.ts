@@ -6,6 +6,9 @@
 
 import { pipeline, type Pipeline } from '@xenova/transformers'
 import { useEffect, useRef, useState } from 'react'
+import { createNamespacedLogger } from '../utils/logger'
+
+const log = createNamespacedLogger('Embedding')
 
 // Xenova feature extraction pipeline type
 type FeatureExtractionPipeline = Pipeline
@@ -59,23 +62,23 @@ export function useEmbedding(): UseEmbeddingResult {
       loadingPromise = pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2')
 
       try {
-        console.log('[useEmbedding] Starting to load Xenova embedding model...')
-        console.log('[useEmbedding] Model: Xenova/all-MiniLM-L6-v2')
+        log.info('Starting to load Xenova embedding model...')
+        log.debug('Model: Xenova/all-MiniLM-L6-v2')
         embedderInstance = await loadingPromise
-        console.log('[useEmbedding] ✓ Embedding model loaded successfully!')
+        log.info('Embedding model loaded successfully!')
 
         if (isMountedRef.current) {
           setIsReady(true)
           setIsLoading(false)
-          console.log('[useEmbedding] ✓ State updated - RAG is ready')
+          log.debug('State updated - RAG is ready')
         }
       } catch (err) {
-        console.error('[useEmbedding] ✗ FAILED to load embedding model:', err)
+        console.error('[Embedding] FAILED to load embedding model:', err)
         console.error(
-          '[useEmbedding] Error type:',
+          '[Embedding] Error type:',
           err instanceof Error ? 'Error' : typeof err
         )
-        console.error('[useEmbedding] Error details:', JSON.stringify(err, null, 2))
+        console.error('[Embedding] Error details:', JSON.stringify(err, null, 2))
         if (isMountedRef.current) {
           const errorMessage =
             err instanceof Error
@@ -83,7 +86,7 @@ export function useEmbedding(): UseEmbeddingResult {
               : 'Failed to load embedding model (unknown error)'
           setError(new Error(errorMessage))
           setIsLoading(false)
-          console.log('[useEmbedding] ✗ State updated - RAG failed')
+          log.debug('State updated - RAG failed')
         }
       } finally {
         loadingPromise = null
@@ -107,9 +110,7 @@ export function useEmbedding(): UseEmbeddingResult {
     }
 
     try {
-      console.log(
-        `[useEmbedding] Generating embedding for text (${text.length} chars)...`
-      )
+      log.debug(`Generating embedding for text (${text.length} chars)...`)
 
       const output = await embedderInstance(text, {
         pooling: 'mean',
@@ -117,11 +118,11 @@ export function useEmbedding(): UseEmbeddingResult {
       })
 
       const embedding = Array.from(output.data) as number[]
-      console.log(`[useEmbedding] Embedding generated (${embedding.length} dimensions)`)
+      log.debug(`Embedding generated (${embedding.length} dimensions)`)
 
       return embedding
     } catch (err) {
-      console.error('[useEmbedding] Failed to generate embedding:', err)
+      console.error('[Embedding] Failed to generate embedding:', err)
       throw err instanceof Error ? err : new Error('Failed to generate embedding')
     }
   }

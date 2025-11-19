@@ -60,10 +60,17 @@ Medium - Not blocking functionality but affects code quality. Can be addressed s
   - Drop-in replacement for console.log
 - ✅ Migrated `useScriptProcessor.ts` to logger utility (2025-11-19)
   - 13 console.log statements converted to namespaced logger
-- Current status: 128 console.log remaining (down from 141)
+- ✅ Migrated 6 additional files to logger utility (2025-11-19)
+  - `useScriptFormatterState.ts` - 11 statements migrated
+  - `updateManifest.ts` - 11 statements migrated
+  - `useCopyProgress.ts` - 8 statements migrated
+  - `useEmbedding.ts` - 7 statements migrated
+  - `AppRouter.tsx` - 7 statements migrated
+  - `useUpdateManager.ts` - 6 statements migrated
+- Current status: 78 console.log remaining (down from 128)
   - 34 in UserFeedbackService.ts (intentional user feedback - keep)
   - 8 in debug.ts (development debugging - keep)
-  - ~86 candidates for gradual migration
+  - ~36 candidates for gradual migration
 - Remaining: Continue gradual migration as files are touched
 
 **Target Resolution:** Q1 2026
