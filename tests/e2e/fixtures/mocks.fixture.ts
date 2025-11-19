@@ -1,27 +1,144 @@
 import { Page } from '@playwright/test'
 
+import type {
+  BreadcrumbsFile,
+  ProjectFolder,
+  ScanResult,
+} from '../../../src/types/baker'
+import type { ExampleWithMetadata } from '../../../src/types/exampleEmbeddings'
+
 /**
  * Mock data and helpers for Tauri API mocking
  */
 
 /**
- * Mock breadcrumbs data for testing
+ * Mock breadcrumbs file (matches BreadcrumbsFile interface)
  */
-export const mockBreadcrumbs = {
-  projectName: 'Test Project',
-  clientName: 'Test Client',
-  shootDate: '2024-01-15',
+export const mockBreadcrumbs: BreadcrumbsFile = {
+  projectTitle: 'Test Project',
+  numberOfCameras: 2,
+  files: [
+    { camera: 1, name: 'A001_001.mov', path: '/Footage/A001_001.mov' },
+    { camera: 2, name: 'B001_001.mov', path: '/Footage/B001_001.mov' },
+  ],
+  parentFolder: '/test/project',
+  createdBy: 'Test User',
+  creationDateTime: '2024-01-15T10:00:00Z',
+  folderSizeBytes: 1024000,
   videoLinks: [],
   trelloCards: [],
 }
 
 /**
- * Mock project folder structure
+ * Mock project folder (matches ProjectFolder interface)
  */
-export const mockProjectStructure = {
+export const mockProjectFolder: ProjectFolder = {
   path: '/test/project',
-  folders: ['Footage', 'Graphics', 'Renders', 'Projects', 'Scripts'],
+  name: 'Test Project',
+  isValid: true,
   hasBreadcrumbs: true,
+  staleBreadcrumbs: false,
+  invalidBreadcrumbs: false,
+  lastScanned: '2024-01-15T10:00:00Z',
+  cameraCount: 2,
+  validationErrors: [],
+}
+
+/**
+ * Mock example embedding data (matches ExampleWithMetadata interface)
+ */
+export const mockExamples: ExampleWithMetadata[] = [
+  {
+    id: '1',
+    title: 'Educational Script Example',
+    category: 'educational',
+    beforeText: 'Original script content for testing',
+    afterText: 'Formatted script content for testing',
+    tags: ['tutorial', 'beginner'],
+    wordCount: 150,
+    qualityScore: 4,
+    source: 'bundled',
+    createdAt: '2024-01-01T00:00:00Z',
+  },
+  {
+    id: '2',
+    title: 'Business Script Example',
+    category: 'business',
+    beforeText: 'Another original script',
+    afterText: 'Another formatted script',
+    tags: ['corporate', 'presentation'],
+    wordCount: 200,
+    qualityScore: 5,
+    source: 'bundled',
+    createdAt: '2024-01-02T00:00:00Z',
+  },
+  {
+    id: '3',
+    title: 'User Custom Script',
+    category: 'user-custom',
+    beforeText: 'User uploaded original script',
+    afterText: 'User uploaded formatted script',
+    tags: ['custom'],
+    wordCount: 100,
+    qualityScore: 3,
+    source: 'user-uploaded',
+    createdAt: '2024-01-10T00:00:00Z',
+  },
+]
+
+/**
+ * Mock scan results for Baker (matches ProjectFolder[])
+ */
+export const mockScanResults: ProjectFolder[] = [
+  {
+    path: '/test/project-1',
+    name: 'Project One',
+    isValid: true,
+    hasBreadcrumbs: true,
+    staleBreadcrumbs: false,
+    invalidBreadcrumbs: false,
+    lastScanned: '2024-01-15T10:00:00Z',
+    cameraCount: 2,
+    validationErrors: [],
+  },
+  {
+    path: '/test/project-2',
+    name: 'Project Two',
+    isValid: true,
+    hasBreadcrumbs: true,
+    staleBreadcrumbs: true,
+    invalidBreadcrumbs: false,
+    lastScanned: '2024-01-14T10:00:00Z',
+    cameraCount: 3,
+    validationErrors: [],
+  },
+  {
+    path: '/test/project-3',
+    name: 'Project Three',
+    isValid: true,
+    hasBreadcrumbs: false,
+    staleBreadcrumbs: false,
+    invalidBreadcrumbs: false,
+    lastScanned: '2024-01-13T10:00:00Z',
+    cameraCount: 1,
+    validationErrors: [],
+  },
+]
+
+/**
+ * Mock complete scan result (matches ScanResult interface)
+ */
+export const mockScanResult: ScanResult = {
+  startTime: '2024-01-15T10:00:00Z',
+  endTime: '2024-01-15T10:05:00Z',
+  rootPath: '/test',
+  totalFolders: 10,
+  validProjects: 3,
+  updatedBreadcrumbs: 1,
+  createdBreadcrumbs: 0,
+  totalFolderSize: 5120000,
+  errors: [],
+  projects: mockScanResults,
 }
 
 /**
