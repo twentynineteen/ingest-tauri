@@ -3,8 +3,11 @@ import { core } from '@tauri-apps/api'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { loadApiKeys } from '../utils/storage'
+import { createNamespacedLogger } from '../utils/logger'
 import { queryKeys } from './query-keys'
 import { createQueryError, createQueryOptions, shouldRetry } from './query-utils'
+
+const logger = createNamespacedLogger('Prefetch')
 
 /**
  * Query Prefetching Strategies
@@ -35,7 +38,7 @@ export class QueryPrefetchManager {
 
     const failures = results.filter(result => result.status === 'rejected')
     if (failures.length > 0) {
-      console.warn('Some startup data prefetching failed:', failures)
+      logger.log('Some startup data prefetching failed:', failures)
     }
 
     return results
@@ -130,7 +133,7 @@ export class QueryPrefetchManager {
         | Record<string, string>
         | undefined
       if (!apiKeys?.trello || !apiKeys?.trelloToken) {
-        console.log('Trello prefetch skipped: missing API credentials')
+        logger.log('Trello prefetch skipped: missing API credentials')
         return
       }
       apiKey = apiKeys.trello
@@ -176,7 +179,7 @@ export class QueryPrefetchManager {
         | Record<string, string>
         | undefined
       if (!apiKeys?.sproutVideo) {
-        console.log('Sprout prefetch skipped: missing API key')
+        logger.log('Sprout prefetch skipped: missing API key')
         return
       }
       apiKey = apiKeys.sproutVideo

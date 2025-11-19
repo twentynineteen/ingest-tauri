@@ -1,6 +1,9 @@
 import { QueryClient } from '@tanstack/react-query'
 import { persistQueryClient } from '@tanstack/react-query-persist-client'
 import { del, get, set } from '@tauri-apps/plugin-store'
+import { createNamespacedLogger } from '../utils/logger'
+
+const logger = createNamespacedLogger('QueryClient')
 
 /**
  * Advanced Query Client Configuration
@@ -251,7 +254,7 @@ export class QueryClientOptimizer {
     })
 
     if (removedCount > 0 || errorCount > 0) {
-      console.log(
+      logger.log(
         `Query cleanup: removed ${removedCount} stale queries, ${errorCount} error queries`
       )
     }

@@ -1,5 +1,8 @@
 import { QueryClient, QueryObserver } from '@tanstack/react-query'
 import React from 'react'
+import { createNamespacedLogger } from '../utils/logger'
+
+const logger = createNamespacedLogger('Performance')
 
 /**
  * Performance Monitoring Utilities for React Query
@@ -420,7 +423,7 @@ export function createPerformanceLogger() {
   return {
     onSuccess: (data: unknown, variables: unknown, context: { startTime?: number }) => {
       const duration = Date.now() - (context.startTime || 0)
-      console.log(`✅ Query succeeded in ${duration}ms`, {
+      logger.log(`✅ Query succeeded in ${duration}ms`, {
         variables,
         dataSize: JSON.stringify(data).length
       })
@@ -431,7 +434,7 @@ export function createPerformanceLogger() {
       context: { startTime?: number }
     ) => {
       const duration = Date.now() - (context.startTime || 0)
-      console.error(`❌ Query failed after ${duration}ms`, {
+      logger.log(`❌ Query failed after ${duration}ms`, {
         error: error.message,
         variables
       })

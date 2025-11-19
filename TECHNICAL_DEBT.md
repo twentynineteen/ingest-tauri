@@ -78,13 +78,16 @@ Medium - Not blocking functionality but affects code quality. Can be addressed s
   - `Login.tsx` - 1 statement migrated
   - `useSproutVideoProcessor.ts` - 1 statement migrated
   - `useVideoLinksManager.ts`, `useUploadEvents.ts`, `useFileUpload.ts` - removed unnecessary logs
-- Current status: 48 console.log remaining (down from 78)
+- ✅ Migrated 3 lib files to logger utility (2025-11-19)
+  - `query-client-config.ts` - 1 statement migrated
+  - `prefetch-strategies.ts` - 3 statements migrated
+  - `performance-monitor.ts` - 2 statements migrated
+- Current status: 44 console.log remaining (down from 48)
   - 34 in UserFeedbackService.ts (intentional user feedback - keep)
   - 8 in debug.ts (development debugging - keep)
-  - 4 in lib files (query-client-config, prefetch-strategies, performance-monitor) - infrastructure logging
   - 1 in logger.ts (the logger itself)
   - 1 in useSproutVideoApi.ts (JSDoc example comment - not actual code)
-- Remaining: Infrastructure/lib files can be migrated opportunistically
+- **Migration complete for actionable files** - remaining console.log statements are intentional
 
 **Target Resolution:** Q1 2026
 
@@ -623,7 +626,7 @@ _No items marked as won't fix yet._
 - All architecture debt resolved ✅
 
 **Areas of Concern:**
-- ~128 console statements need migration to logger (DEBT-001)
+- Console.log migration nearly complete - only 44 intentional statements remain (DEBT-001)
 
 **Recent Achievements:**
 - E2E testing infrastructure fully implemented with CI integration (DEBT-009)
