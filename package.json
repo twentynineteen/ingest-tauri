@@ -20,7 +20,11 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "test:e2e": "playwright test --config tests/e2e/playwright.config.ts",
+    "test:e2e:headed": "playwright test --config tests/e2e/playwright.config.ts --headed",
+    "test:e2e:debug": "playwright test --config tests/e2e/playwright.config.ts --debug",
+    "test:e2e:report": "playwright show-report playwright-report"
   },
   "license": "MIT",
   "devDependencies": {
@@ -33,6 +37,7 @@
     "@babel/preset-typescript": "^7.27.1",
     "@eslint/js": "9.37.0",
     "@ianvs/prettier-plugin-sort-imports": "4.7.0",
+    "@playwright/test": "^1.56.1",
     "@tailwindcss/postcss": "^4.1.14",
     "@tanstack/react-query-devtools": "^5.90.2",
     "@tauri-apps/api": "^2.9.0",
@@ -58,6 +63,7 @@
     "lightningcss": "1.30.2",
     "msw": "^2.11.5",
     "npm-check-updates": "^19.1.1",
+    "playwright": "^1.56.1",
     "postcss": "8.5.6",
     "prettier": "3.6.2",
     "prettier-eslint-cli": "^8.0.1",

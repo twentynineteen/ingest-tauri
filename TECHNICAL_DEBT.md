@@ -207,13 +207,31 @@ E2E infrastructure not yet implemented. Tests written in TDD RED phase but infra
 **Priority Justification:**
 Medium - Good unit test coverage exists, but integration testing would improve confidence in releases.
 
-**Status:** Open
+**Status:** In Progress
+
+**Progress:**
+- ✅ Created E2E testing implementation plan (2025-11-19)
+  - Plan document: `specs/e2e-testing/README.md`
+  - Recommended stack: Playwright + Tauri WebDriver
+  - 4 implementation phases defined
+  - Estimated 3-4 days total effort
+- ✅ Phase 1: Basic Infrastructure Complete (2025-11-19)
+  - Installed `@playwright/test` and `playwright` packages
+  - Created `tests/e2e/playwright.config.ts` configuration
+  - Created directory structure: `tests/e2e/{fixtures,pages,specs}/`
+  - Created app launch fixture (`fixtures/app.fixture.ts`)
+  - Created Tauri mocking fixtures (`fixtures/mocks.fixture.ts`)
+  - Created basic smoke tests (`specs/smoke.spec.ts`)
+  - Added npm scripts: `test:e2e`, `test:e2e:headed`, `test:e2e:debug`, `test:e2e:report`
+  - Installed Chromium and WebKit browsers
+- Remaining: Phase 2 (Test Fixtures), Phase 3 (Migrate Skipped Tests), Phase 4 (CI Integration)
 
 **Target Resolution:** Q1 2026
 
 **Notes:**
-- Consider Tauri's WebDriver integration
-- May need headless testing setup for CI
+- Playwright configured for Chromium and WebKit testing
+- Tauri API mocking infrastructure in place
+- See `specs/e2e-testing/README.md` for detailed implementation plan
 
 ---
 
