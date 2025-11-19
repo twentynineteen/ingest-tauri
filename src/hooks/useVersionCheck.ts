@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { getVersion } from '@tauri-apps/api/app'
+import { CACHE } from '../constants/timing'
 import { isUpdateAvailable, normalizeVersion } from 'utils/versionUtils'
 
 interface GitHubRelease {
@@ -64,7 +65,7 @@ export function useVersionCheck() {
         publishedAt: latestRelease.published_at
       }
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE.STANDARD, // 5 minutes
     retry: 2
   })
 }

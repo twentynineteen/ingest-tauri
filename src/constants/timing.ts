@@ -63,6 +63,12 @@ export const CACHE = {
   /** Short-lived cache (30 seconds) */
   SHORT: 30 * SECONDS,
 
+  /** Brief cache duration (1 minute) */
+  BRIEF: 1 * MINUTES,
+
+  /** Quick cache duration (2 minutes) */
+  QUICK: 2 * MINUTES,
+
   /** Standard cache duration (5 minutes) */
   STANDARD: 5 * MINUTES,
 
@@ -71,6 +77,15 @@ export const CACHE = {
 
   /** Long cache duration (30 minutes) */
   LONG: 30 * MINUTES,
+
+  /** Extended cache duration (1 hour) */
+  EXTENDED: 1 * HOURS,
+
+  /** Persistent cache duration (24 hours) */
+  PERSISTENT: 24 * HOURS,
+
+  /** GC time for brief cache (1 minute) */
+  GC_BRIEF: 1 * MINUTES,
 
   /** GC time for short cache (2 minutes) */
   GC_SHORT: 2 * MINUTES,
@@ -82,7 +97,10 @@ export const CACHE = {
   GC_MEDIUM: 10 * MINUTES,
 
   /** GC time for long cache (15 minutes) */
-  GC_LONG: 15 * MINUTES
+  GC_LONG: 15 * MINUTES,
+
+  /** GC time for extended cache (30 minutes) */
+  GC_EXTENDED: 30 * MINUTES
 } as const
 
 // =============================================================================

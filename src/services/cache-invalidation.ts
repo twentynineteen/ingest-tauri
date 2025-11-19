@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
+import { CACHE } from '../constants/timing'
 import { queryKeys } from '../lib/query-keys'
 
 /**
@@ -161,7 +162,7 @@ export class CacheInvalidationService {
   /**
    * Smart cache cleanup - remove stale queries older than specified age
    */
-  async cleanupStaleCache(maxAgeMs: number = 30 * 60 * 1000) {
+  async cleanupStaleCache(maxAgeMs: number = CACHE.LONG) {
     // 30 minutes default
     const now = Date.now()
     const queryCache = this.queryClient.getQueryCache()

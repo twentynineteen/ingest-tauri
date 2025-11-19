@@ -1,8 +1,9 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect } from 'react'
-import { useBreadcrumbStore } from 'store/useBreadcrumbStore'
+import { CACHE } from '../constants/timing'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryOptions } from '../lib/query-utils'
+import { useBreadcrumbStore } from 'store/useBreadcrumbStore'
 
 interface BreadcrumbItem {
   label: string
@@ -40,8 +41,8 @@ export const useBreadcrumb = (items: BreadcrumbItem[]) => {
       },
       'STATIC', // Breadcrumb data is relatively stable
       {
-        staleTime: 5 * 60 * 1000, // 5 minutes
-        gcTime: 10 * 60 * 1000, // 10 minutes
+        staleTime: CACHE.STANDARD, // 5 minutes
+        gcTime: CACHE.GC_MEDIUM, // 10 minutes
         refetchOnWindowFocus: false
       }
     )

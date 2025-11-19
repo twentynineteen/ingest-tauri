@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo } from 'react'
+import { CACHE } from '../constants/timing'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryOptions } from '../lib/query-utils'
 
@@ -44,7 +45,7 @@ export function useCameraAutoRemap(
       'STATIC', // Use static profile for computed values
       {
         staleTime: Infinity, // Never stale - only updates when inputs change
-        gcTime: 5 * 60 * 1000 // Keep cached for 5 minutes
+        gcTime: CACHE.GC_STANDARD // Keep cached for 5 minutes
       }
     )
   })

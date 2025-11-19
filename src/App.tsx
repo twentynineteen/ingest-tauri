@@ -4,6 +4,12 @@ import React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import AppRouter from './AppRouter'
 import { QueryErrorBoundary } from './components/ErrorBoundary'
+import {
+  CACHE,
+  getBackoffDelay,
+  RETRY,
+  SECONDS
+} from './constants/timing'
 import { AuthProvider } from './context/AuthProvider'
 import { initializePerformanceMonitor } from './lib/performance-monitor'
 import { initializePrefetchManager } from './lib/prefetch-strategies'
@@ -19,17 +25,18 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       // Default stale time - data is considered fresh for 30 seconds
-      staleTime: 30 * 1000,
+      staleTime: CACHE.SHORT,
       // Default garbage collection time - keep unused data for 5 minutes
-      gcTime: 5 * 60 * 1000,
+      gcTime: CACHE.GC_STANDARD,
       // Default retry configuration - retry failed requests 3 times with exponential backoff
       retry: (failureCount, error) => {
         // Don't retry on 4xx errors (client errors)
         if (error instanceof Error && error.message.includes('4')) return false
-        return failureCount < 3
+        return failureCount < RETRY.DEFAULT_ATTEMPTS
       },
       // Retry delay with exponential backoff
-      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+      retryDelay: attemptIndex =>
+        getBackoffDelay(attemptIndex, RETRY.MAX_DELAY_DEFAULT),
       // Refetch on window focus for critical data
       refetchOnWindowFocus: false, // Disabled by default, hooks can override this
       // Background refetch interval for important data
@@ -45,7 +52,8 @@ const queryClient = new QueryClient({
         return failureCount < 2 // Fewer retries for mutations
       },
       // Retry delay for mutations
-      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 10000)
+      retryDelay: attemptIndex =>
+        getBackoffDelay(attemptIndex, RETRY.MAX_DELAY_MUTATION)
     }
   }
 })

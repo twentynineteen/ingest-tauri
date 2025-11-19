@@ -8,6 +8,7 @@
 // import { createOpenAI } from '@ai-sdk/openai' // Commented out for Phase 1
 import type { LanguageModel } from 'ai'
 import { createOllama } from 'ollama-ai-provider-v2'
+import { SECONDS, TIMEOUTS } from '../../constants/timing'
 import type { ProviderConfiguration } from '../../types/scriptFormatter'
 import { createNamespacedLogger } from '../../utils/logger'
 import type { ModelInfo, ProviderAdapter, ProviderRegistry } from './types'
@@ -296,12 +297,12 @@ export const DEFAULT_PROVIDER_CONFIGS: Record<string, Partial<ProviderConfigurat
   ollama: {
     serviceUrl: 'http://localhost:11434',
     connectionStatus: 'not-configured',
-    timeout: 5000
+    timeout: 5 * SECONDS
   },
   openai: {
     serviceUrl: 'https://api.openai.com',
     connectionStatus: 'not-configured',
-    timeout: 30000
+    timeout: TIMEOUTS.DEFAULT
   }
 }
 
@@ -314,7 +315,7 @@ export function getDefaultConfig(providerId: string): ProviderConfiguration {
   return {
     serviceUrl: defaults.serviceUrl || '',
     connectionStatus: 'not-configured',
-    timeout: defaults.timeout || 5000,
+    timeout: defaults.timeout || 5 * SECONDS,
     ...defaults
   } as ProviderConfiguration
 }

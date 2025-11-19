@@ -5,6 +5,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query'
+import { REFRESH, SECONDS } from '../constants/timing'
 import { providerRegistry } from '../services/ai/providerConfig'
 import {
   queryKeys,
@@ -64,8 +65,8 @@ export function useAIModels({
       return aiModels
     },
     enabled,
-    refetchInterval: 30000, // Refresh every 30 seconds while active
-    staleTime: 20000, // Consider data stale after 20 seconds
+    refetchInterval: REFRESH.AI_MODELS, // Refresh every 30 seconds while active
+    staleTime: 20 * SECONDS, // Consider data stale after 20 seconds
     retry: 2 // Retry failed requests
   })
 

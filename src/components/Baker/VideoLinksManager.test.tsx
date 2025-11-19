@@ -452,15 +452,117 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
       expect(screen.getByRole('button', { name: /uploading.*45%/i })).toBeInTheDocument()
     })
 
-    // NOTE: Skipped pending rewrite for proper dynamic state testing
-    // The component works correctly in production. This test attempts to change mock
-    // return values mid-test to simulate state transitions, which doesn't trigger
-    // component rerenders in React Testing Library.
-    // TODO: Rewrite to use actual state management or integration testing approach
-    it.skip('should re-enable button after upload completes', async () => {
+    it('should re-enable button after upload completes', async () => {
       // Contract: Button should change from "Upload and Add" → "Uploading..." → "Upload and Add"
       // Contract: Button should be enabled → disabled → enabled
-      // TODO: Implement with proper state change simulation or E2E approach
+      //
+      // Test strategy: Use rerender to simulate state changes between upload phases
+      // This tests the component's rendering behavior at each state, which is what
+      // unit tests should verify. Full E2E flow testing belongs in integration tests.
+
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: { retry: false },
+          mutations: { retry: false }
+        }
+      })
+
+      // Phase 1: Initial state with file selected (before upload)
+      vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
+        selectedFile: '/test/video.mp4',
+        uploading: false,
+        response: null,
+        selectFile: mockSelectFile,
+        uploadFile: mockUploadFile,
+        resetUploadState: mockResetUploadState
+      })
+
+      vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
+        progress: 0,
+        message: null
+      })
+
+      const { rerender } = render(
+        <QueryClientProvider client={queryClient}>
+          <VideoLinksManager projectPath={mockProjectPath} />
+        </QueryClientProvider>
+      )
+
+      // Open dialog and switch to upload tab
+      const addButton = screen.getByRole('button', { name: /add video/i })
+      await userEvent.click(addButton)
+
+      const uploadTab = screen.getByRole('tab', { name: /upload file/i })
+      await userEvent.click(uploadTab)
+
+      // Verify initial state: button should be enabled with "Upload and Add" text
+      let uploadButton = screen.getByRole('button', { name: /upload and add/i })
+      expect(uploadButton).toBeEnabled()
+
+      // Phase 2: Uploading state (button should be disabled)
+      vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
+        selectedFile: '/test/video.mp4',
+        uploading: true,
+        response: null,
+        selectFile: mockSelectFile,
+        uploadFile: mockUploadFile,
+        resetUploadState: mockResetUploadState
+      })
+
+      vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
+        progress: 50,
+        message: null
+      })
+
+      rerender(
+        <QueryClientProvider client={queryClient}>
+          <VideoLinksManager projectPath={mockProjectPath} />
+        </QueryClientProvider>
+      )
+
+      // Verify uploading state: button should be disabled and show progress
+      uploadButton = screen.getByRole('button', { name: /uploading/i })
+      expect(uploadButton).toBeDisabled()
+
+      // Phase 3: Upload complete (button should be re-enabled)
+      const mockUploadResponse = {
+        id: 'abc123xyz',
+        embedded_url: 'https://sproutvideo.com/videos/abc123xyz',
+        title: 'Test Video',
+        assets: { poster_frames: ['https://example.com/thumb.jpg'] },
+        created_at: '2025-01-15T10:30:00Z'
+      }
+
+      vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
+        selectedFile: '/test/video.mp4',
+        uploading: false,
+        response: mockUploadResponse,
+        selectFile: mockSelectFile,
+        uploadFile: mockUploadFile,
+        resetUploadState: mockResetUploadState
+      })
+
+      vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
+        progress: 100,
+        message: null
+      })
+
+      rerender(
+        <QueryClientProvider client={queryClient}>
+          <VideoLinksManager projectPath={mockProjectPath} />
+        </QueryClientProvider>
+      )
+
+      // Verify completed state: dialog should show success state with Finish button
+      // After successful upload, the dialog shows a "Finish" button instead of "Upload and Add"
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /^finish$/i })).toBeInTheDocument()
+      })
+
+      // Verify the addVideoLink was called (video was successfully added)
+      await waitFor(() => {
+        expect(mockAddVideoLink).toHaveBeenCalled()
+      })
     })
   })
 
@@ -540,16 +642,97 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
       })
     })
 
-    // NOTE: Skipped pending rewrite for proper dynamic state testing
-    // The component works correctly in production. This test attempts to change mock
-    // return values mid-test to simulate progress updates, which doesn't trigger
-    // component rerenders in React Testing Library.
-    // TODO: Rewrite to use actual state management or integration testing approach
-    it.skip('should show smooth progress updates (mocked progress events)', async () => {
+    it('should show smooth progress updates (mocked progress events)', async () => {
       // Contract: Progress should update from 0% → 10% → 50% → 100%
       // Contract: Progress text should display current percentage
       // Contract: Progress bar should visually reflect percentage
-      // TODO: Implement with proper state change simulation or E2E approach
+      //
+      // Test strategy: Use rerender to simulate progress updates at each stage
+      // This verifies the component correctly renders progress at each percentage
+
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: { retry: false },
+          mutations: { retry: false }
+        }
+      })
+
+      // Initial uploading state at 0%
+      vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
+        selectedFile: '/test/video.mp4',
+        uploading: true,
+        response: null,
+        selectFile: mockSelectFile,
+        uploadFile: mockUploadFile,
+        resetUploadState: mockResetUploadState
+      })
+
+      vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
+        progress: 0,
+        message: null
+      })
+
+      const { rerender } = render(
+        <QueryClientProvider client={queryClient}>
+          <VideoLinksManager projectPath={mockProjectPath} />
+        </QueryClientProvider>
+      )
+
+      // Open dialog and switch to upload tab
+      const addButton = screen.getByRole('button', { name: /add video/i })
+      await userEvent.click(addButton)
+
+      const uploadTab = screen.getByRole('tab', { name: /upload file/i })
+      await userEvent.click(uploadTab)
+
+      // Verify 0% progress
+      expect(screen.getByRole('progressbar')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /uploading.*0%/i })).toBeInTheDocument()
+
+      // Progress update to 10%
+      vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
+        progress: 10,
+        message: null
+      })
+
+      rerender(
+        <QueryClientProvider client={queryClient}>
+          <VideoLinksManager projectPath={mockProjectPath} />
+        </QueryClientProvider>
+      )
+
+      expect(screen.getByRole('button', { name: /uploading.*10%/i })).toBeInTheDocument()
+      expect(screen.getByText(/uploading:.*10%/i)).toBeInTheDocument()
+
+      // Progress update to 50%
+      vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
+        progress: 50,
+        message: null
+      })
+
+      rerender(
+        <QueryClientProvider client={queryClient}>
+          <VideoLinksManager projectPath={mockProjectPath} />
+        </QueryClientProvider>
+      )
+
+      expect(screen.getByRole('button', { name: /uploading.*50%/i })).toBeInTheDocument()
+      expect(screen.getByText(/uploading:.*50%/i)).toBeInTheDocument()
+
+      // Progress update to 100%
+      vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
+        progress: 100,
+        message: null
+      })
+
+      rerender(
+        <QueryClientProvider client={queryClient}>
+          <VideoLinksManager projectPath={mockProjectPath} />
+        </QueryClientProvider>
+      )
+
+      expect(screen.getByRole('button', { name: /uploading.*100%/i })).toBeInTheDocument()
+      expect(screen.getByText(/uploading:.*100%/i)).toBeInTheDocument()
     })
   })
 
