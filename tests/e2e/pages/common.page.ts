@@ -33,12 +33,10 @@ export class CommonPage {
       '[data-testid="loading"], .animate-spin, [role="progressbar"]'
     )
     this.toast = page.locator('[data-sonner-toast], [role="alert"]')
-    this.dialog = page.locator('[role="dialog"], [data-state="open"]')
-    this.dialogTitle = page.locator(
-      '[role="dialog"] h2, [data-state="open"] h2'
-    )
+    this.dialog = page.locator('[role="dialog"]')
+    this.dialogTitle = page.locator('[role="dialog"] h2')
     this.dialogClose = page.locator(
-      '[role="dialog"] button[aria-label="Close"], [data-state="open"] button:has(svg)'
+      '[role="dialog"] button[aria-label="Close"]'
     )
 
     // Forms

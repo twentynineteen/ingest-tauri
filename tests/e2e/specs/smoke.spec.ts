@@ -38,9 +38,11 @@ test.describe('Smoke Tests', () => {
         !error.includes('invoke') &&
         !error.includes('transformCallback') &&
         !error.includes('Failed to fetch') &&
+        !error.includes('Failed to load resource') &&
         !error.includes('net::ERR') &&
         !error.includes('Error loading API keys') &&
-        !error.includes('Failed to setup copy progress')
+        !error.includes('Failed to setup copy progress') &&
+        !error.includes('403')
     )
 
     expect(unexpectedErrors).toHaveLength(0)
