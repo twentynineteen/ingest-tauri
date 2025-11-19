@@ -16,8 +16,8 @@ export default defineConfig({
   ],
 
   use: {
-    // Base URL for the Tauri app
-    baseURL: 'http://localhost:1420',
+    // Base URL for the Vite dev server
+    baseURL: 'http://localhost:1422',
 
     // Collect trace on first retry
     trace: 'on-first-retry',
@@ -45,8 +45,8 @@ export default defineConfig({
   // Run local dev server before starting tests
   webServer: {
     command: 'npm run dev',
-    port: 1420,
-    timeout: 120 * 1000,
+    url: 'http://localhost:1422',
+    timeout: 60 * 1000,
     reuseExistingServer: !process.env.CI,
   },
 
