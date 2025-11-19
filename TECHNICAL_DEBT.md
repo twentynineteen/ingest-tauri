@@ -1,17 +1,17 @@
 # Technical Debt Register
 
 **Project:** Bucket (ingest-tauri)
-**Last Updated:** 2025-11-18
+**Last Updated:** 2025-11-19
 **Maintained By:** Development Team
 
 ## Summary
 
-- **Total Debt Items:** 9 (7 resolved)
+- **Total Debt Items:** 9 (8 resolved)
 - **Critical:** 0
 - **High:** 0
-- **Medium:** 2
+- **Medium:** 1
 - **Low:** 3
-- **Estimated Total Effort:** 3-5 days
+- **Estimated Total Effort:** 2-4 days
 
 ---
 
@@ -207,7 +207,7 @@ E2E infrastructure not yet implemented. Tests written in TDD RED phase but infra
 **Priority Justification:**
 Medium - Good unit test coverage exists, but integration testing would improve confidence in releases.
 
-**Status:** In Progress
+**Status:** Completed ✅
 
 **Progress:**
 - ✅ Created E2E testing implementation plan (2025-11-19)
@@ -233,9 +233,15 @@ Medium - Good unit test coverage exists, but integration testing would improve c
   - Created `specs/baker-workflow.spec.ts` (11 tests)
   - Total: 50 E2E tests passing (25 Chromium + 25 WebKit)
   - Test execution time: ~30 seconds
-- Remaining: Phase 4 (CI Integration)
+- ✅ Phase 4: CI Integration Complete (2025-11-19)
+  - Added E2E test job to GitHub Actions CI workflow
+  - Configured to run after build job completes
+  - Installs Playwright browsers (Chromium only for CI speed)
+  - Uploads Playwright HTML report as artifact (30-day retention)
+  - Uploads test results on failure (screenshots/videos, 7-day retention)
+  - Runs on PRs and pushes to master/release branches
 
-**Target Resolution:** Q1 2026
+**Resolved:** 2025-11-19
 
 **Notes:**
 - Playwright configured for Chromium and WebKit testing
@@ -519,7 +525,7 @@ _No items marked as won't fix yet._
 ### By Category
 - Code Quality: 3 items (DEBT-001, 008, 011)
 - Architecture: 0 items
-- Test: 1 item (DEBT-009)
+- Test: 0 items
 - Documentation: 0 items
 - Dependency: 1 item (DEBT-012)
 - Performance: 0 items
@@ -530,7 +536,7 @@ _No items marked as won't fix yet._
 ### By Severity
 - Critical: 0 items
 - High: 0 items
-- Medium: 2 items (DEBT-001, 009)
+- Medium: 1 item (DEBT-001)
 - Low: 3 items (DEBT-008, 011, 012)
 
 ### Aging
@@ -545,9 +551,9 @@ _No items marked as won't fix yet._
 2. ~~**Sprint Q1 2026**: Long parameter lists (DEBT-005)~~ ✅ Already using options pattern
 3. ~~**Sprint Q1 2026**: Complex functions (DEBT-002)~~ ✅ All functions now below complexity threshold
 4. ~~**Sprint Q1 2026**: Deep nesting issues (DEBT-003)~~ ✅ No max-depth violations remaining
-5. **Sprint Q1 2026**: Implement E2E testing infrastructure (DEBT-009)
-6. **Sprint Q1 2026**: Implement no-console ESLint rule (DEBT-001)
-7. **Q2 2026**: Opportunistic refactoring of large files and cleanup
+5. ~~**Sprint Q1 2026**: Implement E2E testing infrastructure (DEBT-009)~~ ✅ Complete with CI integration
+6. **Sprint Q1 2026**: Continue console.log migration (DEBT-001)
+7. **Q2 2026**: Opportunistic cleanup (magic numbers, deprecated code)
 
 ---
 
@@ -569,8 +575,8 @@ _No items marked as won't fix yet._
    - [x] Resolve deep nesting issues (DEBT-003) - ✅ No max-depth violations remaining
 
 2. **Next Sprint:**
-   - [ ] Implement no-console ESLint rule for production (DEBT-001)
-   - [ ] Set up E2E testing infrastructure (DEBT-009)
+   - [ ] Continue console.log migration (DEBT-001)
+   - [x] Set up E2E testing infrastructure (DEBT-009) - ✅ Completed with CI integration
 
 3. **Next Quarter:**
    - [x] Rewrite BakerPage tests (DEBT-010) - ✅ Completed
@@ -597,5 +603,8 @@ _No items marked as won't fix yet._
 - All architecture debt resolved ✅
 
 **Areas of Concern:**
-- 247 console statements need cleanup (DEBT-001)
-- Missing E2E test infrastructure (DEBT-009)
+- ~128 console statements need migration to logger (DEBT-001)
+
+**Recent Achievements:**
+- E2E testing infrastructure fully implemented with CI integration (DEBT-009)
+- 8 of 9 technical debt items resolved
