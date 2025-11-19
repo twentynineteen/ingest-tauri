@@ -8,6 +8,9 @@
 import { tool } from 'ai'
 import { z } from 'zod'
 import type { SimilarExample } from '../hooks/useScriptRetrieval'
+import { createNamespacedLogger } from './logger'
+
+const logger = createNamespacedLogger('buildRAGPrompt')
 
 // ============================================================================
 // Autocue Prompt (v1.0.0)
@@ -277,11 +280,11 @@ export const TOOL_DEFINITIONS = [
 export function buildRAGPrompt(userScript: string, examples: SimilarExample[]): string {
   // If no relevant examples found, use standard prompt
   if (examples.length === 0) {
-    console.log('[buildRAGPrompt] No examples provided, using standard prompt')
+    logger.log('No examples provided, using standard prompt')
     return AUTOCUE_PROMPT
   }
 
-  console.log(`[buildRAGPrompt] Building prompt with ${examples.length} examples`)
+  logger.log(`Building prompt with ${examples.length} examples`)
 
   // Build examples section
   const exampleSection = examples

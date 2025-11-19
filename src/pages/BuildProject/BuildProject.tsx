@@ -10,11 +10,14 @@ import { useTrelloApiKeys } from 'hooks/useApiKeys'
 import { FootageFile } from 'hooks/useCameraAutoRemap'
 import React, { useState } from 'react'
 import { TrelloCardsManager } from '../../components/Baker/TrelloCardsManager'
+import { createNamespacedLogger } from '../../utils/logger'
 import FolderSelector from './FolderSelector'
 import ProgressBar from './ProgressBar'
 import ProjectActions from './ProjectActions'
 import ProjectFileList from './ProjectFileList'
 import ProjectInputs from './ProjectInputs'
+
+const logger = createNamespacedLogger('BuildProject')
 
 // The BuildProject component is used for uploading footage from camera cards
 // Footage can be marked with the relevant camera in order to place in the correct folder.
@@ -45,7 +48,7 @@ const BuildProject: React.FC = () => {
 
   const { apiKey, apiToken } = useTrelloApiKeys()
 
-  console.log('BuildProject render - progress:', progress, 'completed:', completed)
+  logger.log('BuildProject render - progress:', progress, 'completed:', completed)
 
   useCameraAutoRemap(files, numCameras, setFiles)
 
@@ -96,7 +99,7 @@ const BuildProject: React.FC = () => {
   const handleDeleteFile = (index: number) => {
     setFiles(prevFiles => {
       const updatedFiles = prevFiles.filter((_, idx) => idx !== index)
-      console.log('Updated files:', updatedFiles) // Debugging
+      logger.log('Updated files:', updatedFiles)
       return updatedFiles
     })
   }
@@ -104,8 +107,8 @@ const BuildProject: React.FC = () => {
   const { createProject } = useCreateProject()
 
   const handleCreateProject = () => {
-    console.log('Create Project clicked!')
-    console.log('Parameters:', { title, files: files.length, selectedFolder, numCameras })
+    logger.log('Create Project clicked!')
+    logger.log('Parameters:', { title, files: files.length, selectedFolder, numCameras })
 
     createProject({
       title,

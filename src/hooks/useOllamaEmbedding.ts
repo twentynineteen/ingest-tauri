@@ -5,6 +5,9 @@
  */
 
 import { useEffect, useState } from 'react'
+import { createNamespacedLogger } from '../utils/logger'
+
+const logger = createNamespacedLogger('useOllamaEmbedding')
 
 interface UseOllamaEmbeddingResult {
   embed: (text: string) => Promise<number[]>
@@ -45,7 +48,7 @@ export function useOllamaEmbedding(): UseOllamaEmbeddingResult {
       setError(null)
 
       try {
-        console.log('[useOllamaEmbedding] Checking Ollama connection...')
+        logger.log('Checking Ollama connection...')
 
         // Check if Ollama is running
         const tagsResponse = await fetch(`${OLLAMA_BASE_URL}/api/tags`, {
@@ -59,10 +62,7 @@ export function useOllamaEmbedding(): UseOllamaEmbeddingResult {
         const data = (await tagsResponse.json()) as OllamaTagsResponse
         const models = data.models || []
 
-        console.log(
-          '[useOllamaEmbedding] Available models:',
-          models.map(m => m.name)
-        )
+        logger.log('Available models:', models.map(m => m.name))
 
         // Check if nomic-embed-text is installed
         const hasEmbeddingModel = models.some(m => m.name.includes(EMBEDDING_MODEL))
@@ -73,7 +73,7 @@ export function useOllamaEmbedding(): UseOllamaEmbeddingResult {
           )
         }
 
-        console.log('[useOllamaEmbedding] Model available:', EMBEDDING_MODEL)
+        logger.log('Model available:', EMBEDDING_MODEL)
         setIsReady(true)
       } catch (err) {
         console.error('[useOllamaEmbedding] Failed to check model availability:', err)
@@ -97,9 +97,7 @@ export function useOllamaEmbedding(): UseOllamaEmbeddingResult {
     }
 
     try {
-      console.log(
-        `[useOllamaEmbedding] Generating embedding for text (${text.length} chars)...`
-      )
+      logger.log(`Generating embedding for text (${text.length} chars)...`)
 
       const response = await fetch(`${OLLAMA_BASE_URL}/api/embeddings`, {
         method: 'POST',
@@ -125,9 +123,7 @@ export function useOllamaEmbedding(): UseOllamaEmbeddingResult {
       }
 
       const embedding = data.embedding as number[]
-      console.log(
-        `[useOllamaEmbedding] Embedding generated (${embedding.length} dimensions)`
-      )
+      logger.log(`Embedding generated (${embedding.length} dimensions)`)
 
       return embedding
     } catch (err) {

@@ -203,7 +203,7 @@ export function useVideoLinksManager({ projectPath }: UseVideoLinksManagerProps)
   }
 
   const handleAddTrelloCard = () => {
-    console.log('Add Trello Card functionality to be implemented')
+    // TODO: Add Trello Card functionality to be implemented
   }
 
   const handleDialogOpenChange = (open: boolean) => {

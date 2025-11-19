@@ -67,11 +67,24 @@ Medium - Not blocking functionality but affects code quality. Can be addressed s
   - `useEmbedding.ts` - 7 statements migrated
   - `AppRouter.tsx` - 7 statements migrated
   - `useUpdateManager.ts` - 6 statements migrated
-- Current status: 78 console.log remaining (down from 128)
+- ✅ Migrated 10 additional files to logger utility (2025-11-19)
+  - `useScriptRetrieval.ts` - 5 statements migrated
+  - `providerConfig.ts` - 5 statements migrated
+  - `useOllamaEmbedding.ts` - 5 statements migrated
+  - `BuildProject.tsx` - 4 statements migrated
+  - `ProgressBar.tsx` - 2 statements migrated
+  - `aiPrompts.ts` - 2 statements migrated
+  - `useAppendVideoInfo.ts` - 2 statements migrated
+  - `Login.tsx` - 1 statement migrated
+  - `useSproutVideoProcessor.ts` - 1 statement migrated
+  - `useVideoLinksManager.ts`, `useUploadEvents.ts`, `useFileUpload.ts` - removed unnecessary logs
+- Current status: 48 console.log remaining (down from 78)
   - 34 in UserFeedbackService.ts (intentional user feedback - keep)
   - 8 in debug.ts (development debugging - keep)
-  - ~36 candidates for gradual migration
-- Remaining: Continue gradual migration as files are touched
+  - 4 in lib files (query-client-config, prefetch-strategies, performance-monitor) - infrastructure logging
+  - 1 in logger.ts (the logger itself)
+  - 1 in useSproutVideoApi.ts (JSDoc example comment - not actual code)
+- Remaining: Infrastructure/lib files can be migrated opportunistically
 
 **Target Resolution:** Q1 2026
 

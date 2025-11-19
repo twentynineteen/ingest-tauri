@@ -96,7 +96,7 @@ export const useUploadEvents = (): UseUploadEventsReturn => {
     // Prevent double setup in StrictMode
     if (listenersSetup.current) return
 
-    console.log('Setting up upload event listeners with React Query integration...')
+    // Setting up upload event listeners with React Query integration
     listenersSetup.current = true
 
     let unlistenProgress: (() => void) | null = null

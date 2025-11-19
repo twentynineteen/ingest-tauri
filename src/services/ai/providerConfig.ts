@@ -9,7 +9,10 @@
 import type { LanguageModel } from 'ai'
 import { createOllama } from 'ollama-ai-provider-v2'
 import type { ProviderConfiguration } from '../../types/scriptFormatter'
+import { createNamespacedLogger } from '../../utils/logger'
 import type { ModelInfo, ProviderAdapter, ProviderRegistry } from './types'
+
+const logger = createNamespacedLogger('Ollama')
 
 // ============================================================================
 // Ollama Provider Adapter
@@ -28,7 +31,7 @@ const ollamaAdapter: ProviderAdapter = {
     // Normalize URL: remove trailing slashes and ensure no /api suffix
     baseUrl = baseUrl.replace(/\/+$/, '').replace(/\/api$/, '')
 
-    console.log('[Ollama] Creating model with baseURL:', `${baseUrl}/api`)
+    logger.log('Creating model with baseURL:', `${baseUrl}/api`)
 
     // Custom fetch with extended timeout for AI generation (5 minutes)
     const customFetch = async (url: RequestInfo | URL, init?: RequestInit) => {
@@ -67,7 +70,7 @@ const ollamaAdapter: ProviderAdapter = {
       baseUrl = baseUrl.replace(/\/+$/, '').replace(/\/api$/, '')
       const apiUrl = `${baseUrl}/api/tags`
 
-      console.log('[Ollama] Validating connection to:', apiUrl)
+      logger.log('Validating connection to:', apiUrl)
 
       const response = await fetch(apiUrl, {
         method: 'GET',
@@ -86,10 +89,7 @@ const ollamaAdapter: ProviderAdapter = {
 
       const data = await response.json()
 
-      console.log(
-        '[Ollama] Validation successful. Models found:',
-        data.models?.length || 0
-      )
+      logger.log('Validation successful. Models found:', data.models?.length || 0)
 
       return {
         success: true,
@@ -114,7 +114,7 @@ const ollamaAdapter: ProviderAdapter = {
       baseUrl = baseUrl.replace(/\/+$/, '').replace(/\/api$/, '')
       const apiUrl = `${baseUrl}/api/tags`
 
-      console.log('[Ollama] Fetching models from:', apiUrl)
+      logger.log('Fetching models from:', apiUrl)
 
       const response = await fetch(apiUrl, {
         signal: AbortSignal.timeout(config.timeout || 5000)
@@ -134,7 +134,7 @@ const ollamaAdapter: ProviderAdapter = {
         }>
       }
 
-      console.log('[Ollama] Models fetched:', data.models?.length || 0)
+      logger.log('Models fetched:', data.models?.length || 0)
 
       return (data.models || []).map(model => ({
         id: model.name,

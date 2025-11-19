@@ -114,7 +114,7 @@ export const useFileUpload = (): UseFileUploadReturn => {
       // Update the state with the final response from the backend upload
       setResponse(finalResponse)
       appStore.getState().setLatestSproutUpload(finalResponse)
-      console.log('Upload completed with response:', finalResponse)
+      // Upload completed successfully
     } catch (error) {
       // Log and display any error encountered during the upload process
       console.error('Upload error:', error)

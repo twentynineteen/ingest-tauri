@@ -8,7 +8,10 @@
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
 import type { VideoLink } from '../types/baker'
+import { createNamespacedLogger } from '../utils/logger'
 import type { SproutUploadResponse } from '../utils/types'
+
+const logger = createNamespacedLogger('useSproutVideoProcessor')
 
 interface ProcessVideoResult {
   videoLink: VideoLink | null
@@ -52,9 +55,7 @@ function processUploadResponse(
     response.embedded_url || `https://sproutvideo.com/videos/${response.id}`
 
   if (!response.embedded_url) {
-    console.log(
-      `Video ${response.id} state: ${response.state}, adding with constructed URL...`
-    )
+    logger.log(`Video ${response.id} state: ${response.state}, adding with constructed URL...`)
   }
 
   const videoLink: VideoLink = {
