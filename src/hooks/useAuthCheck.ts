@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
+import { CACHE } from '../constants/timing'
 
 interface AuthCheckResult {
   isAuthenticated: boolean
@@ -47,7 +48,7 @@ export function useAuthCheck() {
   return useQuery({
     queryKey: ['authCheck'],
     queryFn: checkAuthStatus,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: CACHE.STANDARD, // 5 minutes
     retry: 1,
     refetchOnWindowFocus: false
   })

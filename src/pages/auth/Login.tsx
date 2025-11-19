@@ -2,6 +2,9 @@ import { useAuth } from 'hooks/useAuth'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
+import { createNamespacedLogger } from '../../utils/logger'
+
+const logger = createNamespacedLogger('Login')
 
 const loginSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
@@ -24,7 +27,7 @@ const Login: React.FC = () => {
     }
 
     try {
-      console.log('Validating creds.')
+      logger.log('Validating creds.')
       loginSchema.parse({ username, password })
       const fakeToken = `token_${username}` // Simulating a token
       await login(fakeToken, username)

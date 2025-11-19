@@ -7,6 +7,7 @@ import { CheckCircle, Loader2, XCircle } from 'lucide-react'
 import React, { useState } from 'react'
 import { useAppStore } from 'store/useAppStore'
 import ApiKeyInput from 'utils/ApiKeyInput'
+import { CACHE } from '../constants/timing'
 import { useAIProvider } from '../hooks/useAIProvider'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
@@ -43,8 +44,8 @@ const Settings: React.FC = () => {
       },
       'DYNAMIC',
       {
-        staleTime: 5 * 60 * 1000, // 5 minutes
-        gcTime: 10 * 60 * 1000, // Keep cached for 10 minutes
+        staleTime: CACHE.STANDARD, // 5 minutes
+        gcTime: CACHE.GC_MEDIUM, // Keep cached for 10 minutes
         retry: (failureCount, error) => shouldRetry(error, failureCount, 'settings')
       }
     )

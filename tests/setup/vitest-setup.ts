@@ -3,14 +3,14 @@ import { beforeAll, afterEach, afterAll } from 'vitest'
 
 // Mock Tauri APIs
 const mockTauriApis = () => {
-  global.__TAURI_IPC__ = {
-    invoke: vi.fn(),
-    transformCallback: vi.fn(),
-  }
+  // Note: We don't mock @tauri-apps/api/core here because mockIPC() from
+  // tauri-mocks.ts handles invoke() mocking for contract/integration tests.
+  // Individual tests can use vi.mock() locally if they need custom behavior.
 
-  // Mock core functions
-  vi.mock('@tauri-apps/api/core', () => ({
-    invoke: vi.fn(),
+  // Mock event listeners - must return unlisten function to avoid cleanup errors
+  vi.mock('@tauri-apps/api/event', () => ({
+    listen: vi.fn().mockResolvedValue(vi.fn()),
+    emit: vi.fn().mockResolvedValue(undefined)
   }))
 
   // Mock app functions

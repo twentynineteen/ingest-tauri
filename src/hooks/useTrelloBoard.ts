@@ -1,5 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
+import { CACHE } from '../constants/timing'
+import { queryKeys } from '../lib/query-keys'
+import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
 import { loadApiKeys } from 'utils/storage'
 import {
   fetchTrelloCards,
@@ -7,8 +10,6 @@ import {
   groupCardsByList,
   TrelloCard
 } from 'utils/TrelloCards'
-import { queryKeys } from '../lib/query-keys'
-import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
 
 interface TrelloBoardData {
   grouped: Record<string, TrelloCard[]>
@@ -28,7 +29,7 @@ export function useTrelloBoard(boardId: string): TrelloBoardData {
   const { data: credentials, isLoading: credentialsLoading } = useQuery({
     queryKey: ['api-keys'],
     queryFn: loadApiKeys,
-    staleTime: 5 * 60 * 1000,
+    staleTime: CACHE.STANDARD,
     refetchOnWindowFocus: false
   })
 
@@ -47,7 +48,7 @@ export function useTrelloBoard(boardId: string): TrelloBoardData {
       'DYNAMIC',
       {
         enabled: !!apiKey && !!token && !credentialsLoading,
-        staleTime: 2 * 60 * 1000, // 2 minutes
+        staleTime: CACHE.QUICK, // 2 minutes
         retry: (failureCount, error) => shouldRetry(error, failureCount, 'external')
       }
     )
@@ -65,7 +66,7 @@ export function useTrelloBoard(boardId: string): TrelloBoardData {
       'DYNAMIC',
       {
         enabled: !!apiKey && !!token && !credentialsLoading,
-        staleTime: 2 * 60 * 1000, // 2 minutes
+        staleTime: CACHE.QUICK, // 2 minutes
         retry: (failureCount, error) => shouldRetry(error, failureCount, 'external')
       }
     )

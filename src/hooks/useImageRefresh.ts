@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
+import { REFRESH } from '../constants/timing'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryOptions } from '../lib/query-utils'
 import { SproutUploadResponse } from '../utils/types'
@@ -52,7 +53,7 @@ export const useImageRefresh = (
       'REALTIME', // 30-second staleTime with auto-refetch
       {
         enabled: !!response && !!videoId,
-        refetchInterval: 30000, // 30 seconds
+        refetchInterval: REFRESH.REALTIME, // 30 seconds
         refetchIntervalInBackground: false,
         refetchOnWindowFocus: true
         // Note: onSuccess is deprecated in newer React Query versions

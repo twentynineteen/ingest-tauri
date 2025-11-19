@@ -1,5 +1,8 @@
 import { listen } from '@tauri-apps/api/event'
 import { useEffect, useRef, useState } from 'react'
+import { createNamespacedLogger } from '../utils/logger'
+
+const log = createNamespacedLogger('CopyProgress')
 
 interface ProgressState {
   total: number
@@ -31,7 +34,7 @@ export function useCopyProgress({
   onProgress,
   onComplete
 }: UseCopyProgressOptions): UseCopyProgressReturn {
-  console.log('useCopyProgress hook called with operationId:', operationId)
+  log.debug('useCopyProgress hook called with operationId:', operationId)
 
   const listenersSetup = useRef(false)
   const [currentState, setCurrentState] = useState<CopyProgressState>({
@@ -41,10 +44,10 @@ export function useCopyProgress({
     status: 'idle'
   })
 
-  console.log('useCopyProgress initial state:', currentState)
+  log.trace('useCopyProgress initial state:', currentState)
 
   useEffect(() => {
-    console.log(
+    log.trace(
       'useCopyProgress useEffect running, listenersSetup.current:',
       listenersSetup.current
     )
@@ -57,13 +60,13 @@ export function useCopyProgress({
     let isMounted = true
 
     const setupListeners = async () => {
-      console.log('Setting up copy progress listeners...')
+      log.debug('Setting up copy progress listeners...')
       try {
         unlistenProgress = await listen<number>('copy_progress', event => {
           if (!isMounted) return
 
           const progressValue = event.payload
-          console.log('Received copy_progress event:', progressValue)
+          log.debug('Received copy_progress event:', progressValue)
 
           const newState: CopyProgressState = {
             total: 100,
@@ -73,7 +76,7 @@ export function useCopyProgress({
           }
 
           setCurrentState(newState)
-          console.log('Updated state:', newState)
+          log.trace('Updated state:', newState)
 
           // Call legacy callbacks for backward compatibility
           if (onProgress) {
@@ -88,7 +91,7 @@ export function useCopyProgress({
         unlistenComplete = await listen<string[]>('copy_complete', () => {
           if (!isMounted) return
 
-          console.log('Received copy_complete event')
+          log.debug('Received copy_complete event')
 
           const completedState: CopyProgressState = {
             total: 100,
@@ -145,7 +148,7 @@ export function useCopyProgress({
 
   // Only log when there's actual progress or state change to avoid spam
   if (currentState.status !== 'idle' || currentState.percentage > 0) {
-    console.log('useCopyProgress returning:', returnValue)
+    log.trace('useCopyProgress returning:', returnValue)
   }
 
   return returnValue

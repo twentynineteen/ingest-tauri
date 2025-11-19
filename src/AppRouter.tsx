@@ -3,6 +3,9 @@ import { relaunch } from '@tauri-apps/plugin-process'
 import { check } from '@tauri-apps/plugin-updater'
 import { useEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { createNamespacedLogger } from './utils/logger'
+
+const log = createNamespacedLogger('AppRouter')
 // The AppRouter component switches the display if the user is not logged in
 // The top level component, Page, acts as the provider for the layout
 // subsequent components are loaded within the page window via the Outlet component.
@@ -31,11 +34,11 @@ export const AppRouter: React.FC = () => {
 
       try {
         const update = await check()
-        console.log('Update check result:', update)
+        log.debug('Update check result:', update)
 
         // Only proceed if an actual update is returned
         if (update?.version) {
-          console.log(`Found update: ${update.version}`)
+          log.info(`Found update: ${update.version}`)
 
           let downloaded = 0
           let contentLength = 0
@@ -44,25 +47,25 @@ export const AppRouter: React.FC = () => {
             switch (event.event) {
               case 'Started':
                 contentLength = event.data.contentLength
-                console.log(`Started downloading ${event.data.contentLength} bytes`)
+                log.info(`Started downloading ${event.data.contentLength} bytes`)
                 break
               case 'Progress':
                 downloaded += event.data.chunkLength
-                console.log(`Downloaded ${downloaded} from ${contentLength}`)
+                log.debug(`Downloaded ${downloaded} from ${contentLength}`)
                 break
               case 'Finished':
-                console.log('Download finished')
+                log.info('Download finished')
                 break
             }
           })
 
-          console.log('Update installed')
+          log.info('Update installed')
           await relaunch()
         } else {
-          console.log('No update available')
+          log.debug('No update available')
         }
       } catch (err) {
-        console.error('Updater error:', err)
+        console.error('[AppRouter] Updater error:', err)
       }
     }
 

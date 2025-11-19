@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useCallback } from 'react'
+import { CACHE } from '../constants/timing'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryOptions } from '../lib/query-utils'
 
@@ -61,7 +62,7 @@ export function useAutoFileSelection({
       'DYNAMIC',
       {
         enabled: files.length > 0,
-        staleTime: 30000, // Re-analyze after 30 seconds if files change
+        staleTime: CACHE.SHORT, // Re-analyze after 30 seconds if files change
         refetchOnWindowFocus: false
       }
     )

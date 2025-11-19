@@ -98,7 +98,9 @@ Before using the Script Formatter, download the following language models:
 ```bash
 # script formatting:
 ollama pull llama3.1:latest       # Fast, good quality (8B parameters)
-
+# script embedding:
+ollama pull nomic-embed-text:latest
+# Required for adding new scripts to database
 
 # List installed models:
 ollama list
@@ -183,4 +185,4 @@ Then update the URL in Bucket Settings to `http://localhost:11435`
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is proprietary software. All rights reserved. Unauthorized copying, modification, distribution, or use of this software is strictly prohibited.

@@ -1,17 +1,22 @@
 /**
  * Contract Test: baker_validate_folder Tauri Command
- * 
+ *
  * This test verifies the contract for the baker_validate_folder command.
- * It MUST FAIL initially until the Rust backend implementation is complete.
+ * Uses mocked Tauri backend for testing the contract interface.
  */
 
 import { invoke } from '@tauri-apps/api/core'
-import { describe, test, expect } from 'vitest'
+import { describe, test, expect, beforeAll } from 'vitest'
+import { setupTauriMocks } from '../setup/tauri-mocks'
 import type { ProjectFolder } from '../../src/types/baker'
 import { resolve } from 'path'
 
 describe('baker_validate_folder Contract', () => {
   const testDataPath = resolve(__dirname, '../fixtures/baker-test-data')
+
+  beforeAll(() => {
+    setupTauriMocks()
+  })
   
   test('should validate folder with correct BuildProject structure', async () => {
     const validProjectPath = resolve(testDataPath, 'TestProject1')
@@ -51,14 +56,14 @@ describe('baker_validate_folder Contract', () => {
 
   test('should reject invalid folder structure', async () => {
     const invalidPath = resolve(testDataPath, 'InvalidFolder')
-    
+
     const result: ProjectFolder = await invoke('baker_validate_folder', {
       folderPath: invalidPath
     })
 
     expect(result.isValid).toBe(false)
     expect(result.validationErrors.length).toBeGreaterThan(0)
-    expect(result.validationErrors).toContain(expect.stringContaining('required subfolder'))
+    expect(result.validationErrors.some(err => err.includes('required subfolder'))).toBe(true)
   })
 
   test('should reject when folder does not exist', async () => {
@@ -84,7 +89,7 @@ describe('baker_validate_folder Contract', () => {
 
     // Folder structure might be valid, but breadcrumbs are corrupted
     expect(result.hasBreadcrumbs).toBe(false) // Should detect corruption
-    expect(result.validationErrors).toContain(expect.stringContaining('corrupted'))
+    expect(result.validationErrors.some(err => err.includes('corrupted'))).toBe(true)
   })
 
   test('should count camera folders correctly', async () => {

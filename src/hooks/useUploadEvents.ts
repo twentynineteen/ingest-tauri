@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { listen } from '@tauri-apps/api/event'
 import { useCallback, useEffect, useRef } from 'react'
+import { CACHE } from '../constants/timing'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryOptions } from '../lib/query-utils'
 
@@ -29,7 +30,7 @@ export const useUploadEvents = (): UseUploadEventsReturn => {
       'REALTIME',
       {
         staleTime: 0, // Always fresh for real-time updates
-        gcTime: 1 * 60 * 1000, // Keep cached for 1 minute
+        gcTime: CACHE.GC_BRIEF, // Keep cached for 1 minute
         refetchInterval: false // Don't auto-refetch, use event updates
       }
     )
@@ -96,7 +97,7 @@ export const useUploadEvents = (): UseUploadEventsReturn => {
     // Prevent double setup in StrictMode
     if (listenersSetup.current) return
 
-    console.log('Setting up upload event listeners with React Query integration...')
+    // Setting up upload event listeners with React Query integration
     listenersSetup.current = true
 
     let unlistenProgress: (() => void) | null = null

@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
+import { CACHE } from '../constants/timing'
 import { queryKeys } from '../lib/query-keys'
 
 /**
@@ -46,7 +47,7 @@ export class CacheInvalidationService {
     } else {
       // Invalidate all Trello data
       await this.queryClient.invalidateQueries({
-        queryKey: queryKeys.trello.all()
+        queryKey: queryKeys.trello.all
       })
     }
   }
@@ -63,17 +64,19 @@ export class CacheInvalidationService {
     } else {
       // Invalidate all Sprout data
       await this.queryClient.invalidateQueries({
-        queryKey: queryKeys.sprout.all()
+        queryKey: queryKeys.sprout.all
       })
     }
   }
 
   /**
    * Invalidate system information queries
+   * Note: There is no dedicated 'system' query key domain in queryKeys.
+   * This method invalidates camera queries as a placeholder for system-level data.
    */
   async invalidateSystemInfo() {
     await this.queryClient.invalidateQueries({
-      queryKey: queryKeys.system.all()
+      queryKey: queryKeys.camera.all
     })
   }
 
@@ -159,7 +162,7 @@ export class CacheInvalidationService {
   /**
    * Smart cache cleanup - remove stale queries older than specified age
    */
-  async cleanupStaleCache(maxAgeMs: number = 30 * 60 * 1000) {
+  async cleanupStaleCache(maxAgeMs: number = CACHE.LONG) {
     // 30 minutes default
     const now = Date.now()
     const queryCache = this.queryClient.getQueryCache()

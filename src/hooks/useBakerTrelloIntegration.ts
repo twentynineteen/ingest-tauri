@@ -21,6 +21,49 @@ interface UseBakerTrelloIntegrationResult {
   updateTrelloCards: (projectPaths: string[]) => Promise<TrelloError[]>
 }
 
+/**
+ * Extract card ID from Trello URL
+ */
+function extractCardIdFromUrl(trelloCardUrl: string): string | null {
+  const cardIdMatch = trelloCardUrl.match(/\/c\/([^/]+)/)
+  return cardIdMatch ? cardIdMatch[1] : null
+}
+
+/**
+ * Update a single project's Trello card with breadcrumbs data
+ */
+async function updateProjectTrelloCard(
+  breadcrumbsData: Record<string, unknown>,
+  apiKey: string,
+  token: string
+): Promise<void> {
+  const trelloCardUrl = breadcrumbsData.trelloCardUrl as string | undefined
+  if (!trelloCardUrl) return
+
+  const cardId = extractCardIdFromUrl(trelloCardUrl)
+  if (!cardId) return
+
+  // Create a mock TrelloCard object for the API call
+  const mockCard = {
+    id: cardId,
+    desc: '',
+    name: 'Baker Update',
+    idList: ''
+  }
+
+  // Use the core utility functions with the specific breadcrumbs data
+  const { generateBreadcrumbsBlock, updateTrelloCardWithBreadcrumbs } =
+    await import('hooks/useAppendBreadcrumbs')
+
+  const block = generateBreadcrumbsBlock(breadcrumbsData)
+  if (!block) return
+
+  await updateTrelloCardWithBreadcrumbs(mockCard, block, apiKey, token, {
+    autoReplace: true,
+    silentErrors: true
+  })
+}
+
 export function useBakerTrelloIntegration({
   apiKey,
   token
@@ -41,34 +84,7 @@ export function useBakerTrelloIntegration({
           const breadcrumbsContent = await readTextFile(breadcrumbsPath)
           const breadcrumbsData = JSON.parse(breadcrumbsContent)
 
-          // Check if this project has a linked Trello card
-          if (breadcrumbsData.trelloCardUrl) {
-            // Extract card ID from URL
-            const cardIdMatch = breadcrumbsData.trelloCardUrl.match(/\/c\/([^/]+)/)
-            if (cardIdMatch) {
-              const cardId = cardIdMatch[1]
-
-              // Create a mock TrelloCard object for the API call
-              const mockCard = {
-                id: cardId,
-                desc: '',
-                name: 'Baker Update',
-                idList: ''
-              }
-
-              // Use the core utility functions with the specific breadcrumbs data
-              const { generateBreadcrumbsBlock, updateTrelloCardWithBreadcrumbs } =
-                await import('hooks/useAppendBreadcrumbs')
-
-              const block = generateBreadcrumbsBlock(breadcrumbsData)
-              if (block) {
-                await updateTrelloCardWithBreadcrumbs(mockCard, block, apiKey, token, {
-                  autoReplace: true,
-                  silentErrors: true
-                })
-              }
-            }
-          }
+          await updateProjectTrelloCard(breadcrumbsData, apiKey, token)
         } catch (trelloError) {
           const projectName = projectPath.split('/').pop() || projectPath
           trelloErrors.push({

@@ -8,8 +8,12 @@
 // import { createOpenAI } from '@ai-sdk/openai' // Commented out for Phase 1
 import type { LanguageModel } from 'ai'
 import { createOllama } from 'ollama-ai-provider-v2'
+import { SECONDS, TIMEOUTS } from '../../constants/timing'
 import type { ProviderConfiguration } from '../../types/scriptFormatter'
+import { createNamespacedLogger } from '../../utils/logger'
 import type { ModelInfo, ProviderAdapter, ProviderRegistry } from './types'
+
+const logger = createNamespacedLogger('Ollama')
 
 // ============================================================================
 // Ollama Provider Adapter
@@ -28,7 +32,7 @@ const ollamaAdapter: ProviderAdapter = {
     // Normalize URL: remove trailing slashes and ensure no /api suffix
     baseUrl = baseUrl.replace(/\/+$/, '').replace(/\/api$/, '')
 
-    console.log('[Ollama] Creating model with baseURL:', `${baseUrl}/api`)
+    logger.log('Creating model with baseURL:', `${baseUrl}/api`)
 
     // Custom fetch with extended timeout for AI generation (5 minutes)
     const customFetch = async (url: RequestInfo | URL, init?: RequestInit) => {
@@ -67,7 +71,7 @@ const ollamaAdapter: ProviderAdapter = {
       baseUrl = baseUrl.replace(/\/+$/, '').replace(/\/api$/, '')
       const apiUrl = `${baseUrl}/api/tags`
 
-      console.log('[Ollama] Validating connection to:', apiUrl)
+      logger.log('Validating connection to:', apiUrl)
 
       const response = await fetch(apiUrl, {
         method: 'GET',
@@ -86,10 +90,7 @@ const ollamaAdapter: ProviderAdapter = {
 
       const data = await response.json()
 
-      console.log(
-        '[Ollama] Validation successful. Models found:',
-        data.models?.length || 0
-      )
+      logger.log('Validation successful. Models found:', data.models?.length || 0)
 
       return {
         success: true,
@@ -114,7 +115,7 @@ const ollamaAdapter: ProviderAdapter = {
       baseUrl = baseUrl.replace(/\/+$/, '').replace(/\/api$/, '')
       const apiUrl = `${baseUrl}/api/tags`
 
-      console.log('[Ollama] Fetching models from:', apiUrl)
+      logger.log('Fetching models from:', apiUrl)
 
       const response = await fetch(apiUrl, {
         signal: AbortSignal.timeout(config.timeout || 5000)
@@ -134,7 +135,7 @@ const ollamaAdapter: ProviderAdapter = {
         }>
       }
 
-      console.log('[Ollama] Models fetched:', data.models?.length || 0)
+      logger.log('Models fetched:', data.models?.length || 0)
 
       return (data.models || []).map(model => ({
         id: model.name,
@@ -225,11 +226,23 @@ const ollamaAdapter: ProviderAdapter = {
         throw new Error(`Failed to fetch models: HTTP ${response.status}`)
       }
 
-      const data = await response.json()
+      interface OpenAIModel {
+        id: string
+        object: string
+        created: number
+        owned_by: string
+      }
+
+      interface OpenAIModelsResponse {
+        data: OpenAIModel[]
+        object: string
+      }
+
+      const data = await response.json() as OpenAIModelsResponse
 
       return (data.data || [])
-        .filter((model: any) => model.id.startsWith('gpt-')) // Only GPT models
-        .map((model: any) => ({
+        .filter((model) => model.id.startsWith('gpt-')) // Only GPT models
+        .map((model) => ({
           id: model.id,
           name: model.id,
           contextLength: 128000, // GPT-4 context
@@ -284,12 +297,12 @@ export const DEFAULT_PROVIDER_CONFIGS: Record<string, Partial<ProviderConfigurat
   ollama: {
     serviceUrl: 'http://localhost:11434',
     connectionStatus: 'not-configured',
-    timeout: 5000
+    timeout: 5 * SECONDS
   },
   openai: {
     serviceUrl: 'https://api.openai.com',
     connectionStatus: 'not-configured',
-    timeout: 30000
+    timeout: TIMEOUTS.DEFAULT
   }
 }
 
@@ -302,7 +315,7 @@ export function getDefaultConfig(providerId: string): ProviderConfiguration {
   return {
     serviceUrl: defaults.serviceUrl || '',
     connectionStatus: 'not-configured',
-    timeout: defaults.timeout || 5000,
+    timeout: defaults.timeout || 5 * SECONDS,
     ...defaults
   } as ProviderConfiguration
 }

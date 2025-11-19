@@ -8,7 +8,9 @@ import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@testing-library/jest-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import * as useApiKeysModule from '../../hooks/useApiKeys'
+import * as useBreadcrumbsTrelloCardsModule from '../../hooks/useBreadcrumbsTrelloCards'
 import * as useBreadcrumbsVideoLinksModule from '../../hooks/useBreadcrumbsVideoLinks'
 import * as useFileUploadModule from '../../hooks/useFileUpload'
 import * as useSproutVideoApiModule from '../../hooks/useSproutVideoApi'
@@ -18,6 +20,7 @@ import { VideoLinksManager } from './VideoLinksManager'
 
 // Mock hooks
 vi.mock('../../hooks/useBreadcrumbsVideoLinks')
+vi.mock('../../hooks/useBreadcrumbsTrelloCards')
 vi.mock('../../hooks/useSproutVideoApi')
 vi.mock('../../hooks/useApiKeys')
 vi.mock('../../hooks/useFileUpload')
@@ -35,6 +38,17 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
   const mockUploadFile = vi.fn()
   const mockResetUploadState = vi.fn()
   const mockVideoProcessorReset = vi.fn()
+
+  // Helper to wrap component with QueryClientProvider
+  const renderWithQueryClient = (ui: React.ReactElement) => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: { retry: false },
+        mutations: { retry: false }
+      }
+    })
+    return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
+  }
 
   beforeEach(() => {
     // Reset all mocks
@@ -59,11 +73,26 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
       error: null
     })
 
+    // Mock useBreadcrumbsTrelloCards
+    vi.mocked(useBreadcrumbsTrelloCardsModule.useBreadcrumbsTrelloCards).mockReturnValue({
+      trelloCards: [],
+      isLoading: false,
+      error: null as any
+    })
+
     // Mock useSproutVideoApiKey
     vi.mocked(useApiKeysModule.useSproutVideoApiKey).mockReturnValue({
       apiKey: 'test-api-key',
       isLoading: false,
-      updateApiKey: vi.fn()
+      error: null as any
+    })
+
+    // Mock useTrelloApiKeys
+    vi.mocked(useApiKeysModule.useTrelloApiKeys).mockReturnValue({
+      apiKey: 'test-trello-key',
+      apiToken: 'test-trello-token',
+      isLoading: false,
+      error: null as any
     })
 
     // Mock useFileUpload
@@ -138,7 +167,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
   // ==========================================
   describe('T002: Tab switching behavior', () => {
     it('should open dialog with "Enter URL" tab active by default', async () => {
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -153,7 +182,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     })
 
     it('should switch to "Upload File" tab when clicked', async () => {
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -172,7 +201,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     })
 
     it('should clear validation errors when switching tabs', async () => {
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -207,7 +236,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -230,7 +259,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
   // ==========================================
   describe('T003: File selection workflow', () => {
     it('should show "Select Video File" button in upload tab', async () => {
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -245,7 +274,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     })
 
     it('should call selectFile when "Select Video File" button is clicked', async () => {
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -271,7 +300,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -286,7 +315,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     })
 
     it('should disable "Upload and Add" button when no file is selected', async () => {
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -309,7 +338,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -327,7 +356,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
   // ==========================================
   describe('T004: Upload button disabled states', () => {
     it('should disable "Upload and Add" when no file selected', async () => {
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -357,7 +386,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -383,7 +412,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -411,7 +440,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         message: null
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -424,28 +453,21 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     })
 
     it('should re-enable button after upload completes', async () => {
-      // Start with uploading state
-      const { rerender } = render(<VideoLinksManager projectPath={mockProjectPath} />)
+      // Contract: Button should change from "Upload and Add" → "Uploading..." → "Upload and Add"
+      // Contract: Button should be enabled → disabled → enabled
+      //
+      // Test strategy: Use rerender to simulate state changes between upload phases
+      // This tests the component's rendering behavior at each state, which is what
+      // unit tests should verify. Full E2E flow testing belongs in integration tests.
 
-      vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
-        selectedFile: '/test/video.mp4',
-        uploading: true,
-        response: null,
-        selectFile: mockSelectFile,
-        uploadFile: mockUploadFile,
-        resetUploadState: mockResetUploadState
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: { retry: false },
+          mutations: { retry: false }
+        }
       })
 
-      const addButton = screen.getByRole('button', { name: /add video/i })
-      await userEvent.click(addButton)
-
-      const uploadTab = screen.getByRole('tab', { name: /upload file/i })
-      await userEvent.click(uploadTab)
-
-      // Button should be disabled during upload
-      expect(screen.getByRole('button', { name: /uploading/i })).toBeDisabled()
-
-      // Mock upload completion
+      // Phase 1: Initial state with file selected (before upload)
       vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
         selectedFile: '/test/video.mp4',
         uploading: false,
@@ -455,12 +477,91 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      rerender(<VideoLinksManager projectPath={mockProjectPath} />)
+      vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
+        progress: 0,
+        message: null
+      })
 
-      // Button should be re-enabled
+      const { rerender } = render(
+        <QueryClientProvider client={queryClient}>
+          <VideoLinksManager projectPath={mockProjectPath} />
+        </QueryClientProvider>
+      )
+
+      // Open dialog and switch to upload tab
+      const addButton = screen.getByRole('button', { name: /add video/i })
+      await userEvent.click(addButton)
+
+      const uploadTab = screen.getByRole('tab', { name: /upload file/i })
+      await userEvent.click(uploadTab)
+
+      // Verify initial state: button should be enabled with "Upload and Add" text
+      let uploadButton = screen.getByRole('button', { name: /upload and add/i })
+      expect(uploadButton).toBeEnabled()
+
+      // Phase 2: Uploading state (button should be disabled)
+      vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
+        selectedFile: '/test/video.mp4',
+        uploading: true,
+        response: null,
+        selectFile: mockSelectFile,
+        uploadFile: mockUploadFile,
+        resetUploadState: mockResetUploadState
+      })
+
+      vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
+        progress: 50,
+        message: null
+      })
+
+      rerender(
+        <QueryClientProvider client={queryClient}>
+          <VideoLinksManager projectPath={mockProjectPath} />
+        </QueryClientProvider>
+      )
+
+      // Verify uploading state: button should be disabled and show progress
+      uploadButton = screen.getByRole('button', { name: /uploading/i })
+      expect(uploadButton).toBeDisabled()
+
+      // Phase 3: Upload complete (button should be re-enabled)
+      const mockUploadResponse = {
+        id: 'abc123xyz',
+        embedded_url: 'https://sproutvideo.com/videos/abc123xyz',
+        title: 'Test Video',
+        assets: { poster_frames: ['https://example.com/thumb.jpg'] },
+        created_at: '2025-01-15T10:30:00Z'
+      }
+
+      vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
+        selectedFile: '/test/video.mp4',
+        uploading: false,
+        response: mockUploadResponse,
+        selectFile: mockSelectFile,
+        uploadFile: mockUploadFile,
+        resetUploadState: mockResetUploadState
+      })
+
+      vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
+        progress: 100,
+        message: null
+      })
+
+      rerender(
+        <QueryClientProvider client={queryClient}>
+          <VideoLinksManager projectPath={mockProjectPath} />
+        </QueryClientProvider>
+      )
+
+      // Verify completed state: dialog should show success state with Finish button
+      // After successful upload, the dialog shows a "Finish" button instead of "Upload and Add"
       await waitFor(() => {
-        const uploadButton = screen.getByRole('button', { name: /upload and add/i })
-        expect(uploadButton).toBeEnabled()
+        expect(screen.getByRole('button', { name: /^finish$/i })).toBeInTheDocument()
+      })
+
+      // Verify the addVideoLink was called (video was successfully added)
+      await waitFor(() => {
+        expect(mockAddVideoLink).toHaveBeenCalled()
       })
     })
   })
@@ -470,7 +571,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
   // ==========================================
   describe('T005: Progress bar updates', () => {
     it('should hide progress bar when not uploading', async () => {
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -498,7 +599,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         message: null
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -527,7 +628,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         message: null
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -542,6 +643,21 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     })
 
     it('should show smooth progress updates (mocked progress events)', async () => {
+      // Contract: Progress should update from 0% → 10% → 50% → 100%
+      // Contract: Progress text should display current percentage
+      // Contract: Progress bar should visually reflect percentage
+      //
+      // Test strategy: Use rerender to simulate progress updates at each stage
+      // This verifies the component correctly renders progress at each percentage
+
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: { retry: false },
+          mutations: { retry: false }
+        }
+      })
+
+      // Initial uploading state at 0%
       vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
         selectedFile: '/test/video.mp4',
         uploading: true,
@@ -551,47 +667,72 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      // Initial progress
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
-        progress: 10,
+        progress: 0,
         message: null
       })
 
-      const { rerender } = render(<VideoLinksManager projectPath={mockProjectPath} />)
+      const { rerender } = render(
+        <QueryClientProvider client={queryClient}>
+          <VideoLinksManager projectPath={mockProjectPath} />
+        </QueryClientProvider>
+      )
 
+      // Open dialog and switch to upload tab
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
 
       const uploadTab = screen.getByRole('tab', { name: /upload file/i })
       await userEvent.click(uploadTab)
 
-      await waitFor(() => {
-        expect(screen.getByText('Uploading: 10%')).toBeInTheDocument()
+      // Verify 0% progress
+      expect(screen.getByRole('progressbar')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /uploading.*0%/i })).toBeInTheDocument()
+
+      // Progress update to 10%
+      vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
+        progress: 10,
+        message: null
       })
 
-      // Update progress to 50%
+      rerender(
+        <QueryClientProvider client={queryClient}>
+          <VideoLinksManager projectPath={mockProjectPath} />
+        </QueryClientProvider>
+      )
+
+      expect(screen.getByRole('button', { name: /uploading.*10%/i })).toBeInTheDocument()
+      expect(screen.getByText(/uploading:.*10%/i)).toBeInTheDocument()
+
+      // Progress update to 50%
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 50,
         message: null
       })
 
-      rerender(<VideoLinksManager projectPath={mockProjectPath} />)
+      rerender(
+        <QueryClientProvider client={queryClient}>
+          <VideoLinksManager projectPath={mockProjectPath} />
+        </QueryClientProvider>
+      )
 
-      await waitFor(() => {
-        expect(screen.getByText('Uploading: 50%')).toBeInTheDocument()
-      })
+      expect(screen.getByRole('button', { name: /uploading.*50%/i })).toBeInTheDocument()
+      expect(screen.getByText(/uploading:.*50%/i)).toBeInTheDocument()
 
-      // Update progress to 90%
+      // Progress update to 100%
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
-        progress: 90,
+        progress: 100,
         message: null
       })
 
-      rerender(<VideoLinksManager projectPath={mockProjectPath} />)
+      rerender(
+        <QueryClientProvider client={queryClient}>
+          <VideoLinksManager projectPath={mockProjectPath} />
+        </QueryClientProvider>
+      )
 
-      await waitFor(() => {
-        expect(screen.getByText('Uploading: 90%')).toBeInTheDocument()
-      })
+      expect(screen.getByRole('button', { name: /uploading.*100%/i })).toBeInTheDocument()
+      expect(screen.getByText(/uploading:.*100%/i)).toBeInTheDocument()
     })
   })
 
@@ -620,7 +761,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -658,7 +799,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -686,7 +827,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -720,7 +861,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -753,7 +894,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -790,7 +931,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -818,7 +959,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -847,7 +988,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -873,7 +1014,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -902,7 +1043,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -929,7 +1070,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -944,7 +1085,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     })
 
     it('should reset form data when closing dialog', async () => {
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -972,7 +1113,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     })
 
     it('should reset validation errors when closing dialog', async () => {
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -997,7 +1138,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     })
 
     it('should reset addMode to "url" when closing dialog', async () => {
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)
@@ -1030,7 +1171,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
         resetUploadState: mockResetUploadState
       })
 
-      render(<VideoLinksManager projectPath={mockProjectPath} />)
+      renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
 
       const addButton = screen.getByRole('button', { name: /add video/i })
       await userEvent.click(addButton)

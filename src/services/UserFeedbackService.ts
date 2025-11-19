@@ -3,6 +3,7 @@
  * Provides interactive user feedback and notifications during updates
  */
 
+import { TIMEOUTS } from '../constants/timing'
 import { ProgressTracker, ProgressUpdate } from './ProgressTracker'
 
 export interface FeedbackOptions {
@@ -183,7 +184,7 @@ export class UserFeedbackService {
    */
   public async promptUser(prompt: UserPrompt): Promise<string | null> {
     return new Promise(resolve => {
-      const timeoutMs = prompt.timeout || 30000 // 30 second default timeout
+      const timeoutMs = prompt.timeout || TIMEOUTS.USER_FEEDBACK // 30 second default timeout
 
       console.log(`\n${prompt.message}`)
 
@@ -218,7 +219,7 @@ export class UserFeedbackService {
   public async confirmAction(
     message: string,
     defaultYes: boolean = false,
-    timeout: number = 30000
+    timeout: number = TIMEOUTS.USER_FEEDBACK
   ): Promise<boolean> {
     const prompt: UserPrompt = {
       id: `confirm-${Date.now()}`,
