@@ -52,6 +52,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./tests/setup/vitest-setup.ts', './tests/setup/msw-server.ts'],
-    mockReset: true
+    mockReset: true,
+    exclude: ['**/node_modules/**', '**/dist/**', '**/tests/e2e/**']
   }
 })
