@@ -54,12 +54,17 @@ Medium - Not blocking functionality but affects code quality. Can be addressed s
 - ✅ Added ESLint `no-console` rule (2025-11-18)
   - Rule warns on `console.log`, `console.info`, `console.debug`, `console.trace`
   - Allows `console.error` and `console.warn` for legitimate error handling
-  - Currently detecting 144 violations (140 console.log + 4 others)
 - ✅ Created `src/utils/logger.ts` utility (2025-11-18)
   - Development-only logging (silent in production)
   - Namespaced logger support for module-specific debugging
   - Drop-in replacement for console.log
-- Remaining: Gradually migrate console.log calls to logger utility
+- ✅ Migrated `useScriptProcessor.ts` to logger utility (2025-11-19)
+  - 13 console.log statements converted to namespaced logger
+- Current status: 128 console.log remaining (down from 141)
+  - 34 in UserFeedbackService.ts (intentional user feedback - keep)
+  - 8 in debug.ts (development debugging - keep)
+  - ~86 candidates for gradual migration
+- Remaining: Continue gradual migration as files are touched
 
 **Target Resolution:** Q1 2026
 

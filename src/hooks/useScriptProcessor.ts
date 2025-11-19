@@ -11,8 +11,11 @@ import { useRef, useState } from 'react'
 import { ModelFactory } from '../services/ai/modelFactory'
 import type { ProcessedOutput, ProviderConfiguration } from '../types/scriptFormatter'
 import { buildRAGPrompt } from '../utils/aiPrompts'
+import { createNamespacedLogger } from '../utils/logger'
 import { useOllamaEmbedding } from './useOllamaEmbedding'
 import type { SimilarExample } from './useScriptRetrieval'
+
+const logger = createNamespacedLogger('useScriptProcessor')
 
 interface ProcessScriptOptions {
   text: string
@@ -49,10 +52,11 @@ async function retrieveSimilarExamples(
   const enableRAG = true
 
   if (!enableRAG || !isEmbeddingReady || options.text.length <= 50) {
-    console.log(
-      '[useScriptProcessor] RAG disabled or not ready - processing without examples',
-      { enableRAG, isEmbeddingReady, textLength: options.text.length }
-    )
+    logger.log('RAG disabled or not ready - processing without examples', {
+      enableRAG,
+      isEmbeddingReady,
+      textLength: options.text.length
+    })
     options.onRAGUpdate?.('RAG not available', 0)
     return []
   }
@@ -61,14 +65,12 @@ async function retrieveSimilarExamples(
     options.onRAGUpdate?.('Searching for similar examples...', 0)
 
     // Generate embedding for query
-    console.log('[useScriptProcessor] Generating embedding for query text...')
+    logger.log('Generating embedding for query text...')
     const queryEmbedding = await embed(options.text)
-    console.log(
-      `[useScriptProcessor] Query embedding generated: ${queryEmbedding.length} dimensions`
-    )
+    logger.log(`Query embedding generated: ${queryEmbedding.length} dimensions`)
 
     // Search for similar scripts
-    console.log('[useScriptProcessor] Searching database for similar examples...')
+    logger.log('Searching database for similar examples...')
     const allSimilarExamples = await invoke<SimilarExample[]>('search_similar_scripts', {
       queryEmbedding,
       topK: 10,
@@ -78,13 +80,11 @@ async function retrieveSimilarExamples(
     // Filter by enabled example IDs if provided
     const examples = filterEnabledExamples(allSimilarExamples, options.enabledExampleIds)
 
-    console.log(
-      `[useScriptProcessor] Search complete: Using ${examples.length} similar examples`
-    )
+    logger.log(`Search complete: Using ${examples.length} similar examples`)
 
     if (examples.length > 0) {
-      console.log(
-        '[useScriptProcessor] Example details:',
+      logger.log(
+        'Example details:',
         examples.map(ex => ({
           id: ex.id,
           title: ex.title,
@@ -98,7 +98,7 @@ async function retrieveSimilarExamples(
       )
     } else {
       const reason = getNoExamplesReason(options.enabledExampleIds)
-      console.log(`[useScriptProcessor] ${reason}`)
+      logger.log(reason)
       options.onRAGUpdate?.(reason, 0)
     }
 
@@ -126,9 +126,7 @@ function filterEnabledExamples(
   }
 
   const filtered = allExamples.filter(ex => enabledIds.has(ex.id))
-  console.log(
-    `[useScriptProcessor] Filtered ${allExamples.length} examples to ${filtered.length} enabled`
-  )
+  logger.log(`Filtered ${allExamples.length} examples to ${filtered.length} enabled`)
   return filtered
 }
 
@@ -150,7 +148,7 @@ async function streamAIResponse(
   systemPrompt: string,
   abortSignal: AbortSignal
 ): Promise<string> {
-  console.log('[useScriptProcessor] Processing with AI...')
+  logger.log('Processing with AI...')
 
   const model = ModelFactory.createModel({
     providerId: options.providerId,
@@ -199,8 +197,8 @@ function createProcessedOutput(
   examplesCount: number
 ): ProcessedOutput {
   // Debug logging
-  console.log('Formatted text preview (first 200 chars):', formattedText.substring(0, 200))
-  console.log('Line breaks found:', formattedText.split('\n').length)
+  logger.debug('Formatted text preview (first 200 chars):', formattedText.substring(0, 200))
+  logger.debug('Line breaks found:', formattedText.split('\n').length)
 
   // Convert line breaks to proper HTML paragraphs
   const htmlContent = formattedText
@@ -274,7 +272,7 @@ export function useScriptProcessor(): UseScriptProcessorResult {
     while (attempt < maxRetries) {
       try {
         // Step 1: Retrieve similar examples using RAG (10% progress)
-        console.log('[useScriptProcessor] Step 1: Retrieving similar examples...')
+        logger.log('Step 1: Retrieving similar examples...')
         setProgress(5)
         options.onProgress?.(5)
 
@@ -284,7 +282,7 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         options.onProgress?.(15)
 
         // Step 2: Build enhanced prompt with examples (20% progress)
-        console.log('[useScriptProcessor] Step 2: Building prompt...')
+        logger.log('Step 2: Building prompt...')
         const systemPrompt = buildRAGPrompt(options.text, examples)
         setProgress(20)
         options.onProgress?.(20)
