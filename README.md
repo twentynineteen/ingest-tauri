@@ -1,4 +1,4 @@
-<!-- ⚠️ This README has been generated from the file(s) "blueprint.md" ⚠️-->template.title
+<h1 align="center">bucket</h1>
 
 {
 "ids": {
@@ -13,17 +13,51 @@
 ]
 }
 
-template.description
+<p align="center">
+  <b>A desktop video editing workflow application that streamlines video ingest, project creation, and integrates with professional video production tools.</b></br>
+  <sub><sub>
+</p>
 
-template.toc
+<br />
 
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#table-of-contents)
+
+## ➤ Table of Contents
+
+    * [➤ Overview](#-overview)
+    * [➤ Key Features](#-key-features)
+    * [➤ Installation](#-installation)
+    	* [Prerequisites](#prerequisites)
+    	* [Quick Start](#quick-start)
+    	* [Development Setup](#development-setup)
+    * [➤ Ollama Setup](#-ollama-setup)
+    	* [Installing Ollama](#installing-ollama)
+    	* [Running Ollama](#running-ollama)
+
+- [➤ Table of Contents](#-table-of-contents)
+- [➤ Overview](#-overview)
+- [➤ Key Features](#-key-features)
+- [➤ Installation](#-installation)
+  - [Prerequisites](#prerequisites)
+  - [Quick Start](#quick-start)
+  - [Development Setup](#development-setup)
+- [➤ Ollama Setup](#-ollama-setup)
+  - [Installing Ollama](#installing-ollama)
+  - [Running Ollama](#running-ollama)
+  - [Installing AI Models](#installing-ai-models)
+  - [Configuring in Bucket](#configuring-in-bucket)
+  - [Troubleshooting Ollama](#troubleshooting-ollama)
+- [➤ How It Works](#-how-it-works)
+  - [AI Script Formatter Workflow](#ai-script-formatter-workflow)
+  - [Video Project Workflow](#video-project-workflow)
+- [➤ Tech Stack](#-tech-stack)
+- [➤ License](#-license)
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#overview)
 
 ## ➤ Overview
 
 Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScript) designed to streamline video editing workflows for professionals. It simplifies video file ingest, automates project creation, and seamlessly integrates with industry-standard tools like Adobe Premiere, Trello, and Sprout Video.
-
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#key-features)
 
@@ -42,7 +76,6 @@ Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScri
   - **Sprout Video**: Video hosting with custom posterframe generation
 - **Secure User Management**: Login/registration with encrypted data storage
 - **Cross-Platform**: Available for Windows, macOS, and Linux
-
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#installation)
 
@@ -87,11 +120,13 @@ To run in development mode:
 npm run dev:tauri
 ```
 
-### Ollama Setup
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#ollama-setup)
+
+## ➤ Ollama Setup
 
 The AI Script Formatter feature requires Ollama to be installed and running locally.
 
-#### Installing Ollama
+### Installing Ollama
 
 1. Download and install Ollama from [ollama.com](https://ollama.com)
    - **macOS**: Download the `.dmg` installer
@@ -103,7 +138,7 @@ The AI Script Formatter feature requires Ollama to be installed and running loca
    ollama --version
    ```
 
-#### Running Ollama
+### Running Ollama
 
 Ollama runs as a background service. To start it:
 
@@ -121,7 +156,7 @@ ollama serve
 
 The service runs on `http://localhost:11434` by default.
 
-#### Installing AI Models
+### Installing AI Models
 
 Before using the Script Formatter, download the following language models:
 
@@ -152,7 +187,7 @@ ollama list
 
 - **llama3.2**: Best for quick formatting on limited hardware
 
-#### Configuring in Bucket
+### Configuring in Bucket
 
 1. Launch Bucket and navigate to **Settings**
 2. Find the **Ollama URL** field (default: `http://localhost:11434`)
@@ -160,7 +195,7 @@ ollama list
 4. Click **Test Connection** to verify Ollama is running and see how many models are available
 5. Navigate to **AI Tools > Script Formatter** to start formatting scripts
 
-#### Troubleshooting Ollama
+### Troubleshooting Ollama
 
 **Connection Failed:**
 
@@ -203,7 +238,6 @@ OLLAMA_HOST=0.0.0.0:11435 ollama serve
 
 Then update the URL in Bucket Settings to `http://localhost:11435`
 
-
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#how-it-works)
 
 ## ➤ How It Works
@@ -226,7 +260,6 @@ Then update the URL in Bucket Settings to `http://localhost:11435`
 5. **Track Progress**: Monitor file operations with real-time progress updates
 6. **Integrate & Upload**: Connect with Trello for project management or Sprout Video for hosting
 
-
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#tech-stack)
 
 ## ➤ Tech Stack
@@ -243,11 +276,10 @@ Then update the URL in Bucket Settings to `http://localhost:11435`
   - mammoth.js for Word document parsing
   - docx for document generation
 
+{{ template:contributors }}
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#license)
 
 ## ➤ License
 
-This project is proprietary software. All rights reserved. Unauthorized copying, modification, distribution, or use of this software is strictly prohibited.
-
-{{ template: license }}
+Licensed under [UNLICENSED](https://opensource.org/licenses/UNLICENSED).
