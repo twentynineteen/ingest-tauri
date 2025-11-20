@@ -11,8 +11,8 @@
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/twentynineteen/ingest-tauri.git
-   cd ingest-tauri
+   git clone https://github.com/twentynineteen/bucket.git
+   cd bucket
    ```
 
 2. Install dependencies:

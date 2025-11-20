@@ -25,7 +25,7 @@ interface VersionCheckResult {
  */
 async function fetchLatestRelease(): Promise<GitHubRelease> {
   const response = await fetch(
-    'https://api.github.com/repos/twentynineteen/ingest-tauri/releases/latest'
+    'https://api.github.com/repos/twentynineteen/bucket/releases/latest'
   )
 
   if (!response.ok) {

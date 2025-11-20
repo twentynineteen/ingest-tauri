@@ -24,6 +24,7 @@ Before starting, ensure you have:
 - **Code editor** (VS Code recommended with Rust Analyzer extension)
 
 **Optional (for AI features):**
+
 - **Ollama** ([install from ollama.com](https://ollama.com))
 - At least one model: `ollama pull llama3.1:latest`
 
@@ -34,23 +35,26 @@ Before starting, ensure you have:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/twentynineteen/ingest-tauri.git
-cd ingest-tauri
+git clone https://github.com/twentynineteen/bucket.git
+cd bucket
 ```
 
 ### Install Dependencies
 
 Using **Bun** (recommended - faster):
+
 ```bash
 bun install
 ```
 
 Or using **npm**:
+
 ```bash
 npm install
 ```
 
 This installs:
+
 - Frontend dependencies (React, TypeScript, Vite, etc.)
 - Development tools (Prettier, ESLint, Vitest)
 - Tauri CLI
@@ -63,6 +67,7 @@ cargo --version
 ```
 
 If Rust is not installed:
+
 ```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 source $HOME/.cargo/env
@@ -79,6 +84,7 @@ npm run dev:tauri
 ```
 
 This will:
+
 1. Start the Vite dev server (React frontend)
 2. Compile Rust backend
 3. Launch the desktop app with devtools
@@ -104,7 +110,7 @@ This will:
 ### Project Structure Overview
 
 ```
-ingest-tauri/
+bucket/
 ├── src/                    # React frontend (TypeScript)
 │   ├── pages/              # Page components (routes)
 │   ├── components/         # Reusable UI components
@@ -128,14 +134,14 @@ ingest-tauri/
 
 ### Key Files to Know
 
-| File | Purpose |
-|------|---------|
-| `src/App.tsx` | Root React component |
-| `src/AppRouter.tsx` | Route definitions |
-| `src-tauri/src/main.rs` | Rust app entry point |
-| `src-tauri/src/commands/mod.rs` | Tauri commands registry |
-| `package.json` | npm scripts and dependencies |
-| `CLAUDE.md` | Project instructions for AI assistants |
+| File                            | Purpose                                |
+| ------------------------------- | -------------------------------------- |
+| `src/App.tsx`                   | Root React component                   |
+| `src/AppRouter.tsx`             | Route definitions                      |
+| `src-tauri/src/main.rs`         | Rust app entry point                   |
+| `src-tauri/src/commands/mod.rs` | Tauri commands registry                |
+| `package.json`                  | npm scripts and dependencies           |
+| `CLAUDE.md`                     | Project instructions for AI assistants |
 
 ### Read the Documentation
 
@@ -158,6 +164,7 @@ Let's make a simple change to see the development workflow.
 **Task:** Add a welcome message to the Settings page
 
 1. **Open the file:**
+
    ```bash
    code src/pages/Settings.tsx
    ```
@@ -165,6 +172,7 @@ Let's make a simple change to see the development workflow.
 2. **Find the return statement** (around line 50)
 
 3. **Add a welcome message above the settings form:**
+
    ```tsx
    return (
      <div className="container mx-auto p-6">
@@ -193,11 +201,13 @@ Let's make a simple change to see the development workflow.
 **Task:** Add a command that returns the current timestamp
 
 1. **Create a new command file:**
+
    ```bash
    code src-tauri/src/commands/timestamp.rs
    ```
 
 2. **Add the command:**
+
    ```rust
    use chrono::Utc;
 
@@ -210,6 +220,7 @@ Let's make a simple change to see the development workflow.
 3. **Export the command:**
 
    Edit `src-tauri/src/commands/mod.rs`:
+
    ```rust
    pub mod timestamp;  // Add this line
    pub use timestamp::*;  // Add this line
@@ -218,6 +229,7 @@ Let's make a simple change to see the development workflow.
 4. **Register the command:**
 
    Edit `src-tauri/src/main.rs`, find `.invoke_handler(...)` and add `get_timestamp`:
+
    ```rust
    .invoke_handler(tauri::generate_handler![
        // ... existing commands
@@ -228,15 +240,16 @@ Let's make a simple change to see the development workflow.
 5. **Call from frontend:**
 
    Create `src/hooks/useTimestamp.ts`:
+
    ```typescript
-   import { invoke } from '@tauri-apps/api/core'
    import { useQuery } from '@tanstack/react-query'
+   import { invoke } from '@tauri-apps/api/core'
 
    export function useTimestamp() {
      return useQuery({
        queryKey: ['timestamp'],
        queryFn: () => invoke<string>('get_timestamp'),
-       refetchInterval: 1000  // Update every second
+       refetchInterval: 1000 // Update every second
      })
    }
    ```
@@ -244,6 +257,7 @@ Let's make a simple change to see the development workflow.
 6. **Use in a component:**
 
    Edit `src/pages/Settings.tsx`:
+
    ```tsx
    import { useTimestamp } from '@/hooks/useTimestamp'
 
@@ -280,6 +294,7 @@ npm run eslint:fix
 ```
 
 **Formatting rules:**
+
 - 90 character line width
 - Single quotes
 - No semicolons
@@ -296,6 +311,7 @@ npm run test:ui
 ```
 
 **Coverage check:**
+
 ```bash
 npm run test:coverage
 ```
@@ -353,6 +369,7 @@ Follow the Conventional Commits format:
 ```
 
 **Types:**
+
 - `feat:` - New feature
 - `fix:` - Bug fix
 - `docs:` - Documentation changes
@@ -362,6 +379,7 @@ Follow the Conventional Commits format:
 - `chore:` - Maintenance tasks
 
 **Examples:**
+
 ```bash
 git commit -m "feat: add timestamp display to Settings"
 git commit -m "fix: resolve file copy corruption issue"
@@ -407,6 +425,7 @@ Explain the motivation
 ### Adding a New Page
 
 1. **Create page component:**
+
    ```bash
    mkdir src/pages/MyFeature
    code src/pages/MyFeature/MyFeature.tsx
@@ -414,6 +433,7 @@ Explain the motivation
 
 2. **Add route:**
    Edit `src/AppRouter.tsx`:
+
    ```tsx
    <Route path="/my-feature" element={<MyFeature />} />
    ```
@@ -433,6 +453,7 @@ Explain the motivation
 See [Step 4: Backend Change Example](#backend-change-example) above.
 
 **Quick reference:**
+
 1. Create command in `src-tauri/src/commands/`
 2. Export in `mod.rs`
 3. Register in `main.rs`
@@ -442,6 +463,7 @@ See [Step 4: Backend Change Example](#backend-change-example) above.
 ### Adding a New Dependency
 
 **Frontend:**
+
 ```bash
 bun add package-name
 # or
@@ -449,6 +471,7 @@ npm install package-name
 ```
 
 **Backend:**
+
 ```bash
 cd src-tauri
 cargo add crate-name
@@ -457,11 +480,13 @@ cargo add crate-name
 ### Debugging Tips
 
 **Frontend debugging:**
+
 - Right-click in app → Inspect Element
 - Use React DevTools (installed automatically in dev mode)
 - Check TanStack Query DevTools (bottom-left icon)
 
 **Backend debugging:**
+
 ```bash
 # Enable detailed Rust logs
 RUST_LOG=debug npm run dev:tauri
@@ -472,12 +497,12 @@ RUST_LOG=app_lib::commands=debug npm run dev:tauri
 
 **Common issues:**
 
-| Problem | Solution |
-|---------|----------|
-| "Command not found" error | Command not registered in `main.rs` |
-| Hot reload not working | Restart dev server |
-| Rust compilation fails | Run `cargo clean`, then rebuild |
-| File picker doesn't open | Check Tauri permissions in `tauri.conf.json` |
+| Problem                   | Solution                                     |
+| ------------------------- | -------------------------------------------- |
+| "Command not found" error | Command not registered in `main.rs`          |
+| Hot reload not working    | Restart dev server                           |
+| Rust compilation fails    | Run `cargo clean`, then rebuild              |
+| File picker doesn't open  | Check Tauri permissions in `tauri.conf.json` |
 
 ---
 
@@ -486,6 +511,7 @@ RUST_LOG=app_lib::commands=debug npm run dev:tauri
 ### 1. Use React Query for Data Fetching
 
 **Don't do this:**
+
 ```typescript
 const [data, setData] = useState(null)
 
@@ -495,6 +521,7 @@ useEffect(() => {
 ```
 
 **Do this:**
+
 ```typescript
 const { data } = useQuery({
   queryKey: ['data'],
@@ -505,6 +532,7 @@ const { data } = useQuery({
 ### 2. Use Zustand for Global UI State
 
 **Example:**
+
 ```typescript
 // src/store/useMyStore.ts
 import { create } from 'zustand'
@@ -514,15 +542,16 @@ interface MyStore {
   increment: () => void
 }
 
-export const useMyStore = create<MyStore>((set) => ({
+export const useMyStore = create<MyStore>(set => ({
   count: 0,
-  increment: () => set((state) => ({ count: state.count + 1 }))
+  increment: () => set(state => ({ count: state.count + 1 }))
 }))
 ```
 
 ### 3. Keep Components Small
 
 **Guideline:**
+
 - Components should be <200 lines
 - Extract complex logic to custom hooks
 - Break large components into smaller sub-components
@@ -530,6 +559,7 @@ export const useMyStore = create<MyStore>((set) => ({
 ### 4. Type Everything
 
 **Always use TypeScript:**
+
 ```typescript
 // Good
 interface User {
@@ -546,14 +576,16 @@ function getUser() { ... }  // No return type
 ### 5. Test New Features
 
 Write tests for:
+
 - Utility functions (required)
 - Custom hooks (recommended)
 - Complex components (recommended)
 
 **Example test:**
+
 ```typescript
-import { describe, it, expect } from 'vitest'
 import { myFunction } from '@/utils/myFunction'
+import { describe, expect, it } from 'vitest'
 
 describe('myFunction', () => {
   it('should return correct value', () => {
@@ -576,15 +608,18 @@ describe('myFunction', () => {
 ### External Resources
 
 **React & TypeScript:**
+
 - [React Documentation](https://react.dev)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/)
 - [TanStack Query](https://tanstack.com/query/latest)
 
 **Tauri:**
+
 - [Tauri Documentation](https://tauri.app/v2/guides/)
 - [Tauri Commands Guide](https://tauri.app/v2/guides/features/commands/)
 
 **Rust:**
+
 - [The Rust Book](https://doc.rust-lang.org/book/)
 - [Rust by Example](https://doc.rust-lang.org/rust-by-example/)
 
@@ -609,8 +644,8 @@ describe('myFunction', () => {
 
 ### Community
 
-- **GitHub Issues:** [Report bugs or request features](https://github.com/twentynineteen/ingest-tauri/issues)
-- **GitHub Discussions:** [Ask questions](https://github.com/twentynineteen/ingest-tauri/discussions)
+- **GitHub Issues:** [Report bugs or request features](https://github.com/twentynineteen/bucket/issues)
+- **GitHub Discussions:** [Ask questions](https://github.com/twentynineteen/bucket/discussions)
 
 ### When You're Stuck
 
