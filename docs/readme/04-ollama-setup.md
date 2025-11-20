@@ -19,8 +19,6 @@ The AI Script Formatter feature requires Ollama to be installed and running loca
 Ollama runs as a background service. To start it:
 
 ```bash
-# Ollama typically starts automatically on macOS/Windows
-# On Linux, you may need to start it manually:
 ollama serve
 ```
 
@@ -31,13 +29,9 @@ The service runs on `http://localhost:11434` by default.
 Before using the Script Formatter, download the following language models:
 
 ```bash
-# script formatting:
-ollama pull llama3.1:latest       # Fast, good quality (8B parameters)
-# script embedding:
-ollama pull nomic-embed-text:latest
-# Required for adding new scripts to database
 
-# List installed models:
+ollama pull llama3.1:latest
+ollama pull nomic-embed-text:latest
 ollama list
 ```
 
@@ -56,22 +50,28 @@ ollama list
 ### Troubleshooting Ollama
 
 **Connection Failed:**
+Check if Ollama is running:
 
 ```bash
-# Check if Ollama is running:
 curl http://localhost:11434/api/tags
+```
 
-# If not running, start it:
+If not running, start it:
+
+```bash
 ollama serve
 ```
 
 **No Models Available:**
+List installed models:
 
 ```bash
-# List installed models:
 ollama list
+```
 
-# Install a model:
+Install a model:
+
+```bash
 ollama pull llama3:latest
 ```
 

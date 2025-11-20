@@ -1,57 +1,44 @@
 <!-- ⚠️ This README has been generated from the file(s) "blueprint.md" ⚠️--><h1 align="center">bucket</h1>
 
-{{ template: badges }}
-
 <p align="center">
   <b>A desktop video editing workflow application that streamlines video ingest, project creation, and integrates with professional video production tools.</b></br>
-  <sub><sub>
+  <sub>Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScript) designed to streamline video editing workflows for professionals. It simplifies video file ingest, automates project creation, and seamlessly integrates with industry-standard tools like Adobe Premiere, Trello, and Sprout Video.<sub>
 </p>
 
 <br />
 
 
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#table-of-contents)
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#table-of-contents)
 
 ## ➤ Table of Contents
 
-	* [➤ Overview](#-overview)
-	* [➤ Key Features](#-key-features)
-	* [➤ Installation](#-installation)
-		* [Prerequisites](#prerequisites)
-		* [Quick Start](#quick-start)
-		* [Development Setup](#development-setup)
-	* [➤ Ollama Setup](#-ollama-setup)
-		* [Installing Ollama](#installing-ollama)
-		* [Running Ollama](#running-ollama)
-* [➤ Ollama typically starts automatically on macOS/Windows](#-ollama-typically-starts-automatically-on-macoswindows)
-* [➤ On Linux, you may need to start it manually:](#-on-linux-you-may-need-to-start-it-manually)
-		* [Installing AI Models](#installing-ai-models)
-* [➤ script formatting:](#-script-formatting)
-* [➤ script embedding:](#-script-embedding)
-* [➤ Required for adding new scripts to database](#-required-for-adding-new-scripts-to-database)
-* [➤ List installed models:](#-list-installed-models)
-		* [Configuring in Bucket](#configuring-in-bucket)
-		* [Troubleshooting Ollama](#troubleshooting-ollama)
-* [➤ Check if Ollama is running:](#-check-if-ollama-is-running)
-* [➤ If not running, start it:](#-if-not-running-start-it)
-* [➤ List installed models:](#-list-installed-models-1)
-* [➤ Install a model:](#-install-a-model)
-	* [➤ How It Works](#-how-it-works)
-		* [AI Script Formatter Workflow](#ai-script-formatter-workflow)
-		* [Video Project Workflow](#video-project-workflow)
-	* [➤ Tech Stack](#-tech-stack)
-	* [➤ License](#-license)
+* [➤ Overview](#-overview)
+* [➤ Key Features](#-key-features)
+* [➤ Installation](#-installation)
+	* [Prerequisites](#prerequisites)
+	* [Quick Start](#quick-start)
+	* [Development Setup](#development-setup)
+* [➤ Ollama Setup](#-ollama-setup)
+	* [Installing Ollama](#installing-ollama)
+	* [Running Ollama](#running-ollama)
+	* [Installing AI Models](#installing-ai-models)
+	* [Configuring in Bucket](#configuring-in-bucket)
+	* [Troubleshooting Ollama](#troubleshooting-ollama)
+* [➤ How It Works](#-how-it-works)
+	* [AI Script Formatter Workflow](#ai-script-formatter-workflow)
+	* [Video Project Workflow](#video-project-workflow)
+* [➤ Tech Stack](#-tech-stack)
+* [➤ License](#-license)
 
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#overview)
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#overview)
 
 ## ➤ Overview
 
 Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScript) designed to streamline video editing workflows for professionals. It simplifies video file ingest, automates project creation, and seamlessly integrates with industry-standard tools like Adobe Premiere, Trello, and Sprout Video.
 
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#key-features)
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#key-features)
 
 ## ➤ Key Features
 
@@ -70,7 +57,7 @@ Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScri
 - **Cross-Platform**: Available for Windows, macOS, and Linux
 
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#installation)
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#installation)
 
 ## ➤ Installation
 
@@ -114,7 +101,7 @@ npm run dev:tauri
 ```
 
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#ollama-setup)
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#ollama-setup)
 
 ## ➤ Ollama Setup
 
@@ -137,14 +124,6 @@ The AI Script Formatter feature requires Ollama to be installed and running loca
 Ollama runs as a background service. To start it:
 
 ```bash
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#ollama-typically-starts-automatically-on-macoswindows)
-
-# ➤ Ollama typically starts automatically on macOS/Windows
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#on-linux-you-may-need-to-start-it-manually)
-
-# ➤ On Linux, you may need to start it manually:
 ollama serve
 ```
 
@@ -156,24 +135,8 @@ Before using the Script Formatter, download the following language models:
 
 ```bash
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#script-formatting)
-
-# ➤ script formatting:
-ollama pull llama3.1:latest       # Fast, good quality (8B parameters)
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#script-embedding)
-
-# ➤ script embedding:
+ollama pull llama3.1:latest
 ollama pull nomic-embed-text:latest
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#required-for-adding-new-scripts-to-database)
-
-# ➤ Required for adding new scripts to database
-
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#list-installed-models)
-
-# ➤ List installed models:
 ollama list
 ```
 
@@ -192,34 +155,28 @@ ollama list
 ### Troubleshooting Ollama
 
 **Connection Failed:**
+Check if Ollama is running:
 
 ```bash
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#check-if-ollama-is-running)
-
-# ➤ Check if Ollama is running:
 curl http://localhost:11434/api/tags
+```
 
+If not running, start it:
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#if-not-running-start-it)
-
-# ➤ If not running, start it:
+```bash
 ollama serve
 ```
 
 **No Models Available:**
+List installed models:
 
 ```bash
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#list-installed-models)
-
-# ➤ List installed models:
 ollama list
+```
 
+Install a model:
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#install-a-model)
-
-# ➤ Install a model:
+```bash
 ollama pull llama3:latest
 ```
 
@@ -233,7 +190,7 @@ OLLAMA_HOST=0.0.0.0:11435 ollama serve
 Then update the URL in Bucket Settings to `http://localhost:11435`
 
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#how-it-works)
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#how-it-works)
 
 ## ➤ How It Works
 
@@ -256,7 +213,7 @@ Then update the URL in Bucket Settings to `http://localhost:11435`
 6. **Integrate & Upload**: Connect with Trello for project management or Sprout Video for hosting
 
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#tech-stack)
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#tech-stack)
 
 ## ➤ Tech Stack
 
@@ -273,8 +230,7 @@ Then update the URL in Bucket Settings to `http://localhost:11435`
   - docx for document generation
 
 
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#license)
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#license)
 
 ## ➤ License
 	
