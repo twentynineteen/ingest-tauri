@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
-      - name: Checkout 🛎️
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Install system dependencies
@@ -51,5 +51,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build 🔧
+      - name: Build
         run: npm run build:tauri
