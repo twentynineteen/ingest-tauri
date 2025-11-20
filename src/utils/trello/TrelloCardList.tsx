@@ -6,7 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger
 } from '@components/ui/accordion'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { TrelloCard } from '../TrelloCards'
 
 interface TrelloCardListProps {
@@ -21,20 +21,18 @@ interface TrelloCardListProps {
  */
 const TrelloCardList: React.FC<TrelloCardListProps> = ({ grouped, onSelect }) => {
   const STORAGE_KEY = 'trello-accordion-state'
-  const [openSections, setOpenSections] = useState<string[]>([])
-
-  // Load accordion state from localStorage on mount
-  useEffect(() => {
+  const [openSections, setOpenSections] = useState<string[]>(() => {
+    // Load accordion state from localStorage on initial render
     try {
       const savedState = localStorage.getItem(STORAGE_KEY)
       if (savedState) {
-        const parsedState = JSON.parse(savedState)
-        setOpenSections(parsedState)
+        return JSON.parse(savedState)
       }
     } catch (error) {
       console.error('Failed to load accordion state:', error)
     }
-  }, [])
+    return []
+  })
 
   // Save accordion state to localStorage when it changes
   const handleAccordionChange = (value: string[]) => {
