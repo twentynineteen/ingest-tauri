@@ -1,17 +1,6 @@
 {{ template:title }}
 
-{
-"ids": {
-"github": "twentynineteen/ingest-tauri/",
-},
-"badges": [
-{
-"alt": "Custom badge",
-"url": "https://github.com/badges/shields",
-"img": "https://img.shields.io/badge/custom-badge-f39f37.svg"
-}
-]
-}
+{{ template: badges }}
 
 {{ template:description }}
 
