@@ -1,20 +1,12 @@
-<!-- ⚠️ This README has been generated from the file(s) "blueprint.md" ⚠️-->
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#bucket)
-
-# ➤ Bucket
+# Bucket
 
 A desktop video editing workflow application that streamlines video ingest, project creation, and integrates with professional video production tools.
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#overview)
-
-## ➤ Overview
+## Overview
 
 Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScript) designed to streamline video editing workflows for professionals. It simplifies video file ingest, automates project creation, and seamlessly integrates with industry-standard tools like Adobe Premiere, Trello, and Sprout Video.
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#key-features)
-
-## ➤ Key Features
+## Key Features
 
 - **AI Script Formatter**: AI-powered autocue script formatting using locally hosted LLM models
   - Upload Word documents (.docx) and format them for teleprompter use
@@ -30,9 +22,7 @@ Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScri
 - **Secure User Management**: Login/registration with encrypted data storage
 - **Cross-Platform**: Available for Windows, macOS, and Linux
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#installation)
-
-## ➤ Installation
+## Installation
 
 ### Prerequisites
 
@@ -94,14 +84,8 @@ The AI Script Formatter feature requires Ollama to be installed and running loca
 Ollama runs as a background service. To start it:
 
 ```bash
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#ollama-typically-starts-automatically-on-macoswindows)
-
-# ➤ Ollama typically starts automatically on macOS/Windows
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#on-linux-you-may-need-to-start-it-manually)
-
-# ➤ On Linux, you may need to start it manually:
+# Ollama typically starts automatically on macOS/Windows
+# On Linux, you may need to start it manually:
 ollama serve
 ```
 
@@ -112,25 +96,13 @@ The service runs on `http://localhost:11434` by default.
 Before using the Script Formatter, download the following language models:
 
 ```bash
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#script-formatting)
-
-# ➤ script formatting:
+# script formatting:
 ollama pull llama3.1:latest       # Fast, good quality (8B parameters)
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#script-embedding)
-
-# ➤ script embedding:
+# script embedding:
 ollama pull nomic-embed-text:latest
+# Required for adding new scripts to database
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#required-for-adding-new-scripts-to-database)
-
-# ➤ Required for adding new scripts to database
-
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#list-installed-models)
-
-# ➤ List installed models:
+# List installed models:
 ollama list
 ```
 
@@ -151,32 +123,20 @@ ollama list
 **Connection Failed:**
 
 ```bash
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#check-if-ollama-is-running)
-
-# ➤ Check if Ollama is running:
+# Check if Ollama is running:
 curl http://localhost:11434/api/tags
 
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#if-not-running-start-it)
-
-# ➤ If not running, start it:
+# If not running, start it:
 ollama serve
 ```
 
 **No Models Available:**
 
 ```bash
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#list-installed-models)
-
-# ➤ List installed models:
+# List installed models:
 ollama list
 
-
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#install-a-model)
-
-# ➤ Install a model:
+# Install a model:
 ollama pull llama3:latest
 ```
 
@@ -189,9 +149,7 @@ OLLAMA_HOST=0.0.0.0:11435 ollama serve
 
 Then update the URL in Bucket Settings to `http://localhost:11435`
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#how-it-works)
-
-## ➤ How It Works
+## How It Works
 
 ### AI Script Formatter Workflow
 
@@ -211,9 +169,7 @@ Then update the URL in Bucket Settings to `http://localhost:11435`
 5. **Track Progress**: Monitor file operations with real-time progress updates
 6. **Integrate & Upload**: Connect with Trello for project management or Sprout Video for hosting
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#tech-stack)
-
-## ➤ Tech Stack
+## Tech Stack
 
 - **Frontend**: React 18 + TypeScript + TailwindCSS
 - **Backend**: Tauri 2.0 (Rust)
@@ -227,8 +183,6 @@ Then update the URL in Bucket Settings to `http://localhost:11435`
   - mammoth.js for Word document parsing
   - docx for document generation
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#license)
-
-## ➤ License
+## License
 
 This project is proprietary software. All rights reserved. Unauthorized copying, modification, distribution, or use of this software is strictly prohibited.
