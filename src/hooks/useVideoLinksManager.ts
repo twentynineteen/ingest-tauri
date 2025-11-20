@@ -5,7 +5,9 @@
  */
 
 import { invoke } from '@tauri-apps/api/core'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import type { BreadcrumbsFile, VideoLink } from '../types/baker'
+import { validateVideoLink } from '../utils/validation'
 import { useSproutVideoApiKey, useTrelloApiKeys } from './useApiKeys'
 import {
   generateBreadcrumbsBlock,
@@ -17,8 +19,6 @@ import { useFileUpload } from './useFileUpload'
 import { useSproutVideoApi } from './useSproutVideoApi'
 import { useSproutVideoProcessor } from './useSproutVideoProcessor'
 import { useUploadEvents } from './useUploadEvents'
-import type { BreadcrumbsFile, VideoLink } from '../types/baker'
-import { validateVideoLink } from '../utils/validation'
 
 interface UseVideoLinksManagerProps {
   projectPath: string
@@ -66,7 +66,6 @@ export function useVideoLinksManager({ projectPath }: UseVideoLinksManagerProps)
   const [formData, setFormData] = useState<FormData>(initialFormData)
   const [validationErrors, setValidationErrors] = useState<string[]>([])
   const [fetchError, setFetchError] = useState<string | null>(null)
-  const [uploadSuccess, setUploadSuccess] = useState(false)
 
   // React Query-based upload processor
   const videoProcessor = useSproutVideoProcessor({
@@ -82,16 +81,11 @@ export function useVideoLinksManager({ projectPath }: UseVideoLinksManagerProps)
     },
     onError: error => {
       setValidationErrors([error])
-      setUploadSuccess(false)
     }
   })
 
-  // Track when upload completes
-  useEffect(() => {
-    if (response && !uploading && addMode === 'upload') {
-      setUploadSuccess(true)
-    }
-  }, [response, uploading, addMode])
+  // Derive upload success from state
+  const uploadSuccess = response && !uploading && addMode === 'upload'
 
   // Handlers
   const handleFetchVideoDetails = async () => {
@@ -214,7 +208,6 @@ export function useVideoLinksManager({ projectPath }: UseVideoLinksManagerProps)
       setValidationErrors([])
       setFetchError(null)
       setAddMode('url')
-      setUploadSuccess(false)
       resetUploadState()
       videoProcessor.reset()
     }
@@ -224,7 +217,6 @@ export function useVideoLinksManager({ projectPath }: UseVideoLinksManagerProps)
     setAddMode(value as 'url' | 'upload')
     setValidationErrors([])
     setFetchError(null)
-    setUploadSuccess(false)
 
     if (value === 'url') {
       resetUploadState()
