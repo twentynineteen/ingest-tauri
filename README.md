@@ -2,7 +2,7 @@
 
 <p align="center">
   <b>A desktop video editing workflow application that streamlines video ingest, project creation, and integrates with professional video production tools.</b></br>
-  <sub>Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScript) designed to streamline video editing workflows for professionals. It simplifies video file ingest, automates project creation, and seamlessly integrates with industry-standard tools like Adobe Premiere, Trello, and Sprout Video.<sub>
+  <sub><sub>
 </p>
 
 <br />
