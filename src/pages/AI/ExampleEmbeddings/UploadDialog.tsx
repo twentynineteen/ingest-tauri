@@ -26,11 +26,7 @@ import {
 } from '@/components/ui/select'
 import { ExampleCategory } from '@/types/exampleEmbeddings'
 import { Loader2 } from 'lucide-react'
-import {
-  FileInputField,
-  ModelStatusIndicator,
-  UploadSuccessView
-} from './components'
+import { FileInputField, ModelStatusIndicator, UploadSuccessView } from './components'
 import { useUploadDialogForm, type UploadData } from './hooks/useUploadDialogForm'
 
 interface UploadDialogProps {

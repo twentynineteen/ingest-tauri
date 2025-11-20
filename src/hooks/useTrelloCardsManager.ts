@@ -5,11 +5,11 @@
  */
 
 import { useMemo, useState } from 'react'
-import { useFuzzySearch } from './useFuzzySearch'
-import { useTrelloBoard } from './useTrelloBoard'
-import { useBreadcrumbsTrelloCards } from './useBreadcrumbsTrelloCards'
 import type { TrelloCard } from '../types/baker'
 import { extractTrelloCardId, validateTrelloCard } from '../utils/validation'
+import { useBreadcrumbsTrelloCards } from './useBreadcrumbsTrelloCards'
+import { useFuzzySearch } from './useFuzzySearch'
+import { useTrelloBoard } from './useTrelloBoard'
 
 interface UseTrelloCardsManagerProps {
   projectPath: string

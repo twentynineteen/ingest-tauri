@@ -87,9 +87,7 @@ export const NormalView: React.FC<NormalViewProps> = ({
       </div>
 
       {/* Trello Card URL */}
-      {breadcrumbs.trelloCardUrl && (
-        <TrelloCardLink url={breadcrumbs.trelloCardUrl} />
-      )}
+      {breadcrumbs.trelloCardUrl && <TrelloCardLink url={breadcrumbs.trelloCardUrl} />}
 
       {/* Modification Info */}
       {(breadcrumbs.lastModified || breadcrumbs.scannedBy) && (

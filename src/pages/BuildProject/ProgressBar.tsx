@@ -13,7 +13,12 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress, completed }) => {
 
   // Show progress bar when progress is 0 or greater, but hide when completed
   if (progress < 0 || completed) {
-    logger.log('ProgressBar returning null - progress:', progress, 'completed:', completed)
+    logger.log(
+      'ProgressBar returning null - progress:',
+      progress,
+      'completed:',
+      completed
+    )
     return null
   }
 
