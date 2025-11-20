@@ -1,8 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
-import { CACHE } from '../constants/timing'
-import { queryKeys } from '../lib/query-keys'
-import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
+import { useMemo } from 'react'
 import { loadApiKeys } from 'utils/storage'
 import {
   fetchTrelloCards,
@@ -10,6 +7,9 @@ import {
   groupCardsByList,
   TrelloCard
 } from 'utils/TrelloCards'
+import { CACHE } from '../constants/timing'
+import { queryKeys } from '../lib/query-keys'
+import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
 
 interface TrelloBoardData {
   grouped: Record<string, TrelloCard[]>
@@ -23,8 +23,6 @@ interface TrelloBoardData {
  * then group the cards by their list.
  */
 export function useTrelloBoard(boardId: string): TrelloBoardData {
-  const [grouped, setGrouped] = useState<Record<string, TrelloCard[]>>({})
-
   // Use a simpler approach - direct query for credentials
   const { data: credentials, isLoading: credentialsLoading } = useQuery({
     queryKey: ['api-keys'],
@@ -76,21 +74,17 @@ export function useTrelloBoard(boardId: string): TrelloBoardData {
   const isDataReady = cards && lists && !cardsLoading && !listsLoading
   const isLoading = credentialsLoading || cardsLoading || listsLoading
 
-  // Group cards when data changes
-  useEffect(() => {
+  // Compute grouped cards as a derived value using useMemo
+  const grouped = useMemo(() => {
     if (isDataReady) {
       try {
-        const groupedCards = groupCardsByList(cards, lists)
-        setGrouped(groupedCards)
+        return groupCardsByList(cards, lists)
       } catch (error) {
         console.error('Error grouping Trello cards:', error)
-        // Reset to empty state on error
-        setGrouped({})
+        return {}
       }
-    } else {
-      // Clear grouped data when dependencies are loading/missing
-      setGrouped({})
     }
+    return {}
   }, [cards, lists, isDataReady])
 
   return {

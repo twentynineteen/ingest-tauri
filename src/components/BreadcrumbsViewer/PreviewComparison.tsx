@@ -35,7 +35,10 @@ export const PreviewComparison: React.FC<PreviewComparisonProps> = ({ preview })
   return (
     <div className="space-y-4">
       {/* Summary */}
-      <ChangeSummary summaryDiff={summaryDiff} hasMeaningfulChanges={hasMeaningfulChanges} />
+      <ChangeSummary
+        summaryDiff={summaryDiff}
+        hasMeaningfulChanges={hasMeaningfulChanges}
+      />
 
       {/* Side-by-side comparison */}
       <div className="grid grid-cols-2 gap-4">
@@ -56,7 +59,10 @@ interface ChangeSummaryProps {
   hasMeaningfulChanges: boolean
 }
 
-const ChangeSummary: React.FC<ChangeSummaryProps> = ({ summaryDiff, hasMeaningfulChanges }) => (
+const ChangeSummary: React.FC<ChangeSummaryProps> = ({
+  summaryDiff,
+  hasMeaningfulChanges
+}) => (
   <div
     className={`border rounded-lg p-3 ${hasMeaningfulChanges ? 'bg-blue-50 border-blue-200' : 'bg-green-50 border-green-200'}`}
   >
@@ -170,7 +176,14 @@ const AfterUpdateView: React.FC<AfterUpdateViewProps> = ({ changes, formatDate }
 
     switch (change.field) {
       case 'projectTitle':
-        return <Field key={key} label="Project Title" value={change.newValue} change={change} />
+        return (
+          <Field
+            key={key}
+            label="Project Title"
+            value={change.newValue}
+            change={change}
+          />
+        )
       case 'numberOfCameras':
         return (
           <Field
@@ -243,7 +256,9 @@ const AfterUpdateView: React.FC<AfterUpdateViewProps> = ({ changes, formatDate }
           />
         )
       case 'scannedBy':
-        return <Field key={key} label="Scanned By" value={change.newValue} change={change} />
+        return (
+          <Field key={key} label="Scanned By" value={change.newValue} change={change} />
+        )
       default:
         return null
     }

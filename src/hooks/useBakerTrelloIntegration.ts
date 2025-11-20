@@ -52,8 +52,9 @@ async function updateProjectTrelloCard(
   }
 
   // Use the core utility functions with the specific breadcrumbs data
-  const { generateBreadcrumbsBlock, updateTrelloCardWithBreadcrumbs } =
-    await import('hooks/useAppendBreadcrumbs')
+  const { generateBreadcrumbsBlock, updateTrelloCardWithBreadcrumbs } = await import(
+    'hooks/useAppendBreadcrumbs'
+  )
 
   const block = generateBreadcrumbsBlock(breadcrumbsData)
   if (!block) return

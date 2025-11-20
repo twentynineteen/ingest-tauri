@@ -197,7 +197,10 @@ function createProcessedOutput(
   examplesCount: number
 ): ProcessedOutput {
   // Debug logging
-  logger.debug('Formatted text preview (first 200 chars):', formattedText.substring(0, 200))
+  logger.debug(
+    'Formatted text preview (first 200 chars):',
+    formattedText.substring(0, 200)
+  )
   logger.debug('Line breaks found:', formattedText.split('\n').length)
 
   // Convert line breaks to proper HTML paragraphs

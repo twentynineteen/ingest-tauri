@@ -62,7 +62,10 @@ export function useOllamaEmbedding(): UseOllamaEmbeddingResult {
         const data = (await tagsResponse.json()) as OllamaTagsResponse
         const models = data.models || []
 
-        logger.log('Available models:', models.map(m => m.name))
+        logger.log(
+          'Available models:',
+          models.map(m => m.name)
+        )
 
         // Check if nomic-embed-text is installed
         const hasEmbeddingModel = models.some(m => m.name.includes(EMBEDDING_MODEL))

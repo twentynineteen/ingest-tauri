@@ -60,9 +60,7 @@ export const Field: React.FC<FieldProps> = ({ label, value, icon, change }) => {
         {icon && <span className="mr-1">{icon}</span>}
         {label}
       </label>
-      <p className="text-gray-900 mt-1">
-        {formatFieldValue(value, label.toLowerCase())}
-      </p>
+      <p className="text-gray-900 mt-1">{formatFieldValue(value, label.toLowerCase())}</p>
     </div>
   )
 }

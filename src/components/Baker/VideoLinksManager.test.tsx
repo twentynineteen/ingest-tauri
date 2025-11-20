@@ -4,11 +4,11 @@
  * Tests T002-T008: Component behavior for video upload toggle enhancement
  */
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import '@testing-library/jest-dom'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import '@testing-library/jest-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import * as useApiKeysModule from '../../hooks/useApiKeys'
 import * as useBreadcrumbsTrelloCardsModule from '../../hooks/useBreadcrumbsTrelloCards'
 import * as useBreadcrumbsVideoLinksModule from '../../hooks/useBreadcrumbsVideoLinks'
@@ -16,6 +16,7 @@ import * as useFileUploadModule from '../../hooks/useFileUpload'
 import * as useSproutVideoApiModule from '../../hooks/useSproutVideoApi'
 import * as useSproutVideoProcessorModule from '../../hooks/useSproutVideoProcessor'
 import * as useUploadEventsModule from '../../hooks/useUploadEvents'
+import type { SproutUploadResponse } from '../../utils/types'
 import { VideoLinksManager } from './VideoLinksManager'
 
 // Mock hooks
@@ -26,6 +27,65 @@ vi.mock('../../hooks/useApiKeys')
 vi.mock('../../hooks/useFileUpload')
 vi.mock('../../hooks/useUploadEvents')
 vi.mock('../../hooks/useSproutVideoProcessor')
+
+// Helper function to create a complete mock SproutUploadResponse
+const createMockSproutUploadResponse = (
+  overrides?: Partial<SproutUploadResponse>
+): SproutUploadResponse => ({
+  created_at: '2024-01-01T00:00:00Z',
+  updated_at: '2024-01-01T00:00:00Z',
+  height: 1080,
+  width: 1920,
+  description: '',
+  id: 'test-video-id',
+  plays: 0,
+  title: 'Test Video',
+  source_video_file_size: 1000000,
+  embed_code: '<iframe></iframe>',
+  state: 'deployed',
+  security_token: 'token',
+  progress: 100,
+  tags: [],
+  embedded_url: 'https://sproutvideo.com/videos/test123',
+  duration: 120,
+  password: null,
+  privacy: 0,
+  requires_signed_embeds: false,
+  selected_poster_frame_number: 0,
+  assets: {
+    videos: {
+      '240p': '',
+      '360p': '',
+      '480p': '',
+      '720p': '',
+      '1080p': '',
+      '2k': null,
+      '4k': null,
+      '8k': null,
+      source: null
+    },
+    thumbnails: ['https://example.com/thumb.jpg'],
+    poster_frames: ['https://example.com/poster.jpg'],
+    poster_frame_mp4: null,
+    timeline_images: [],
+    hls_manifest: ''
+  },
+  download_sd: null,
+  download_hd: null,
+  download_source: null,
+  allowed_domains: null,
+  allowed_ips: null,
+  player_social_sharing: null,
+  player_embed_sharing: null,
+  require_email: false,
+  require_name: false,
+  hide_on_site: false,
+  folder_id: null,
+  airplay_support: null,
+  session_watermarks: null,
+  direct_file_access: null,
+  ...overrides
+})
 
 describe('VideoLinksManager - Upload Toggle Enhancement', () => {
   const mockProjectPath = '/test/project'
@@ -60,31 +120,54 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
       isLoading: false,
       error: null,
       addVideoLink: mockAddVideoLink,
+      addVideoLinkAsync: vi.fn(),
       removeVideoLink: mockRemoveVideoLink,
+      removeVideoLinkAsync: vi.fn(),
+      updateVideoLink: vi.fn(),
+      updateVideoLinkAsync: vi.fn(),
       reorderVideoLinks: mockReorderVideoLinks,
+      reorderVideoLinksAsync: vi.fn(),
       isUpdating: false,
-      addError: null
+      addError: null,
+      removeError: null,
+      updateError: null,
+      reorderError: null
     })
 
     // Mock useSproutVideoApi
     vi.mocked(useSproutVideoApiModule.useSproutVideoApi).mockReturnValue({
+      fetchVideoDetails: vi.fn(),
       fetchVideoDetailsAsync: vi.fn(),
       isFetching: false,
-      error: null
+      error: null,
+      data: undefined,
+      reset: vi.fn()
     })
 
     // Mock useBreadcrumbsTrelloCards
     vi.mocked(useBreadcrumbsTrelloCardsModule.useBreadcrumbsTrelloCards).mockReturnValue({
       trelloCards: [],
       isLoading: false,
-      error: null as any
+      error: null,
+      addTrelloCard: vi.fn(),
+      addTrelloCardAsync: vi.fn(),
+      removeTrelloCard: vi.fn(),
+      removeTrelloCardAsync: vi.fn(),
+      fetchCardDetails: vi.fn(),
+      fetchCardDetailsAsync: vi.fn(),
+      isUpdating: false,
+      isFetchingDetails: false,
+      addError: null,
+      removeError: null,
+      fetchError: null,
+      fetchedCardData: undefined
     })
 
     // Mock useSproutVideoApiKey
     vi.mocked(useApiKeysModule.useSproutVideoApiKey).mockReturnValue({
       apiKey: 'test-api-key',
       isLoading: false,
-      error: null as any
+      error: null
     })
 
     // Mock useTrelloApiKeys
@@ -92,7 +175,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
       apiKey: 'test-trello-key',
       apiToken: 'test-trello-token',
       isLoading: false,
-      error: null as any
+      error: null
     })
 
     // Mock useFileUpload
@@ -108,7 +191,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     // Mock useUploadEvents
     vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
       progress: 0,
-      message: null
+      uploading: false,
+      message: null,
+      setUploading: vi.fn(),
+      setProgress: vi.fn(),
+      setMessage: vi.fn()
     })
 
     // Mock useSproutVideoProcessor - implement callback behavior
@@ -373,7 +460,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
       vi.mocked(useApiKeysModule.useSproutVideoApiKey).mockReturnValue({
         apiKey: null,
         isLoading: false,
-        updateApiKey: vi.fn()
+        error: null
       })
 
       // Mock selected file
@@ -437,7 +524,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
 
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 45,
-        message: null
+        uploading: true,
+        message: null,
+        setUploading: vi.fn(),
+        setProgress: vi.fn(),
+        setMessage: vi.fn()
       })
 
       renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
@@ -479,7 +570,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
 
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 0,
-        message: null
+        uploading: false,
+        message: null,
+        setUploading: vi.fn(),
+        setProgress: vi.fn(),
+        setMessage: vi.fn()
       })
 
       const { rerender } = render(
@@ -511,7 +606,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
 
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 50,
-        message: null
+        uploading: true,
+        message: null,
+        setUploading: vi.fn(),
+        setProgress: vi.fn(),
+        setMessage: vi.fn()
       })
 
       rerender(
@@ -525,13 +624,30 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
       expect(uploadButton).toBeDisabled()
 
       // Phase 3: Upload complete (button should be re-enabled)
-      const mockUploadResponse = {
+      const mockUploadResponse = createMockSproutUploadResponse({
         id: 'abc123xyz',
         embedded_url: 'https://sproutvideo.com/videos/abc123xyz',
         title: 'Test Video',
-        assets: { poster_frames: ['https://example.com/thumb.jpg'] },
+        assets: {
+          videos: {
+            '240p': '',
+            '360p': '',
+            '480p': '',
+            '720p': '',
+            '1080p': '',
+            '2k': null,
+            '4k': null,
+            '8k': null,
+            source: null
+          },
+          thumbnails: ['https://example.com/thumb.jpg'],
+          poster_frames: ['https://example.com/thumb.jpg'],
+          poster_frame_mp4: null,
+          timeline_images: [],
+          hls_manifest: ''
+        },
         created_at: '2025-01-15T10:30:00Z'
-      }
+      })
 
       vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
         selectedFile: '/test/video.mp4',
@@ -544,7 +660,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
 
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 100,
-        message: null
+        uploading: false,
+        message: null,
+        setUploading: vi.fn(),
+        setProgress: vi.fn(),
+        setMessage: vi.fn()
       })
 
       rerender(
@@ -596,7 +716,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
 
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 25,
-        message: null
+        uploading: true,
+        message: null,
+        setUploading: vi.fn(),
+        setProgress: vi.fn(),
+        setMessage: vi.fn()
       })
 
       renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
@@ -625,7 +749,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
 
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 67,
-        message: null
+        uploading: true,
+        message: null,
+        setUploading: vi.fn(),
+        setProgress: vi.fn(),
+        setMessage: vi.fn()
       })
 
       renderWithQueryClient(<VideoLinksManager projectPath={mockProjectPath} />)
@@ -669,7 +797,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
 
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 0,
-        message: null
+        uploading: true,
+        message: null,
+        setUploading: vi.fn(),
+        setProgress: vi.fn(),
+        setMessage: vi.fn()
       })
 
       const { rerender } = render(
@@ -692,7 +824,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
       // Progress update to 10%
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 10,
-        message: null
+        uploading: true,
+        message: null,
+        setUploading: vi.fn(),
+        setProgress: vi.fn(),
+        setMessage: vi.fn()
       })
 
       rerender(
@@ -707,7 +843,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
       // Progress update to 50%
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 50,
-        message: null
+        uploading: true,
+        message: null,
+        setUploading: vi.fn(),
+        setProgress: vi.fn(),
+        setMessage: vi.fn()
       })
 
       rerender(
@@ -722,7 +862,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
       // Progress update to 100%
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 100,
-        message: null
+        uploading: true,
+        message: null,
+        setUploading: vi.fn(),
+        setProgress: vi.fn(),
+        setMessage: vi.fn()
       })
 
       rerender(
@@ -740,15 +884,30 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
   // T006: Successful upload auto-adds VideoLink
   // ==========================================
   describe('T006: Successful upload auto-adds VideoLink', () => {
-    const mockUploadResponse = {
+    const mockUploadResponse = createMockSproutUploadResponse({
       id: 'abc123xyz',
       embedded_url: 'https://sproutvideo.com/videos/abc123xyz',
       title: 'Test Video Title',
       assets: {
-        poster_frames: ['https://example.com/thumbnail.jpg']
+        videos: {
+          '240p': '',
+          '360p': '',
+          '480p': '',
+          '720p': '',
+          '1080p': '',
+          '2k': null,
+          '4k': null,
+          '8k': null,
+          source: null
+        },
+        thumbnails: ['https://example.com/thumbnail.jpg'],
+        poster_frames: ['https://example.com/thumbnail.jpg'],
+        poster_frame_mp4: null,
+        timeline_images: [],
+        hls_manifest: ''
       },
       created_at: '2025-01-15T10:30:00Z'
-    }
+    })
 
     it('should call addVideoLink with correct VideoLink after successful upload', async () => {
       // Mock successful upload response
@@ -919,7 +1078,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     it('should show error alert when upload fails (network error)', async () => {
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 0,
-        message: 'Upload failed: Network error'
+        uploading: false,
+        message: 'Upload failed: Network error',
+        setUploading: vi.fn(),
+        setProgress: vi.fn(),
+        setMessage: vi.fn()
       })
 
       vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
@@ -947,7 +1110,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     it('should show error alert when upload times out', async () => {
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 0,
-        message: 'Upload failed: Request timeout'
+        uploading: false,
+        message: 'Upload failed: Request timeout',
+        setUploading: vi.fn(),
+        setProgress: vi.fn(),
+        setMessage: vi.fn()
       })
 
       vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
@@ -976,7 +1143,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
       vi.mocked(useApiKeysModule.useSproutVideoApiKey).mockReturnValue({
         apiKey: null,
         isLoading: false,
-        updateApiKey: vi.fn()
+        error: null
       })
 
       vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
@@ -1002,7 +1169,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     it('should keep file selected after error (for retry)', async () => {
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 0,
-        message: 'Upload failed: Network error'
+        uploading: false,
+        message: 'Upload failed: Network error',
+        setUploading: vi.fn(),
+        setProgress: vi.fn(),
+        setMessage: vi.fn()
       })
 
       vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
@@ -1031,7 +1202,11 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
     it('should re-enable "Upload and Add" button after error', async () => {
       vi.mocked(useUploadEventsModule.useUploadEvents).mockReturnValue({
         progress: 0,
-        message: 'Upload failed'
+        uploading: false,
+        message: 'Upload failed',
+        setUploading: vi.fn(),
+        setProgress: vi.fn(),
+        setMessage: vi.fn()
       })
 
       vi.mocked(useFileUploadModule.useFileUpload).mockReturnValue({
