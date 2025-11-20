@@ -1,16 +1,29 @@
-<!-- ⚠️ This README has been generated from the file(s) "blueprint.md" ⚠️-->
+<!-- ⚠️ This README has been generated from the file(s) "blueprint.md" ⚠️-->template.title
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#bucket)
+{
+"ids": {
+"github": "twentynineteen/ingest-tauri/",
+},
+"badges": [
+{
+"alt": "Custom badge",
+"url": "https://github.com/badges/shields",
+"img": "https://img.shields.io/badge/custom-badge-f39f37.svg"
+}
+]
+}
 
-# ➤ Bucket
+template.description
 
-A desktop video editing workflow application that streamlines video ingest, project creation, and integrates with professional video production tools.
+template.toc
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#overview)
 
 ## ➤ Overview
 
 Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScript) designed to streamline video editing workflows for professionals. It simplifies video file ingest, automates project creation, and seamlessly integrates with industry-standard tools like Adobe Premiere, Trello, and Sprout Video.
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#key-features)
 
@@ -29,6 +42,7 @@ Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScri
   - **Sprout Video**: Video hosting with custom posterframe generation
 - **Secure User Management**: Login/registration with encrypted data storage
 - **Cross-Platform**: Available for Windows, macOS, and Linux
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#installation)
 
@@ -189,6 +203,7 @@ OLLAMA_HOST=0.0.0.0:11435 ollama serve
 
 Then update the URL in Bucket Settings to `http://localhost:11435`
 
+
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#how-it-works)
 
 ## ➤ How It Works
@@ -211,6 +226,7 @@ Then update the URL in Bucket Settings to `http://localhost:11435`
 5. **Track Progress**: Monitor file operations with real-time progress updates
 6. **Integrate & Upload**: Connect with Trello for project management or Sprout Video for hosting
 
+
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#tech-stack)
 
 ## ➤ Tech Stack
@@ -227,8 +243,11 @@ Then update the URL in Bucket Settings to `http://localhost:11435`
   - mammoth.js for Word document parsing
   - docx for document generation
 
+
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#license)
 
 ## ➤ License
 
 This project is proprietary software. All rights reserved. Unauthorized copying, modification, distribution, or use of this software is strictly prohibited.
+
+{{ template: license }}
