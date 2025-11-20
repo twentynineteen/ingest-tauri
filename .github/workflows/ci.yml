@@ -104,7 +104,7 @@ jobs:
     timeout-minutes: 15
     needs: [lint, test]
     steps:
-      - name: Checkout 🛎️
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Node
