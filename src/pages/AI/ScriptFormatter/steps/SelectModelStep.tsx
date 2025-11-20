@@ -12,7 +12,12 @@ import {
 import { Database, Sparkles } from 'lucide-react'
 import React from 'react'
 import type { ExampleWithMetadata } from '../../../../types/exampleEmbeddings'
-import type { AIModel, AIProvider, ProviderConfiguration, ScriptDocument } from '../../../../types/scriptFormatter'
+import type {
+  AIModel,
+  AIProvider,
+  ProviderConfiguration,
+  ScriptDocument
+} from '../../../../types/scriptFormatter'
 import { ExampleToggleList } from '../ExampleToggleList'
 import { ModelSelector } from '../ModelSelector'
 import { ProviderSelector } from '../ProviderSelector'
@@ -102,9 +107,8 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
             </AccordionTrigger>
             <AccordionContent className="pb-4">
               <p className="text-xs text-gray-600 mb-3">
-                Choose which examples the AI should reference when formatting your
-                script. The system will automatically select the most relevant enabled
-                examples.
+                Choose which examples the AI should reference when formatting your script.
+                The system will automatically select the most relevant enabled examples.
               </p>
               <ExampleToggleList
                 examples={allExamples}
@@ -141,9 +145,7 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
             />
           ) : (
             <div className="flex items-center justify-center h-full text-gray-400">
-              <p className="text-sm">
-                Select and validate an AI provider to see models
-              </p>
+              <p className="text-sm">Select and validate an AI provider to see models</p>
             </div>
           )}
         </div>
@@ -184,8 +186,7 @@ const RAGStatusContent: React.FC<{
   if (isReady) {
     return (
       <p className="text-sm text-green-600">
-        ✓ RAG system ready (Ollama) - will use similar examples to improve
-        formatting
+        ✓ RAG system ready (Ollama) - will use similar examples to improve formatting
       </p>
     )
   }

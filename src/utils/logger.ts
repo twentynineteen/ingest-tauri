@@ -16,8 +16,6 @@
 
 const isDevelopment = import.meta.env.DEV
 
-type LogLevel = 'log' | 'info' | 'debug' | 'trace'
-
 interface Logger {
   log: (...args: unknown[]) => void
   info: (...args: unknown[]) => void

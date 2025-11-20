@@ -1,10 +1,10 @@
 [package]
 name = "Bucket"
-version = "0.9.3"
+version = "0.9.5"
 description = "An app to streamline ingesting and uploading video content"
 authors = ["Daniel Mills"]
 license = "UNLICENSED"
-repository = "https://github.com/twentynineteen/ingest-tauri"
+repository = "https://github.com/twentynineteen/bucket"
 default-run = "Bucket"
 edition = "2021"
 

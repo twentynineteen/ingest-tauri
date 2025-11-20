@@ -138,10 +138,7 @@ export function convertGitHubReleaseToTauriManifest(
     return null
   }
 
-  log.info(
-    'Successfully created update manifest with platforms:',
-    Object.keys(platforms)
-  )
+  log.info('Successfully created update manifest with platforms:', Object.keys(platforms))
 
   return {
     version: release.tag_name.replace(/^v/, ''), // Remove leading 'v'

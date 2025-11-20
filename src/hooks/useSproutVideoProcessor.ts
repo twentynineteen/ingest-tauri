@@ -55,7 +55,9 @@ function processUploadResponse(
     response.embedded_url || `https://sproutvideo.com/videos/${response.id}`
 
   if (!response.embedded_url) {
-    logger.log(`Video ${response.id} state: ${response.state}, adding with constructed URL...`)
+    logger.log(
+      `Video ${response.id} state: ${response.state}, adding with constructed URL...`
+    )
   }
 
   const videoLink: VideoLink = {

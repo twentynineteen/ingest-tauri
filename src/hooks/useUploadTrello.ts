@@ -18,7 +18,10 @@ import { useMemo, useState } from 'react'
 import { appStore } from 'store/useAppStore'
 import { TrelloCard } from 'utils/TrelloCards'
 import { SproutUploadResponse } from 'utils/types'
-import { useCardDetailsSync, useCardValidation } from '../pages/UploadTrello/UploadTrelloHooks'
+import {
+  useCardDetailsSync,
+  useCardValidation
+} from '../pages/UploadTrello/UploadTrelloHooks'
 import {
   createDefaultSproutUploadResponse,
   SelectedCard

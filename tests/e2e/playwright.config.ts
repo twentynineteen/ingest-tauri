@@ -35,11 +35,13 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
-    // WebKit for macOS testing
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
+    // WebKit for macOS testing (skip in CI unless explicitly requested)
+    ...(process.env.CI && !process.env.PLAYWRIGHT_PROJECT?.includes('webkit') ? [] : [
+      {
+        name: 'webkit',
+        use: { ...devices['Desktop Safari'] },
+      }
+    ]),
   ],
 
   // Run local dev server before starting tests
@@ -48,6 +50,11 @@ export default defineConfig({
     url: 'http://localhost:1422',
     timeout: 60 * 1000,
     reuseExistingServer: !process.env.CI,
+    // Suppress npm warnings by clearing npm-related environment variables
+    env: {
+      ...process.env,
+      npm_config_project: undefined,
+    },
   },
 
   // Output directory for test artifacts

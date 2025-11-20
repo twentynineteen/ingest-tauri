@@ -20,7 +20,7 @@ Get up and running in under 5 minutes:
 
 #### Option 1: Download Pre-built App (Recommended)
 
-1. Download the latest DMG from [Releases](https://github.com/twentynineteen/ingest-tauri/releases)
+1. Download the latest DMG from [Releases](https://github.com/twentynineteen/bucket/releases)
 2. Open the DMG and drag Bucket to your Applications folder
 3. Launch Bucket from Applications
 
@@ -28,8 +28,8 @@ Get up and running in under 5 minutes:
 
 ```bash
 # Clone the repository
-git clone https://github.com/twentynineteen/ingest-tauri.git
-cd ingest-tauri
+git clone https://github.com/twentynineteen/bucket.git
+cd bucket
 
 # Install dependencies (using Bun - recommended)
 bun install
@@ -67,7 +67,7 @@ npm run test
 ## Project Structure
 
 ```
-ingest-tauri/
+bucket/
 ├── src/                           # Frontend React/TypeScript code
 │   ├── pages/                     # Page-level components (routes)
 │   │   ├── BuildProject/          # Main project creation workflow
@@ -522,8 +522,8 @@ ProjectFolder/
 
 ## Getting Help
 
-- **Issues:** [GitHub Issues](https://github.com/twentynineteen/ingest-tauri/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/twentynineteen/ingest-tauri/discussions)
+- **Issues:** [GitHub Issues](https://github.com/twentynineteen/bucket/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/twentynineteen/bucket/discussions)
 - **Email:** Check repository for contact information
 
 ## License

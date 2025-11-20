@@ -5,13 +5,6 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useAIModels } from './useAIModels'
-import { useAIProvider } from './useAIProvider'
-import { useDocxGenerator } from './useDocxGenerator'
-import { useDocxParser } from './useDocxParser'
-import { useExampleManagement } from './useExampleManagement'
-import { useOllamaEmbedding } from './useOllamaEmbedding'
-import { useScriptProcessor } from './useScriptProcessor'
 import {
   ExampleCategory,
   type ExampleMetadata,
@@ -24,10 +17,22 @@ import {
   type ScriptDocument
 } from '../types/scriptFormatter'
 import { createNamespacedLogger } from '../utils/logger'
+import { useAIModels } from './useAIModels'
+import { useAIProvider } from './useAIProvider'
+import { useDocxGenerator } from './useDocxGenerator'
+import { useDocxParser } from './useDocxParser'
+import { useExampleManagement } from './useExampleManagement'
+import { useOllamaEmbedding } from './useOllamaEmbedding'
+import { useScriptProcessor } from './useScriptProcessor'
 
 const log = createNamespacedLogger('ScriptFormatterState')
 
-export type WorkflowStep = 'upload' | 'select-model' | 'processing' | 'review' | 'download'
+export type WorkflowStep =
+  | 'upload'
+  | 'select-model'
+  | 'processing'
+  | 'review'
+  | 'download'
 
 /**
  * Converts markdown formatting to HTML

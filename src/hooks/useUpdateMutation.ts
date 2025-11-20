@@ -61,7 +61,7 @@ async function handleUpdateError(updateError: Error): Promise<void> {
   )
 
   if (manualUpdate) {
-    await openUrl('https://github.com/twentynineteen/ingest-tauri/releases/latest')
+    await openUrl('https://github.com/twentynineteen/bucket/releases/latest')
   }
 }
 

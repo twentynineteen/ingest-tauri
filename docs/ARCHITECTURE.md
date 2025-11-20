@@ -74,7 +74,7 @@ This document explains the high-level architecture of Bucket, including how diff
 ## Directory Structure
 
 ```
-ingest-tauri/
+bucket/
 ├── src/                            # React frontend source
 │   ├── pages/                      # Page-level components (routes)
 │   │   ├── BuildProject/           # Multi-camera project creation
@@ -1012,8 +1012,8 @@ Currently no telemetry/metrics collection (privacy-focused desktop app).
 
 ## Questions and Feedback
 
-- **GitHub Issues:** [ingest-tauri/issues](https://github.com/twentynineteen/ingest-tauri/issues)
-- **GitHub Discussions:** [ingest-tauri/discussions](https://github.com/twentynineteen/ingest-tauri/discussions)
+- **GitHub Issues:** [bucket/issues](https://github.com/twentynineteen/bucket/issues)
+- **GitHub Discussions:** [bucket/discussions](https://github.com/twentynineteen/bucket/discussions)
 
 ---
 

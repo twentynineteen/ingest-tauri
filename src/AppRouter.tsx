@@ -3,9 +3,6 @@ import { relaunch } from '@tauri-apps/plugin-process'
 import { check } from '@tauri-apps/plugin-updater'
 import { useEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { createNamespacedLogger } from './utils/logger'
-
-const log = createNamespacedLogger('AppRouter')
 // The AppRouter component switches the display if the user is not logged in
 // The top level component, Page, acts as the provider for the layout
 // subsequent components are loaded within the page window via the Outlet component.
@@ -24,6 +21,9 @@ import Settings from './pages/Settings'
 import UploadOtter from './pages/UploadOtter'
 import UploadSprout from './pages/UploadSprout'
 import UploadTrello from './pages/UploadTrello'
+import { createNamespacedLogger } from './utils/logger'
+
+const log = createNamespacedLogger('AppRouter')
 
 export const AppRouter: React.FC = () => {
   const isAuthenticated = true // Track authentication state

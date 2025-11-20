@@ -1,12 +1,43 @@
-# Bucket
+<!-- ⚠️ This README has been generated from the file(s) "blueprint.md" ⚠️--><h1 align="center">bucket</h1>
 
-A desktop video editing workflow application that streamlines video ingest, project creation, and integrates with professional video production tools.
+<p align="center">
+  <b>A desktop video editing workflow application that streamlines video ingest, project creation, and integrates with professional video production tools.</b></br>
+  <sub><sub>
+</p>
 
-## Overview
+<br />
+
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#table-of-contents)
+
+## ➤ Table of Contents
+
+- [➤ Overview](#-overview)
+- [➤ Key Features](#-key-features)
+- [➤ Installation](#-installation)
+  - [Prerequisites](#prerequisites)
+  - [Quick Start](#quick-start)
+  - [Development Setup](#development-setup)
+- [➤ Ollama Setup](#-ollama-setup)
+  - [Installing Ollama](#installing-ollama)
+  - [Running Ollama](#running-ollama)
+  - [Installing AI Models](#installing-ai-models)
+  - [Configuring in Bucket](#configuring-in-bucket)
+  - [Troubleshooting Ollama](#troubleshooting-ollama)
+- [➤ How It Works](#-how-it-works)
+  - [AI Script Formatter Workflow](#ai-script-formatter-workflow)
+  - [Video Project Workflow](#video-project-workflow)
+- [➤ Tech Stack](#-tech-stack)
+- [➤ License](#-license)
+
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#overview)
+
+## ➤ Overview
 
 Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScript) designed to streamline video editing workflows for professionals. It simplifies video file ingest, automates project creation, and seamlessly integrates with industry-standard tools like Adobe Premiere, Trello, and Sprout Video.
 
-## Key Features
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#key-features)
+
+## ➤ Key Features
 
 - **AI Script Formatter**: AI-powered autocue script formatting using locally hosted LLM models
   - Upload Word documents (.docx) and format them for teleprompter use
@@ -22,7 +53,9 @@ Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScri
 - **Secure User Management**: Login/registration with encrypted data storage
 - **Cross-Platform**: Available for Windows, macOS, and Linux
 
-## Installation
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#installation)
+
+## ➤ Installation
 
 ### Prerequisites
 
@@ -35,8 +68,8 @@ Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScri
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/twentynineteen/ingest-tauri.git
-   cd ingest-tauri
+   git clone https://github.com/twentynineteen/bucket.git
+   cd bucket
    ```
 
 2. Install dependencies:
@@ -63,11 +96,13 @@ To run in development mode:
 npm run dev:tauri
 ```
 
-### Ollama Setup
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#ollama-setup)
+
+## ➤ Ollama Setup
 
 The AI Script Formatter feature requires Ollama to be installed and running locally.
 
-#### Installing Ollama
+### Installing Ollama
 
 1. Download and install Ollama from [ollama.com](https://ollama.com)
    - **macOS**: Download the `.dmg` installer
@@ -79,30 +114,24 @@ The AI Script Formatter feature requires Ollama to be installed and running loca
    ollama --version
    ```
 
-#### Running Ollama
+### Running Ollama
 
 Ollama runs as a background service. To start it:
 
 ```bash
-# Ollama typically starts automatically on macOS/Windows
-# On Linux, you may need to start it manually:
 ollama serve
 ```
 
 The service runs on `http://localhost:11434` by default.
 
-#### Installing AI Models
+### Installing AI Models
 
 Before using the Script Formatter, download the following language models:
 
 ```bash
-# script formatting:
-ollama pull llama3.1:latest       # Fast, good quality (8B parameters)
-# script embedding:
-ollama pull nomic-embed-text:latest
-# Required for adding new scripts to database
 
-# List installed models:
+ollama pull llama3.1:latest
+ollama pull nomic-embed-text:latest
 ollama list
 ```
 
@@ -110,7 +139,7 @@ ollama list
 
 - **llama3.2**: Best for quick formatting on limited hardware
 
-#### Configuring in Bucket
+### Configuring in Bucket
 
 1. Launch Bucket and navigate to **Settings**
 2. Find the **Ollama URL** field (default: `http://localhost:11434`)
@@ -118,25 +147,31 @@ ollama list
 4. Click **Test Connection** to verify Ollama is running and see how many models are available
 5. Navigate to **AI Tools > Script Formatter** to start formatting scripts
 
-#### Troubleshooting Ollama
+### Troubleshooting Ollama
 
 **Connection Failed:**
+Check if Ollama is running:
 
 ```bash
-# Check if Ollama is running:
 curl http://localhost:11434/api/tags
+```
 
-# If not running, start it:
+If not running, start it:
+
+```bash
 ollama serve
 ```
 
 **No Models Available:**
+List installed models:
 
 ```bash
-# List installed models:
 ollama list
+```
 
-# Install a model:
+Install a model:
+
+```bash
 ollama pull llama3:latest
 ```
 
@@ -149,7 +184,9 @@ OLLAMA_HOST=0.0.0.0:11435 ollama serve
 
 Then update the URL in Bucket Settings to `http://localhost:11435`
 
-## How It Works
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#how-it-works)
+
+## ➤ How It Works
 
 ### AI Script Formatter Workflow
 
@@ -169,7 +206,9 @@ Then update the URL in Bucket Settings to `http://localhost:11435`
 5. **Track Progress**: Monitor file operations with real-time progress updates
 6. **Integrate & Upload**: Connect with Trello for project management or Sprout Video for hosting
 
-## Tech Stack
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#tech-stack)
+
+## ➤ Tech Stack
 
 - **Frontend**: React 18 + TypeScript + TailwindCSS
 - **Backend**: Tauri 2.0 (Rust)
@@ -183,6 +222,8 @@ Then update the URL in Bucket Settings to `http://localhost:11435`
   - mammoth.js for Word document parsing
   - docx for document generation
 
-## License
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#license)
 
-This project is proprietary software. All rights reserved. Unauthorized copying, modification, distribution, or use of this software is strictly prohibited.
+## ➤ License
+
+Licensed under [UNLICENSED](https://opensource.org/licenses/UNLICENSED).

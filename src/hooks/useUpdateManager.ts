@@ -183,7 +183,7 @@ async function performUpdate(): Promise<void> {
     )
 
     if (manualUpdate) {
-      await openUrl('https://github.com/twentynineteen/ingest-tauri/releases/latest')
+      await openUrl('https://github.com/twentynineteen/bucket/releases/latest')
     }
   }
 }
