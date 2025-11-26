@@ -9,6 +9,7 @@ import type { editor } from 'monaco-editor'
 import React, { useEffect, useRef, useState } from 'react'
 
 // Configure loader to use CDN
+// Note: Using /min/vs path - sourcemaps not available but editor works fine
 loader.config({
   paths: {
     vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.53.0/min/vs'
@@ -26,6 +27,9 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [isEditorReady, setIsEditorReady] = useState(false)
+
+  // Ensure we have valid content for Monaco
+  const editorValue = modified ?? ''
 
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
@@ -78,8 +82,8 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
           height="100%"
           width="100%"
           language="markdown"
-          value={modified || ''}
-          defaultValue={modified || ''}
+          value={editorValue}
+          defaultValue={editorValue}
           onChange={handleEditorChange}
           onMount={handleEditorDidMount}
           loading={

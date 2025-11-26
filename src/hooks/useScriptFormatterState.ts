@@ -83,6 +83,7 @@ export function useScriptFormatterState() {
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const [enabledExampleIds, setEnabledExampleIds] = useState<Set<string>>(new Set())
   const [isValidatingProvider, setIsValidatingProvider] = useState(false)
+  const [localProgress, setLocalProgress] = useState<number>(0)
   const validatedProviderRef = useRef<string | null>(null)
 
   // Initialize hooks
@@ -102,7 +103,6 @@ export function useScriptFormatterState() {
 
   const {
     processScript,
-    progress,
     error: processingError,
     cancel: cancelProcessing,
     isEmbeddingReady,
@@ -189,6 +189,7 @@ export function useScriptFormatterState() {
     setMarkdownText('')
     setRagStatus('')
     setExamplesCount(0)
+    setLocalProgress(0)
 
     log.debug('Setting step to processing...')
     setCurrentStep('processing')
@@ -205,7 +206,10 @@ export function useScriptFormatterState() {
         providerId: activeProvider.id,
         configuration: activeProvider.configuration,
         enabledExampleIds: enabledExampleIds,
-        onProgress: prog => log.debug(`Progress: ${prog}%`),
+        onProgress: prog => {
+          log.debug(`Progress: ${prog}%`)
+          setLocalProgress(prog)
+        },
         onRAGUpdate: (status, count) => {
           setRagStatus(status)
           setExamplesCount(count)
@@ -215,14 +219,22 @@ export function useScriptFormatterState() {
       log.debug('Processing completed successfully:', output)
       log.info('Output preview:', output.formattedText.substring(0, 200) + '...')
 
+      // Set all state first
       setMarkdownText(output.formattedText)
       setModifiedText(output.formattedText)
       setProcessedOutput(output)
-      setCurrentStep('review')
+      setLocalProgress(100)
 
+      // Cache result
       localStorage.setItem(STORAGE_KEYS.PROCESSED_OUTPUT, JSON.stringify(output))
+
+      // Longer delay to ensure all state updates complete and Monaco can initialize properly
+      // This prevents race conditions where Monaco receives data before it's fully mounted
+      await new Promise(resolve => setTimeout(resolve, 300))
+      setCurrentStep('review')
     } catch (error) {
       console.error('[ScriptFormatterState] Processing failed with error:', error)
+      setLocalProgress(0)
     }
   }, [document, selectedModelId, activeProvider, enabledExampleIds, processScript])
 
@@ -401,7 +413,7 @@ export function useScriptFormatterState() {
     allExamples,
     activeProvider,
     availableProviders,
-    progress,
+    progress: localProgress,
 
     // Handlers
     handleFileSelect,
