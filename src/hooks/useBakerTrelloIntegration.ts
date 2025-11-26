@@ -88,7 +88,10 @@ async function updateProjectTrelloCards(
     // Log any failures but don't throw
     results.forEach((result, index) => {
       if (result.status === 'rejected') {
-        console.error(`Failed to update card ${trelloCards[index].cardId}:`, result.reason)
+        console.error(
+          `Failed to update card ${trelloCards[index].cardId}:`,
+          result.reason
+        )
       }
     })
 
