@@ -271,6 +271,27 @@ export const TOOL_DEFINITIONS = [
 // RAG-Enhanced Prompt Builder
 // ============================================================================
 
+// Maximum characters per example to prevent context window overflow
+// With 4096 token context (~16K chars), and 3 examples, each should be max ~4K chars
+const MAX_EXAMPLE_CHARS = 4000
+
+/**
+ * Truncate text if it exceeds the maximum character limit
+ */
+function truncateText(text: string, maxChars: number): string {
+  if (text.length <= maxChars) {
+    return text
+  }
+
+  const truncated = text.substring(0, maxChars)
+  const lastSpace = truncated.lastIndexOf(' ')
+
+  // Truncate at last space to avoid cutting mid-word
+  return lastSpace > maxChars * 0.9
+    ? truncated.substring(0, lastSpace) + '...\n[truncated]'
+    : truncated + '...\n[truncated]'
+}
+
 /**
  * Build an enhanced prompt with similar example scripts (RAG)
  * @param userScript - The script to be formatted
@@ -286,19 +307,29 @@ export function buildRAGPrompt(userScript: string, examples: SimilarExample[]): 
 
   logger.log(`Building prompt with ${examples.length} examples`)
 
-  // Build examples section
+  // Build examples section with truncation protection
   const exampleSection = examples
     .map((ex, i) => {
       const similarityPercent = Math.round(ex.similarity * 100)
+
+      // Truncate very large examples to prevent context overflow
+      const beforeText = truncateText(ex.before_text, MAX_EXAMPLE_CHARS)
+      const afterText = truncateText(ex.after_text, MAX_EXAMPLE_CHARS)
+
+      // Log if truncation occurred
+      if (beforeText.includes('[truncated]') || afterText.includes('[truncated]')) {
+        logger.log(`Example "${ex.title}" was truncated to fit context window`)
+      }
+
       return `
 ### Example ${i + 1}: ${ex.title}
 **Category**: ${ex.category} | **Similarity**: ${similarityPercent}%
 
 **Original Script:**
-${ex.before_text}
+${beforeText}
 
 **Formatted for Autocue:**
-${ex.after_text}
+${afterText}
 `
     })
     .join('\n\n---\n\n')

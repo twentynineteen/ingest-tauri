@@ -40,6 +40,18 @@ const ollamaAdapter: ProviderAdapter = {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), timeout)
 
+      // Merge signals: abort if either the timeout or the passed signal is aborted
+      const existingSignal = init?.signal
+      if (existingSignal) {
+        // If the existing signal is already aborted, abort immediately
+        if (existingSignal.aborted) {
+          controller.abort()
+        } else {
+          // Listen for abort from the existing signal
+          existingSignal.addEventListener('abort', () => controller.abort())
+        }
+      }
+
       try {
         const response = await fetch(url, {
           ...init,
@@ -59,6 +71,7 @@ const ollamaAdapter: ProviderAdapter = {
     })
 
     // Return the model instance
+    // Note: num_ctx and other Ollama options are set via providerOptions in streamText
     return ollama(modelId)
   },
 

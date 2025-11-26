@@ -148,7 +148,16 @@ async function streamAIResponse(
   systemPrompt: string,
   abortSignal: AbortSignal
 ): Promise<string> {
+  const totalPromptSize = systemPrompt.length + options.text.length
   logger.log('Processing with AI...')
+  logger.log('System prompt length:', systemPrompt.length, 'characters')
+  logger.log('User text length:', options.text.length, 'characters')
+  logger.log('Total prompt size:', totalPromptSize, 'characters (~' + Math.ceil(totalPromptSize / 4) + ' tokens)')
+
+  // Warn if prompt is very large
+  if (totalPromptSize > 20000) {
+    logger.log('⚠️  Large prompt detected - first response may take 30-60 seconds')
+  }
 
   const model = ModelFactory.createModel({
     providerId: options.providerId,
@@ -169,7 +178,23 @@ ${options.text}`
       }
     ],
     temperature: 0.3,
-    abortSignal
+    abortSignal,
+    // Ollama-specific options via providerOptions
+    providerOptions: {
+      ollama: {
+        options: {
+          // Context window size - reduced to 4096 for compatibility
+          // Most Ollama models are trained with 2048-4096 context windows
+          // Requesting larger contexts can cause timeouts or failures
+          // 4096 tokens (~16K chars) is sufficient for most scripts with 3 RAG examples
+          num_ctx: 4096,
+          // Unlimited output tokens for long scripts
+          num_predict: -1,
+          // Keep model loaded for 10 minutes to avoid cold start delays
+          keep_alive: '10m'
+        }
+      }
+    }
   })
 
   // Collect streamed text
@@ -311,6 +336,14 @@ export function useScriptProcessor(): UseScriptProcessorResult {
       } catch (err) {
         attempt++
 
+        // Log detailed error information
+        console.error('[useScriptProcessor] Processing error (attempt', attempt, 'of', maxRetries, '):', err)
+        if (err instanceof Error) {
+          console.error('[useScriptProcessor] Error name:', err.name)
+          console.error('[useScriptProcessor] Error message:', err.message)
+          console.error('[useScriptProcessor] Error stack:', err.stack)
+        }
+
         if (abortControllerRef.current?.signal.aborted) {
           // User cancelled
           const cancelError = new Error('Processing cancelled by user')
@@ -323,12 +356,14 @@ export function useScriptProcessor(): UseScriptProcessorResult {
           // Final failure after retries
           const finalError =
             err instanceof Error ? err : new Error('Failed to process script')
+          console.error('[useScriptProcessor] Max retries exceeded. Final error:', finalError)
           setError(finalError)
           setIsProcessing(false)
           throw finalError
         }
 
         // Retry with exponential backoff
+        logger.log(`Retrying in ${Math.pow(2, attempt)}s... (attempt ${attempt} of ${maxRetries})`)
         options.onRetry?.(attempt)
         const backoffDelay = Math.pow(2, attempt) * 1000 // 1s, 2s, 4s
         await new Promise(resolve => setTimeout(resolve, backoffDelay))

@@ -2,6 +2,9 @@ import process from 'node:process'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
+import monacoEditorPluginModule from 'vite-plugin-monaco-editor'
+
+const monacoEditorPlugin = (monacoEditorPluginModule as any).default
 
 /// <reference types="vitest" />
 
@@ -9,7 +12,13 @@ const host = process.env.TAURI_DEV_HOST
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react(), tsconfigPaths()],
+  plugins: [
+    react(),
+    tsconfigPaths(),
+    monacoEditorPlugin({
+      languageWorkers: ['editorWorkerService', 'typescript', 'json', 'html']
+    })
+  ],
   // prevent vite from obscuring rust errors
   clearScreen: false,
   // Tauri expects a fixed port, fail if that port is not available

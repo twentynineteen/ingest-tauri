@@ -4,17 +4,12 @@
  * Purpose: Monaco Editor for viewing and editing formatted output
  */
 
-import Editor, { loader } from '@monaco-editor/react'
+import Editor from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 
-// Configure loader to use CDN
-// Note: Using /min/vs path - sourcemaps not available but editor works fine
-loader.config({
-  paths: {
-    vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.53.0/min/vs'
-  }
-})
+// Monaco is now bundled locally via vite-plugin-monaco-editor
+// No CDN configuration needed - editor loads from local assets
 
 interface DiffEditorProps {
   original: string // Kept for compatibility but not displayed
@@ -26,22 +21,9 @@ interface DiffEditorProps {
 export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChange }) => {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const [isMonacoLoaded, setIsMonacoLoaded] = useState(false)
 
   // Ensure we have valid content for Monaco
   const editorValue = modified ?? ''
-
-  // Track when Monaco is fully loaded and ready
-  useEffect(() => {
-    loader
-      .init()
-      .then(() => {
-        setIsMonacoLoaded(true)
-      })
-      .catch(err => {
-        console.error('Monaco loader failed:', err)
-      })
-  }, [])
 
   // Update editor value when modified text changes (handles late-arriving content)
   useEffect(() => {
@@ -49,6 +31,8 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
       const currentValue = editorRef.current.getValue()
       if (currentValue !== editorValue) {
         editorRef.current.setValue(editorValue)
+        // Ensure editor layout is updated after value change
+        editorRef.current.layout()
       }
     }
   }, [editorValue])
@@ -60,6 +44,7 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
   }
 
   const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
+    // Monaco editor mounted successfully
     editorRef.current = editor
 
     // Set initial value if we have content
@@ -67,10 +52,10 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
       editor.setValue(editorValue)
     }
 
-    // Force layout after mount
-    setTimeout(() => {
-      editor.layout()
-    }, 100)
+    // Force layout after mount with multiple attempts to ensure proper rendering
+    setTimeout(() => editor.layout(), 100)
+    setTimeout(() => editor.layout(), 300)
+    setTimeout(() => editor.layout(), 500)
   }
 
   // Re-layout editor when window resizes
@@ -85,9 +70,6 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
     return () => window.removeEventListener('resize', handleResize)
   }, [])
 
-  // Don't render Monaco until it's loaded and we have content
-  const shouldRenderEditor = isMonacoLoaded && editorValue
-
   return (
     <div className="border border-gray-300 rounded-lg overflow-hidden mb-2 flex flex-col h-[calc(100vh-300px)]">
       <div className="bg-gray-100 px-4 py-2 border-b border-gray-300 flex items-center justify-between shrink-0">
@@ -98,18 +80,7 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
       </div>
 
       <div ref={containerRef} className="flex-1 relative">
-        {!shouldRenderEditor && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-              <p className="text-sm text-gray-600">
-                {!isMonacoLoaded ? 'Loading editor...' : 'Waiting for script content...'}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">This may take a few seconds</p>
-            </div>
-          </div>
-        )}
-        {shouldRenderEditor && (
+        {editorValue ? (
           <Editor
             height="100%"
             width="100%"
@@ -149,6 +120,13 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
             }}
             theme="vs-light"
           />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-white">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+              <p className="text-sm text-gray-600">Waiting for script content...</p>
+            </div>
+          </div>
         )}
       </div>
     </div>
