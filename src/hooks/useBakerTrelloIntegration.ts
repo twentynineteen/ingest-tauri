@@ -30,19 +30,14 @@ function extractCardIdFromUrl(trelloCardUrl: string): string | null {
 }
 
 /**
- * Update a single project's Trello card with breadcrumbs data
+ * Update a single Trello card with breadcrumbs data
  */
-async function updateProjectTrelloCard(
-  breadcrumbsData: Record<string, unknown>,
+async function updateSingleTrelloCard(
+  cardId: string,
+  breadcrumbsBlock: string,
   apiKey: string,
   token: string
 ): Promise<void> {
-  const trelloCardUrl = breadcrumbsData.trelloCardUrl as string | undefined
-  if (!trelloCardUrl) return
-
-  const cardId = extractCardIdFromUrl(trelloCardUrl)
-  if (!cardId) return
-
   // Create a mock TrelloCard object for the API call
   const mockCard = {
     id: cardId,
@@ -51,18 +46,63 @@ async function updateProjectTrelloCard(
     idList: ''
   }
 
-  // Use the core utility functions with the specific breadcrumbs data
-  const { generateBreadcrumbsBlock, updateTrelloCardWithBreadcrumbs } = await import(
-    'hooks/useAppendBreadcrumbs'
-  )
+  const { updateTrelloCardWithBreadcrumbs } = await import('hooks/useAppendBreadcrumbs')
+
+  await updateTrelloCardWithBreadcrumbs(mockCard, breadcrumbsBlock, apiKey, token, {
+    autoReplace: true,
+    silentErrors: true
+  })
+}
+
+/**
+ * Update all Trello cards for a project with breadcrumbs data
+ * Handles both new trelloCards array and legacy trelloCardUrl field
+ */
+async function updateProjectTrelloCards(
+  breadcrumbsData: Record<string, unknown>,
+  apiKey: string,
+  token: string
+): Promise<void> {
+  const { generateBreadcrumbsBlock } = await import('hooks/useAppendBreadcrumbs')
 
   const block = generateBreadcrumbsBlock(breadcrumbsData)
   if (!block) return
 
-  await updateTrelloCardWithBreadcrumbs(mockCard, block, apiKey, token, {
-    autoReplace: true,
-    silentErrors: true
-  })
+  // Priority 1: Check for new trelloCards array (Phase 004)
+  const trelloCards = breadcrumbsData.trelloCards as
+    | Array<{ cardId: string; url: string }>
+    | undefined
+
+  if (trelloCards && trelloCards.length > 0) {
+    // Update all cards in the array asynchronously
+    const updatePromises = trelloCards.map(card =>
+      updateSingleTrelloCard(card.cardId, block, apiKey, token).catch(err => {
+        console.warn(`Failed to update Trello card ${card.cardId}:`, err)
+        throw err // Re-throw to be caught by Promise.allSettled
+      })
+    )
+
+    // Use allSettled to ensure all cards are attempted even if some fail
+    const results = await Promise.allSettled(updatePromises)
+
+    // Log any failures but don't throw
+    results.forEach((result, index) => {
+      if (result.status === 'rejected') {
+        console.error(`Failed to update card ${trelloCards[index].cardId}:`, result.reason)
+      }
+    })
+
+    return
+  }
+
+  // Fallback: Check for legacy trelloCardUrl field
+  const trelloCardUrl = breadcrumbsData.trelloCardUrl as string | undefined
+  if (!trelloCardUrl) return
+
+  const cardId = extractCardIdFromUrl(trelloCardUrl)
+  if (!cardId) return
+
+  await updateSingleTrelloCard(cardId, block, apiKey, token)
 }
 
 export function useBakerTrelloIntegration({
@@ -85,7 +125,7 @@ export function useBakerTrelloIntegration({
           const breadcrumbsContent = await readTextFile(breadcrumbsPath)
           const breadcrumbsData = JSON.parse(breadcrumbsContent)
 
-          await updateProjectTrelloCard(breadcrumbsData, apiKey, token)
+          await updateProjectTrelloCards(breadcrumbsData, apiKey, token)
         } catch (trelloError) {
           const projectName = projectPath.split('/').pop() || projectPath
           trelloErrors.push({
