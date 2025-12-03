@@ -101,28 +101,40 @@ export function TrelloCardsManager({
         </div>
 
         <AddCardDialog
-          isOpen={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-          canAddCard={canAddCard}
-          hasApiCredentials={hasApiCredentials}
-          addMode={addMode}
-          onAddModeChange={setAddMode}
-          cardUrl={cardUrl}
-          onCardUrlChange={setCardUrl}
-          onFetchAndAdd={handleFetchAndAdd}
-          searchTerm={searchTerm}
-          onSearchTermChange={setSearchTerm}
-          filteredGrouped={filteredGrouped}
-          onSelectCard={handleSelectCard}
-          isBoardLoading={isBoardLoading}
-          isFetchingCard={isFetchingCard}
-          onClose={() => {
-            setIsDialogOpen(false)
-            setCardUrl('')
+          dialog={{
+            isOpen: isDialogOpen,
+            onOpenChange: setIsDialogOpen,
+            canAddCard: canAddCard,
+            hasApiCredentials: hasApiCredentials
           }}
-          validationErrors={validationErrors}
-          addError={addError}
-          fetchError={fetchError}
+          mode={{
+            addMode: addMode,
+            onAddModeChange: setAddMode
+          }}
+          urlMode={{
+            cardUrl: cardUrl,
+            onCardUrlChange: setCardUrl,
+            onFetchAndAdd: handleFetchAndAdd
+          }}
+          selectMode={{
+            searchTerm: searchTerm,
+            onSearchTermChange: setSearchTerm,
+            filteredGrouped: filteredGrouped,
+            onSelectCard: handleSelectCard,
+            isBoardLoading: isBoardLoading
+          }}
+          common={{
+            isFetchingCard: isFetchingCard,
+            onClose: () => {
+              setIsDialogOpen(false)
+              setCardUrl('')
+            }
+          }}
+          errors={{
+            validationErrors: validationErrors,
+            addError: addError,
+            fetchError: fetchError
+          }}
         />
       </div>
 

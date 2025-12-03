@@ -100,27 +100,39 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
         </div>
 
         <AddVideoDialog
-          isOpen={isDialogOpen}
-          onOpenChange={handleDialogOpenChange}
-          canAddVideo={canAddVideo}
-          addMode={addMode}
-          onTabChange={handleTabChange}
-          formData={formData}
-          onFormFieldChange={updateFormField}
-          onFetchDetails={handleFetchVideoDetails}
-          onAddVideo={handleAddVideo}
-          isFetchingVideo={isFetchingVideo}
-          hasApiKey={hasApiKey}
-          fetchError={fetchError}
-          selectedFile={selectedFile}
-          uploading={uploading}
-          progress={progress}
-          message={message}
-          uploadSuccess={uploadSuccess}
-          onSelectFile={selectFile}
-          onUploadAndAdd={handleUploadAndAdd}
-          validationErrors={validationErrors}
-          addError={addError}
+          dialog={{
+            isOpen: isDialogOpen,
+            onOpenChange: handleDialogOpenChange,
+            canAddVideo: canAddVideo
+          }}
+          mode={{
+            addMode: addMode,
+            onTabChange: handleTabChange
+          }}
+          form={{
+            formData: formData,
+            onFormFieldChange: updateFormField
+          }}
+          urlMode={{
+            onFetchDetails: handleFetchVideoDetails,
+            onAddVideo: handleAddVideo,
+            isFetchingVideo: isFetchingVideo,
+            hasApiKey: hasApiKey,
+            fetchError: fetchError
+          }}
+          uploadMode={{
+            selectedFile: selectedFile,
+            uploading: uploading,
+            progress: progress,
+            message: message,
+            uploadSuccess: uploadSuccess,
+            onSelectFile: selectFile,
+            onUploadAndAdd: handleUploadAndAdd
+          }}
+          errors={{
+            validationErrors: validationErrors,
+            addError: addError
+          }}
         />
       </div>
 
