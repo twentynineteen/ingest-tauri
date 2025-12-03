@@ -9,6 +9,7 @@ import { AuthProvider } from './context/AuthProvider'
 import { initializePerformanceMonitor } from './lib/performance-monitor'
 import { initializePrefetchManager } from './lib/prefetch-strategies'
 import { initializeCacheService } from './services/cache-invalidation'
+import { logger } from './utils/logger'
 
 // The app component acts as the main routing generator for the application.
 // AppRouter wraps the app routes to make use of the useLocation method within react-router-dom
@@ -58,7 +59,7 @@ initializePerformanceMonitor(queryClient)
 
 // Prefetch essential app data on startup (non-blocking)
 prefetchManager.prefetchAppStartupData().catch(error => {
-  console.warn('Startup prefetching failed:', error)
+  logger.warn('Startup prefetching failed:', error)
   // Non-critical - app continues to work normally
 })
 

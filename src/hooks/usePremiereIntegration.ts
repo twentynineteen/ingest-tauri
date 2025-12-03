@@ -13,6 +13,7 @@
  */
 
 import { invoke } from '@tauri-apps/api/core'
+import { logger } from '@/utils/logger'
 
 interface PremiereParams {
   projectFolder: string
@@ -49,7 +50,7 @@ export function usePremiereIntegration() {
 
       setMessage('Success: ' + result)
     } catch (error) {
-      console.error('Error:', error)
+      logger.error('Error:', error)
       setMessage('Error: ' + error)
     } finally {
       setLoading(false)
@@ -70,7 +71,7 @@ export function usePremiereIntegration() {
         destination: projectFolder
       })
     } catch (error) {
-      console.error('Error:', error)
+      logger.error('Error:', error)
     }
   }
 

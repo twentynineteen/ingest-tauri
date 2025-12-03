@@ -10,6 +10,7 @@ import { extractTrelloCardId, validateTrelloCard } from '../utils/validation'
 import { useBreadcrumbsTrelloCards } from './useBreadcrumbsTrelloCards'
 import { useFuzzySearch } from './useFuzzySearch'
 import { useTrelloBoard } from './useTrelloBoard'
+import { logger } from '@/utils/logger'
 
 interface UseTrelloCardsManagerProps {
   projectPath: string
@@ -152,7 +153,7 @@ export function useTrelloCardsManager({
         { autoReplace: true, silentErrors: false }
       )
     } catch (err) {
-      console.error('Failed to sync breadcrumbs to Trello:', err)
+      logger.error('Failed to sync breadcrumbs to Trello:', err)
     } finally {
       setIsSyncingToTrello(false)
     }

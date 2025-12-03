@@ -20,6 +20,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { appStore } from 'store/useAppStore'
 import TrelloCardList from '../../utils/trello/TrelloCardList'
 import { TrelloCard } from '../../utils/TrelloCards'
+import { logger } from '@/utils/logger'
 
 interface TrelloIntegrationModalProps {
   isOpen: boolean
@@ -144,7 +145,7 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
         setUpdateMessage('Failed to generate breadcrumbs block')
       }
     } catch (error) {
-      console.error('Error updating Trello card:', error)
+      logger.error('Error updating Trello card:', error)
       setUpdateMessage('Failed to update Trello card')
     } finally {
       setIsUpdating(false)

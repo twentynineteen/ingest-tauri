@@ -3,6 +3,7 @@ import { persistQueryClient } from '@tanstack/react-query-persist-client'
 import { del, get, set } from '@tauri-apps/plugin-store'
 import { CACHE, getBackoffDelay, RETRY, SECONDS } from '../constants/timing'
 import { createNamespacedLogger } from '../utils/logger'
+import { logger } from '@/utils/logger'
 
 const logger = createNamespacedLogger('QueryClient')
 
@@ -38,7 +39,7 @@ class TauriStorePersister {
       }
       await set(this.storeName, JSON.stringify(dataToStore))
     } catch (error) {
-      console.error('Failed to persist query client:', error)
+      logger.error('Failed to persist query client:', error)
       // Don't throw error - persistence is non-critical
     }
   }
@@ -60,7 +61,7 @@ class TauriStorePersister {
       const { ...clientData } = data
       return clientData
     } catch (error) {
-      console.error('Failed to restore query client:', error)
+      logger.error('Failed to restore query client:', error)
       // Clean up corrupted data
       await this.removeClient()
       return undefined
@@ -71,7 +72,7 @@ class TauriStorePersister {
     try {
       await del(this.storeName)
     } catch (error) {
-      console.error('Failed to remove persisted client:', error)
+      logger.error('Failed to remove persisted client:', error)
     }
   }
 }

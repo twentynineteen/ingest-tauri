@@ -6,6 +6,7 @@
 
 import { readTextFile } from '@tauri-apps/plugin-fs'
 import { useCallback } from 'react'
+import { logger } from '@/utils/logger'
 
 interface TrelloError {
   project: string
@@ -77,7 +78,7 @@ async function updateProjectTrelloCards(
     // Update all cards in the array asynchronously
     const updatePromises = trelloCards.map(card =>
       updateSingleTrelloCard(card.cardId, block, apiKey, token).catch(err => {
-        console.warn(`Failed to update Trello card ${card.cardId}:`, err)
+        logger.warn(`Failed to update Trello card ${card.cardId}:`, err)
         throw err // Re-throw to be caught by Promise.allSettled
       })
     )
@@ -88,7 +89,7 @@ async function updateProjectTrelloCards(
     // Log any failures but don't throw
     results.forEach((result, index) => {
       if (result.status === 'rejected') {
-        console.error(
+        logger.error(
           `Failed to update card ${trelloCards[index].cardId}:`,
           result.reason
         )
@@ -136,7 +137,7 @@ export function useBakerTrelloIntegration({
             error:
               trelloError instanceof Error ? trelloError.message : String(trelloError)
           })
-          console.warn(`Failed to update Trello card for ${projectPath}:`, trelloError)
+          logger.warn(`Failed to update Trello card for ${projectPath}:`, trelloError)
         }
       }
 

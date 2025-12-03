@@ -1,5 +1,6 @@
 import { open } from '@tauri-apps/plugin-dialog'
 import React from 'react'
+import { logger } from '@/utils/logger'
 
 type Props = {
   onSelect: (folderPath: string) => void
@@ -25,7 +26,7 @@ const FolderTree: React.FC<Props> = ({ onSelect, selectedFolder }) => {
         onSelect(newSelectedFolder)
       }
     } catch (error) {
-      console.error('Error selecting folder:', error)
+      logger.error('Error selecting folder:', error)
     }
   }
 

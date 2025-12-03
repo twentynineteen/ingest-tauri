@@ -5,6 +5,7 @@
  */
 
 import { format, parse } from 'date-fns'
+import { logger } from '../logger'
 
 /**
  * Format breadcrumbs date strings with comprehensive fallback handling
@@ -57,10 +58,10 @@ export function formatBreadcrumbDate(
       }
     }
 
-    console.warn('Unable to parse date string:', dateString)
+    logger.warn('Unable to parse date string:', dateString)
     return 'Invalid date'
   } catch (error) {
-    console.warn('Error parsing date:', dateString, error)
+    logger.warn('Error parsing date:', dateString, error)
     return 'Invalid date'
   }
 }
@@ -79,12 +80,12 @@ export function formatBreadcrumbDateSimple(
   try {
     const date = new Date(dateString)
     if (isNaN(date.getTime())) {
-      console.warn('Invalid date string received:', dateString)
+      logger.warn('Invalid date string received:', dateString)
       return 'Invalid date'
     }
     return date.toLocaleString()
   } catch (error) {
-    console.warn('Error parsing date:', dateString, error)
+    logger.warn('Error parsing date:', dateString, error)
     return 'Invalid date'
   }
 }

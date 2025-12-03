@@ -14,6 +14,7 @@ import { buildRAGPrompt } from '../utils/aiPrompts'
 import { createNamespacedLogger } from '../utils/logger'
 import { useOllamaEmbedding } from './useOllamaEmbedding'
 import type { SimilarExample } from './useScriptRetrieval'
+import { logger } from '@/utils/logger'
 
 const logger = createNamespacedLogger('useScriptProcessor')
 
@@ -104,7 +105,7 @@ async function retrieveSimilarExamples(
 
     return examples
   } catch (ragError) {
-    console.error('[useScriptProcessor] RAG retrieval failed:', ragError)
+    logger.error('[useScriptProcessor] RAG retrieval failed:', ragError)
     options.onRAGUpdate?.(
       'RAG search failed: ' +
         (ragError instanceof Error ? ragError.message : String(ragError)),
@@ -342,7 +343,7 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         attempt++
 
         // Log detailed error information
-        console.error(
+        logger.error(
           '[useScriptProcessor] Processing error (attempt',
           attempt,
           'of',
@@ -351,9 +352,9 @@ export function useScriptProcessor(): UseScriptProcessorResult {
           err
         )
         if (err instanceof Error) {
-          console.error('[useScriptProcessor] Error name:', err.name)
-          console.error('[useScriptProcessor] Error message:', err.message)
-          console.error('[useScriptProcessor] Error stack:', err.stack)
+          logger.error('[useScriptProcessor] Error name:', err.name)
+          logger.error('[useScriptProcessor] Error message:', err.message)
+          logger.error('[useScriptProcessor] Error stack:', err.stack)
         }
 
         if (abortControllerRef.current?.signal.aborted) {
@@ -368,7 +369,7 @@ export function useScriptProcessor(): UseScriptProcessorResult {
           // Final failure after retries
           const finalError =
             err instanceof Error ? err : new Error('Failed to process script')
-          console.error(
+          logger.error(
             '[useScriptProcessor] Max retries exceeded. Final error:',
             finalError
           )

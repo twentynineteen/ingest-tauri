@@ -8,6 +8,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import { useCallback, useState } from 'react'
 import type { BreadcrumbsFile, FileInfo } from '../types/baker'
+import { logger } from '@/utils/logger'
 
 // Constants
 const RAW_CONTENT_PREVIEW_LIMIT = 200
@@ -40,7 +41,7 @@ export function useLiveBreadcrumbsReader(): UseLiveBreadcrumbsReaderResult {
           }
         )
       } catch (breadcrumbsError) {
-        console.warn(
+        logger.warn(
           `Failed to read existing breadcrumbs for ${projectPath}:`,
           breadcrumbsError
         )
@@ -54,7 +55,7 @@ export function useLiveBreadcrumbsReader(): UseLiveBreadcrumbsReaderResult {
           projectPath
         })
       } catch (scanError) {
-        console.warn(
+        logger.warn(
           `Failed to scan current files for ${projectPath}, using cached data:`,
           scanError
         )

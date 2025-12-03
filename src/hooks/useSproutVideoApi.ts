@@ -9,6 +9,7 @@ import { useMutation } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 import type { SproutVideoDetails } from '../types/media'
 import { parseSproutVideoUrl } from '../utils/parseSproutVideoUrl'
+import { logger } from '@/utils/logger'
 
 interface FetchVideoDetailsParams {
   videoUrl: string
@@ -26,9 +27,9 @@ interface FetchVideoDetailsParams {
  *     videoUrl: 'https://sproutvideo.com/videos/abc123',
  *     apiKey: userApiKey
  *   })
- *   console.log(details.title, details.assets.poster_frames[0])
+ *   logger.log(details.title, details.assets.poster_frames[0])
  * } catch (err) {
- *   console.error('Failed to fetch:', err)
+ *   logger.error('Failed to fetch:', err)
  * }
  */
 export function useSproutVideoApi() {

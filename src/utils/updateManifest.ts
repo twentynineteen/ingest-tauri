@@ -117,11 +117,11 @@ export function convertGitHubReleaseToTauriManifest(
           signatureFile.name
         )
       } else {
-        console.warn(
+        logger.warn(
           `[UpdateManifest] Found update file but no signature for ${config.key}:`,
           updateFile.name
         )
-        console.warn(`[UpdateManifest] Tauri requires signatures - skipping this asset`)
+        logger.warn(`[UpdateManifest] Tauri requires signatures - skipping this asset`)
       }
     } else {
       log.debug(`No matching asset found for ${config.key}`)
@@ -130,7 +130,7 @@ export function convertGitHubReleaseToTauriManifest(
 
   // Return null if no platforms found
   if (Object.keys(platforms).length === 0) {
-    console.error('[UpdateManifest] No compatible platforms found in release assets:', {
+    logger.error('[UpdateManifest] No compatible platforms found in release assets:', {
       totalAssets: release.assets.length,
       updateFiles: updateFiles.map(f => f.name),
       signatureFiles: signatureFiles.map(f => f.name)
@@ -159,7 +159,7 @@ export function convertGitHubReleaseToTauriResponse(
 
   if (!manifest) {
     const assetNames = release.assets.map(a => a.name)
-    console.error('[UpdateManifest] Failed to generate update manifest from release:', {
+    logger.error('[UpdateManifest] Failed to generate update manifest from release:', {
       releaseName: release.name,
       tagName: release.tag_name,
       isDraft: release.draft,
@@ -172,7 +172,7 @@ export function convertGitHubReleaseToTauriResponse(
 
   if (!manifest.platforms[platformKey]) {
     const allAssets = release.assets.map(a => a.name)
-    console.error('[UpdateManifest] No platform found for key:', {
+    logger.error('[UpdateManifest] No platform found for key:', {
       requestedPlatform: platformKey,
       availablePlatforms: Object.keys(manifest.platforms),
       allAssets
@@ -255,7 +255,7 @@ function getWebGLVendor(): string {
       }
     }
   } catch (e) {
-    console.debug('WebGL vendor detection failed:', e)
+    logger.debug('WebGL vendor detection failed:', e)
   }
   return ''
 }
@@ -318,7 +318,7 @@ function findBestMatchingAsset(
     }
   }
 
-  console.warn(
+  logger.warn(
     `[UpdateManifest] No matching asset found for architectures: ${config.architectures.join(', ')}`
   )
   return undefined

@@ -26,6 +26,7 @@ import {
   createDefaultSproutUploadResponse,
   SelectedCard
 } from '../pages/UploadTrello/UploadTrelloTypes'
+import { logger } from '@/utils/logger'
 
 // Hard-coded boardId for 'small projects'
 const BOARD_ID = '55a504d70bed2bd21008dc5a'
@@ -145,7 +146,7 @@ export function useUploadTrello() {
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error)
           alert('Failed to save breadcrumbs: ' + errorMessage)
-          console.error('Failed to write breadcrumbs file:', error)
+          logger.error('Failed to write breadcrumbs file:', error)
         }
       }
 

@@ -8,6 +8,7 @@ import {
 } from '@components/ui/accordion'
 import React, { useState } from 'react'
 import { TrelloCard } from '../TrelloCards'
+import { logger } from '../logger'
 
 interface TrelloCardListProps {
   grouped: Record<string, TrelloCard[]>
@@ -29,7 +30,7 @@ const TrelloCardList: React.FC<TrelloCardListProps> = ({ grouped, onSelect }) =>
         return JSON.parse(savedState)
       }
     } catch (error) {
-      console.error('Failed to load accordion state:', error)
+      logger.error('Failed to load accordion state:', error)
     }
     return []
   })
@@ -40,7 +41,7 @@ const TrelloCardList: React.FC<TrelloCardListProps> = ({ grouped, onSelect }) =>
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(value))
     } catch (error) {
-      console.error('Failed to save accordion state:', error)
+      logger.error('Failed to save accordion state:', error)
     }
   }
 

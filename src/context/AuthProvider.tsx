@@ -3,6 +3,7 @@ import { invoke } from '@tauri-apps/api/core'
 import React from 'react'
 import { useAuthCheck } from '../hooks/useAuthCheck'
 import { AuthContext } from './AuthContext'
+import { logger } from '@/utils/logger'
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const queryClient = useQueryClient()
@@ -18,7 +19,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('username', username)
       queryClient.invalidateQueries({ queryKey: ['authCheck'] })
     } catch (error) {
-      console.error('Login failed:', error)
+      logger.error('Login failed:', error)
     }
   }
 

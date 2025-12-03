@@ -1,6 +1,7 @@
 import { listen } from '@tauri-apps/api/event'
 import { useEffect, useRef, useState } from 'react'
 import { createNamespacedLogger } from '../utils/logger'
+import { logger } from '@/utils/logger'
 
 const log = createNamespacedLogger('CopyProgress')
 
@@ -107,7 +108,7 @@ export function useCopyProgress({
           }
         })
       } catch (error) {
-        console.error('Failed to setup copy progress listeners:', error)
+        logger.error('Failed to setup copy progress listeners:', error)
 
         const errorState: CopyProgressState = {
           total: 100,
@@ -132,7 +133,7 @@ export function useCopyProgress({
           if (unlistenProgress) unlistenProgress()
           if (unlistenComplete) unlistenComplete()
         } catch (error) {
-          console.debug('Copy progress listener cleanup encountered errors:', error)
+          logger.debug('Copy progress listener cleanup encountered errors:', error)
         }
       }, 0)
     }

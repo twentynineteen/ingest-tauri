@@ -11,6 +11,7 @@ import type {
   ProjectChangeDetail
 } from '../../types/baker'
 import { formatFieldName, formatFieldValue } from './displayFormatting'
+import { logger } from '../logger'
 
 /**
  * Categorize fields by their type and importance
@@ -40,7 +41,7 @@ export function categorizeField(field: string): {
   if (fieldCategories[field as keyof typeof fieldCategories]) {
     return fieldCategories[field as keyof typeof fieldCategories]
   } else {
-    console.warn(
+    logger.warn(
       `[breadcrumbsComparison] Unknown field encountered in categorizeField: '${field}'. Defaulting to category 'metadata' with 'medium' impact.`
     )
     return { category: 'metadata', impact: 'medium' }

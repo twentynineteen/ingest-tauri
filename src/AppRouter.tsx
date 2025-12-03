@@ -65,7 +65,7 @@ export const AppRouter: React.FC = () => {
           log.debug('No update available')
         }
       } catch (err) {
-        console.error('[AppRouter] Updater error:', err)
+        log.error('Updater error:', err)
       }
     }
 

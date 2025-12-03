@@ -1,6 +1,7 @@
 import { Button } from '@components/ui/button'
 import { QueryErrorResetBoundary } from '@tanstack/react-query'
 import React, { Component, ReactNode } from 'react'
+import { logger } from '@/utils/logger'
 
 interface ErrorBoundaryState {
   hasError: boolean
@@ -26,7 +27,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log the error details
-    console.error('ErrorBoundary caught an error:', error, errorInfo)
+    logger.error('ErrorBoundary caught an error:', error, errorInfo)
 
     this.setState({
       error,

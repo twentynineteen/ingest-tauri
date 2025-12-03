@@ -17,6 +17,7 @@ import { writeTextFile } from '@tauri-apps/plugin-fs'
 import { appStore } from 'store/useAppStore'
 import { Breadcrumb } from 'utils/types'
 import { FootageFile } from './useCameraAutoRemap'
+import { logger } from '@/utils/logger'
 
 interface CreateBreadcrumbsParams {
   title: string
@@ -46,7 +47,7 @@ export function useProjectBreadcrumbs() {
       const size = await invoke<number>('get_folder_size', { folderPath })
       return size
     } catch (error) {
-      console.warn('Failed to calculate folder size:', error)
+      logger.warn('Failed to calculate folder size:', error)
       return undefined
     }
   }

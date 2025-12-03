@@ -23,6 +23,7 @@ import { useTrelloBoard } from 'hooks'
 import { useBreadcrumb } from 'hooks/useBreadcrumb'
 import { AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react'
 import React, { useCallback, useState } from 'react'
+import { logger } from '@/utils/logger'
 
 const BakerPageContent: React.FC = () => {
   // Set breadcrumbs for navigation
@@ -76,7 +77,7 @@ const BakerPageContent: React.FC = () => {
         backupOriginals: preferences.backupOriginals
       })
     } catch (error) {
-      console.error('Failed to start scan:', error)
+      logger.error('Failed to start scan:', error)
     }
   }, [selectedFolder, preferences, startScan])
 

@@ -1,3 +1,5 @@
+import { logger } from '@/utils/logger'
+
 /**
  * Progress Tracker Service
  * Provides real-time progress tracking and user feedback during updates
@@ -158,7 +160,7 @@ export class ProgressTracker {
         try {
           subscription.callback(update)
         } catch (error) {
-          console.error(`Error in progress callback ${subscription.id}:`, error)
+          logger.error(`Error in progress callback ${subscription.id}:`, error)
         }
       }
     }

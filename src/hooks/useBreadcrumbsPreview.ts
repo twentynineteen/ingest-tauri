@@ -12,6 +12,7 @@ import {
   compareBreadcrumbsMeaningful,
   generateBreadcrumbsPreview
 } from '../utils/breadcrumbsComparison'
+import { logger } from '@/utils/logger'
 
 interface UseBreadcrumbsPreviewResult {
   // State
@@ -59,7 +60,7 @@ export function useBreadcrumbsPreview(): UseBreadcrumbsPreviewResult {
               }
             )
           } catch (readError) {
-            console.warn(
+            logger.warn(
               `Failed to read existing breadcrumbs for ${projectPath}:`,
               readError
             )
@@ -78,7 +79,7 @@ export function useBreadcrumbsPreview(): UseBreadcrumbsPreviewResult {
             projectPath
           })
         } catch (scanError) {
-          console.warn(
+          logger.warn(
             `Failed to scan current files for ${projectPath}, falling back to breadcrumbs/placeholder:`,
             scanError
           )
@@ -162,7 +163,7 @@ export function useBreadcrumbsPreview(): UseBreadcrumbsPreviewResult {
           )
           preview.meaningfulDiff = meaningfulDiff
         } catch (sizeError) {
-          console.warn(`Failed to calculate folder size for ${projectPath}:`, sizeError)
+          logger.warn(`Failed to calculate folder size for ${projectPath}:`, sizeError)
         }
 
         setPreviews(prev => new Map(prev.set(projectPath, preview)))

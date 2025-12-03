@@ -7,6 +7,7 @@ import { exists, mkdir, remove, writeTextFile } from '@tauri-apps/plugin-fs'
 import { appStore } from 'store/useAppStore'
 import { Breadcrumb } from 'utils/types'
 import { FootageFile } from './useCameraAutoRemap'
+import { logger } from '@/utils/logger'
 
 interface CreateProjectParams {
   title: string
@@ -77,7 +78,7 @@ export function useCreateProject() {
           mkdir(`${projectFolder}/Scripts`, { recursive: true })
         ])
       } catch (mkdirError) {
-        console.error('Error creating folders:', mkdirError)
+        logger.error('Error creating folders:', mkdirError)
         alert('Error creating project: ' + mkdirError)
         // Clean up listener if it was created
         if (unlistenComplete) unlistenComplete()
@@ -102,7 +103,7 @@ export function useCreateProject() {
           folderPath: projectFolder
         })
       } catch (error) {
-        console.warn('Failed to calculate folder size:', error)
+        logger.warn('Failed to calculate folder size:', error)
         folderSizeBytes = undefined
       }
 
@@ -141,7 +142,7 @@ export function useCreateProject() {
 
           setMessage('Success: ' + result)
         } catch (error) {
-          console.error('Error:', error)
+          logger.error('Error:', error)
           setMessage('Error: ' + error)
         } finally {
           setLoading(false)
@@ -156,7 +157,7 @@ export function useCreateProject() {
             destination: `${projectData.parentFolder}/${projectData.projectTitle}`
           })
         } catch (error) {
-          console.error('Error:', error)
+          logger.error('Error:', error)
         }
       }
 
@@ -167,7 +168,7 @@ export function useCreateProject() {
           await createTemplatePremiereProject()
           await showDialogAndOpenFolder()
         } catch (error) {
-          console.error('Error in copy_complete handler:', error)
+          logger.error('Error in copy_complete handler:', error)
           alert('Error completing project: ' + error)
         } finally {
           // Clean up the event listener after handling the event
@@ -182,14 +183,14 @@ export function useCreateProject() {
           baseDest: projectFolder
         })
       } catch (moveError) {
-        console.error('Error moving files:', moveError)
+        logger.error('Error moving files:', moveError)
         alert('Error creating project: ' + moveError)
         // Clean up listener
         if (unlistenComplete) unlistenComplete()
         return
       }
     } catch (error) {
-      console.error('Error creating project:', error)
+      logger.error('Error creating project:', error)
       alert('Error creating project: ' + error)
       // Clean up listener if we error before move_files completes
       if (unlistenComplete) unlistenComplete()

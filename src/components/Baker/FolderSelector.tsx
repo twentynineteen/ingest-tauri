@@ -9,6 +9,7 @@ import { Input } from '@components/ui/input'
 import { open } from '@tauri-apps/plugin-dialog'
 import { FolderOpen, Play, RefreshCw, Square } from 'lucide-react'
 import React, { useCallback } from 'react'
+import { logger } from '@/utils/logger'
 
 interface FolderSelectorProps {
   selectedFolder: string
@@ -43,7 +44,7 @@ export const FolderSelector: React.FC<FolderSelectorProps> = ({
         onFolderChange(selected)
       }
     } catch (error) {
-      console.error('Failed to select folder:', error)
+      logger.error('Failed to select folder:', error)
     }
   }, [onFolderChange])
 

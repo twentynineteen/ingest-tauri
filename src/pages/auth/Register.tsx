@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
+import { logger } from '@/utils/logger'
 
 const registerSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
@@ -38,7 +39,7 @@ export default function Register() {
       // Redirect to login page after successful registration
       navigate('/login')
     } catch (err) {
-      console.error('Registration failed:', err)
+      logger.error('Registration failed:', err)
       setError('An error occurred while registering. Please try again.')
     }
   }

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ExternalLink, RefreshCw, Trash2 } from 'lucide-react'
 import type { TrelloCard } from '../../types/baker'
+import { logger } from '@/utils/logger'
 
 interface TrelloCardItemProps {
   trelloCard: TrelloCard
@@ -43,7 +44,7 @@ export function TrelloCardItem({ trelloCard, onRemove, onRefresh }: TrelloCardIt
     try {
       await openUrl(trelloCard.url)
     } catch (error) {
-      console.error('Failed to open Trello URL:', error)
+      logger.error('Failed to open Trello URL:', error)
     }
   }
 

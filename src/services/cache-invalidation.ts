@@ -1,6 +1,7 @@
 import { QueryClient } from '@tanstack/react-query'
 import { CACHE } from '../constants/timing'
 import { queryKeys } from '../lib/query-keys'
+import { logger } from '@/utils/logger'
 
 /**
  * Cache Invalidation Service
@@ -155,7 +156,7 @@ export class CacheInvalidationService {
         await this.invalidateSproutData(context?.apiKey, context?.parentId)
         break
       default:
-        console.warn(`Unknown mutation type: ${mutationType}`)
+        logger.warn(`Unknown mutation type: ${mutationType}`)
     }
   }
 

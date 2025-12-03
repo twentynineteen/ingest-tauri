@@ -4,6 +4,7 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { useState } from 'react'
 import { appStore } from '../store/useAppStore'
 import { SproutUploadResponse } from '../utils/types'
+import { logger } from '@/utils/logger'
 
 interface UseFileUploadReturn {
   selectedFile: string | null
@@ -64,7 +65,7 @@ export const useFileUpload = (): UseFileUploadReturn => {
               const unsub = await completeUnlisten
               unsub()
             } catch (e) {
-              console.warn('Failed to unsubscribe from upload_complete:', e)
+              logger.warn('Failed to unsubscribe from upload_complete:', e)
             }
           }
           if (errorUnlisten) {
@@ -72,7 +73,7 @@ export const useFileUpload = (): UseFileUploadReturn => {
               const unsub = await errorUnlisten
               unsub()
             } catch (e) {
-              console.warn('Failed to unsubscribe from upload_error:', e)
+              logger.warn('Failed to unsubscribe from upload_error:', e)
             }
           }
         }
@@ -117,7 +118,7 @@ export const useFileUpload = (): UseFileUploadReturn => {
       // Upload completed successfully
     } catch (error) {
       // Log and display any error encountered during the upload process
-      console.error('Upload error:', error)
+      logger.error('Upload error:', error)
 
       // Provide more specific error messages based on error type
       let errorMessage = 'Upload failed: '

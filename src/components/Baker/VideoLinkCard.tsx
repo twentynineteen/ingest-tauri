@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ChevronDown, ChevronUp, ExternalLink, Trash2, Video } from 'lucide-react'
 import type { VideoLink } from '../../types/baker'
+import { logger } from '@/utils/logger'
 
 interface VideoLinkCardProps {
   videoLink: VideoLink
@@ -39,7 +40,7 @@ export function VideoLinkCard({
     try {
       await openUrl(videoLink.url)
     } catch (error) {
-      console.error('Failed to open video URL:', error)
+      logger.error('Failed to open video URL:', error)
     }
   }
 

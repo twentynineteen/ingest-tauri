@@ -19,6 +19,7 @@ import { useFileUpload } from './useFileUpload'
 import { useSproutVideoApi } from './useSproutVideoApi'
 import { useSproutVideoProcessor } from './useSproutVideoProcessor'
 import { useUploadEvents } from './useUploadEvents'
+import { logger } from '@/utils/logger'
 
 interface UseVideoLinksManagerProps {
   projectPath: string
@@ -162,7 +163,7 @@ export function useVideoLinksManager({ projectPath }: UseVideoLinksManagerProps)
     try {
       await uploadFile(apiKey)
     } catch (error) {
-      console.error('Upload failed:', error)
+      logger.error('Upload failed:', error)
     }
   }
 

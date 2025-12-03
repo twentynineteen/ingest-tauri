@@ -7,6 +7,7 @@
 import mammoth from 'mammoth'
 import { useState } from 'react'
 import type { FormattingMetadata, ScriptDocument } from '../types/scriptFormatter'
+import { logger } from '@/utils/logger'
 
 interface UseDocxParserResult {
   parseFile: (file: File) => Promise<ScriptDocument>
@@ -206,7 +207,7 @@ function extractFormattingMetadata(html: string): FormattingMetadata {
     return metadata
   } catch (error) {
     // If metadata extraction fails, return empty metadata
-    console.warn('Failed to extract formatting metadata:', error)
+    logger.warn('Failed to extract formatting metadata:', error)
     return metadata
   }
 }

@@ -33,11 +33,19 @@ vi.mock('../../../src/hooks/useScriptDownload', () => ({
 }))
 
 vi.mock('../../../src/utils/logger', () => ({
+  logger: {
+    debug: vi.fn(),
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    log: vi.fn()
+  },
   createNamespacedLogger: () => ({
     debug: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
-    error: vi.fn()
+    error: vi.fn(),
+    log: vi.fn()
   })
 }))
 

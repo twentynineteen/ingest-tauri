@@ -9,6 +9,7 @@ import { usePosterframeAutoRedraw } from 'hooks/usePosterframeAutoRedraw'
 import { usePosterframeCanvas } from 'hooks/usePosterframeCanvas'
 import { useZoomPan } from 'hooks/useZoomPan'
 import React, { useRef, useState } from 'react'
+import { logger } from '@/utils/logger'
 
 const Posterframe = () => {
   const [videoTitle, setVideoTitle] = useState('')
@@ -69,7 +70,7 @@ const Posterframe = () => {
         alert(`Thumbnail saved at: ${fullPath}`)
         invoke('open_folder', { path: savePath })
       } catch (err) {
-        console.error('Save failed:', err)
+        logger.error('Save failed:', err)
         alert('Error saving file.')
       }
     }, 'image/jpeg')

@@ -8,6 +8,7 @@ import { open } from '@tauri-apps/plugin-dialog'
 import { readFile } from '@tauri-apps/plugin-fs'
 import { AlertCircle, FileText, Upload } from 'lucide-react'
 import React, { useState } from 'react'
+import { logger } from '@/utils/logger'
 
 interface FileUploaderProps {
   onFileSelect: (file: File) => void
@@ -61,7 +62,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
       setSelectedFileName(filename)
       onFileSelect(file)
     } catch (err) {
-      console.error('File upload error:', err)
+      logger.error('File upload error:', err)
       // Error is handled by parent component
     }
   }

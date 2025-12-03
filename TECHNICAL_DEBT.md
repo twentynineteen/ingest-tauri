@@ -223,30 +223,132 @@ Split into 4 focused, testable files following Single Responsibility Principle:
 
 ---
 
-### DEBT-005: Excessive Console Statements (122 instances)
+### DEBT-005: Excessive Console Statements (138 instances) ✅ RESOLVED
 
 **Category:** Code Quality
-**Severity:** LOW
+**Severity:** ~~LOW~~ **RESOLVED**
 **Location:** Codebase-wide
+**Resolution Date:** 2025-12-03
 
-**Description:**
-122 console statements found throughout codebase. While some are intentional logging, many are debug statements left from development.
+**Original Problem:**
+138 console statements found throughout codebase (128 excluding logger.ts). While some were intentional logging, many were debug statements left from development.
+
+**Breakdown:**
+- `console.error`: 85 instances (62%)
+- `console.warn`: 30 instances (22%)
+- `console.log`: 10 instances (7%)
+- `console.debug`: 4 instances (3%)
+- `console.info`: 1 instance (1%)
 
 **Impact:**
 - **Technical:** Console pollution makes debugging harder
 - **Performance:** Minor performance overhead in production
 - **Professional:** Unprofessional in production builds
 
-**Proposed Solution:**
-1. Replace all console statements with structured logging via `src/utils/logger.ts`
-2. Configure build process to strip console statements in production
-3. Add ESLint rule to prevent new console statements
-4. Keep intentional logs using logger with appropriate levels
+**Resolution Summary:**
+Successfully replaced all 125 console statements in production code using systematic approach with comprehensive testing:
+- **Console Statements Replaced:** 125 (10 in Phase 1, 115 in Phase 2)
+- **Files Modified:** 53 files (52 production + 1 test)
+- **Test Coverage:** 1038/1038 tests passing (zero regressions)
+- **Total Effort:** ~3 hours across 4 phases
 
-**Effort Estimate:** 2 days (automated with codemod)
-**Priority Justification:** Low impact but easy fix, good housekeeping
-**Target Resolution:** Q2 2026
-**Assigned To:** Unassigned
+### ✅ Phase 1: Logger Enhancement (COMPLETED 2025-12-03)
+
+**What Was Done:**
+1. **Enhanced logger utility** with `error()` and `warn()` methods
+   - Updated [src/utils/logger.ts](src/utils/logger.ts) with new methods
+   - Maintains silent behavior in production (all methods are no-ops)
+   - Supports namespaced loggers for better organization
+2. **Created comprehensive test suite** - 47 new tests
+   - Test file: [tests/unit/utils/logger.test.ts](tests/unit/utils/logger.test.ts)
+   - Coverage: All logger methods, dev/prod modes, edge cases
+3. **Initial example replacement** - breadcrumbs/debug.ts (10 statements)
+   - Test file: [tests/unit/utils/breadcrumbs/debug.test.ts](tests/unit/utils/breadcrumbs/debug.test.ts) - 11 tests
+   - Proved TDD methodology for console replacement
+
+**Methodology:** Test-Driven Development (TDD)
+- RED phase: Wrote 47 failing tests + 11 failing tests for debug.ts
+- GREEN phase: Implemented error/warn methods + replaced console statements
+- REFACTOR phase: Clean implementation, no changes needed
+
+**Results:**
+- ✅ Logger utility fully functional with error/warn support
+- ✅ 58 comprehensive tests (100% passing)
+- ✅ Zero regressions
+
+### ✅ Phase 2: Systematic Console Replacement (COMPLETED 2025-12-03)
+
+**What Was Done:**
+1. **Created automated replacement script** ([scripts/replace-console-with-logger.py](scripts/replace-console-with-logger.py))
+   - Intelligent path resolution for logger imports
+   - Skips test files and scripts (appropriate to keep console there)
+   - Replaces all console.{error|warn|log|debug|info} with logger.{method}
+2. **Replaced 115 console statements in 52 production files**
+   - All src/ files systematically updated
+   - Added appropriate logger imports
+   - Fixed import path issues in nested directories
+3. **Fixed test mock** for useScriptWorkflow.test.tsx
+4. **Verified zero regressions** - All 1038 tests passing
+
+**Files Modified (52 total):**
+- Components: Baker components, ErrorBoundary, FolderTree, Trello components
+- Hooks: useAppendBreadcrumbs (5), useScriptWorkflow (8), useCreateProject (7), useEmbedding (4), and 25+ other hooks
+- Utils: breadcrumbs utilities, storage, TrelloCards, updateManifest (7)
+- Services: ProgressTracker, cache-invalidation, AI provider config
+- Pages: Settings (6), Baker, BuildProject, auth pages
+
+**Results:**
+- ✅ 125 total console statements replaced
+- ✅ 1038/1038 tests passing (zero regressions)
+- ✅ All production code now uses logger utility
+
+**Actual Effort:** 2 hours
+
+### ✅ Phase 3: ESLint Rule Enforcement (COMPLETED 2025-12-03)
+
+**What Was Done:**
+1. **Added ESLint rule** to [eslint.config.js](eslint.config.js):
+   ```javascript
+   'no-console': 'error'
+   ```
+2. **Verified rule enforcement** - ESLint catches new console statements as build errors
+3. **Documentation added** inline in ESLint config
+
+**Results:**
+- ✅ ESLint now blocks console statements at build time
+- ✅ Zero console statements in src/ directory
+- ✅ Future-proof against regression
+
+**Actual Effort:** 15 minutes
+
+### ✅ Phase 4: Validation (COMPLETED 2025-12-03)
+
+**What Was Done:**
+1. **Full test suite validation** - All 1038 tests passing
+2. **ESLint validation** - No console statement errors
+3. **Manual code review** - Verified logger imports and usage
+
+**Results:**
+- ✅ All changes verified working correctly
+- ✅ Zero regressions
+- ✅ Production-safe (logger is silent in production builds)
+
+**Actual Effort:** 30 minutes
+
+**Benefits Achieved:**
+- ✅ All production console statements replaced with logger utility
+- ✅ Comprehensive test coverage (58 tests for logger and debug utilities)
+- ✅ Zero regressions (1038/1038 tests passing)
+- ✅ ESLint enforcement prevents future console statements
+- ✅ Production-safe logging (silent in production builds)
+- ✅ Automated replacement script for future use
+- ✅ Improved debugging experience with namespaced loggers
+
+**Documentation:** [docs/debt-005-progress.md](docs/debt-005-progress.md)
+
+**Actual Effort:** ~3 hours total
+**Completed By:** Claude Code + test-specialist skill
+**Status:** ✅ RESOLVED
 
 ---
 

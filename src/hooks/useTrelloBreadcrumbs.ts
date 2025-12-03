@@ -9,6 +9,7 @@ import { appStore } from '../store/useAppStore'
 import type { TrelloCard } from '../utils/TrelloCards'
 import { useAppendBreadcrumbs } from './useAppendBreadcrumbs'
 import { useParsedTrelloDescription } from './useParsedTrelloDescription'
+import { logger } from '@/utils/logger'
 
 /**
  * Hook to manage breadcrumbs operations for Trello cards
@@ -68,7 +69,7 @@ export function useTrelloBreadcrumbs(
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : String(error)
           alert('Failed to save breadcrumbs: ' + errorMessage)
-          console.error('Failed to write breadcrumbs file:', error)
+          logger.error('Failed to write breadcrumbs file:', error)
         }
       }
 

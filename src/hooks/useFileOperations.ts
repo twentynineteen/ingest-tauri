@@ -15,6 +15,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { FootageFile } from './useCameraAutoRemap'
+import { logger } from '@/utils/logger'
 
 interface MoveFilesWithProgressParams {
   files: FootageFile[]
@@ -48,7 +49,7 @@ export function useFileOperations() {
       try {
         await onComplete()
       } catch (error) {
-        console.error('Error in copy_complete handler:', error)
+        logger.error('Error in copy_complete handler:', error)
       } finally {
         unlisten()
       }

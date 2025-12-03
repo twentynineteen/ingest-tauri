@@ -4,6 +4,7 @@ import { ask, message } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { check } from '@tauri-apps/plugin-updater'
 import { useVersionCheck } from './useVersionCheck'
+import { logger } from '@/utils/logger'
 
 /**
  * Show error message dialog
@@ -48,7 +49,7 @@ async function performUpdate(): Promise<void> {
  * Handle update error by offering manual download
  */
 async function handleUpdateError(updateError: Error): Promise<void> {
-  console.error('Tauri updater error:', updateError)
+  logger.error('Tauri updater error:', updateError)
 
   const manualUpdate = await ask(
     `Automatic update failed. Would you like to download the update manually?\n\nError: ${updateError.message || 'Unknown error'}`,
@@ -119,7 +120,7 @@ export function useUpdateMutation() {
         await handleUpdateError(updateError as Error)
       }
     } catch (error) {
-      console.error('Update check error:', error)
+      logger.error('Update check error:', error)
       await showErrorMessage(
         (error as Error).message || 'An unexpected error occurred during update check.',
         'Error'

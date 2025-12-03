@@ -1,5 +1,6 @@
 import type { UseMutationOptions, UseQueryOptions } from '@tanstack/react-query'
 import { CACHE, getBackoffDelay, MINUTES, RETRY, SECONDS } from '../constants/timing'
+import { logger } from '@/utils/logger'
 
 export type QueryKey =
   | readonly [
@@ -201,7 +202,7 @@ export function shouldRetry(
 ): boolean {
   const config = retryStrategies[strategy]
   if (!config) {
-    console.warn(`Unknown retry strategy: ${strategy}, using default`)
+    logger.warn(`Unknown retry strategy: ${strategy}, using default`)
     return attempt < 3 // Default to 3 attempts
   }
   return attempt < config.attempts && config.condition(error)
@@ -213,7 +214,7 @@ export function getRetryDelay(
 ): number {
   const config = retryStrategies[strategy]
   if (!config) {
-    console.warn(`Unknown retry strategy: ${strategy}, using default delay`)
+    logger.warn(`Unknown retry strategy: ${strategy}, using default delay`)
     return getBackoffDelay(attempt, RETRY.MAX_DELAY_MUTATION)
   }
   return config.delay(attempt)

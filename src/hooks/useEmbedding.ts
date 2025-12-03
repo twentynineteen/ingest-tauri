@@ -7,6 +7,7 @@
 import { pipeline, type Pipeline } from '@xenova/transformers'
 import { useEffect, useRef, useState } from 'react'
 import { createNamespacedLogger } from '../utils/logger'
+import { logger } from '@/utils/logger'
 
 const log = createNamespacedLogger('Embedding')
 
@@ -73,12 +74,12 @@ export function useEmbedding(): UseEmbeddingResult {
           log.debug('State updated - RAG is ready')
         }
       } catch (err) {
-        console.error('[Embedding] FAILED to load embedding model:', err)
-        console.error(
+        logger.error('[Embedding] FAILED to load embedding model:', err)
+        logger.error(
           '[Embedding] Error type:',
           err instanceof Error ? 'Error' : typeof err
         )
-        console.error('[Embedding] Error details:', JSON.stringify(err, null, 2))
+        logger.error('[Embedding] Error details:', JSON.stringify(err, null, 2))
         if (isMountedRef.current) {
           const errorMessage =
             err instanceof Error
@@ -122,7 +123,7 @@ export function useEmbedding(): UseEmbeddingResult {
 
       return embedding
     } catch (err) {
-      console.error('[Embedding] Failed to generate embedding:', err)
+      logger.error('[Embedding] Failed to generate embedding:', err)
       throw err instanceof Error ? err : new Error('Failed to generate embedding')
     }
   }

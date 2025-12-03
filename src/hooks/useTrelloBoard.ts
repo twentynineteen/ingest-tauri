@@ -10,6 +10,7 @@ import {
 import { CACHE } from '../constants/timing'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
+import { logger } from '@/utils/logger'
 
 interface TrelloBoardData {
   grouped: Record<string, TrelloCard[]>
@@ -81,7 +82,7 @@ export function useTrelloBoard(boardId: string): TrelloBoardData {
       try {
         return groupCardsByList(cards, lists)
       } catch (error) {
-        console.error('Error grouping Trello cards:', error)
+        logger.error('Error grouping Trello cards:', error)
         return {}
       }
     }

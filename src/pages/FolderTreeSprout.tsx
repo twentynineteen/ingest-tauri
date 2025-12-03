@@ -2,6 +2,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import React, { useState } from 'react'
 import { GetFoldersResponse, SproutFolder } from '../utils/types'
+import { logger } from '@/utils/logger'
 
 interface FolderTreeSproutProps {
   folder: SproutFolder
@@ -30,7 +31,7 @@ const FolderTreeSprout: React.FC<FolderTreeSproutProps> = ({
         })
         setChildren(result.folders)
       } catch (error) {
-        console.error('Error fetching subfolders:', error)
+        logger.error('Error fetching subfolders:', error)
       }
     }
     setExpanded(!expanded)

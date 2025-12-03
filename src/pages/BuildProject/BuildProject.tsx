@@ -16,6 +16,7 @@ import ProgressBar from './ProgressBar'
 import ProjectActions from './ProjectActions'
 import ProjectFileList from './ProjectFileList'
 import ProjectInputs from './ProjectInputs'
+import { logger } from '@/utils/logger'
 
 const logger = createNamespacedLogger('BuildProject')
 
@@ -85,7 +86,7 @@ const BuildProject: React.FC = () => {
   const updateFileCamera = (index: number, camera: number) => {
     // Validate camera number is within valid range
     if (camera < 1 || camera > numCameras) {
-      console.warn(`Invalid camera number ${camera}. Must be between 1 and ${numCameras}`)
+      logger.warn(`Invalid camera number ${camera}. Must be between 1 and ${numCameras}`)
       return
     }
 

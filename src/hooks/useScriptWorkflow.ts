@@ -17,6 +17,7 @@ import { useAIProcessing } from './useAIProcessing'
 import { useScriptDownload } from './useScriptDownload'
 import { useScriptReview } from './useScriptReview'
 import { useScriptUpload } from './useScriptUpload'
+import { logger } from '@/utils/logger'
 
 const log = createNamespacedLogger('ScriptWorkflow')
 
@@ -48,7 +49,7 @@ function getInitialStep(): WorkflowStep {
       return session.currentStep
     }
   } catch (error) {
-    console.error('Failed to get initial step:', (error as Error).message)
+    logger.error('Failed to get initial step:', (error as Error).message)
   }
 
   return 'upload'
@@ -64,7 +65,7 @@ export function useScriptWorkflow() {
       log.info('File uploaded successfully:', document.filename)
     },
     onError: error => {
-      console.error('File upload failed:', error.message)
+      logger.error('File upload failed:', error.message)
     }
   })
 
@@ -75,7 +76,7 @@ export function useScriptWorkflow() {
       goToStep('review')
     },
     onError: error => {
-      console.error('Script processing failed:', error.message)
+      logger.error('Script processing failed:', error.message)
     }
   })
 
@@ -91,7 +92,7 @@ export function useScriptWorkflow() {
       log.info('File downloaded successfully')
     },
     onError: error => {
-      console.error('File download failed:', error.message)
+      logger.error('File download failed:', error.message)
     }
   })
 
@@ -150,7 +151,7 @@ export function useScriptWorkflow() {
           }
         }
       } catch (error) {
-        console.error('Failed to restore processed output:', (error as Error).message)
+        logger.error('Failed to restore processed output:', (error as Error).message)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -166,7 +167,7 @@ export function useScriptWorkflow() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(session))
       log.debug('Saved session to localStorage')
     } catch (error) {
-      console.error('Failed to save session:', (error as Error).message)
+      logger.error('Failed to save session:', (error as Error).message)
     }
   }, [currentStep, processingHook.processedOutput])
 
@@ -181,7 +182,7 @@ export function useScriptWorkflow() {
         localStorage.removeItem(PROCESSED_OUTPUT_KEY)
         log.debug('Cleared PROCESSED_OUTPUT from localStorage')
       } catch (error) {
-        console.error('Failed to clear PROCESSED_OUTPUT:', (error as Error).message)
+        logger.error('Failed to clear PROCESSED_OUTPUT:', (error as Error).message)
       }
     }
   }, [])
@@ -199,7 +200,7 @@ export function useScriptWorkflow() {
       localStorage.removeItem(STORAGE_KEY)
       log.debug('Cleared session from localStorage')
     } catch (error) {
-      console.error('Failed to clear session:', (error as Error).message)
+      logger.error('Failed to clear session:', (error as Error).message)
     }
 
     // Go back to upload step

@@ -12,6 +12,7 @@ import { useAIProvider } from '../hooks/useAIProvider'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
 import { ApiKeys, loadApiKeys, saveApiKeys } from '../utils/storage'
+import { logger } from '@/utils/logger'
 
 const Settings: React.FC = () => {
   const queryClient = useQueryClient()
@@ -93,7 +94,7 @@ const Settings: React.FC = () => {
       alert('Default background folder saved!')
     } catch (error) {
       alert('Failed to save default background folder')
-      console.error('Save error:', error)
+      logger.error('Save error:', error)
     }
   }
 
@@ -103,7 +104,7 @@ const Settings: React.FC = () => {
       alert('Ollama URL saved successfully!')
     } catch (error) {
       alert('Failed to save Ollama URL')
-      console.error('Save error:', error)
+      logger.error('Save error:', error)
     }
   }
 
@@ -119,7 +120,7 @@ const Settings: React.FC = () => {
       await open(authUrl)
       alert('After authorizing, copy the token from the URL and paste it below.')
     } catch (err) {
-      console.error('Failed to open Trello authorization URL:', err)
+      logger.error('Failed to open Trello authorization URL:', err)
     }
   }
 
@@ -136,7 +137,7 @@ const Settings: React.FC = () => {
       alert('SproutVideo API Key saved successfully!')
     } catch (error) {
       alert('Failed to save SproutVideo API Key')
-      console.error('Save error:', error)
+      logger.error('Save error:', error)
     }
   }
 
@@ -146,7 +147,7 @@ const Settings: React.FC = () => {
       alert('Trello API Key saved successfully!')
     } catch (error) {
       alert('Failed to save Trello API Key')
-      console.error('Save error:', error)
+      logger.error('Save error:', error)
     }
   }
 
@@ -156,7 +157,7 @@ const Settings: React.FC = () => {
       alert('Trello API Token saved successfully!')
     } catch (error) {
       alert('Failed to save Trello API Token')
-      console.error('Save error:', error)
+      logger.error('Save error:', error)
     }
   }
 

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef } from 'react'
 import { CACHE } from '../constants/timing'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryOptions } from '../lib/query-utils'
+import { logger } from '@/utils/logger'
 
 interface UseUploadEventsReturn {
   progress: number
@@ -136,7 +137,7 @@ export const useUploadEvents = (): UseUploadEventsReturn => {
           }
         })
       } catch (error) {
-        console.error('Failed to setup upload event listeners:', error)
+        logger.error('Failed to setup upload event listeners:', error)
         updateUploadState({
           message: 'Failed to setup event listeners',
           uploading: false
@@ -158,7 +159,7 @@ export const useUploadEvents = (): UseUploadEventsReturn => {
           if (unlistenError) unlistenError()
         } catch (error) {
           // Silently handle cleanup errors to avoid console spam
-          console.debug('Event listener cleanup encountered errors:', error)
+          logger.debug('Event listener cleanup encountered errors:', error)
         }
       }, 0)
     }

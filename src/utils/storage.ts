@@ -1,6 +1,7 @@
 import { appDataDir } from '@tauri-apps/api/path'
 import { exists, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
 import { appStore } from 'store/useAppStore'
+import { logger } from './logger'
 
 const setSproutVideoApiKey = (state: string) =>
   appStore.getState().setSproutVideoApiKey(state)
@@ -43,7 +44,7 @@ export const saveApiKeys = async (apiKeys: ApiKeys): Promise<void> => {
     const data = JSON.stringify(apiKeys, null, 2) // Pretty-print JSON for readability.
     await writeTextFile(filePath, data)
   } catch (error) {
-    console.error('Error saving API keys:', error)
+    logger.error('Error saving API keys:', error)
   }
 }
 
@@ -64,7 +65,7 @@ export const loadApiKeys = async (): Promise<ApiKeys> => {
 
     return result
   } catch (error) {
-    console.error('Error loading API keys:', error)
+    logger.error('Error loading API keys:', error)
     return {}
   }
 }

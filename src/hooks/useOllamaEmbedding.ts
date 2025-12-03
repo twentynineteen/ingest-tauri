@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from 'react'
 import { createNamespacedLogger } from '../utils/logger'
+import { logger } from '@/utils/logger'
 
 const logger = createNamespacedLogger('useOllamaEmbedding')
 
@@ -79,7 +80,7 @@ export function useOllamaEmbedding(): UseOllamaEmbeddingResult {
         logger.log('Model available:', EMBEDDING_MODEL)
         setIsReady(true)
       } catch (err) {
-        console.error('[useOllamaEmbedding] Failed to check model availability:', err)
+        logger.error('[useOllamaEmbedding] Failed to check model availability:', err)
         setError(err instanceof Error ? err : new Error('Failed to connect to Ollama'))
         setIsReady(false)
       } finally {
@@ -130,7 +131,7 @@ export function useOllamaEmbedding(): UseOllamaEmbeddingResult {
 
       return embedding
     } catch (err) {
-      console.error('[useOllamaEmbedding] Failed to generate embedding:', err)
+      logger.error('[useOllamaEmbedding] Failed to generate embedding:', err)
       throw err instanceof Error ? err : new Error('Failed to generate embedding')
     }
   }
