@@ -16,7 +16,6 @@ import ProgressBar from './ProgressBar'
 import ProjectActions from './ProjectActions'
 import ProjectFileList from './ProjectFileList'
 import ProjectInputs from './ProjectInputs'
-import { logger } from '@/utils/logger'
 
 const logger = createNamespacedLogger('BuildProject')
 

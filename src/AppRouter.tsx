@@ -25,51 +25,73 @@ import { createNamespacedLogger } from './utils/logger'
 
 const log = createNamespacedLogger('AppRouter')
 
+// Extract download event handler to reduce nesting
+type DownloadEvent = {
+  event: 'Started' | 'Progress' | 'Finished'
+  data: { contentLength?: number; chunkLength?: number }
+}
+
+function createDownloadHandler() {
+  let downloaded = 0
+  let contentLength = 0
+
+  return (event: DownloadEvent) => {
+    if (event.event === 'Started') {
+      contentLength = event.data.contentLength || 0
+      log.info(`Started downloading ${contentLength} bytes`)
+      return
+    }
+
+    if (event.event === 'Progress') {
+      downloaded += event.data.chunkLength || 0
+      log.debug(`Downloaded ${downloaded} from ${contentLength}`)
+      return
+    }
+
+    if (event.event === 'Finished') {
+      log.info('Download finished')
+    }
+  }
+}
+
+// Extract update installation logic to reduce nesting
+async function installUpdateAndRelaunch(update: any) {
+  log.info(`Found update: ${update.version}`)
+
+  const downloadHandler = createDownloadHandler()
+  await update.downloadAndInstall(downloadHandler)
+
+  log.info('Update installed')
+  await relaunch()
+}
+
+// Extract update check logic to reduce nesting
+async function checkAndInstallUpdates() {
+  if (process.env.NODE_ENV === 'development') {
+    return // Skip updates in dev mode
+  }
+
+  try {
+    const update = await check()
+    log.debug('Update check result:', update)
+
+    // Early return if no update available
+    if (!update?.version) {
+      log.debug('No update available')
+      return
+    }
+
+    await installUpdateAndRelaunch(update)
+  } catch (err) {
+    log.error('Updater error:', err)
+  }
+}
+
 export const AppRouter: React.FC = () => {
   const isAuthenticated = true // Track authentication state
 
   useEffect(() => {
-    const updateApp = async () => {
-      if (process.env.NODE_ENV === 'development') return // Skip updates in dev mode
-
-      try {
-        const update = await check()
-        log.debug('Update check result:', update)
-
-        // Only proceed if an actual update is returned
-        if (update?.version) {
-          log.info(`Found update: ${update.version}`)
-
-          let downloaded = 0
-          let contentLength = 0
-
-          await update.downloadAndInstall(event => {
-            switch (event.event) {
-              case 'Started':
-                contentLength = event.data.contentLength
-                log.info(`Started downloading ${event.data.contentLength} bytes`)
-                break
-              case 'Progress':
-                downloaded += event.data.chunkLength
-                log.debug(`Downloaded ${downloaded} from ${contentLength}`)
-                break
-              case 'Finished':
-                log.info('Download finished')
-                break
-            }
-          })
-
-          log.info('Update installed')
-          await relaunch()
-        } else {
-          log.debug('No update available')
-        }
-      } catch (err) {
-        log.error('Updater error:', err)
-      }
-    }
-
-    updateApp()
+    checkAndInstallUpdates()
   }, [])
 
   return (
