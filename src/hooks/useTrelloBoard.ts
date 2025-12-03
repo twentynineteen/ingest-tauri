@@ -13,6 +13,7 @@ import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-
 
 interface TrelloBoardData {
   grouped: Record<string, TrelloCard[]>
+  allCards: TrelloCard[]
   isLoading: boolean
   apiKey: string | null
   token: string | null
@@ -87,8 +88,14 @@ export function useTrelloBoard(boardId: string): TrelloBoardData {
     return {}
   }, [cards, lists, isDataReady])
 
+  // Flatten all cards for search/filtering
+  const allCards = useMemo(() => {
+    return cards || []
+  }, [cards])
+
   return {
     grouped,
+    allCards,
     isLoading,
     apiKey,
     token

@@ -48,7 +48,7 @@ function getInitialStep(): WorkflowStep {
       return session.currentStep
     }
   } catch (error) {
-    log.error('Failed to get initial step:', (error as Error).message)
+    console.error('Failed to get initial step:', (error as Error).message)
   }
 
   return 'upload'
@@ -64,7 +64,7 @@ export function useScriptWorkflow() {
       log.info('File uploaded successfully:', document.filename)
     },
     onError: error => {
-      log.error('File upload failed:', error.message)
+      console.error('File upload failed:', error.message)
     }
   })
 
@@ -75,7 +75,7 @@ export function useScriptWorkflow() {
       goToStep('review')
     },
     onError: error => {
-      log.error('Script processing failed:', error.message)
+      console.error('Script processing failed:', error.message)
     }
   })
 
@@ -91,7 +91,7 @@ export function useScriptWorkflow() {
       log.info('File downloaded successfully')
     },
     onError: error => {
-      log.error('File download failed:', error.message)
+      console.error('File download failed:', error.message)
     }
   })
 
@@ -150,7 +150,7 @@ export function useScriptWorkflow() {
           }
         }
       } catch (error) {
-        log.error('Failed to restore processed output:', (error as Error).message)
+        console.error('Failed to restore processed output:', (error as Error).message)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -166,7 +166,7 @@ export function useScriptWorkflow() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(session))
       log.debug('Saved session to localStorage')
     } catch (error) {
-      log.error('Failed to save session:', (error as Error).message)
+      console.error('Failed to save session:', (error as Error).message)
     }
   }, [currentStep, processingHook.processedOutput])
 
@@ -181,7 +181,7 @@ export function useScriptWorkflow() {
         localStorage.removeItem(PROCESSED_OUTPUT_KEY)
         log.debug('Cleared PROCESSED_OUTPUT from localStorage')
       } catch (error) {
-        log.error('Failed to clear PROCESSED_OUTPUT:', (error as Error).message)
+        console.error('Failed to clear PROCESSED_OUTPUT:', (error as Error).message)
       }
     }
   }, [])
@@ -199,7 +199,7 @@ export function useScriptWorkflow() {
       localStorage.removeItem(STORAGE_KEY)
       log.debug('Cleared session from localStorage')
     } catch (error) {
-      log.error('Failed to clear session:', (error as Error).message)
+      console.error('Failed to clear session:', (error as Error).message)
     }
 
     // Go back to upload step
