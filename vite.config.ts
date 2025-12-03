@@ -16,7 +16,8 @@ export default defineConfig({
     react(),
     tsconfigPaths(),
     monacoEditorPlugin({
-      languageWorkers: ['editorWorkerService', 'typescript', 'json', 'html']
+      // Include markdown for script formatter, plus common languages
+      languageWorkers: ['editorWorkerService', 'typescript', 'json', 'html', 'css']
     })
   ],
   // prevent vite from obscuring rust errors

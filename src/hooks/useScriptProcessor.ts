@@ -183,15 +183,16 @@ ${options.text}`
     providerOptions: {
       ollama: {
         options: {
-          // Context window size - reduced to 4096 for compatibility
-          // Most Ollama models are trained with 2048-4096 context windows
-          // Requesting larger contexts can cause timeouts or failures
-          // 4096 tokens (~16K chars) is sufficient for most scripts with 3 RAG examples
-          num_ctx: 4096,
+          // Context window size - set to 8192 for better compatibility with longer prompts
+          // Reduced from previous larger values to prevent timeout issues
+          // 8192 tokens (~32K chars) provides good balance between capacity and performance
+          num_ctx: 8192,
           // Unlimited output tokens for long scripts
           num_predict: -1,
           // Keep model loaded for 10 minutes to avoid cold start delays
-          keep_alive: '10m'
+          keep_alive: '10m',
+          // Reduce temperature for more consistent output
+          temperature: 0.3
         }
       }
     }

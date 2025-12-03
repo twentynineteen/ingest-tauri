@@ -6,10 +6,11 @@
 
 import Editor from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
-// Monaco is now bundled locally via vite-plugin-monaco-editor
-// No CDN configuration needed - editor loads from local assets
+// Monaco is bundled locally via vite-plugin-monaco-editor
+// The plugin automatically configures workers for Tauri environment
+// No manual worker configuration needed
 
 interface DiffEditorProps {
   original: string // Kept for compatibility but not displayed
@@ -21,21 +22,7 @@ interface DiffEditorProps {
 export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChange }) => {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-
-  // Ensure we have valid content for Monaco
-  const editorValue = modified ?? ''
-
-  // Update editor value when modified text changes (handles late-arriving content)
-  useEffect(() => {
-    if (editorRef.current && editorValue) {
-      const currentValue = editorRef.current.getValue()
-      if (currentValue !== editorValue) {
-        editorRef.current.setValue(editorValue)
-        // Ensure editor layout is updated after value change
-        editorRef.current.layout()
-      }
-    }
-  }, [editorValue])
+  const [isEditorReady, setIsEditorReady] = useState(false)
 
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
@@ -44,18 +31,13 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
   }
 
   const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
-    // Monaco editor mounted successfully
     editorRef.current = editor
+    setIsEditorReady(true)
 
-    // Set initial value if we have content
-    if (editorValue) {
-      editor.setValue(editorValue)
-    }
-
-    // Force layout after mount with multiple attempts to ensure proper rendering
-    setTimeout(() => editor.layout(), 100)
-    setTimeout(() => editor.layout(), 300)
-    setTimeout(() => editor.layout(), 500)
+    // Force layout after mount
+    setTimeout(() => {
+      editor.layout()
+    }, 100)
   }
 
   // Re-layout editor when window resizes
@@ -80,54 +62,55 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
       </div>
 
       <div ref={containerRef} className="flex-1 relative">
-        {editorValue ? (
-          <Editor
-            height="100%"
-            width="100%"
-            language="markdown"
-            defaultValue={editorValue}
-            onChange={handleEditorChange}
-            onMount={handleEditorDidMount}
-            loading={
-              <div className="flex items-center justify-center h-full">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-                  <p className="text-sm text-gray-600">Initializing Monaco Editor...</p>
-                  <p className="text-xs text-gray-500 mt-2">
-                    If this persists, check browser console for errors
-                  </p>
-                </div>
-              </div>
-            }
-            options={{
-              wordWrap: 'bounded',
-              wrappingStrategy: 'advanced',
-              minimap: { enabled: true },
-              scrollBeyondLastLine: false,
-              fontSize: 14,
-              lineNumbers: 'on',
-              glyphMargin: true,
-              folding: true,
-              readOnly: false,
-              automaticLayout: true,
-              renderWhitespace: 'selection',
-              tabSize: 2,
-              unicodeHighlight: {
-                ambiguousCharacters: false,
-                invisibleCharacters: false,
-                nonBasicASCII: false
-              }
-            }}
-            theme="vs-light"
-          />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center bg-white">
+        {!isEditorReady && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-              <p className="text-sm text-gray-600">Waiting for script content...</p>
+              <p className="text-sm text-gray-600">Loading editor...</p>
+              <p className="text-xs text-gray-500 mt-1">This may take a few seconds</p>
             </div>
           </div>
         )}
+        <Editor
+          height="100%"
+          width="100%"
+          language="markdown"
+          value={modified || ''}
+          defaultValue={modified || ''}
+          onChange={handleEditorChange}
+          onMount={handleEditorDidMount}
+          loading={
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
+                <p className="text-sm text-gray-600">Loading Monaco Editor...</p>
+                <p className="text-xs text-gray-500 mt-2">
+                  If this persists, check browser console for errors
+                </p>
+              </div>
+            </div>
+          }
+          options={{
+            wordWrap: 'bounded',
+            wrappingStrategy: 'advanced',
+            minimap: { enabled: true },
+            scrollBeyondLastLine: false,
+            fontSize: 14,
+            lineNumbers: 'on',
+            glyphMargin: true,
+            folding: true,
+            readOnly: false,
+            automaticLayout: true,
+            renderWhitespace: 'selection',
+            tabSize: 2,
+            unicodeHighlight: {
+              ambiguousCharacters: false,
+              invisibleCharacters: false,
+              nonBasicASCII: false
+            }
+          }}
+          theme="vs-light"
+        />
       </div>
     </div>
   )
