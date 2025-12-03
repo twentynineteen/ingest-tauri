@@ -7,6 +7,8 @@ interface AppState {
   setTrelloApiKey: (trelloKey: string) => void
   trelloApiToken: string
   setTrelloApiToken: (trelloToken: string) => void
+  trelloBoardId: string
+  setTrelloBoardId: (boardId: string) => void
   sproutVideoApiKey: string
   setSproutVideoApiKey: (sproutKey: string) => void
   breadcrumbs: Breadcrumb
@@ -25,6 +27,8 @@ export const useAppStore = create<AppState>(set => ({
   setTrelloApiKey: trelloKey => set({ trelloApiKey: trelloKey }),
   trelloApiToken: '',
   setTrelloApiToken: trelloToken => set({ trelloApiToken: trelloToken }),
+  trelloBoardId: '',
+  setTrelloBoardId: boardId => set({ trelloBoardId: boardId }),
   sproutVideoApiKey: '',
   setSproutVideoApiKey: sproutKey => set({ sproutVideoApiKey: sproutKey }),
   breadcrumbs: {},

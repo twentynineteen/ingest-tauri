@@ -7,6 +7,7 @@ const setSproutVideoApiKey = (state: string) =>
   appStore.getState().setSproutVideoApiKey(state)
 const setTrelloApiKey = (state: string) => appStore.getState().setTrelloApiKey(state)
 const setTrelloApiToken = (state: string) => appStore.getState().setTrelloApiToken(state)
+const setTrelloBoardId = (state: string) => appStore.getState().setTrelloBoardId(state)
 const setOllamaUrl = (state: string) => appStore.getState().setOllamaUrl(state)
 
 // Define an interface for multiple API keys.
@@ -14,6 +15,7 @@ export interface ApiKeys {
   sproutVideo?: string
   trello?: string
   trelloToken?: string
+  trelloBoardId?: string // DEBT-014: Configurable Trello board ID
   // Add more services as needed.
   defaultBackgroundFolder?: string
   ollamaUrl?: string
@@ -37,6 +39,7 @@ export const saveApiKeys = async (apiKeys: ApiKeys): Promise<void> => {
     setSproutVideoApiKey(apiKeys.sproutVideo)
     setTrelloApiKey(apiKeys.trello)
     setTrelloApiToken(apiKeys.trelloToken)
+    if (apiKeys.trelloBoardId !== undefined) setTrelloBoardId(apiKeys.trelloBoardId)
     setDefaultBackgroundFolder(apiKeys.defaultBackgroundFolder)
     if (apiKeys.ollamaUrl) setOllamaUrl(apiKeys.ollamaUrl)
 
@@ -60,6 +63,7 @@ export const loadApiKeys = async (): Promise<ApiKeys> => {
     setSproutVideoApiKey(result.sproutVideo)
     setTrelloApiKey(result.trello)
     setTrelloApiToken(result.trelloToken)
+    if (result.trelloBoardId !== undefined) setTrelloBoardId(result.trelloBoardId)
     setDefaultBackgroundFolder(result.defaultBackgroundFolder)
     if (result.ollamaUrl) setOllamaUrl(result.ollamaUrl)
 
