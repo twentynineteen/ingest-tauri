@@ -253,3 +253,10 @@ export interface ConnectionStatus {
   message?: string
   latencyMs?: number
 }
+
+// ============================================================================
+// Workflow Types
+// ============================================================================
+
+export type WorkflowStep = "upload" | "select-model" | "processing" | "review" | "download"
+
