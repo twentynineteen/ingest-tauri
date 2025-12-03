@@ -152,7 +152,11 @@ async function streamAIResponse(
   logger.log('Processing with AI...')
   logger.log('System prompt length:', systemPrompt.length, 'characters')
   logger.log('User text length:', options.text.length, 'characters')
-  logger.log('Total prompt size:', totalPromptSize, 'characters (~' + Math.ceil(totalPromptSize / 4) + ' tokens)')
+  logger.log(
+    'Total prompt size:',
+    totalPromptSize,
+    'characters (~' + Math.ceil(totalPromptSize / 4) + ' tokens)'
+  )
 
   // Warn if prompt is very large
   if (totalPromptSize > 20000) {
@@ -338,7 +342,14 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         attempt++
 
         // Log detailed error information
-        console.error('[useScriptProcessor] Processing error (attempt', attempt, 'of', maxRetries, '):', err)
+        console.error(
+          '[useScriptProcessor] Processing error (attempt',
+          attempt,
+          'of',
+          maxRetries,
+          '):',
+          err
+        )
         if (err instanceof Error) {
           console.error('[useScriptProcessor] Error name:', err.name)
           console.error('[useScriptProcessor] Error message:', err.message)
@@ -357,14 +368,19 @@ export function useScriptProcessor(): UseScriptProcessorResult {
           // Final failure after retries
           const finalError =
             err instanceof Error ? err : new Error('Failed to process script')
-          console.error('[useScriptProcessor] Max retries exceeded. Final error:', finalError)
+          console.error(
+            '[useScriptProcessor] Max retries exceeded. Final error:',
+            finalError
+          )
           setError(finalError)
           setIsProcessing(false)
           throw finalError
         }
 
         // Retry with exponential backoff
-        logger.log(`Retrying in ${Math.pow(2, attempt)}s... (attempt ${attempt} of ${maxRetries})`)
+        logger.log(
+          `Retrying in ${Math.pow(2, attempt)}s... (attempt ${attempt} of ${maxRetries})`
+        )
         options.onRetry?.(attempt)
         const backoffDelay = Math.pow(2, attempt) * 1000 // 1s, 2s, 4s
         await new Promise(resolve => setTimeout(resolve, backoffDelay))

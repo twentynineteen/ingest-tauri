@@ -42,9 +42,7 @@ export function useProjectValidation() {
   /**
    * Validate folder selection
    */
-  const validateFolder = async (
-    selectedFolder: string
-  ): Promise<ValidationResult> => {
+  const validateFolder = async (selectedFolder: string): Promise<ValidationResult> => {
     if (!selectedFolder) {
       return {
         isValid: false,
@@ -77,9 +75,7 @@ export function useProjectValidation() {
   /**
    * Validate files (confirm if empty)
    */
-  const validateFiles = async (
-    files: FootageFile[]
-  ): Promise<ValidationResult> => {
+  const validateFiles = async (files: FootageFile[]): Promise<ValidationResult> => {
     if (files.length === 0) {
       const confirmNoFiles = await confirm(
         'No files have been added to the drag and drop section. Are you sure you want to create the project?'

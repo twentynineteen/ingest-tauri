@@ -258,5 +258,9 @@ export interface ConnectionStatus {
 // Workflow Types
 // ============================================================================
 
-export type WorkflowStep = "upload" | "select-model" | "processing" | "review" | "download"
-
+export type WorkflowStep =
+  | 'upload'
+  | 'select-model'
+  | 'processing'
+  | 'review'
+  | 'download'

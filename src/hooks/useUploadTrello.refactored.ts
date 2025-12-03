@@ -5,12 +5,12 @@
  * This is the new refactored version. Once tested, replace the original.
  */
 
+import { useTrelloActions } from './useTrelloActions'
 import { useTrelloBoard } from './useTrelloBoard'
 import { useTrelloBoardSearch } from './useTrelloBoardSearch'
+import { useTrelloBreadcrumbs } from './useTrelloBreadcrumbs'
 import { useTrelloCardSelection } from './useTrelloCardSelection'
 import { useTrelloVideoInfo } from './useTrelloVideoInfo'
-import { useTrelloBreadcrumbs } from './useTrelloBreadcrumbs'
-import { useTrelloActions } from './useTrelloActions'
 
 // Hard-coded boardId for 'small projects'
 // TODO: Make this configurable in Settings (addressing DEBT-014)
@@ -22,10 +22,19 @@ const BOARD_ID = '55a504d70bed2bd21008dc5a'
  */
 export function useUploadTrello() {
   // 1. Fetch board data
-  const { grouped, allCards, isLoading: isBoardLoading, apiKey, token } = useTrelloBoard(BOARD_ID)
+  const {
+    grouped,
+    allCards,
+    isLoading: isBoardLoading,
+    apiKey,
+    token
+  } = useTrelloBoard(BOARD_ID)
 
   // 2. Search and filter cards
-  const { searchTerm, setSearchTerm, filteredGrouped } = useTrelloBoardSearch(allCards, grouped)
+  const { searchTerm, setSearchTerm, filteredGrouped } = useTrelloBoardSearch(
+    allCards,
+    grouped
+  )
 
   // 3. Card selection and details
   const {
@@ -39,25 +48,16 @@ export function useUploadTrello() {
   } = useTrelloCardSelection(apiKey, token)
 
   // 4. Video info operations
-  const {
-    uploadedVideo,
-    videoInfoData,
-    videoInfoBlock,
-    handleAppendVideoInfo
-  } = useTrelloVideoInfo(apiKey, token, selectedCardDetails, refetchCard)
+  const { uploadedVideo, videoInfoData, videoInfoBlock, handleAppendVideoInfo } =
+    useTrelloVideoInfo(apiKey, token, selectedCardDetails, refetchCard)
 
   // 5. Breadcrumbs operations
-  const {
-    mainDescription,
-    breadcrumbsData,
-    breadcrumbsBlock,
-    handleAppendBreadcrumbs
-  } = useTrelloBreadcrumbs(apiKey, token, selectedCardDetails, refetchCard)
+  const { mainDescription, breadcrumbsData, breadcrumbsBlock, handleAppendBreadcrumbs } =
+    useTrelloBreadcrumbs(apiKey, token, selectedCardDetails, refetchCard)
 
   // 6. External actions (open in Trello, close dialog)
-  const { handleOpenInTrello, handleCloseDialog } = useTrelloActions(
-    selectedCard,
-    () => setSelectedCard(null)
+  const { handleOpenInTrello, handleCloseDialog } = useTrelloActions(selectedCard, () =>
+    setSelectedCard(null)
   )
 
   // Return unified interface (same as original for backward compatibility)

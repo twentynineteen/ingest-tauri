@@ -44,7 +44,11 @@ function defaultFilenameFormatter(originalFilename: string): string {
 }
 
 export function useScriptDownload(options?: UseScriptDownloadOptions) {
-  const { onSuccess, onError, filenameFormatter = defaultFilenameFormatter } = options || {}
+  const {
+    onSuccess,
+    onError,
+    filenameFormatter = defaultFilenameFormatter
+  } = options || {}
 
   const [localError, setLocalError] = useState<Error | null>(null)
   const { generateFile, isGenerating, error: generatorError } = useDocxGenerator()

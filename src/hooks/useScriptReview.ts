@@ -33,8 +33,12 @@ export function useScriptReview(options?: UseScriptReviewOptions) {
   const { initialOutput, onChange } = options || {}
 
   // Initialize state from initial output
-  const [originalText, setOriginalText] = useState(() => initialOutput?.formattedText || '')
-  const [modifiedText, setModifiedText] = useState(() => initialOutput?.formattedText || '')
+  const [originalText, setOriginalText] = useState(
+    () => initialOutput?.formattedText || ''
+  )
+  const [modifiedText, setModifiedText] = useState(
+    () => initialOutput?.formattedText || ''
+  )
   const [editHistory, setEditHistory] = useState<EditHistoryEntry[]>(
     () => initialOutput?.editHistory || []
   )
@@ -44,7 +48,10 @@ export function useScriptReview(options?: UseScriptReviewOptions) {
 
   // Derived state
   const markdownText = modifiedText
-  const hasChanges = useMemo(() => modifiedText !== originalText, [modifiedText, originalText])
+  const hasChanges = useMemo(
+    () => modifiedText !== originalText,
+    [modifiedText, originalText]
+  )
   const hasUnsavedChanges = useMemo(() => hasChanges && !isSaved, [hasChanges, isSaved])
   const canUndo = undoStack.length > 0
   const canRedo = redoStack.length > 0

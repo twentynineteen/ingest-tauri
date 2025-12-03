@@ -41,9 +41,7 @@ export function useProjectBreadcrumbs() {
   /**
    * Calculate folder size (returns undefined on error)
    */
-  const calculateFolderSize = async (
-    folderPath: string
-  ): Promise<number | undefined> => {
+  const calculateFolderSize = async (folderPath: string): Promise<number | undefined> => {
     try {
       const size = await invoke<number>('get_folder_size', { folderPath })
       return size

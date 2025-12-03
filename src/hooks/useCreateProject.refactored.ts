@@ -14,11 +14,11 @@
  */
 
 import { FootageFile } from './useCameraAutoRemap'
-import { useProjectValidation } from './useProjectValidation'
-import { useProjectFolders } from './useProjectFolders'
-import { useProjectBreadcrumbs } from './useProjectBreadcrumbs'
 import { useFileOperations } from './useFileOperations'
 import { usePremiereIntegration } from './usePremiereIntegration'
+import { useProjectBreadcrumbs } from './useProjectBreadcrumbs'
+import { useProjectFolders } from './useProjectFolders'
+import { useProjectValidation } from './useProjectValidation'
 
 interface CreateProjectParams {
   title: string
@@ -71,10 +71,7 @@ export function useCreateProject() {
     if (!trimmedTitle || !projectFolder) return
 
     // Step 2: Create folder structure
-    const folderResult = await folders.createFolderStructure(
-      projectFolder,
-      numCameras
-    )
+    const folderResult = await folders.createFolderStructure(projectFolder, numCameras)
 
     if (!folderResult.success) {
       alert('Error creating project: ' + folderResult.error)

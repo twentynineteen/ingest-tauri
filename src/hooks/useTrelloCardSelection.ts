@@ -4,12 +4,12 @@
  */
 
 import { useState } from 'react'
-import { useTrelloCardDetails } from './useTrelloCardDetails'
 import {
   useCardDetailsSync,
   useCardValidation
 } from '../pages/UploadTrello/UploadTrelloHooks'
 import type { SelectedCard } from '../pages/UploadTrello/UploadTrelloTypes'
+import { useTrelloCardDetails } from './useTrelloCardDetails'
 
 /**
  * Hook to manage Trello card selection and details
@@ -17,10 +17,7 @@ import type { SelectedCard } from '../pages/UploadTrello/UploadTrelloTypes'
  * @param token - Trello auth token
  * @returns Card selection state and details
  */
-export function useTrelloCardSelection(
-  apiKey: string | null,
-  token: string | null
-) {
+export function useTrelloCardSelection(apiKey: string | null, token: string | null) {
   const [selectedCard, setSelectedCard] = useState<SelectedCard | null>(null)
 
   // Fetch card details and members
