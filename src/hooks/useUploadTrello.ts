@@ -11,6 +11,7 @@ import {
   useFuzzySearch,
   useParsedTrelloDescription,
   useTrelloBoard,
+  useTrelloBoardId,
   useTrelloCardDetails,
   useVideoInfoBlock
 } from 'hooks'
@@ -28,13 +29,12 @@ import {
 } from '../pages/UploadTrello/UploadTrelloTypes'
 import { logger } from '@/utils/logger'
 
-// Hard-coded boardId for 'small projects'
-const BOARD_ID = '55a504d70bed2bd21008dc5a'
-
 export function useUploadTrello() {
   const [selectedCard, setSelectedCard] = useState<SelectedCard | null>(null)
 
-  const { grouped, isLoading: isBoardLoading, apiKey, token } = useTrelloBoard(BOARD_ID)
+  // DEBT-014: Use configurable board ID
+  const { boardId } = useTrelloBoardId()
+  const { grouped, isLoading: isBoardLoading, apiKey, token } = useTrelloBoard(boardId)
 
   // Flatten all cards for search
   const allCards = useMemo(() => {

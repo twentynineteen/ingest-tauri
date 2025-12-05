@@ -6,9 +6,19 @@ type Props = {
   apiKey: string
   setApiKey: React.Dispatch<React.SetStateAction<string>>
   onSave: () => void // Callback to save the API key
+  id?: string // Optional ID for label association
+  inputType?: 'text' | 'password' // Allow specifying input type (default: password for API keys)
+  placeholder?: string // Optional custom placeholder
 }
 
-const ApiKeyInput: React.FC<Props> = ({ apiKey, setApiKey, onSave }) => {
+const ApiKeyInput: React.FC<Props> = ({
+  apiKey,
+  setApiKey,
+  onSave,
+  id,
+  inputType = 'password',
+  placeholder = 'Enter your API key...'
+}) => {
   // State to track whether the API key should be visible
   const [showApiKey, setShowApiKey] = useState(false)
 
@@ -16,10 +26,11 @@ const ApiKeyInput: React.FC<Props> = ({ apiKey, setApiKey, onSave }) => {
     <div style={{ display: 'flex', alignItems: 'center' }}>
       {/* Input field with dynamic type based on showApiKey */}
       <Input
-        type={showApiKey ? 'text' : 'password'}
+        id={id}
+        type={inputType === 'text' ? 'text' : (showApiKey ? 'text' : 'password')}
         value={apiKey}
         onChange={e => setApiKey(e.target.value)}
-        placeholder="Enter your API key..."
+        placeholder={placeholder}
         style={{ flex: 1 }}
       />
       {/* Button to toggle visibility */}

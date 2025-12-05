@@ -12,6 +12,7 @@ import { ReactNode } from 'react'
 import { useTrelloBoardId } from '@/hooks/useTrelloBoardId'
 import * as storage from '@/utils/storage'
 import { appStore } from '@/store/useAppStore'
+import { queryKeys } from '@/lib/query-keys'
 
 // Mock storage
 vi.mock('@/utils/storage', () => ({

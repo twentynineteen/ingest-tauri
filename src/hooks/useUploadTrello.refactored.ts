@@ -7,28 +7,29 @@
 
 import { useTrelloActions } from './useTrelloActions'
 import { useTrelloBoard } from './useTrelloBoard'
+import { useTrelloBoardId } from './useTrelloBoardId'
 import { useTrelloBoardSearch } from './useTrelloBoardSearch'
 import { useTrelloBreadcrumbs } from './useTrelloBreadcrumbs'
 import { useTrelloCardSelection } from './useTrelloCardSelection'
 import { useTrelloVideoInfo } from './useTrelloVideoInfo'
 
-// Hard-coded boardId for 'small projects'
-// TODO: Make this configurable in Settings (addressing DEBT-014)
-const BOARD_ID = '55a504d70bed2bd21008dc5a'
-
 /**
  * Main hook for UploadTrello page
  * Orchestrates all Trello-related operations
+ * DEBT-014: Now uses configurable board ID from settings
  */
 export function useUploadTrello() {
-  // 1. Fetch board data
+  // 1. Get configurable board ID (DEBT-014 resolved)
+  const { boardId } = useTrelloBoardId()
+
+  // 2. Fetch board data
   const {
     grouped,
     allCards,
     isLoading: isBoardLoading,
     apiKey,
     token
-  } = useTrelloBoard(BOARD_ID)
+  } = useTrelloBoard(boardId)
 
   // 2. Search and filter cards
   const { searchTerm, setSearchTerm, filteredGrouped } = useTrelloBoardSearch(

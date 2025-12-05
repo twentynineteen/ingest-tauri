@@ -161,6 +161,16 @@ const Settings: React.FC = () => {
     }
   }
 
+  const handleSaveTrelloBoardId = async () => {
+    try {
+      await saveApiKeysMutation.mutateAsync({ trelloBoardId: localApiKeys.trelloBoardId })
+      alert('Trello Board ID saved successfully!')
+    } catch (error) {
+      alert('Failed to save Trello Board ID')
+      logger.error('Save error:', error)
+    }
+  }
+
   const handleOllamaUrlChange = (newUrl: string) => {
     setOllamaUrl(newUrl)
     setLocalApiKeys({ ...localApiKeys, ollamaUrl: newUrl })
@@ -209,7 +219,7 @@ const Settings: React.FC = () => {
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">
+            <label htmlFor="ollama-url-input" className="block text-sm font-medium mb-2">
               Ollama URL
               <span className="text-xs text-gray-500 ml-2">
                 (Default: http://localhost:11434)
@@ -217,6 +227,7 @@ const Settings: React.FC = () => {
             </label>
             <div className="space-y-2">
               <ApiKeyInput
+                id="ollama-url-input"
                 apiKey={ollamaUrl || 'http://localhost:11434'}
                 setApiKey={handleOllamaUrlChange}
                 onSave={handleSaveOllamaUrl}
@@ -267,8 +278,9 @@ const Settings: React.FC = () => {
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Trello API Key</label>
+            <label htmlFor="trello-api-key-input" className="block text-sm font-medium mb-2">Trello API Key</label>
             <ApiKeyInput
+              id="trello-api-key-input"
               apiKey={localApiKeys.trello || ''}
               setApiKey={(newKey: string) =>
                 setLocalApiKeys({ ...localApiKeys, trello: newKey })
@@ -281,14 +293,36 @@ const Settings: React.FC = () => {
             <Button onClick={handleAuthorizeWithTrello}>Authorize with Trello</Button>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Trello API Token</label>
+            <label htmlFor="trello-api-token-input" className="block text-sm font-medium mb-2">Trello API Token</label>
             <ApiKeyInput
+              id="trello-api-token-input"
               apiKey={localApiKeys.trelloToken || ''}
               setApiKey={(newKey: string) =>
                 setLocalApiKeys({ ...localApiKeys, trelloToken: newKey })
               }
               onSave={handleSaveTrelloToken}
             />
+          </div>
+          <div>
+            <label htmlFor="trello-board-id-input" className="block text-sm font-medium mb-2">
+              Trello Board ID
+              <span className="text-xs text-gray-500 ml-2">
+                (24-character alphanumeric ID from board URL)
+              </span>
+            </label>
+            <ApiKeyInput
+              id="trello-board-id-input"
+              inputType="text"
+              placeholder="Board ID (e.g., 55a504d70bed2bd21008dc5a)"
+              apiKey={localApiKeys.trelloBoardId || ''}
+              setApiKey={(newKey: string) =>
+                setLocalApiKeys({ ...localApiKeys, trelloBoardId: newKey.trim() })
+              }
+              onSave={handleSaveTrelloBoardId}
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Leave empty to use default board. Find the board ID in your Trello board URL.
+            </p>
           </div>
         </section>
 
@@ -301,8 +335,9 @@ const Settings: React.FC = () => {
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">SproutVideo API Key</label>
+            <label htmlFor="sprout-video-api-key-input" className="block text-sm font-medium mb-2">SproutVideo API Key</label>
             <ApiKeyInput
+              id="sprout-video-api-key-input"
               apiKey={localApiKeys.sproutVideo || ''}
               setApiKey={(newKey: string) =>
                 setLocalApiKeys({ ...localApiKeys, sproutVideo: newKey })

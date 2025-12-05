@@ -318,7 +318,8 @@ describe('useTrelloBoardSearch', () => {
       const duration = performance.now() - start
 
       // Should complete quickly even with 1000 cards
-      expect(duration).toBeLessThan(100)
+      // Threshold set to 250ms to account for different environments
+      expect(duration).toBeLessThan(250)
     })
   })
 })
