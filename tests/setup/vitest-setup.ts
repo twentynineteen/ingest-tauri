@@ -1,6 +1,21 @@
 import '@testing-library/jest-dom'
 import { beforeAll, afterEach, afterAll } from 'vitest'
 
+// Mock matchMedia IMMEDIATELY at module load time (before next-themes can access it)
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(), // deprecated
+    removeListener: vi.fn(), // deprecated
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+})
+
 // Mock Tauri APIs
 const mockTauriApis = () => {
   // Note: We don't mock @tauri-apps/api/core here because mockIPC() from
@@ -54,21 +69,6 @@ const mockBrowserApis = () => {
     unobserve: vi.fn(),
     disconnect: vi.fn(),
   }))
-
-  // Mock matchMedia
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: vi.fn().mockImplementation(query => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener: vi.fn(), // deprecated
-      removeListener: vi.fn(), // deprecated
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
-  })
 
   // Mock TextEncoder/TextDecoder for Node.js environment
   if (typeof global.TextEncoder === 'undefined') {
