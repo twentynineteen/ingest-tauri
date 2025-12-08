@@ -194,7 +194,7 @@ function UrlEntryContent({
           </Button>
         </div>
         {!urlMode.hasApiKey && form.formData.url && (
-          <p className="text-xs text-amber-600">
+          <p className="text-xs text-warning">
             Sprout Video API key not configured. Go to Settings to add it.
           </p>
         )}
@@ -255,7 +255,9 @@ function UrlEntryContent({
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {errors.addError instanceof Error ? errors.addError.message : String(errors.addError)}
+            {errors.addError instanceof Error
+              ? errors.addError.message
+              : String(errors.addError)}
           </AlertDescription>
         </Alert>
       )}
@@ -288,9 +290,11 @@ function UploadContent({
           </Button>
         </div>
         {uploadMode.selectedFile && (
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Selected:{' '}
-            <span className="font-medium">{uploadMode.selectedFile.split('/').pop()}</span>
+            <span className="font-medium">
+              {uploadMode.selectedFile.split('/').pop()}
+            </span>
           </p>
         )}
       </div>
@@ -307,11 +311,13 @@ function UploadContent({
       {uploadMode.uploading && (
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">Uploading: {uploadMode.progress}%</span>
+            <span className="text-muted-foreground">
+              Uploading: {uploadMode.progress}%
+            </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
             <div
-              className="h-full bg-blue-600 transition-all duration-300"
+              className="h-full bg-primary transition-all duration-300"
               style={{ width: `${uploadMode.progress}%` }}
               role="progressbar"
               aria-valuenow={uploadMode.progress}
@@ -325,7 +331,8 @@ function UploadContent({
       {uploadMode.message && !uploadMode.uploading && (
         <Alert
           variant={
-            typeof uploadMode.message === 'string' && uploadMode.message.includes('failed')
+            typeof uploadMode.message === 'string' &&
+            uploadMode.message.includes('failed')
               ? 'destructive'
               : 'default'
           }

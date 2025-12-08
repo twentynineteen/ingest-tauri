@@ -4,10 +4,10 @@
  */
 
 import { Button } from '@/components/ui/button'
+import { logger } from '@/utils/logger'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ChevronDown, ChevronUp, ExternalLink, Trash2, Video } from 'lucide-react'
 import type { VideoLink } from '../../types/baker'
-import { logger } from '@/utils/logger'
 
 interface VideoLinkCardProps {
   videoLink: VideoLink
@@ -45,7 +45,7 @@ export function VideoLinkCard({
   }
 
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+    <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md">
       {/* Thumbnail */}
       <div className="flex-shrink-0">
         {videoLink.thumbnailUrl ? (
@@ -55,21 +55,23 @@ export function VideoLinkCard({
             className="h-20 w-32 rounded object-cover"
           />
         ) : (
-          <div className="flex h-20 w-32 items-center justify-center rounded bg-gray-100">
-            <Video className="h-8 w-8 text-gray-400" />
+          <div className="flex h-20 w-32 items-center justify-center rounded bg-muted">
+            <Video className="h-8 w-8 text-muted-foreground" />
           </div>
         )}
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-gray-900 truncate">{videoLink.title}</h3>
+        <h3 className="font-medium text-foreground truncate">{videoLink.title}</h3>
 
         {videoLink.sproutVideoId && (
-          <p className="text-sm text-gray-500 mt-1">ID: {videoLink.sproutVideoId}</p>
+          <p className="text-sm text-muted-foreground mt-1">
+            ID: {videoLink.sproutVideoId}
+          </p>
         )}
 
-        <div className="flex gap-4 mt-2 text-xs text-gray-500">
+        <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
           {videoLink.uploadDate && (
             <span>Uploaded: {formatDate(videoLink.uploadDate)}</span>
           )}
@@ -117,7 +119,7 @@ export function VideoLinkCard({
           variant="ghost"
           size="icon"
           onClick={onRemove}
-          className="h-8 w-8 text-red-600 hover:text-red-700"
+          className="h-8 w-8 text-destructive hover:text-destructive/90"
           title="Remove video"
         >
           <Trash2 className="h-4 w-4" />

@@ -1,7 +1,7 @@
+import { logger } from '@/utils/logger'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
-import { logger } from '@/utils/logger'
 
 const registerSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
@@ -47,7 +47,7 @@ export default function Register() {
   return (
     <div className="flex flex-col p-6 max-w-sm mx-auto bg-white shadow-md rounded-xl">
       <h2 className="text-xl font-semibold mb-4">Register</h2>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-destructive text-sm">{error}</p>}
       <input
         type="text"
         placeholder="Username"
@@ -64,13 +64,13 @@ export default function Register() {
       />
       <button
         onClick={handleRegister}
-        className="bg-green-500 text-white p-2 rounded w-full hover:bg-green-600"
+        className="bg-primary text-primary-foreground p-2 rounded w-full hover:bg-primary/90"
       >
         Register
       </button>
       <p className="mt-3">
         Registered? Click{' '}
-        <Link to="/login" className="font-bold text-blue-600">
+        <Link to="/login" className="font-bold text-primary">
           here
         </Link>{' '}
         to log in.

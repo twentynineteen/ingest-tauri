@@ -5,8 +5,8 @@
  */
 
 import type { BreadcrumbsFile } from '../../types/baker'
-import { compareBreadcrumbs, compareBreadcrumbsMeaningful } from './comparison'
 import { createNamespacedLogger } from '../logger'
+import { compareBreadcrumbs, compareBreadcrumbsMeaningful } from './comparison'
 
 const log = createNamespacedLogger('BreadcrumbsDebug')
 

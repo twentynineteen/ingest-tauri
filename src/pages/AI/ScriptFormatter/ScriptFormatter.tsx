@@ -86,7 +86,7 @@ const ScriptFormatter: React.FC = () => {
         {currentStep !== 'upload' && (
           <button
             onClick={handleStartOver}
-            className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
+            className="px-4 py-2 text-sm text-muted-foreground border border-border rounded hover:bg-secondary"
           >
             Start Over
           </button>

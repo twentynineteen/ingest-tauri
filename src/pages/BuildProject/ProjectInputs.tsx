@@ -21,7 +21,7 @@ const ProjectInputs: React.FC<ProjectInputsProps> = ({
       <div className="title-input w-full">
         <label
           htmlFor="project-title"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          className="block mb-2 text-sm font-medium text-foreground"
         >
           Project title
         </label>
@@ -29,20 +29,18 @@ const ProjectInputs: React.FC<ProjectInputsProps> = ({
           id="project-title"
           value={title}
           onChange={e => onTitleChange(e.target.value)}
-          className="bg-gray-50 border border-gray-300 text-gray-900 
-            text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 
-            block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 
-            dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 
-            dark:focus:border-blue-500"
+          className="bg-secondary border border-input text-foreground
+            text-sm rounded-lg focus:ring-info focus:border-info
+            block w-full p-2.5"
           placeholder="Enter title here"
         />
         {showSanitizationWarning ? (
-          <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">
+          <p className="mt-2 text-sm text-warning">
             Some characters were changed to hyphens (/ \ : * ? " &lt; &gt; |) to ensure
             compatibility
           </p>
         ) : (
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <p className="mt-2 text-sm text-muted-foreground">
             e.g. DBA - IB1234 - J Doe - Introductions 060626
           </p>
         )}
@@ -52,24 +50,22 @@ const ProjectInputs: React.FC<ProjectInputsProps> = ({
       <div className="camera-input">
         <label
           htmlFor="number-input"
-          className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          className="block mb-2 text-sm font-medium text-foreground"
         >
           Number of cameras:
         </label>
         <input
           type="number"
           id="number-input"
-          className="bg-gray-50 border border-gray-300 
-            text-gray-900 text-sm rounded-lg focus:ring-blue-500 
-            focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 
-            dark:border-gray-600 dark:placeholder-gray-400 dark:text-white 
-            dark:focus:ring-blue-500 dark:focus:border-blue-500 font-semibold"
+          className="bg-secondary border border-input
+            text-foreground text-sm rounded-lg focus:ring-info
+            focus:border-info block w-full p-2.5 font-semibold"
           placeholder="2"
           value={numCameras}
           onChange={e => onNumCamerasChange(Number(e.target.value))}
           required
         />
-        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Default: 2</p>
+        <p className="mt-2 text-sm text-muted-foreground">Default: 2</p>
       </div>
     </div>
   )

@@ -200,7 +200,7 @@ describe('ScanResults Component', () => {
       // Assert
       const validProjectsElement = screen.getByText('3')
       expect(validProjectsElement).toBeInTheDocument()
-      expect(validProjectsElement).toHaveClass('text-green-600')
+      expect(validProjectsElement).toHaveClass('text-success')
       expect(screen.getByText('Valid Projects')).toBeInTheDocument()
     })
 
@@ -217,8 +217,8 @@ describe('ScanResults Component', () => {
       // Arrange & Act
       const { container } = render(<ScanResults scanResult={mockScanResult} isScanning={false} />)
 
-      // Assert - Find the error count element specifically by its orange color class
-      const errorSection = container.querySelector('.text-orange-600')
+      // Assert - Find the error count element specifically by its warning color class
+      const errorSection = container.querySelector('.text-warning')
       expect(errorSection).toBeInTheDocument()
       expect(errorSection?.textContent).toBe('2')
       expect(screen.getByText('Errors')).toBeInTheDocument()
@@ -249,7 +249,7 @@ describe('ScanResults Component', () => {
       // mockProjects has 1 invalid breadcrumbs (project4)
       const invalidBreadcrumbsElement = screen.getByText('1')
       expect(invalidBreadcrumbsElement).toBeInTheDocument()
-      expect(invalidBreadcrumbsElement).toHaveClass('text-red-600')
+      expect(invalidBreadcrumbsElement).toHaveClass('text-destructive')
       expect(screen.getByText('Invalid Breadcrumbs')).toBeInTheDocument()
     })
 

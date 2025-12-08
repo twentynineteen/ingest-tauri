@@ -1,9 +1,9 @@
+import { logger } from '@/utils/logger'
 import { QueryClient } from '@tanstack/react-query'
 import { persistQueryClient } from '@tanstack/react-query-persist-client'
 import { del, get, set } from '@tauri-apps/plugin-store'
 import { CACHE, getBackoffDelay, RETRY, SECONDS } from '../constants/timing'
 import { createNamespacedLogger } from '../utils/logger'
-import { logger } from '@/utils/logger'
 
 const logger = createNamespacedLogger('QueryClient')
 

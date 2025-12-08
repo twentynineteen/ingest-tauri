@@ -10,8 +10,8 @@ import type {
   FieldChange,
   ProjectChangeDetail
 } from '../../types/baker'
-import { formatFieldName, formatFieldValue } from './displayFormatting'
 import { logger } from '../logger'
+import { formatFieldName, formatFieldValue } from './displayFormatting'
 
 /**
  * Categorize fields by their type and importance

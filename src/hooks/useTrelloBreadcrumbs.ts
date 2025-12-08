@@ -3,13 +3,13 @@
  * Handles appending breadcrumbs to cards and saving to local files
  */
 
+import { logger } from '@/utils/logger'
 import { writeTextFile } from '@tauri-apps/plugin-fs'
 import { useCallback } from 'react'
 import { appStore } from '../store/useAppStore'
 import type { TrelloCard } from '../utils/TrelloCards'
 import { useAppendBreadcrumbs } from './useAppendBreadcrumbs'
 import { useParsedTrelloDescription } from './useParsedTrelloDescription'
-import { logger } from '@/utils/logger'
 
 /**
  * Hook to manage breadcrumbs operations for Trello cards

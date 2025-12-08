@@ -5,6 +5,7 @@
  * Enhanced with RAG (Retrieval-Augmented Generation)
  */
 
+import { logger } from '@/utils/logger'
 import { invoke } from '@tauri-apps/api/core'
 import { streamText } from 'ai'
 import { useRef, useState } from 'react'
@@ -14,7 +15,6 @@ import { buildRAGPrompt } from '../utils/aiPrompts'
 import { createNamespacedLogger } from '../utils/logger'
 import { useOllamaEmbedding } from './useOllamaEmbedding'
 import type { SimilarExample } from './useScriptRetrieval'
-import { logger } from '@/utils/logger'
 
 const logger = createNamespacedLogger('useScriptProcessor')
 

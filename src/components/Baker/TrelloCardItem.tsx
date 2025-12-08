@@ -4,10 +4,10 @@
  */
 
 import { Button } from '@/components/ui/button'
+import { logger } from '@/utils/logger'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ExternalLink, RefreshCw, Trash2 } from 'lucide-react'
 import type { TrelloCard } from '../../types/baker'
-import { logger } from '@/utils/logger'
 
 interface TrelloCardItemProps {
   trelloCard: TrelloCard
@@ -51,11 +51,11 @@ export function TrelloCardItem({ trelloCard, onRemove, onRefresh }: TrelloCardIt
   const stale = isStale(trelloCard.lastFetched)
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md">
+    <div className="flex items-center gap-3 rounded-lg border border-border bg-background p-4 shadow-sm transition-shadow hover:shadow-md">
       {/* Trello icon placeholder */}
       <div className="flex-shrink-0">
-        <div className="flex h-12 w-12 items-center justify-center rounded bg-blue-100">
-          <svg viewBox="0 0 24 24" className="h-6 w-6 text-blue-600" fill="currentColor">
+        <div className="flex h-12 w-12 items-center justify-center rounded bg-info/10">
+          <svg viewBox="0 0 24 24" className="h-6 w-6 text-info" fill="currentColor">
             <path d="M21 0H3C1.343 0 0 1.343 0 3v18c0 1.656 1.343 3 3 3h18c1.656 0 3-1.344 3-3V3c0-1.657-1.344-3-3-3zM10.44 18.18c0 .795-.645 1.44-1.44 1.44H4.56c-.795 0-1.44-.646-1.44-1.44V4.56c0-.795.645-1.44 1.44-1.44H9c.795 0 1.44.645 1.44 1.44v13.62zm10.44-6c0 .794-.645 1.44-1.44 1.44H15c-.795 0-1.44-.646-1.44-1.44V4.56c0-.795.645-1.44 1.44-1.44h4.44c.795 0 1.44.645 1.44 1.44v7.62z" />
           </svg>
         </div>
@@ -63,15 +63,17 @@ export function TrelloCardItem({ trelloCard, onRemove, onRefresh }: TrelloCardIt
 
       {/* Content */}
       <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-gray-900 truncate">{trelloCard.title}</h3>
+        <h3 className="font-medium text-foreground truncate">{trelloCard.title}</h3>
 
-        <div className="flex gap-4 mt-1 text-xs text-gray-500">
+        <div className="flex gap-4 mt-1 text-xs text-muted-foreground">
           <span>ID: {trelloCard.cardId}</span>
           {trelloCard.boardName && <span>Board: {trelloCard.boardName}</span>}
         </div>
 
         {trelloCard.lastFetched && (
-          <p className={`text-xs mt-1 ${stale ? 'text-orange-600' : 'text-gray-500'}`}>
+          <p
+            className={`text-xs mt-1 ${stale ? 'text-warning' : 'text-muted-foreground'}`}
+          >
             Last updated: {getRelativeTime(trelloCard.lastFetched)}
             {stale && ' (stale)'}
           </p>
@@ -95,7 +97,7 @@ export function TrelloCardItem({ trelloCard, onRemove, onRefresh }: TrelloCardIt
             variant="ghost"
             size="icon"
             onClick={onRefresh}
-            className={`h-8 w-8 ${stale ? 'text-orange-600 hover:text-orange-700' : 'text-gray-600 hover:text-gray-700'}`}
+            className={`h-8 w-8 ${stale ? 'text-warning hover:text-warning/90' : 'text-muted-foreground hover:text-foreground'}`}
             title={stale ? 'Refresh stale card details' : 'Refresh card details'}
           >
             <RefreshCw className="h-4 w-4" />
@@ -105,7 +107,7 @@ export function TrelloCardItem({ trelloCard, onRemove, onRefresh }: TrelloCardIt
           variant="ghost"
           size="icon"
           onClick={onRemove}
-          className="h-8 w-8 text-red-600 hover:text-red-700"
+          className="h-8 w-8 text-destructive hover:text-destructive/90"
           title="Remove card"
         >
           <Trash2 className="h-4 w-4" />

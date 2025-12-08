@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger'
 import { Button } from '@components/ui/button'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { open as openPath } from '@tauri-apps/plugin-dialog'
@@ -12,7 +13,6 @@ import { useAIProvider } from '../hooks/useAIProvider'
 import { queryKeys } from '../lib/query-keys'
 import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
 import { ApiKeys, loadApiKeys, saveApiKeys } from '../utils/storage'
-import { logger } from '@/utils/logger'
 
 const Settings: React.FC = () => {
   const queryClient = useQueryClient()
@@ -211,17 +211,17 @@ const Settings: React.FC = () => {
 
       <div className="px-4 mx-4 space-y-8">
         {/* AI Models Section */}
-        <section className="space-y-4 border border-gray-300 rounded-lg p-6">
+        <section className="space-y-4 border border-border rounded-lg p-6">
           <div className="border-b pb-2">
-            <h3 className="text-lg font-semibold text-gray-900">AI Models</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-lg font-semibold text-foreground">AI Models</h3>
+            <p className="text-sm text-muted-foreground">
               Configure AI provider settings for script formatting
             </p>
           </div>
           <div>
             <label htmlFor="ollama-url-input" className="block text-sm font-medium mb-2">
               Ollama URL
-              <span className="text-xs text-gray-500 ml-2">
+              <span className="text-xs text-muted-foreground ml-2">
                 (Default: http://localhost:11434)
               </span>
             </label>
@@ -247,11 +247,11 @@ const Settings: React.FC = () => {
                 </Button>
 
                 {connectionStatus.status === 'success' && (
-                  <div className="flex items-center gap-2 text-green-600 text-sm">
+                  <div className="flex items-center gap-2 text-success text-sm">
                     <CheckCircle className="h-4 w-4" />
                     <span>{connectionStatus.message}</span>
                     {connectionStatus.latencyMs && (
-                      <span className="text-gray-500">
+                      <span className="text-muted-foreground">
                         ({connectionStatus.latencyMs}ms)
                       </span>
                     )}
@@ -259,7 +259,7 @@ const Settings: React.FC = () => {
                 )}
 
                 {connectionStatus.status === 'error' && (
-                  <div className="flex items-center gap-2 text-red-600 text-sm">
+                  <div className="flex items-center gap-2 text-destructive text-sm">
                     <XCircle className="h-4 w-4" />
                     <span>{connectionStatus.message}</span>
                   </div>
@@ -270,15 +270,20 @@ const Settings: React.FC = () => {
         </section>
 
         {/* Trello Section */}
-        <section className="space-y-4 border border-gray-300 rounded-lg p-6">
+        <section className="space-y-4 border border-border rounded-lg p-6">
           <div className="border-b pb-2">
-            <h3 className="text-lg font-semibold text-gray-900">Trello</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-lg font-semibold text-foreground">Trello</h3>
+            <p className="text-sm text-muted-foreground">
               Configure Trello API integration for project management
             </p>
           </div>
           <div>
-            <label htmlFor="trello-api-key-input" className="block text-sm font-medium mb-2">Trello API Key</label>
+            <label
+              htmlFor="trello-api-key-input"
+              className="block text-sm font-medium mb-2"
+            >
+              Trello API Key
+            </label>
             <ApiKeyInput
               id="trello-api-key-input"
               apiKey={localApiKeys.trello || ''}
@@ -293,7 +298,12 @@ const Settings: React.FC = () => {
             <Button onClick={handleAuthorizeWithTrello}>Authorize with Trello</Button>
           </div>
           <div>
-            <label htmlFor="trello-api-token-input" className="block text-sm font-medium mb-2">Trello API Token</label>
+            <label
+              htmlFor="trello-api-token-input"
+              className="block text-sm font-medium mb-2"
+            >
+              Trello API Token
+            </label>
             <ApiKeyInput
               id="trello-api-token-input"
               apiKey={localApiKeys.trelloToken || ''}
@@ -304,9 +314,12 @@ const Settings: React.FC = () => {
             />
           </div>
           <div>
-            <label htmlFor="trello-board-id-input" className="block text-sm font-medium mb-2">
+            <label
+              htmlFor="trello-board-id-input"
+              className="block text-sm font-medium mb-2"
+            >
               Trello Board ID
-              <span className="text-xs text-gray-500 ml-2">
+              <span className="text-xs text-muted-foreground ml-2">
                 (24-character alphanumeric ID from board URL)
               </span>
             </label>
@@ -320,22 +333,28 @@ const Settings: React.FC = () => {
               }
               onSave={handleSaveTrelloBoardId}
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Leave empty to use default board. Find the board ID in your Trello board URL.
+            <p className="text-xs text-muted-foreground mt-1">
+              Leave empty to use default board. Find the board ID in your Trello board
+              URL.
             </p>
           </div>
         </section>
 
         {/* SproutVideo Section */}
-        <section className="space-y-4 border border-gray-300 rounded-lg p-6">
+        <section className="space-y-4 border border-border rounded-lg p-6">
           <div className="border-b pb-2">
-            <h3 className="text-lg font-semibold text-gray-900">SproutVideo</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-lg font-semibold text-foreground">SproutVideo</h3>
+            <p className="text-sm text-muted-foreground">
               Configure SproutVideo API for video hosting
             </p>
           </div>
           <div>
-            <label htmlFor="sprout-video-api-key-input" className="block text-sm font-medium mb-2">SproutVideo API Key</label>
+            <label
+              htmlFor="sprout-video-api-key-input"
+              className="block text-sm font-medium mb-2"
+            >
+              SproutVideo API Key
+            </label>
             <ApiKeyInput
               id="sprout-video-api-key-input"
               apiKey={localApiKeys.sproutVideo || ''}
@@ -348,10 +367,10 @@ const Settings: React.FC = () => {
         </section>
 
         {/* Backgrounds Section */}
-        <section className="space-y-4 border border-gray-300 rounded-lg p-6">
+        <section className="space-y-4 border border-border rounded-lg p-6">
           <div className="border-b pb-2">
-            <h3 className="text-lg font-semibold text-gray-900">Backgrounds</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="text-lg font-semibold text-foreground">Backgrounds</h3>
+            <p className="text-sm text-muted-foreground">
               Set default folder for background assets
             </p>
           </div>

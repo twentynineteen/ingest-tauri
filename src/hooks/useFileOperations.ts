@@ -12,10 +12,10 @@
  * Lines: ~90
  */
 
+import { logger } from '@/utils/logger'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { FootageFile } from './useCameraAutoRemap'
-import { logger } from '@/utils/logger'
 
 interface MoveFilesWithProgressParams {
   files: FootageFile[]

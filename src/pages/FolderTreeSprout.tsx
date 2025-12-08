@@ -1,8 +1,8 @@
 // FolderTreeSprout.tsx
+import { logger } from '@/utils/logger'
 import { invoke } from '@tauri-apps/api/core'
 import React, { useState } from 'react'
 import { GetFoldersResponse, SproutFolder } from '../utils/types'
-import { logger } from '@/utils/logger'
 
 interface FolderTreeSproutProps {
   folder: SproutFolder

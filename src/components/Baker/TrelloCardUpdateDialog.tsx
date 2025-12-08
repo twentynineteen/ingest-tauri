@@ -126,7 +126,7 @@ export function TrelloCardUpdateDialog({
               <div className="flex-1">
                 <p className="font-medium">{card.title}</p>
                 {card.boardName && (
-                  <p className="text-sm text-gray-500">{card.boardName}</p>
+                  <p className="text-sm text-muted-foreground">{card.boardName}</p>
                 )}
               </div>
             </div>

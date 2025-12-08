@@ -52,7 +52,7 @@ export const DetailedChangesSection: React.FC<DetailedChangesSectionProps> = ({
   return (
     <div className="border rounded-lg p-4">
       <div className="flex items-center justify-between mb-3">
-        <h4 className="font-medium text-gray-900">Detailed Changes</h4>
+        <h4 className="font-medium text-foreground">Detailed Changes</h4>
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
@@ -106,7 +106,7 @@ export const DetailedChangesSection: React.FC<DetailedChangesSectionProps> = ({
                 {showMaintenanceChanges ? 'Hide' : 'Show'} Maintenance
               </Button>
             </div>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-muted-foreground">
               {projectsWithChangesCount} projects with changes
             </span>
           </div>

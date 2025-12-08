@@ -40,7 +40,7 @@ const Login: React.FC = () => {
   return (
     <div className="flex flex-col p-6 max-w-sm mx-auto bg-white shadow-md rounded-xl">
       <h2 className="text-xl font-semibold mb-4">Login</h2>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+      {error && <p className="text-destructive text-sm">{error}</p>}
       <input
         type="text"
         placeholder="Username"
@@ -57,13 +57,13 @@ const Login: React.FC = () => {
       />
       <button
         onClick={handleLogin}
-        className="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600"
+        className="bg-primary text-primary-foreground p-2 rounded w-full hover:bg-primary/90"
       >
         Login
       </button>
       <p className="mt-3">
         No account? click{' '}
-        <Link to="/register" className="font-bold text-blue-600">
+        <Link to="/register" className="font-bold text-primary">
           here
         </Link>{' '}
         to register

@@ -2,6 +2,7 @@
  * Comprehensive update management hook that handles GitHub releases and Tauri updater compatibility
  */
 
+import { logger } from '@/utils/logger'
 import { useMutation } from '@tanstack/react-query'
 import { ask, message } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
@@ -9,7 +10,6 @@ import { relaunch } from '@tauri-apps/plugin-process'
 import { check } from '@tauri-apps/plugin-updater'
 import { createNamespacedLogger } from '../utils/logger'
 import { useVersionCheck } from './useVersionCheck'
-import { logger } from '@/utils/logger'
 
 const log = createNamespacedLogger('UpdateManager')
 

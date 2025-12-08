@@ -20,9 +20,9 @@ export function ModelStatusIndicator({
   modelError
 }: ModelStatusIndicatorProps) {
   const getStatusStyles = () => {
-    if (isCheckingModel) return 'border-blue-200 bg-blue-50'
-    if (isModelReady) return 'border-green-200 bg-green-50'
-    return 'border-red-200 bg-red-50'
+    if (isCheckingModel) return 'border-info/20 bg-info/10'
+    if (isModelReady) return 'border-success/20 bg-success/10'
+    return 'border-destructive/20 bg-destructive/10'
   }
 
   return (
@@ -30,25 +30,25 @@ export function ModelStatusIndicator({
       <div className="flex items-center gap-2">
         {isCheckingModel ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-            <span className="text-sm text-blue-700">Checking embedding model...</span>
+            <Loader2 className="h-4 w-4 animate-spin text-info" />
+            <span className="text-sm text-info">Checking embedding model...</span>
           </>
         ) : isModelReady ? (
           <>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <span className="text-sm text-green-700">
+            <CheckCircle className="h-4 w-4 text-success" />
+            <span className="text-sm text-success">
               Embedding model ready: <code className="font-mono">{modelName}</code>
             </span>
           </>
         ) : (
           <>
-            <AlertCircle className="h-4 w-4 text-red-600" />
+            <AlertCircle className="h-4 w-4 text-destructive" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-red-700">
+              <p className="text-sm font-medium text-destructive">
                 Embedding model not available
               </p>
               {modelError && (
-                <p className="text-xs text-red-600 mt-1">{modelError.message}</p>
+                <p className="text-xs text-destructive/90 mt-1">{modelError.message}</p>
               )}
             </div>
           </>

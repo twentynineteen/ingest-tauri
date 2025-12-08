@@ -41,45 +41,45 @@ export const NormalView: React.FC<NormalViewProps> = ({
       {/* Project Info */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="flex items-center text-xs font-medium text-gray-600">
+          <label className="flex items-center text-xs font-medium text-muted-foreground">
             Project Title
           </label>
-          <p className="text-gray-900">{breadcrumbs.projectTitle}</p>
+          <p className="text-foreground">{breadcrumbs.projectTitle}</p>
         </div>
         <div>
-          <label className="flex items-center text-xs font-medium text-gray-600">
+          <label className="flex items-center text-xs font-medium text-muted-foreground">
             <Camera className="h-3 w-3 mr-1" />
             Cameras
           </label>
-          <p className="text-gray-900">{breadcrumbs.numberOfCameras}</p>
+          <p className="text-foreground">{breadcrumbs.numberOfCameras}</p>
         </div>
       </div>
 
       {/* Creation Info */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="flex items-center text-xs font-medium text-gray-600">
+          <label className="flex items-center text-xs font-medium text-muted-foreground">
             <User className="h-3 w-3 mr-1" />
             Created By
           </label>
-          <p className="text-gray-900">{breadcrumbs.createdBy}</p>
+          <p className="text-foreground">{breadcrumbs.createdBy}</p>
         </div>
         <div>
-          <label className="flex items-center text-xs font-medium text-gray-600">
+          <label className="flex items-center text-xs font-medium text-muted-foreground">
             <Calendar className="h-3 w-3 mr-1" />
             Created
           </label>
-          <p className="text-gray-900">{formatDate(breadcrumbs.creationDateTime)}</p>
+          <p className="text-foreground">{formatDate(breadcrumbs.creationDateTime)}</p>
         </div>
       </div>
 
       {/* Folder Size */}
       <div>
-        <label className="flex items-center text-xs font-medium text-gray-600">
+        <label className="flex items-center text-xs font-medium text-muted-foreground">
           <HardDrive className="h-3 w-3 mr-1" />
           Folder Size
         </label>
-        <p className="text-gray-900">
+        <p className="text-foreground">
           {breadcrumbs.folderSizeBytes
             ? formatFileSize(breadcrumbs.folderSizeBytes)
             : 'Unknown value - update breadcrumb file'}
@@ -100,11 +100,11 @@ export const NormalView: React.FC<NormalViewProps> = ({
 
       {/* Parent Folder */}
       <div>
-        <label className="flex items-center text-xs font-medium text-gray-600">
+        <label className="flex items-center text-xs font-medium text-muted-foreground">
           <FolderOpen className="h-3 w-3 mr-1" />
           Parent Folder
         </label>
-        <p className="text-gray-900 text-xs truncate">{breadcrumbs.parentFolder}</p>
+        <p className="text-foreground text-xs truncate">{breadcrumbs.parentFolder}</p>
       </div>
 
       {/* Files List */}
@@ -135,12 +135,12 @@ interface TrelloCardLinkProps {
 
 const TrelloCardLink: React.FC<TrelloCardLinkProps> = ({ url }) => (
   <div>
-    <label className="flex items-center text-xs font-medium text-gray-600">
+    <label className="flex items-center text-xs font-medium text-muted-foreground">
       <ExternalLink className="h-3 w-3 mr-1" />
       Trello Card
     </label>
     <div className="flex items-center space-x-2">
-      <p className="text-gray-900 text-xs truncate flex-1">{url}</p>
+      <p className="text-foreground text-xs truncate flex-1">{url}</p>
       <Button
         variant="outline"
         size="sm"
@@ -170,14 +170,14 @@ const ModificationInfo: React.FC<ModificationInfoProps> = ({
   <div className="grid grid-cols-2 gap-4">
     {lastModified && (
       <div>
-        <label className="text-xs font-medium text-gray-600">Last Modified</label>
-        <p className="text-gray-900">{formatDate(lastModified)}</p>
+        <label className="text-xs font-medium text-muted-foreground">Last Modified</label>
+        <p className="text-foreground">{formatDate(lastModified)}</p>
       </div>
     )}
     {scannedBy && (
       <div>
-        <label className="text-xs font-medium text-gray-600">Scanned By</label>
-        <p className="text-gray-900">{scannedBy}</p>
+        <label className="text-xs font-medium text-muted-foreground">Scanned By</label>
+        <p className="text-foreground">{scannedBy}</p>
       </div>
     )}
   </div>
@@ -190,7 +190,7 @@ interface FilesListProps {
 const FilesList: React.FC<FilesListProps> = ({ files }) => {
   if (!files || files.length === 0) {
     return (
-      <div className="text-center py-4 text-gray-500">
+      <div className="text-center py-4 text-muted-foreground">
         <File className="h-8 w-8 mx-auto mb-2 opacity-50" />
         <p className="text-xs">No files recorded in breadcrumbs</p>
       </div>
@@ -199,7 +199,7 @@ const FilesList: React.FC<FilesListProps> = ({ files }) => {
 
   return (
     <div>
-      <label className="text-xs font-medium text-gray-600 mb-2">
+      <label className="text-xs font-medium text-muted-foreground mb-2">
         Files ({files.length})
       </label>
       <div className="max-h-32 overflow-y-auto space-y-1">
@@ -210,9 +210,9 @@ const FilesList: React.FC<FilesListProps> = ({ files }) => {
           >
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium truncate">{file.name}</p>
-              <p className="text-xs text-gray-500 truncate">{file.path}</p>
+              <p className="text-xs text-muted-foreground truncate">{file.path}</p>
             </div>
-            <div className="flex items-center text-xs text-gray-600">
+            <div className="flex items-center text-xs text-muted-foreground">
               <Camera className="h-3 w-3 mr-1" />
               {file.camera}
             </div>

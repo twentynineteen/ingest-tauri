@@ -221,7 +221,7 @@ export function ReplaceDialog({ open, example, onClose, onReplace }: ReplaceDial
           <>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-green-600" />
+                <CheckCircle className="h-5 w-5 text-success" />
                 Replace Successful!
               </DialogTitle>
               <DialogDescription>
@@ -230,9 +230,9 @@ export function ReplaceDialog({ open, example, onClose, onReplace }: ReplaceDial
             </DialogHeader>
 
             <div className="space-y-4 py-4">
-              <div className="rounded-md border border-green-200 bg-green-50 p-4">
-                <p className="text-sm font-medium text-green-900">Replaced Example</p>
-                <p className="text-lg font-semibold text-green-700 mt-1">
+              <div className="rounded-md border border-success/20 bg-success/10 p-4">
+                <p className="text-sm font-medium text-success">Replaced Example</p>
+                <p className="text-lg font-semibold text-success/90 mt-1">
                   {example.title}
                 </p>
               </div>
@@ -273,37 +273,37 @@ export function ReplaceDialog({ open, example, onClose, onReplace }: ReplaceDial
                 <div
                   className={`rounded-md border p-3 ${
                     isCheckingModel
-                      ? 'border-blue-200 bg-blue-50'
+                      ? 'border-info/20 bg-info/10'
                       : isModelReady
-                        ? 'border-green-200 bg-green-50'
-                        : 'border-red-200 bg-red-50'
+                        ? 'border-success/20 bg-success/10'
+                        : 'border-destructive/20 bg-destructive/10'
                   }`}
                 >
                   <div className="flex items-center gap-2">
                     {isCheckingModel ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-                        <span className="text-sm text-blue-700">
+                        <Loader2 className="h-4 w-4 animate-spin text-info" />
+                        <span className="text-sm text-info">
                           Checking embedding model...
                         </span>
                       </>
                     ) : isModelReady ? (
                       <>
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                        <span className="text-sm text-green-700">
+                        <CheckCircle className="h-4 w-4 text-success" />
+                        <span className="text-sm text-success">
                           Embedding model ready:{' '}
                           <code className="font-mono">{modelName}</code>
                         </span>
                       </>
                     ) : (
                       <>
-                        <AlertCircle className="h-4 w-4 text-red-600" />
+                        <AlertCircle className="h-4 w-4 text-destructive" />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-red-700">
+                          <p className="text-sm font-medium text-destructive">
                             Embedding model not available
                           </p>
                           {modelError && (
-                            <p className="text-xs text-red-600 mt-1">
+                            <p className="text-xs text-destructive/90 mt-1">
                               {modelError.message}
                             </p>
                           )}

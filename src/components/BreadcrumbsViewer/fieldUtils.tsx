@@ -55,12 +55,14 @@ export const Field: React.FC<FieldProps> = ({ label, value, icon, change }) => {
 
   return (
     <div className={`p-2 border rounded ${changeColor}`}>
-      <label className="flex items-center text-xs font-medium text-gray-600">
+      <label className="flex items-center text-xs font-medium text-muted-foreground">
         {changeIcon && <span className="mr-1">{changeIcon}</span>}
         {icon && <span className="mr-1">{icon}</span>}
         {label}
       </label>
-      <p className="text-gray-900 mt-1">{formatFieldValue(value, label.toLowerCase())}</p>
+      <p className="text-foreground mt-1">
+        {formatFieldValue(value, label.toLowerCase())}
+      </p>
     </div>
   )
 }

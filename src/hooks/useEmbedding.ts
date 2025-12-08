@@ -4,10 +4,10 @@
  * Purpose: Client-side text embedding using Xenova Transformers
  */
 
+import { logger } from '@/utils/logger'
 import { pipeline, type Pipeline } from '@xenova/transformers'
 import { useEffect, useRef, useState } from 'react'
 import { createNamespacedLogger } from '../utils/logger'
-import { logger } from '@/utils/logger'
 
 const log = createNamespacedLogger('Embedding')
 

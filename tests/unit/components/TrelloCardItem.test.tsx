@@ -229,8 +229,8 @@ describe('TrelloCardItem Component', () => {
 
       // Assert
       expect(screen.getByText(/\(stale\)/i)).toBeInTheDocument()
-      // Check for orange color class indicating stale state
-      const staleText = container.querySelector('.text-orange-600')
+      // Check for warning color class indicating stale state
+      const staleText = container.querySelector('.text-warning')
       expect(staleText).toBeInTheDocument()
     })
   })

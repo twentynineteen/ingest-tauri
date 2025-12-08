@@ -1,7 +1,7 @@
+import { logger } from '@/utils/logger'
 import { Button } from '@components/ui/button'
 import { QueryErrorResetBoundary } from '@tanstack/react-query'
 import React, { Component, ReactNode } from 'react'
-import { logger } from '@/utils/logger'
 
 interface ErrorBoundaryState {
   hasError: boolean
@@ -48,13 +48,13 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       return (
         <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center">
           <div className="max-w-md">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+            <h2 className="text-2xl font-semibold text-foreground mb-4">
               Something went wrong
             </h2>
-            <div className="text-gray-600 mb-6 space-y-2">
+            <div className="text-muted-foreground mb-6 space-y-2">
               <p>An unexpected error occurred in the application.</p>
               {this.state.error && (
-                <details className="text-left bg-gray-50 p-4 rounded-md text-sm">
+                <details className="text-left bg-muted p-4 rounded-md text-sm">
                   <summary className="cursor-pointer font-medium">Error Details</summary>
                   <div className="mt-2 space-y-1">
                     <p>
@@ -111,15 +111,15 @@ export const QueryErrorBoundary: React.FC<QueryErrorBoundaryProps> = ({
             ((error, retry) => (
               <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center">
                 <div className="max-w-md">
-                  <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                  <h2 className="text-2xl font-semibold text-foreground mb-4">
                     Query Error
                   </h2>
-                  <div className="text-gray-600 mb-6">
+                  <div className="text-muted-foreground mb-6">
                     <p>
                       Failed to load data. Please check your connection and try again.
                     </p>
                     {error && (
-                      <details className="mt-4 text-left bg-gray-50 p-4 rounded-md text-sm">
+                      <details className="mt-4 text-left bg-muted p-4 rounded-md text-sm">
                         <summary className="cursor-pointer font-medium">
                           Error Details
                         </summary>

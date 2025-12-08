@@ -4,6 +4,7 @@
  * Extracted to reduce component complexity (DEBT-002)
  */
 
+import { logger } from '@/utils/logger'
 import { invoke } from '@tauri-apps/api/core'
 import { useState } from 'react'
 import type { BreadcrumbsFile, VideoLink } from '../types/baker'
@@ -19,7 +20,6 @@ import { useFileUpload } from './useFileUpload'
 import { useSproutVideoApi } from './useSproutVideoApi'
 import { useSproutVideoProcessor } from './useSproutVideoProcessor'
 import { useUploadEvents } from './useUploadEvents'
-import { logger } from '@/utils/logger'
 
 interface UseVideoLinksManagerProps {
   projectPath: string

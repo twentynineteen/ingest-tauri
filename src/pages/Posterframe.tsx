@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger'
 import { invoke } from '@tauri-apps/api/core'
 import { open } from '@tauri-apps/plugin-dialog'
 import { writeFile } from '@tauri-apps/plugin-fs'
@@ -9,7 +10,6 @@ import { usePosterframeAutoRedraw } from 'hooks/usePosterframeAutoRedraw'
 import { usePosterframeCanvas } from 'hooks/usePosterframeCanvas'
 import { useZoomPan } from 'hooks/useZoomPan'
 import React, { useRef, useState } from 'react'
-import { logger } from '@/utils/logger'
 
 const Posterframe = () => {
   const [videoTitle, setVideoTitle] = useState('')
@@ -110,7 +110,7 @@ const Posterframe = () => {
                   path => typeof path === 'string' && loadFolder(path)
                 )
               }
-              className="text-white bg-gray-700 hover:bg-gray-800 rounded-lg px-4 py-2 text-sm"
+              className="text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg px-4 py-2 text-sm"
             >
               Select Background Folder
             </button>
@@ -134,7 +134,7 @@ const Posterframe = () => {
 
             {defaultFolder && currentFolder !== defaultFolder && (
               <button
-                className="text-blue-600 text-sm hover:underline"
+                className="text-info text-sm hover:underline"
                 onClick={() => loadFolder(defaultFolder)}
               >
                 Use Default Background
@@ -184,7 +184,7 @@ const Posterframe = () => {
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-gray-500 italic">
+              <p className="text-sm text-muted-foreground italic">
                 Select a background to preview the thumbnail
               </p>
             )}
@@ -225,24 +225,23 @@ const Posterframe = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={chooseSavePath}
-              className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
+              className="bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary/90"
             >
               Choose Save Path
             </button>
 
             <button
               onClick={generateThumbnail}
-              className="inline-flex items-center justify-center 
-            p-0.5 me-2 overflow-hidden text-sm font-medium 
-            text-gray-900 rounded-lg group bg-linear-to-br from-purple-500 
-            to-pink-500 group-hover:from-purple-500 group-hover:to-pink-500 
-            hover:text-white dark:text-white focus:ring-4 focus:outline-hidden 
-            focus:ring-purple-200 dark:focus:ring-purple-800"
+              className="inline-flex items-center justify-center
+            p-0.5 me-2 overflow-hidden text-sm font-medium
+            text-foreground rounded-lg group bg-linear-to-br from-purple-500
+            to-pink-500 group-hover:from-purple-500 group-hover:to-pink-500
+            hover:text-white focus:ring-4 focus:outline-hidden
+            focus:ring-purple-200"
             >
               <span
-                className="px-5 py-2.5 transition-all ease-in duration-75 
-              bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent 
-              dark:group-hover:bg-transparent"
+                className="px-5 py-2.5 transition-all ease-in duration-75
+              bg-card rounded-md group-hover:bg-transparent"
               >
                 Generate Thumbnail
               </span>
@@ -250,7 +249,9 @@ const Posterframe = () => {
           </div>
 
           {savePath && (
-            <p className="text-sm text-gray-600 mt-2 text-center">Save to: {savePath}</p>
+            <p className="text-sm text-muted-foreground mt-2 text-center">
+              Save to: {savePath}
+            </p>
           )}
         </div>
       </div>

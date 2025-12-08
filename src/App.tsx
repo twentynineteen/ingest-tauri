@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { ThemeProvider } from 'next-themes'
 import React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
 import AppRouter from './AppRouter'
@@ -65,17 +66,19 @@ prefetchManager.prefetchAppStartupData().catch(error => {
 
 const App: React.FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <QueryErrorBoundary>
-        <AuthProvider>
-          <Router>
-            <AppRouter />
-          </Router>
-        </AuthProvider>
-      </QueryErrorBoundary>
-      {/* React Query DevTools - only shows in development */}
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <QueryClientProvider client={queryClient}>
+        <QueryErrorBoundary>
+          <AuthProvider>
+            <Router>
+              <AppRouter />
+            </Router>
+          </AuthProvider>
+        </QueryErrorBoundary>
+        {/* React Query DevTools - only shows in development */}
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </ThemeProvider>
   )
 }
 

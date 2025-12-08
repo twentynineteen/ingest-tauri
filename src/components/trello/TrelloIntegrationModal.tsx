@@ -1,3 +1,4 @@
+import { logger } from '@/utils/logger'
 import { Button } from '@components/ui/button'
 import {
   Dialog,
@@ -20,7 +21,6 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { appStore } from 'store/useAppStore'
 import TrelloCardList from '../../utils/trello/TrelloCardList'
 import { TrelloCard } from '../../utils/TrelloCards'
-import { logger } from '@/utils/logger'
 
 interface TrelloIntegrationModalProps {
   isOpen: boolean
@@ -186,7 +186,7 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
         {!selectedCard ? (
           <div className="space-y-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
               <Input
                 placeholder="Search cards by name or description..."
                 value={searchTerm}
@@ -198,7 +198,7 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
               {Object.keys(filteredGrouped).length > 0 ? (
                 <TrelloCardList grouped={filteredGrouped} onSelect={setSelectedCard} />
               ) : (
-                <p className="text-center text-gray-500 py-8">
+                <p className="text-center text-muted-foreground py-8">
                   {searchTerm.trim()
                     ? 'No cards found matching your search.'
                     : 'No cards available.'}
@@ -210,7 +210,7 @@ const TrelloIntegrationModal: React.FC<TrelloIntegrationModalProps> = ({
           <div className="space-y-4">
             <div>
               <h3 className="font-semibold text-lg">{selectedCard.name}</h3>
-              <p className="text-sm text-gray-600">Card ID: {selectedCard.id}</p>
+              <p className="text-sm text-muted-foreground">Card ID: {selectedCard.id}</p>
             </div>
 
             {updateMessage && (

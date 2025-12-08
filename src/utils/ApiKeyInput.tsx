@@ -27,7 +27,7 @@ const ApiKeyInput: React.FC<Props> = ({
       {/* Input field with dynamic type based on showApiKey */}
       <Input
         id={id}
-        type={inputType === 'text' ? 'text' : (showApiKey ? 'text' : 'password')}
+        type={inputType === 'text' ? 'text' : showApiKey ? 'text' : 'password'}
         value={apiKey}
         onChange={e => setApiKey(e.target.value)}
         placeholder={placeholder}
