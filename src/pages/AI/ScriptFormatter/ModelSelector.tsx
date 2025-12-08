@@ -23,17 +23,17 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-8 border border-gray-200 rounded-lg">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-sm text-gray-600">Loading models...</span>
+      <div className="flex items-center justify-center p-8 border border-border rounded-lg">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <span className="ml-2 text-sm text-muted-foreground">Loading models...</span>
       </div>
     )
   }
 
   if (models.length === 0) {
     return (
-      <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <p className="text-sm text-yellow-800">
+      <div className="p-4 bg-warning/10 border border-warning/20 rounded-lg">
+        <p className="text-sm text-warning">
           No models available. Please check your provider connection.
         </p>
       </div>
@@ -42,7 +42,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
   return (
     <div className="space-y-4">
-      <label className="block text-sm font-medium text-gray-700">Select Model</label>
+      <label className="block text-sm font-medium text-foreground">Select Model</label>
 
       <div className="space-y-2">
         {models.map(model => (
@@ -50,30 +50,32 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
             key={model.id}
             className={`p-4 border rounded-lg cursor-pointer transition-all ${
               selectedModel === model.id
-                ? 'border-black bg-gray-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-foreground bg-secondary'
+                : 'border-border hover:border-foreground/50'
             }`}
             onClick={() => onSelect(model.id)}
           >
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-3">
-                <Brain className="h-5 w-5 text-gray-600 mt-0.5" />
+                <Brain className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
-                  <p className="font-medium text-gray-900">{model.displayName}</p>
+                  <p className="font-medium text-foreground">{model.displayName}</p>
                   {model.size && (
-                    <p className="text-xs text-gray-500 mt-0.5">Size: {model.size}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      Size: {model.size}
+                    </p>
                   )}
 
                   {/* Show model capabilities */}
                   <div className="flex items-center gap-3 mt-2">
                     {model.capabilities.supportsToolCalling && (
-                      <div className="flex items-center gap-1 text-green-600">
+                      <div className="flex items-center gap-1 text-success">
                         <Wrench className="h-3 w-3" />
                         <span className="text-xs">Tool Calling</span>
                       </div>
                     )}
                     {model.capabilities.supportsStreaming && (
-                      <div className="flex items-center gap-1 text-black">
+                      <div className="flex items-center gap-1 text-foreground">
                         <Zap className="h-3 w-3" />
                         <span className="text-xs">Streaming</span>
                       </div>
@@ -84,7 +86,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
 
               {/* Availability indicator */}
               {model.availabilityStatus === 'online' && (
-                <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
+                <span className="px-2 py-1 text-xs bg-success/10 text-success rounded">
                   Available
                 </span>
               )}
@@ -94,7 +96,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       </div>
 
       {selectedModel && (
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           Selected: {models.find(m => m.id === selectedModel)?.displayName}
         </p>
       )}

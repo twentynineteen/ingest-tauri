@@ -32,47 +32,47 @@ interface ProjectChangeDetailViewProps {
 const getChangeIcon = (type: string) => {
   switch (type) {
     case 'added':
-      return <Plus className="h-3 w-3 text-green-600" />
+      return <Plus className="h-3 w-3 text-success" />
     case 'modified':
-      return <Edit className="h-3 w-3 text-orange-600" />
+      return <Edit className="h-3 w-3 text-warning" />
     case 'removed':
-      return <Minus className="h-3 w-3 text-red-600" />
+      return <Minus className="h-3 w-3 text-destructive" />
     default:
-      return <Info className="h-3 w-3 text-gray-600" />
+      return <Info className="h-3 w-3 text-muted-foreground" />
   }
 }
 
 const getFieldIcon = (field: string) => {
   switch (field) {
     case 'files':
-      return <File className="h-4 w-4 text-blue-600" />
+      return <File className="h-4 w-4 text-info" />
     case 'numberOfCameras':
-      return <Camera className="h-4 w-4 text-purple-600" />
+      return <Camera className="h-4 w-4 text-accent-foreground" />
     case 'projectTitle':
-      return <FolderOpen className="h-4 w-4 text-green-600" />
+      return <FolderOpen className="h-4 w-4 text-success" />
     case 'folderSizeBytes':
-      return <HardDrive className="h-4 w-4 text-gray-600" />
+      return <HardDrive className="h-4 w-4 text-muted-foreground" />
     case 'createdBy':
     case 'scannedBy':
-      return <User className="h-4 w-4 text-indigo-600" />
+      return <User className="h-4 w-4 text-primary" />
     case 'creationDateTime':
     case 'lastModified':
-      return <Clock className="h-4 w-4 text-orange-600" />
+      return <Clock className="h-4 w-4 text-warning" />
     default:
-      return <Info className="h-4 w-4 text-gray-500" />
+      return <Info className="h-4 w-4 text-muted-foreground" />
   }
 }
 
 const getImpactColor = (impact: string) => {
   switch (impact) {
     case 'high':
-      return 'text-red-700 bg-red-50 border-red-200'
+      return 'text-destructive bg-destructive/10 border-destructive/20'
     case 'medium':
-      return 'text-orange-700 bg-orange-50 border-orange-200'
+      return 'text-warning bg-warning/10 border-warning/20'
     case 'low':
-      return 'text-gray-700 bg-gray-50 border-gray-200'
+      return 'text-foreground bg-muted border-border'
     default:
-      return 'text-gray-700 bg-gray-50 border-gray-200'
+      return 'text-foreground bg-muted border-border'
   }
 }
 
@@ -80,7 +80,7 @@ const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) 
   // Use neutral styling for unchanged fields, impact-based styling for actual changes
   const containerClass =
     change.type === 'unchanged'
-      ? 'text-gray-700 bg-gray-50 border-gray-200'
+      ? 'text-foreground bg-muted border-border'
       : getImpactColor(change.impact)
 
   return (
@@ -96,10 +96,10 @@ const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) 
           <span
             className={`text-xs px-2 py-1 rounded-full font-medium ${
               change.impact === 'high'
-                ? 'bg-red-100 text-red-800'
+                ? 'bg-destructive/20 text-destructive'
                 : change.impact === 'medium'
-                  ? 'bg-orange-100 text-orange-800'
-                  : 'bg-gray-100 text-gray-800'
+                  ? 'bg-warning/20 text-warning'
+                  : 'bg-muted text-foreground'
             }`}
           >
             {change.impact}
@@ -109,8 +109,8 @@ const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) 
 
       {change.type === 'added' && (
         <div className="text-sm">
-          <span className="text-gray-600">New value: </span>
-          <span className="font-mono bg-green-100 px-2 py-1 rounded">
+          <span className="text-muted-foreground">New value: </span>
+          <span className="font-mono bg-success/20 text-success px-2 py-1 rounded">
             {change.formattedNewValue}
           </span>
         </div>
@@ -118,8 +118,8 @@ const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) 
 
       {change.type === 'removed' && (
         <div className="text-sm">
-          <span className="text-gray-600">Removed value: </span>
-          <span className="font-mono bg-red-100 px-2 py-1 rounded line-through">
+          <span className="text-muted-foreground">Removed value: </span>
+          <span className="font-mono bg-destructive/20 text-destructive px-2 py-1 rounded line-through">
             {change.formattedOldValue}
           </span>
         </div>
@@ -128,17 +128,17 @@ const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) 
       {change.type === 'modified' && (
         <div className="text-sm space-y-1">
           <div className="flex items-center space-x-2">
-            <span className="text-gray-600 flex-shrink-0">From:</span>
-            <span className="font-mono bg-red-100 px-2 py-1 rounded text-red-800 line-through">
+            <span className="text-muted-foreground flex-shrink-0">From:</span>
+            <span className="font-mono bg-destructive/20 px-2 py-1 rounded text-destructive line-through">
               {change.formattedOldValue}
             </span>
           </div>
           <div className="flex items-center space-x-2">
-            <ArrowRight className="h-3 w-3 text-gray-400 flex-shrink-0 ml-8" />
+            <ArrowRight className="h-3 w-3 text-muted-foreground/50 flex-shrink-0 ml-8" />
           </div>
           <div className="flex items-center space-x-2">
-            <span className="text-gray-600 flex-shrink-0">To:</span>
-            <span className="font-mono bg-green-100 px-2 py-1 rounded text-green-800 ml-4">
+            <span className="text-muted-foreground flex-shrink-0">To:</span>
+            <span className="font-mono bg-success/20 px-2 py-1 rounded text-success ml-4">
               {change.formattedNewValue}
             </span>
           </div>
@@ -147,8 +147,8 @@ const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) 
 
       {change.type === 'unchanged' && (
         <div className="text-sm">
-          <span className="text-gray-600">Current value: </span>
-          <span className="font-mono bg-gray-100 px-2 py-1 rounded">
+          <span className="text-muted-foreground">Current value: </span>
+          <span className="font-mono bg-muted px-2 py-1 rounded text-foreground">
             {change.formattedOldValue}
           </span>
         </div>
@@ -188,7 +188,7 @@ const CategorySection: React.FC<{
       </button>
 
       {isExpanded && (
-        <div className="p-4 space-y-3 bg-white">
+        <div className="p-4 space-y-3 bg-card">
           {changes.map((change, index) => (
             <FieldChangeItem key={`${change.field}-${index}`} change={change} />
           ))}
@@ -206,11 +206,11 @@ export const ProjectChangeDetailView: React.FC<ProjectChangeDetailViewProps> = (
 }) => {
   if (!changeDetail.hasChanges) {
     return (
-      <div className="border rounded-lg p-4 bg-green-50 border-green-200">
-        <div className="flex items-center space-x-2 text-green-800">
+      <div className="border rounded-lg p-4 bg-success/10 border-success/20">
+        <div className="flex items-center space-x-2 text-success">
           <Info className="h-4 w-4" />
           <span className="font-medium">{changeDetail.projectName}</span>
-          <span className="text-green-600">- No changes required</span>
+          <span>- No changes required</span>
         </div>
       </div>
     )
@@ -219,22 +219,21 @@ export const ProjectChangeDetailView: React.FC<ProjectChangeDetailViewProps> = (
   return (
     <div className="border rounded-lg overflow-hidden">
       {/* Project Header */}
-      <div className="bg-gray-50 px-4 py-3 border-b">
+      <div className="bg-muted px-4 py-3 border-b border-border">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <FolderOpen className="h-4 w-4 text-gray-600" />
-            <span className="font-medium text-gray-900">{changeDetail.projectName}</span>
+            <FolderOpen className="h-4 w-4 text-muted-foreground" />
+            <span className="font-medium text-foreground">
+              {changeDetail.projectName}
+            </span>
             {changeDetail.summary.contentChanges > 0 && (
-              <AlertCircle className="h-4 w-4 text-orange-600" />
+              <AlertCircle className="h-4 w-4 text-warning" />
             )}
           </div>
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
+          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
             <span>{changeDetail.summary.totalChanges} changes</span>
             {onToggleExpanded && (
-              <button
-                onClick={onToggleExpanded}
-                className="text-blue-600 hover:text-blue-800"
-              >
+              <button onClick={onToggleExpanded} className="text-info hover:text-info/80">
                 {isExpanded ? 'Hide Details' : 'Show Details'}
               </button>
             )}
@@ -244,17 +243,17 @@ export const ProjectChangeDetailView: React.FC<ProjectChangeDetailViewProps> = (
         {/* Summary Pills */}
         <div className="flex items-center space-x-2 mt-2">
           {changeDetail.summary.contentChanges > 0 && (
-            <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">
+            <span className="bg-destructive/20 text-destructive px-2 py-1 rounded-full text-xs font-medium">
               {changeDetail.summary.contentChanges} content
             </span>
           )}
           {changeDetail.summary.metadataChanges > 0 && (
-            <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
+            <span className="bg-warning/20 text-warning px-2 py-1 rounded-full text-xs font-medium">
               {changeDetail.summary.metadataChanges} metadata
             </span>
           )}
           {changeDetail.summary.maintenanceChanges > 0 && showMaintenanceChanges && (
-            <span className="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs font-medium">
+            <span className="bg-muted text-foreground px-2 py-1 rounded-full text-xs font-medium">
               {changeDetail.summary.maintenanceChanges} maintenance
             </span>
           )}
@@ -268,14 +267,14 @@ export const ProjectChangeDetailView: React.FC<ProjectChangeDetailViewProps> = (
             title="Content Changes"
             changes={changeDetail.changeCategories.content}
             icon={<AlertCircle className="h-4 w-4" />}
-            colorClass="bg-red-100 text-red-800"
+            colorClass="bg-destructive/20 text-destructive"
           />
 
           <CategorySection
             title="Metadata Changes"
             changes={changeDetail.changeCategories.metadata}
             icon={<Info className="h-4 w-4" />}
-            colorClass="bg-orange-100 text-orange-800"
+            colorClass="bg-warning/20 text-warning"
           />
 
           {showMaintenanceChanges && (
@@ -283,7 +282,7 @@ export const ProjectChangeDetailView: React.FC<ProjectChangeDetailViewProps> = (
               title="Maintenance Changes"
               changes={changeDetail.changeCategories.maintenance}
               icon={<Clock className="h-4 w-4" />}
-              colorClass="bg-gray-100 text-gray-800"
+              colorClass="bg-muted text-foreground"
             />
           )}
         </div>

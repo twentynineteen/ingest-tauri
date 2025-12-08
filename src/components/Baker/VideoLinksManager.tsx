@@ -69,7 +69,7 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     )
   }
@@ -92,8 +92,8 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Video Links</h3>
-          <p className="text-sm text-gray-500">
+          <h3 className="text-lg font-semibold text-foreground">Video Links</h3>
+          <p className="text-sm text-muted-foreground">
             {videoLinks.length} {videoLinks.length === 1 ? 'video' : 'videos'} • Sprout
             Video uploads
           </p>
@@ -138,9 +138,9 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
 
       {/* Video List */}
       {videoLinks.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-12 text-center">
-          <p className="text-sm text-gray-500">No video links added yet</p>
-          <p className="mt-1 text-xs text-gray-400">
+        <div className="rounded-lg border border-dashed border-border bg-muted p-12 text-center">
+          <p className="text-sm text-muted-foreground">No video links added yet</p>
+          <p className="mt-1 text-xs text-muted-foreground/50">
             Add videos uploaded to Sprout Video to associate them with this project
           </p>
         </div>
@@ -163,8 +163,8 @@ export function VideoLinksManager({ projectPath }: VideoLinksManagerProps) {
       {/* Loading indicator */}
       {isUpdating && (
         <div className="flex items-center justify-center py-4">
-          <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-          <span className="ml-2 text-sm text-gray-500">Updating...</span>
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          <span className="ml-2 text-sm text-muted-foreground">Updating...</span>
         </div>
       )}
 

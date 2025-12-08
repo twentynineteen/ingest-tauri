@@ -4,9 +4,9 @@
  * Handles complex Trello card updating logic for Baker batch operations.
  */
 
+import { logger } from '@/utils/logger'
 import { readTextFile } from '@tauri-apps/plugin-fs'
 import { useCallback } from 'react'
-import { logger } from '@/utils/logger'
 
 interface TrelloError {
   project: string
@@ -89,10 +89,7 @@ async function updateProjectTrelloCards(
     // Log any failures but don't throw
     results.forEach((result, index) => {
       if (result.status === 'rejected') {
-        logger.error(
-          `Failed to update card ${trelloCards[index].cardId}:`,
-          result.reason
-        )
+        logger.error(`Failed to update card ${trelloCards[index].cardId}:`, result.reason)
       }
     })
 

@@ -112,7 +112,7 @@ interface CurrentViewProps {
 
 const CurrentView: React.FC<CurrentViewProps> = ({ current, formatDate }) => (
   <div>
-    <h5 className="font-medium text-gray-700 mb-3 flex items-center">
+    <h5 className="font-medium text-foreground mb-3 flex items-center">
       <File className="h-4 w-4 mr-2" />
       Current
     </h5>
@@ -156,7 +156,7 @@ const CurrentView: React.FC<CurrentViewProps> = ({ current, formatDate }) => (
           {current.scannedBy && <Field label="Scanned By" value={current.scannedBy} />}
         </>
       ) : (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-muted-foreground">
           <File className="h-8 w-8 mx-auto mb-2 opacity-50" />
           <p className="text-sm">No existing breadcrumbs file</p>
         </div>
@@ -266,7 +266,7 @@ const AfterUpdateView: React.FC<AfterUpdateViewProps> = ({ changes, formatDate }
 
   return (
     <div>
-      <h5 className="font-medium text-gray-700 mb-3 flex items-center">
+      <h5 className="font-medium text-foreground mb-3 flex items-center">
         <Eye className="h-4 w-4 mr-2" />
         After Update
       </h5>

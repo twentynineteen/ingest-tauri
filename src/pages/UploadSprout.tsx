@@ -56,14 +56,16 @@ const UploadSprout = () => {
                 Select Video File
               </Button>
               {selectedFile && (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Selected: {selectedFile.split('/').pop()}
                 </p>
               )}
 
               {uploading && (
                 <div className="mt-4">
-                  <p className="text-sm text-gray-500 mb-2">Uploading: {progress}%</p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Uploading: {progress}%
+                  </p>
                   <Progress value={progress} />
                 </div>
               )}

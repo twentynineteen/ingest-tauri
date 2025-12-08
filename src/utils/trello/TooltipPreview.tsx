@@ -26,7 +26,7 @@ const TooltipPreview: React.FC<TooltipPreviewProps> = ({
         <TooltipContent
           side={side}
           align={align}
-          className="max-w-[400px] max-h-[300px] overflow-auto bg-white p-3 border border-gray-300 rounded shadow-sm text-xs font-mono whitespace-pre-wrap text-gray-600"
+          className="max-w-[400px] max-h-[300px] overflow-auto bg-white p-3 border border-border rounded shadow-sm text-xs font-mono whitespace-pre-wrap text-muted-foreground"
         >
           {typeof content === 'string' ? <pre>{content}</pre> : content}
         </TooltipContent>

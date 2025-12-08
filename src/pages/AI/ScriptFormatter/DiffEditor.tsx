@@ -53,21 +53,25 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
   }, [])
 
   return (
-    <div className="border border-gray-300 rounded-lg overflow-hidden mb-2 flex flex-col h-[calc(100vh-300px)]">
-      <div className="bg-gray-100 px-4 py-2 border-b border-gray-300 flex items-center justify-between shrink-0">
-        <span className="text-sm font-medium text-gray-700">
+    <div className="border border-border rounded-lg overflow-hidden mb-2 flex flex-col h-[calc(100vh-300px)]">
+      <div className="bg-muted px-4 py-2 border-b border-border flex items-center justify-between shrink-0">
+        <span className="text-sm font-medium text-foreground">
           Formatted Script (Editable)
         </span>
-        <span className="text-xs text-gray-500">Use **text** for bold formatting</span>
+        <span className="text-xs text-muted-foreground">
+          Use **text** for bold formatting
+        </span>
       </div>
 
       <div ref={containerRef} className="flex-1 relative">
         {!isEditorReady && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
+          <div className="absolute inset-0 flex items-center justify-center bg-background z-10">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-              <p className="text-sm text-gray-600">Loading editor...</p>
-              <p className="text-xs text-gray-500 mt-1">This may take a few seconds</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-foreground mx-auto mb-4"></div>
+              <p className="text-sm text-muted-foreground">Loading editor...</p>
+              <p className="text-xs text-muted-foreground/70 mt-1">
+                This may take a few seconds
+              </p>
             </div>
           </div>
         )}
@@ -82,9 +86,9 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
           loading={
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-                <p className="text-sm text-gray-600">Loading Monaco Editor...</p>
-                <p className="text-xs text-gray-500 mt-2">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-foreground mx-auto mb-4"></div>
+                <p className="text-sm text-muted-foreground">Loading Monaco Editor...</p>
+                <p className="text-xs text-muted-foreground/70 mt-2">
                   If this persists, check browser console for errors
                 </p>
               </div>

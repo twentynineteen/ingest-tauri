@@ -16,10 +16,10 @@ const ProjectActions: React.FC<ProjectActionsProps> = ({
       <div className="select-files">
         <button
           onClick={onSelectFiles}
-          className="text-white bg-gray-700 hover:bg-gray-800 
-            focus:ring-4 focus:outline-hidden focus:ring-gray-300 font-medium 
-            rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center 
-            me-2 dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
+          className="text-primary-foreground bg-primary hover:bg-primary/90
+            focus:ring-4 focus:outline-hidden focus:ring-ring font-medium
+            rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center
+            me-2"
         >
           Select Files
         </button>
@@ -28,11 +28,10 @@ const ProjectActions: React.FC<ProjectActionsProps> = ({
       <div className="clear-all">
         <button
           onClick={onClearAll}
-          className="text-white bg-red-700 hover:bg-red-800 
-            focus:ring-4 focus:outline-hidden focus:ring-red-300 
-            font-medium rounded-lg text-sm px-5 py-2.5 text-center 
-            inline-flex items-center me-2 dark:bg-red-600 
-            dark:hover:bg-red-700 dark:focus:ring-red-800"
+          className="text-destructive-foreground bg-destructive hover:bg-destructive/90
+            focus:ring-4 focus:outline-hidden focus:ring-ring
+            font-medium rounded-lg text-sm px-5 py-2.5 text-center
+            inline-flex items-center me-2"
         >
           Clear All
         </button>
@@ -41,17 +40,16 @@ const ProjectActions: React.FC<ProjectActionsProps> = ({
       <div className="create-project">
         <button
           onClick={onCreateProject}
-          className="inline-flex items-center justify-center 
-            p-0.5 me-2 overflow-hidden text-sm font-medium 
-            text-gray-900 rounded-lg group bg-linear-to-br from-purple-500 
-            to-pink-500 group-hover:from-purple-500 group-hover:to-pink-500 
-            hover:text-white dark:text-white focus:ring-4 focus:outline-hidden 
-            focus:ring-purple-200 dark:focus:ring-purple-800"
+          className="inline-flex items-center justify-center
+            p-0.5 me-2 overflow-hidden text-sm font-medium
+            text-foreground rounded-lg group bg-gradient-to-br from-purple-500
+            to-pink-500 group-hover:from-purple-500 group-hover:to-pink-500
+            hover:text-white dark:text-white focus:ring-4 focus:outline-hidden
+            focus:ring-ring"
         >
           <span
-            className="px-5 py-2.5 transition-all ease-in duration-75 
-              bg-white dark:bg-gray-900 rounded-md group-hover:bg-transparent 
-              dark:group-hover:bg-transparent"
+            className="px-5 py-2.5 transition-all ease-in duration-75
+              bg-background rounded-md group-hover:bg-transparent"
           >
             Create Project
           </span>

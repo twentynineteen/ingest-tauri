@@ -28,7 +28,7 @@ export function UploadSuccessView({
     <>
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2">
-          <CheckCircle className="h-5 w-5 text-green-600" />
+          <CheckCircle className="h-5 w-5 text-success" />
           Upload Successful!
         </DialogTitle>
         <DialogDescription>
@@ -37,9 +37,9 @@ export function UploadSuccessView({
       </DialogHeader>
 
       <div className="space-y-4 py-4">
-        <div className="rounded-md border border-green-200 bg-green-50 p-4">
-          <p className="text-sm font-medium text-green-900">Uploaded Example</p>
-          <p className="text-lg font-semibold text-green-700 mt-1">{uploadedTitle}</p>
+        <div className="rounded-md border border-success/20 bg-success/10 p-4">
+          <p className="text-sm font-medium text-success">Uploaded Example</p>
+          <p className="text-lg font-semibold text-success mt-1">{uploadedTitle}</p>
         </div>
 
         <div className="space-y-2">

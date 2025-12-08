@@ -95,7 +95,10 @@ export function AddCardDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={mode.addMode} onValueChange={v => mode.onAddModeChange(v as 'url' | 'select')}>
+        <Tabs
+          value={mode.addMode}
+          onValueChange={v => mode.onAddModeChange(v as 'url' | 'select')}
+        >
           {dialog.hasApiCredentials && (
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="select">Select from Board</TabsTrigger>
@@ -133,8 +136,8 @@ function SelectFromBoardContent({
   if (selectMode.isBoardLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-sm text-gray-500">Loading cards...</span>
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <span className="ml-2 text-sm text-muted-foreground">Loading cards...</span>
       </div>
     )
   }
@@ -144,7 +147,7 @@ function SelectFromBoardContent({
       <div className="space-y-2">
         <Label htmlFor="search">Search Cards</Label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             id="search"
             placeholder="Search by name or description..."
@@ -158,11 +161,14 @@ function SelectFromBoardContent({
       <div className="max-h-[400px] overflow-y-auto border rounded-md p-4">
         {common.isFetchingCard ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-            <span className="ml-2 text-sm text-gray-500">Adding card...</span>
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <span className="ml-2 text-sm text-muted-foreground">Adding card...</span>
           </div>
         ) : (
-          <TrelloCardList grouped={selectMode.filteredGrouped} onSelect={selectMode.onSelectCard} />
+          <TrelloCardList
+            grouped={selectMode.filteredGrouped}
+            onSelect={selectMode.onSelectCard}
+          />
         )}
       </div>
     </>
@@ -188,7 +194,7 @@ function UrlInputContent({
           value={urlMode.cardUrl}
           onChange={e => urlMode.onCardUrlChange(e.target.value)}
         />
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           {hasApiCredentials
             ? 'Card details will be fetched automatically'
             : 'Enter the full URL from your Trello board'}
@@ -199,7 +205,10 @@ function UrlInputContent({
         <Button variant="outline" onClick={common.onClose}>
           Cancel
         </Button>
-        <Button onClick={urlMode.onFetchAndAdd} disabled={common.isFetchingCard || !urlMode.cardUrl.trim()}>
+        <Button
+          onClick={urlMode.onFetchAndAdd}
+          disabled={common.isFetchingCard || !urlMode.cardUrl.trim()}
+        >
           {common.isFetchingCard ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -234,7 +243,9 @@ function ErrorDisplay({ errors }: { errors: ErrorState }) {
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {errors.addError instanceof Error ? errors.addError.message : String(errors.addError)}
+            {errors.addError instanceof Error
+              ? errors.addError.message
+              : String(errors.addError)}
           </AlertDescription>
         </Alert>
       )}
@@ -243,7 +254,9 @@ function ErrorDisplay({ errors }: { errors: ErrorState }) {
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {errors.fetchError instanceof Error ? errors.fetchError.message : String(errors.fetchError)}
+            {errors.fetchError instanceof Error
+              ? errors.fetchError.message
+              : String(errors.fetchError)}
           </AlertDescription>
         </Alert>
       )}

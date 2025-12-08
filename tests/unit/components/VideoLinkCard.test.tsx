@@ -161,8 +161,8 @@ describe('VideoLinkCard Component', () => {
         />
       )
 
-      // Assert - Should show placeholder with gray background
-      const placeholder = container.querySelector('.bg-gray-100')
+      // Assert - Should show placeholder with muted background
+      const placeholder = container.querySelector('.bg-muted')
       expect(placeholder).toBeInTheDocument()
       expect(screen.queryByAltText('Project Alpha - Final Edit')).not.toBeInTheDocument()
     })

@@ -10,6 +10,7 @@
  * - Navigation warnings for unsaved work
  */
 
+import { logger } from '@/utils/logger'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ProcessedOutput, WorkflowStep } from '../types/scriptFormatter'
 import { createNamespacedLogger } from '../utils/logger'
@@ -17,7 +18,6 @@ import { useAIProcessing } from './useAIProcessing'
 import { useScriptDownload } from './useScriptDownload'
 import { useScriptReview } from './useScriptReview'
 import { useScriptUpload } from './useScriptUpload'
-import { logger } from '@/utils/logger'
 
 const log = createNamespacedLogger('ScriptWorkflow')
 

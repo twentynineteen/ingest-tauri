@@ -37,20 +37,20 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
   }
 
   return (
-    <div className="bg-gray-50 rounded-lg p-4 space-y-4 text-sm">
+    <div className="bg-muted rounded-lg p-4 space-y-4 text-sm">
       <div className="border-b pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="font-semibold text-gray-900 flex items-center">
+            <h4 className="font-semibold text-foreground flex items-center">
               <File className="h-4 w-4 mr-2" />
               Breadcrumbs.json
               {previewMode && (
-                <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                <span className="ml-2 text-xs bg-info/10 text-info px-2 py-1 rounded">
                   Preview Mode
                 </span>
               )}
             </h4>
-            <p className="text-xs text-gray-500 mt-1">{projectPath}</p>
+            <p className="text-xs text-muted-foreground mt-1">{projectPath}</p>
           </div>
           {onTogglePreview && (
             <Button
@@ -78,43 +78,45 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
       {/* Project Info */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-gray-600">Project Title</label>
-          <p className="text-gray-900">{breadcrumbs.projectTitle}</p>
+          <label className="block text-xs font-medium text-muted-foreground">
+            Project Title
+          </label>
+          <p className="text-foreground">{breadcrumbs.projectTitle}</p>
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600 flex items-center">
+          <label className="flex items-center text-xs font-medium text-muted-foreground">
             <Camera className="h-3 w-3 mr-1" />
             Cameras
           </label>
-          <p className="text-gray-900">{breadcrumbs.numberOfCameras}</p>
+          <p className="text-foreground">{breadcrumbs.numberOfCameras}</p>
         </div>
       </div>
 
       {/* Creation Info */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="flex items-center text-xs font-medium text-gray-600">
+          <label className="flex items-center text-xs font-medium text-muted-foreground">
             <User className="h-3 w-3 mr-1" />
             Created By
           </label>
-          <p className="text-gray-900">{breadcrumbs.createdBy}</p>
+          <p className="text-foreground">{breadcrumbs.createdBy}</p>
         </div>
         <div>
-          <label className="flex items-center text-xs font-medium text-gray-600">
+          <label className="flex items-center text-xs font-medium text-muted-foreground">
             <Calendar className="h-3 w-3 mr-1" />
             Created
           </label>
-          <p className="text-gray-900">{formatDate(breadcrumbs.creationDateTime)}</p>
+          <p className="text-foreground">{formatDate(breadcrumbs.creationDateTime)}</p>
         </div>
       </div>
 
       {/* Folder Size */}
       <div>
-        <label className="flex items-center text-xs font-medium text-gray-600">
+        <label className="flex items-center text-xs font-medium text-muted-foreground">
           <HardDrive className="h-3 w-3 mr-1" />
           Folder Size
         </label>
-        <p className="text-gray-900">
+        <p className="text-foreground">
           {breadcrumbs.folderSizeBytes
             ? formatFileSize(breadcrumbs.folderSizeBytes)
             : 'Unknown value - update breadcrumb file'}
@@ -126,18 +128,18 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
         <div className="grid grid-cols-2 gap-4">
           {breadcrumbs.lastModified && (
             <div>
-              <label className="block text-xs font-medium text-gray-600">
+              <label className="block text-xs font-medium text-muted-foreground">
                 Last Modified
               </label>
-              <p className="text-gray-900">{formatDate(breadcrumbs.lastModified)}</p>
+              <p className="text-foreground">{formatDate(breadcrumbs.lastModified)}</p>
             </div>
           )}
           {breadcrumbs.scannedBy && (
             <div>
-              <label className="block text-xs font-medium text-gray-600">
+              <label className="block text-xs font-medium text-muted-foreground">
                 Scanned By
               </label>
-              <p className="text-gray-900">{breadcrumbs.scannedBy}</p>
+              <p className="text-foreground">{breadcrumbs.scannedBy}</p>
             </div>
           )}
         </div>
@@ -145,30 +147,30 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
 
       {/* Parent Folder */}
       <div>
-        <label className="flex items-center text-xs font-medium text-gray-600">
+        <label className="flex items-center text-xs font-medium text-muted-foreground">
           <FolderOpen className="h-3 w-3 mr-1" />
           Parent Folder
         </label>
-        <p className="text-gray-900 text-xs truncate">{breadcrumbs.parentFolder}</p>
+        <p className="text-foreground text-xs truncate">{breadcrumbs.parentFolder}</p>
       </div>
 
       {/* Files List */}
       {breadcrumbs.files && breadcrumbs.files.length > 0 && (
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-2">
+          <label className="block text-xs font-medium text-muted-foreground mb-2">
             Files ({breadcrumbs.files.length})
           </label>
           <div className="max-h-32 overflow-y-auto space-y-1">
             {breadcrumbs.files.map((file, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between bg-white rounded p-2"
+                className="flex items-center justify-between bg-background rounded p-2"
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-medium truncate">{file.name}</p>
-                  <p className="text-xs text-gray-500 truncate">{file.path}</p>
+                  <p className="text-xs text-muted-foreground truncate">{file.path}</p>
                 </div>
-                <div className="flex items-center text-xs text-gray-600">
+                <div className="flex items-center text-xs text-muted-foreground">
                   <Camera className="h-3 w-3 mr-1" />
                   {file.camera}
                 </div>
@@ -179,7 +181,7 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
       )}
 
       {(!breadcrumbs.files || breadcrumbs.files.length === 0) && (
-        <div className="text-center py-4 text-gray-500">
+        <div className="text-center py-4 text-muted-foreground">
           <File className="h-8 w-8 mx-auto mb-2 opacity-50" />
           <p className="text-xs">No files recorded in breadcrumbs</p>
         </div>

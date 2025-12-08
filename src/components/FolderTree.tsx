@@ -1,6 +1,6 @@
+import { logger } from '@/utils/logger'
 import { open } from '@tauri-apps/plugin-dialog'
 import React from 'react'
-import { logger } from '@/utils/logger'
 
 type Props = {
   onSelect: (folderPath: string) => void
@@ -34,14 +34,14 @@ const FolderTree: React.FC<Props> = ({ onSelect, selectedFolder }) => {
     <div className="flex items-center justify-evenly rounded-lg py-3">
       <button
         onClick={openFolderPicker}
-        className="text-white bg-gray-700 hover:bg-gray-800 focus:ring-4 focus:outline-hidden focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-gray-600 dark:hover:bg-gray-700 dark:focus:ring-gray-800"
+        className="text-primary-foreground bg-primary hover:bg-primary/90 focus:ring-4 focus:outline-hidden focus:ring-ring font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2"
       >
         Select Destination
       </button>
       {selectedFolder ? (
-        <p className="text-sm text-gray-700 mt-2">Destination: {selectedFolder}</p>
+        <p className="text-sm text-foreground mt-2">Destination: {selectedFolder}</p>
       ) : (
-        <p className="text-sm text-gray-700 mt-2"></p>
+        <p className="text-sm text-foreground mt-2"></p>
       )}
     </div>
   )

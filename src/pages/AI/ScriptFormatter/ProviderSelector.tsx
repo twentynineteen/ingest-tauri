@@ -34,7 +34,7 @@ export const ProviderSelector: React.FC<ProviderSelectorProps> = ({
 
   return (
     <div className="space-y-4">
-      <label className="block text-sm font-medium text-gray-700">AI Provider</label>
+      <label className="block text-sm font-medium text-foreground">AI Provider</label>
 
       <div className="space-y-2">
         {providers.map(provider => (
@@ -42,17 +42,17 @@ export const ProviderSelector: React.FC<ProviderSelectorProps> = ({
             key={provider.id}
             className={`p-4 border rounded-lg cursor-pointer transition-all ${
               activeProvider?.id === provider.id
-                ? 'border-black bg-gray-50'
-                : 'border-gray-200 hover:border-gray-300'
+                ? 'border-foreground bg-secondary'
+                : 'border-border hover:border-foreground/50'
             }`}
             onClick={() => handleProviderSelect(provider.id)}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Zap className="h-5 w-5 text-gray-600" />
+                <Zap className="h-5 w-5 text-muted-foreground" />
                 <div>
-                  <p className="font-medium text-gray-900">{provider.displayName}</p>
-                  <p className="text-xs text-gray-500">
+                  <p className="font-medium text-foreground">{provider.displayName}</p>
+                  <p className="text-xs text-muted-foreground">
                     {provider.configuration.serviceUrl}
                   </p>
                 </div>
@@ -61,31 +61,33 @@ export const ProviderSelector: React.FC<ProviderSelectorProps> = ({
               {/* Connection status indicator */}
               <div className="flex items-center gap-2">
                 {isValidating && activeProvider?.id === provider.id ? (
-                  <div className="flex items-center gap-1 text-black">
+                  <div className="flex items-center gap-1 text-foreground">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     <span className="text-xs">Validating...</span>
                   </div>
                 ) : (
                   <>
                     {provider.status === 'configured' && (
-                      <div className="flex items-center gap-1 text-green-600">
+                      <div className="flex items-center gap-1 text-success">
                         <CheckCircle className="h-4 w-4" />
                         <span className="text-xs">Connected</span>
                       </div>
                     )}
                     {provider.status === 'error' && (
-                      <div className="flex items-center gap-1 text-red-600">
+                      <div className="flex items-center gap-1 text-destructive">
                         <XCircle className="h-4 w-4" />
                         <span className="text-xs">Error</span>
                       </div>
                     )}
                     {provider.status === 'not-configured' && (
-                      <span className="text-xs text-gray-500">Not configured</span>
+                      <span className="text-xs text-muted-foreground">
+                        Not configured
+                      </span>
                     )}
 
                     {/* Show latency if available */}
                     {provider.configuration.lastValidationResult?.latencyMs && (
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-muted-foreground">
                         ({provider.configuration.lastValidationResult.latencyMs}ms)
                       </span>
                     )}
@@ -99,8 +101,8 @@ export const ProviderSelector: React.FC<ProviderSelectorProps> = ({
 
       {/* Show validation error message */}
       {activeProvider?.configuration.lastValidationResult?.errorMessage && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-800">
+        <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+          <p className="text-sm text-destructive">
             {activeProvider.configuration.lastValidationResult.errorMessage}
           </p>
         </div>

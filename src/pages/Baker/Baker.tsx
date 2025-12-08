@@ -5,6 +5,7 @@
  * Refactored to separate concerns into focused components and hooks.
  */
 
+import { logger } from '@/utils/logger'
 import { BakerPreferences } from '@components/Baker/BakerPreferences'
 import { BatchActions } from '@components/Baker/BatchActions'
 import { FolderSelector } from '@components/Baker/FolderSelector'
@@ -23,7 +24,6 @@ import { useTrelloBoard } from 'hooks'
 import { useBreadcrumb } from 'hooks/useBreadcrumb'
 import { AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react'
 import React, { useCallback, useState } from 'react'
-import { logger } from '@/utils/logger'
 
 const BakerPageContent: React.FC = () => {
   // Set breadcrumbs for navigation
@@ -294,9 +294,9 @@ const BakerPage: React.FC = () => {
       fallback={(error, retry) => (
         <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center">
           <div className="max-w-md">
-            <AlertTriangle className="h-12 w-12 text-red-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Baker Error</h2>
-            <div className="text-gray-600 mb-6">
+            <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <h2 className="text-2xl font-semibold text-foreground mb-4">Baker Error</h2>
+            <div className="text-muted-foreground mb-6">
               <p>An error occurred while loading the Baker page. This could be due to:</p>
               <ul className="text-left mt-2 space-y-1">
                 <li>• File system access issues</li>

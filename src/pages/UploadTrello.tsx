@@ -62,7 +62,7 @@ const UploadTrello = () => {
         </h2>
         <div className="px-4 mx-4 mt-4 space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
             <Input
               placeholder="Search cards by name or description..."
               value={searchTerm}
@@ -74,7 +74,7 @@ const UploadTrello = () => {
             {Object.keys(filteredGrouped).length > 0 ? (
               <TrelloCardList grouped={filteredGrouped} onSelect={setSelectedCard} />
             ) : (
-              <p className="text-center text-gray-500 py-8">
+              <p className="text-center text-muted-foreground py-8">
                 {searchTerm.trim()
                   ? 'No cards found matching your search.'
                   : 'No cards available.'}

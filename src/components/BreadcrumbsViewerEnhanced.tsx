@@ -26,7 +26,7 @@ export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
       <div className="border-b pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="font-semibold text-gray-900 flex items-center">
+            <h4 className="font-semibold text-foreground flex items-center">
               <File className="h-4 w-4 mr-2" />
               Breadcrumbs.json
               {previewMode && (
@@ -35,7 +35,7 @@ export const BreadcrumbsViewerEnhanced: React.FC<BreadcrumbsViewerProps> = ({
                 </span>
               )}
             </h4>
-            <p className="text-xs text-gray-500 mt-1">{projectPath}</p>
+            <p className="text-xs text-muted-foreground mt-1">{projectPath}</p>
           </div>
           {onTogglePreview && (
             <Button

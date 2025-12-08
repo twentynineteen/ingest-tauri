@@ -66,8 +66,8 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* File uploaded confirmation */}
-      <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-        <p className="text-sm text-green-800">
+      <div className="p-4 bg-success/10 border border-success/20 rounded-lg">
+        <p className="text-sm text-success">
           ✓ File uploaded: <strong>{document?.filename}</strong> ({document?.fileSize}{' '}
           bytes)
         </p>
@@ -106,7 +106,7 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
               </div>
             </AccordionTrigger>
             <AccordionContent className="pb-4">
-              <p className="text-xs text-gray-600 mb-3">
+              <p className="text-xs text-muted-foreground mb-3">
                 Choose which examples the AI should reference when formatting your script.
                 The system will automatically select the most relevant enabled examples.
               </p>
@@ -124,7 +124,7 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
       {/* Two-column grid for provider and model selection */}
       <div className="grid grid-cols-2 gap-6">
         {/* Left column: AI Provider */}
-        <div className="p-6 border border-gray-300 rounded-lg max-h-[200px] overflow-y-auto">
+        <div className="p-6 border border-border rounded-lg max-h-[200px] overflow-y-auto">
           <ProviderSelector
             providers={availableProviders}
             activeProvider={activeProvider}
@@ -135,7 +135,7 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
         </div>
 
         {/* Right column: Model Selector */}
-        <div className="p-6 border border-gray-300 rounded-lg max-h-[200px] overflow-y-auto">
+        <div className="p-6 border border-border rounded-lg max-h-[200px] overflow-y-auto">
           {activeProvider?.status === 'configured' ? (
             <ModelSelector
               models={models}
@@ -144,7 +144,7 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
               isLoading={isLoadingModels}
             />
           ) : (
-            <div className="flex items-center justify-center h-full text-gray-400">
+            <div className="flex items-center justify-center h-full text-muted-foreground">
               <p className="text-sm">Select and validate an AI provider to see models</p>
             </div>
           )}
@@ -159,7 +159,7 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
             e.preventDefault()
             onFormatScript()
           }}
-          className="w-full px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 flex items-center justify-center gap-2 mb-3"
+          className="w-full px-6 py-3 bg-foreground text-background rounded-lg hover:bg-foreground/90 flex items-center justify-center gap-2 mb-3"
         >
           <Sparkles className="h-5 w-5" />
           Format Script with AI
@@ -177,15 +177,13 @@ const RAGStatusContent: React.FC<{
 }> = ({ isLoading, isReady, error }) => {
   if (isLoading) {
     return (
-      <p className="text-sm text-blue-600">
-        Checking Ollama embedding model availability...
-      </p>
+      <p className="text-sm text-info">Checking Ollama embedding model availability...</p>
     )
   }
 
   if (isReady) {
     return (
-      <p className="text-sm text-green-600">
+      <p className="text-sm text-success">
         ✓ RAG system ready (Ollama) - will use similar examples to improve formatting
       </p>
     )
@@ -193,10 +191,10 @@ const RAGStatusContent: React.FC<{
 
   if (error) {
     return (
-      <div className="text-sm text-red-600">
+      <div className="text-sm text-destructive">
         <p className="font-medium">⚠ RAG system not available</p>
         <p className="text-xs mt-1">{error.message}</p>
-        <p className="text-xs mt-1 text-gray-600">
+        <p className="text-xs mt-1 text-muted-foreground">
           Will format without example guidance.
         </p>
       </div>
@@ -204,7 +202,7 @@ const RAGStatusContent: React.FC<{
   }
 
   return (
-    <p className="text-sm text-gray-600">
+    <p className="text-sm text-muted-foreground">
       RAG system not available - will format without example guidance
     </p>
   )

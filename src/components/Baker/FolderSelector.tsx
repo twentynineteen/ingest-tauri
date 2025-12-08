@@ -4,12 +4,12 @@
  * Handles folder selection and scan initiation for Baker.
  */
 
+import { logger } from '@/utils/logger'
 import { Button } from '@components/ui/button'
 import { Input } from '@components/ui/input'
 import { open } from '@tauri-apps/plugin-dialog'
 import { FolderOpen, Play, RefreshCw, Square } from 'lucide-react'
 import React, { useCallback } from 'react'
-import { logger } from '@/utils/logger'
 
 interface FolderSelectorProps {
   selectedFolder: string
@@ -51,7 +51,7 @@ export const FolderSelector: React.FC<FolderSelectorProps> = ({
   return (
     <div className="border rounded-lg p-6 space-y-4">
       <h3 className="text-lg font-medium">Select Folder to Scan</h3>
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-muted-foreground">
         Choose a root directory to scan for BuildProject-compatible folders
       </p>
 

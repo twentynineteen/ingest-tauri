@@ -1,7 +1,7 @@
+import { logger } from '@/utils/logger'
 import { listen } from '@tauri-apps/api/event'
 import { useEffect, useRef, useState } from 'react'
 import { createNamespacedLogger } from '../utils/logger'
-import { logger } from '@/utils/logger'
 
 const log = createNamespacedLogger('CopyProgress')
 

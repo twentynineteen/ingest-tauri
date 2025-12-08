@@ -70,7 +70,7 @@ export function TrelloCardsManager({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     )
   }
@@ -93,8 +93,8 @@ export function TrelloCardsManager({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Trello Cards</h3>
-          <p className="text-sm text-gray-500">
+          <h3 className="text-lg font-semibold text-foreground">Trello Cards</h3>
+          <p className="text-sm text-muted-foreground">
             {trelloCards.length} {trelloCards.length === 1 ? 'card' : 'cards'} • Project
             management
           </p>
@@ -140,9 +140,9 @@ export function TrelloCardsManager({
 
       {/* Card List */}
       {trelloCards.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-12 text-center">
-          <p className="text-sm text-gray-500">No Trello cards added yet</p>
-          <p className="mt-1 text-xs text-gray-400">
+        <div className="rounded-lg border border-dashed border-border bg-muted p-12 text-center">
+          <p className="text-sm text-muted-foreground">No Trello cards added yet</p>
+          <p className="mt-1 text-xs text-muted-foreground/50">
             Link Trello cards to track project management tasks
           </p>
         </div>
@@ -162,8 +162,8 @@ export function TrelloCardsManager({
       {/* Loading indicator */}
       {(isUpdating || isFetchingDetails || isSyncingToTrello) && (
         <div className="flex items-center justify-center py-4">
-          <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-          <span className="ml-2 text-sm text-gray-500">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          <span className="ml-2 text-sm text-muted-foreground">
             {isSyncingToTrello
               ? 'Syncing breadcrumbs to Trello...'
               : isFetchingDetails

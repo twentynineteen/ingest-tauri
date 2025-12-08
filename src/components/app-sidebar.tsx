@@ -1,6 +1,7 @@
 import { NavMain } from '@components/nav-main'
 import { NavUser } from '@components/nav-user'
 import { TeamSwitcher } from '@components/team-switcher'
+import { ThemeToggle } from '@components/theme-toggle'
 import {
   Sidebar,
   SidebarContent,
@@ -136,6 +137,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
+        <ThemeToggle />
         <NavUser
           user={user}
           onLogout={logout}

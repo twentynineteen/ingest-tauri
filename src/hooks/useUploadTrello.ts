@@ -3,6 +3,7 @@
  * Extracted from UploadTrello.tsx (DEBT-002)
  */
 
+import { logger } from '@/utils/logger'
 import { writeTextFile } from '@tauri-apps/plugin-fs'
 import { open } from '@tauri-apps/plugin-shell'
 import {
@@ -27,7 +28,6 @@ import {
   createDefaultSproutUploadResponse,
   SelectedCard
 } from '../pages/UploadTrello/UploadTrelloTypes'
-import { logger } from '@/utils/logger'
 
 export function useUploadTrello() {
   const [selectedCard, setSelectedCard] = useState<SelectedCard | null>(null)

@@ -23,9 +23,9 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress, completed }) => {
   }
 
   return (
-    <div className="w-full bg-gray-200 rounded-lg overflow-hidden mt-4">
+    <div className="w-full bg-secondary rounded-lg overflow-hidden mt-4">
       <div
-        className="bg-blue-600 text-xs leading-none py-1 text-center text-white"
+        className="bg-primary text-xs leading-none py-1 text-center text-primary-foreground"
         style={{ width: `${progress}%` }}
       >
         {progress.toFixed(1)}%

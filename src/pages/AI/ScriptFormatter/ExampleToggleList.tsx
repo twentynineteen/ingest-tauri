@@ -22,13 +22,17 @@ export function ExampleToggleList({
 }: ExampleToggleListProps) {
   if (isLoading) {
     return (
-      <div className="p-4 text-center text-sm text-gray-500">Loading examples...</div>
+      <div className="p-4 text-center text-sm text-muted-foreground">
+        Loading examples...
+      </div>
     )
   }
 
   if (examples.length === 0) {
     return (
-      <div className="p-4 text-center text-sm text-gray-500">No examples available</div>
+      <div className="p-4 text-center text-sm text-muted-foreground">
+        No examples available
+      </div>
     )
   }
 
@@ -39,7 +43,7 @@ export function ExampleToggleList({
     <div className="space-y-2">
       {/* Header with count */}
       <div className="flex items-center justify-between px-2 pb-2 border-b">
-        <span className="text-xs font-medium text-gray-700">
+        <span className="text-xs font-medium text-foreground">
           {enabledCount} of {totalCount} enabled
         </span>
         <div className="flex gap-2">
@@ -47,7 +51,7 @@ export function ExampleToggleList({
             onClick={() =>
               examples.forEach(ex => !enabledIds.has(ex.id) && onToggle(ex.id))
             }
-            className="text-xs text-blue-600 hover:text-blue-700"
+            className="text-xs text-info hover:text-info/90"
             disabled={enabledCount === totalCount}
           >
             Enable All
@@ -56,7 +60,7 @@ export function ExampleToggleList({
             onClick={() =>
               examples.forEach(ex => enabledIds.has(ex.id) && onToggle(ex.id))
             }
-            className="text-xs text-gray-600 hover:text-gray-700"
+            className="text-xs text-muted-foreground hover:text-foreground"
             disabled={enabledCount === 0}
           >
             Disable All
@@ -72,20 +76,20 @@ export function ExampleToggleList({
             <button
               key={example.id}
               onClick={() => onToggle(example.id)}
-              className={`w-full flex items-start gap-3 p-2 rounded-md hover:bg-gray-50 transition-colors text-left ${
-                isEnabled ? 'bg-blue-50/50' : 'bg-white'
+              className={`w-full flex items-start gap-3 p-2 rounded-md hover:bg-muted transition-colors text-left ${
+                isEnabled ? 'bg-info/10' : 'bg-card'
               }`}
             >
               {isEnabled ? (
-                <CheckCircle2 className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                <CheckCircle2 className="h-4 w-4 text-info shrink-0 mt-0.5" />
               ) : (
-                <Circle className="h-4 w-4 text-gray-400 shrink-0 mt-0.5" />
+                <Circle className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
               )}
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
                   <p
                     className={`text-sm font-medium ${
-                      isEnabled ? 'text-gray-900' : 'text-gray-600'
+                      isEnabled ? 'text-foreground' : 'text-muted-foreground'
                     }`}
                   >
                     {example.title}
@@ -93,14 +97,14 @@ export function ExampleToggleList({
                   <span
                     className={`text-xs px-2 py-0.5 rounded-full shrink-0 ${
                       isEnabled
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'bg-gray-100 text-gray-600'
+                        ? 'bg-info/20 text-info'
+                        : 'bg-muted text-muted-foreground'
                     }`}
                   >
                     {example.source === 'bundled' ? 'Bundled' : 'Custom'}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500 mt-0.5">{example.category}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{example.category}</p>
               </div>
             </button>
           )

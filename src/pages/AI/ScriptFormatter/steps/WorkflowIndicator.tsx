@@ -25,18 +25,18 @@ export const WorkflowIndicator: React.FC<WorkflowIndicatorProps> = ({ currentSte
         <div
           key={step}
           className={`flex items-center ${
-            currentStep === step ? 'text-black font-medium' : 'text-gray-400'
+            currentStep === step ? 'text-black font-medium' : 'text-muted-foreground/50'
           }`}
         >
           <div
             className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              currentStep === step ? 'bg-black text-white' : 'bg-gray-300'
+              currentStep === step ? 'bg-black text-white' : 'bg-muted'
             }`}
           >
             {idx + 1}
           </div>
           <span className="ml-2 text-sm capitalize">{step.replace('-', ' ')}</span>
-          {idx < 4 && <div className="w-12 h-0.5 bg-gray-300 mx-4" />}
+          {idx < 4 && <div className="w-12 h-0.5 bg-muted mx-4" />}
         </div>
       ))}
     </div>

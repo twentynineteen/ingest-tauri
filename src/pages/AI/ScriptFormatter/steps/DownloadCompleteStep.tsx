@@ -15,15 +15,15 @@ export const DownloadCompleteStep: React.FC<DownloadCompleteStepProps> = ({
 }) => {
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="p-8 bg-green-50 border border-green-200 rounded-lg text-center">
-        <Download className="h-16 w-16 text-green-600 mx-auto mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Download Complete!</h3>
-        <p className="text-sm text-gray-600 mb-4">
+      <div className="p-8 bg-success/10 border border-success/20 rounded-lg text-center">
+        <Download className="h-16 w-16 text-success mx-auto mb-4" />
+        <h3 className="text-lg font-medium text-foreground mb-2">Download Complete!</h3>
+        <p className="text-sm text-muted-foreground mb-4">
           Your formatted script has been saved successfully.
         </p>
         <button
           onClick={onFormatAnother}
-          className="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+          className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"
         >
           Format Another Script
         </button>

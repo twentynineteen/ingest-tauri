@@ -80,36 +80,38 @@ export function SaveExampleDialog({
             <div>
               <label
                 htmlFor="title"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-foreground mb-1"
               >
-                Title <span className="text-red-500">*</span>
+                Title <span className="text-destructive">*</span>
               </label>
               <input
                 id="title"
                 type="text"
                 value={title}
                 onChange={e => setTitle(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-info"
                 placeholder="e.g., Educational Lecture - Business School"
                 maxLength={200}
                 disabled={isSaving}
               />
-              <p className="text-xs text-gray-500 mt-1">{title.length}/200 characters</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {title.length}/200 characters
+              </p>
             </div>
 
             {/* Category Select */}
             <div>
               <label
                 htmlFor="category"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-foreground mb-1"
               >
-                Category <span className="text-red-500">*</span>
+                Category <span className="text-destructive">*</span>
               </label>
               <select
                 id="category"
                 value={category}
                 onChange={e => setCategory(e.target.value as ExampleCategory)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-info"
                 disabled={isSaving}
               >
                 <option value={ExampleCategory.EDUCATIONAL}>Educational</option>
@@ -125,7 +127,7 @@ export function SaveExampleDialog({
             <div>
               <label
                 htmlFor="quality"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-foreground mb-1"
               >
                 Quality Score
               </label>
@@ -144,22 +146,22 @@ export function SaveExampleDialog({
                   {qualityScore}/5
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 Higher quality examples are prioritized in RAG searches
               </p>
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md flex items-start gap-2">
-                <AlertCircle className="h-4 w-4 text-red-500 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md flex items-start gap-2">
+                <AlertCircle className="h-4 w-4 text-destructive flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-destructive">{error}</p>
               </div>
             )}
 
             {/* Info Message */}
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
-              <p className="text-xs text-blue-800">
+            <div className="p-3 bg-info/10 border border-info/20 rounded-md">
+              <p className="text-xs text-info">
                 This will save both the original and formatted versions of your script.
                 The formatted version will be used to match similar content in future RAG
                 searches.
@@ -172,14 +174,14 @@ export function SaveExampleDialog({
                 type="button"
                 onClick={handleClose}
                 disabled={isSaving}
-                className="px-4 py-2 text-sm text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                className="px-4 py-2 text-sm text-foreground border border-input rounded-md hover:bg-secondary disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSaving}
-                className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 text-sm bg-info text-info-foreground rounded-md hover:bg-info/90 disabled:opacity-50"
               >
                 {isSaving ? 'Saving...' : 'Save Example'}
               </button>

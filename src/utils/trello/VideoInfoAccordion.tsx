@@ -47,7 +47,7 @@ const VideoInfoAccordion: React.FC<VideoInfoAccordionProps> = ({
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
+              className="text-info hover:underline"
             >
               Open Video
             </a>

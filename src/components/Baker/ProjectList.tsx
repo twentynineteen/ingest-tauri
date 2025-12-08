@@ -47,7 +47,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
 }) => {
   if (projects.length === 0) {
     return (
-      <div className="border rounded-lg p-6 text-center text-gray-500">
+      <div className="border rounded-lg p-6 text-center text-muted-foreground">
         No projects found
       </div>
     )
@@ -68,7 +68,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                 />
                 <div>
                   <p className="font-medium">{project.name}</p>
-                  <p className="text-sm text-gray-500 truncate max-w-md">
+                  <p className="text-sm text-muted-foreground truncate max-w-md">
                     {project.path}
                   </p>
                 </div>
@@ -76,17 +76,17 @@ export const ProjectList: React.FC<ProjectListProps> = ({
               <div className="flex items-center space-x-2">
                 <div className="flex space-x-2 text-xs">
                   <span
-                    className={`px-2 py-1 rounded ${project.isValid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}
+                    className={`px-2 py-1 rounded ${project.isValid ? 'bg-success/20 text-success' : 'bg-destructive/20 text-destructive'}`}
                   >
                     {project.isValid ? 'Valid' : 'Invalid'}
                   </span>
                   <span
                     className={`px-2 py-1 rounded ${
                       project.invalidBreadcrumbs
-                        ? 'bg-red-100 text-red-800'
+                        ? 'bg-destructive/20 text-destructive'
                         : project.hasBreadcrumbs
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 text-gray-800'
+                          ? 'bg-info/20 text-info'
+                          : 'bg-muted text-muted-foreground'
                     }`}
                   >
                     {project.invalidBreadcrumbs
@@ -97,12 +97,12 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                   </span>
                   {project.hasBreadcrumbs && (
                     <span
-                      className={`px-2 py-1 rounded ${project.staleBreadcrumbs ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}
+                      className={`px-2 py-1 rounded ${project.staleBreadcrumbs ? 'bg-warning/20 text-warning' : 'bg-success/20 text-success'}`}
                     >
                       {project.staleBreadcrumbs ? 'Stale breadcrumbs' : 'Up to date'}
                     </span>
                   )}
-                  <span className="px-2 py-1 rounded bg-gray-100 text-gray-800">
+                  <span className="px-2 py-1 rounded bg-muted text-muted-foreground">
                     {project.cameraCount} camera{project.cameraCount !== 1 ? 's' : ''}
                   </span>
                 </div>
@@ -130,10 +130,12 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                 {isLoadingBreadcrumbs ? (
                   <div className="flex items-center justify-center py-4">
                     <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                    <span className="text-sm text-gray-500">Loading breadcrumbs...</span>
+                    <span className="text-sm text-muted-foreground">
+                      Loading breadcrumbs...
+                    </span>
                   </div>
                 ) : breadcrumbsError ? (
-                  <div className="flex items-center justify-center py-4 text-red-600">
+                  <div className="flex items-center justify-center py-4 text-destructive">
                     <AlertTriangle className="h-4 w-4 mr-2" />
                     <span className="text-sm">{breadcrumbsError}</span>
                   </div>
@@ -148,7 +150,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                     trelloApiToken={trelloApiToken}
                   />
                 ) : (
-                  <div className="flex items-center justify-center py-4 text-gray-500">
+                  <div className="flex items-center justify-center py-4 text-muted-foreground">
                     <span className="text-sm">No breadcrumbs data found</span>
                   </div>
                 )}

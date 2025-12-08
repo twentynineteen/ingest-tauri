@@ -4,11 +4,11 @@
  * Purpose: Upload .docx files with validation
  */
 
+import { logger } from '@/utils/logger'
 import { open } from '@tauri-apps/plugin-dialog'
 import { readFile } from '@tauri-apps/plugin-fs'
 import { AlertCircle, FileText, Upload } from 'lucide-react'
 import React, { useState } from 'react'
-import { logger } from '@/utils/logger'
 
 interface FileUploaderProps {
   onFileSelect: (file: File) => void
@@ -69,7 +69,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
 
   return (
     <div className="space-y-4">
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors">
+      <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-border/60 transition-colors">
         <button
           onClick={handleUploadClick}
           disabled={isLoading}
@@ -77,31 +77,33 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
         >
           {isLoading ? (
             <>
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black" />
-              <p className="text-sm text-gray-600">Processing file...</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary" />
+              <p className="text-sm text-muted-foreground">Processing file...</p>
             </>
           ) : (
             <>
               {selectedFileName ? (
                 <>
-                  <FileText className="h-12 w-12 text-green-500" />
+                  <FileText className="h-12 w-12 text-success" />
                   <div>
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-foreground">
                       {selectedFileName}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Click to select a different file
                     </p>
                   </div>
                 </>
               ) : (
                 <>
-                  <Upload className="h-12 w-12 text-gray-400" />
+                  <Upload className="h-12 w-12 text-muted-foreground" />
                   <div>
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-foreground">
                       Click to upload .docx script
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">Maximum file size: 1GB</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Maximum file size: 1GB
+                    </p>
                   </div>
                 </>
               )}
@@ -112,11 +114,11 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
 
       {/* Display validation errors */}
       {error && (
-        <div className="flex items-start gap-2 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+          <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-red-800">Upload Error</p>
-            <p className="text-sm text-red-700 mt-1">{error.message}</p>
+            <p className="text-sm font-medium text-destructive">Upload Error</p>
+            <p className="text-sm text-destructive/90 mt-1">{error.message}</p>
           </div>
         </div>
       )}
