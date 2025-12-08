@@ -1,3 +1,4 @@
+import { AlertCircle, Camera, FileText } from 'lucide-react'
 import React from 'react'
 
 interface ProjectInputsProps {
@@ -16,56 +17,67 @@ const ProjectInputs: React.FC<ProjectInputsProps> = ({
   showSanitizationWarning = false
 }) => {
   return (
-    <div className="title-camera-inline flex flex-row gap-6 pt-3">
+    <div className="flex flex-row gap-4">
       {/* Project Title Input */}
-      <div className="title-input w-full">
+      <div className="flex-1">
         <label
           htmlFor="project-title"
-          className="block mb-2 text-sm font-medium text-foreground"
+          className="flex items-center gap-1.5 mb-1.5 text-xs font-semibold text-foreground"
         >
-          Project title
+          <FileText className="w-3.5 h-3.5 text-primary" />
+          Project Title
         </label>
         <input
           id="project-title"
           value={title}
           onChange={e => onTitleChange(e.target.value)}
           className="bg-secondary border border-input text-foreground
-            text-sm rounded-lg focus:ring-info focus:border-info
-            block w-full p-2.5"
-          placeholder="Enter title here"
+            text-sm rounded-lg
+            focus:ring-2 focus:ring-info focus:border-info
+            hover:border-input/80
+            block w-full px-3 py-2
+            transition-all duration-200"
+          placeholder="e.g. DBA - IB1234 - J Doe - Introductions 060626"
         />
         {showSanitizationWarning ? (
-          <p className="mt-2 text-sm text-warning">
-            Some characters were changed to hyphens (/ \ : * ? " &lt; &gt; |) to ensure
-            compatibility
-          </p>
+          <div className="flex items-start gap-1.5 mt-1.5 p-1.5 bg-warning/10 border border-warning/30 rounded-md">
+            <AlertCircle className="w-3.5 h-3.5 text-warning flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-warning">
+              Some characters were changed to hyphens (/ \ : * ? &quot; &lt; &gt; |) to
+              ensure compatibility
+            </p>
+          </div>
         ) : (
-          <p className="mt-2 text-sm text-muted-foreground">
-            e.g. DBA - IB1234 - J Doe - Introductions 060626
-          </p>
+          <p className="mt-1 text-xs text-muted-foreground">Enter project title here</p>
         )}
       </div>
 
       {/* Number of Cameras Input */}
-      <div className="camera-input">
+      <div className="w-40 flex-shrink-0">
         <label
           htmlFor="number-input"
-          className="block mb-2 text-sm font-medium text-foreground"
+          className="flex items-center gap-1.5 mb-1.5 text-xs font-semibold text-foreground"
         >
-          Number of cameras:
+          <Camera className="w-3.5 h-3.5 text-primary" />
+          Cameras
         </label>
         <input
           type="number"
           id="number-input"
+          min="1"
+          max="10"
           className="bg-secondary border border-input
-            text-foreground text-sm rounded-lg focus:ring-info
-            focus:border-info block w-full p-2.5 font-semibold"
+            text-foreground text-sm rounded-lg font-semibold
+            focus:ring-2 focus:ring-info focus:border-info
+            hover:border-input/80
+            block w-full px-3 py-2
+            transition-all duration-200"
           placeholder="2"
           value={numCameras}
           onChange={e => onNumCamerasChange(Number(e.target.value))}
           required
         />
-        <p className="mt-2 text-sm text-muted-foreground">Default: 2</p>
+        <p className="mt-1 text-xs text-muted-foreground">Number of cameras</p>
       </div>
     </div>
   )

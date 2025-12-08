@@ -23,12 +23,15 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress, completed }) => {
   }
 
   return (
-    <div className="w-full bg-secondary rounded-lg overflow-hidden mt-4">
+    <div className="w-full bg-secondary rounded-lg overflow-hidden h-8 relative">
       <div
-        className="bg-primary text-xs leading-none py-1 text-center text-primary-foreground"
+        className="bg-primary h-full flex items-center justify-center text-sm font-semibold text-primary-foreground transition-all duration-300"
         style={{ width: `${progress}%` }}
-      >
-        {progress.toFixed(1)}%
+      />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-sm font-semibold text-foreground drop-shadow-sm">
+          {progress.toFixed(1)}%
+        </span>
       </div>
     </div>
   )

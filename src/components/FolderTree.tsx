@@ -31,17 +31,30 @@ const FolderTree: React.FC<Props> = ({ onSelect, selectedFolder }) => {
   }
 
   return (
-    <div className="flex items-center justify-evenly rounded-lg py-3">
+    <div className="flex items-center gap-3 rounded-lg py-2">
       <button
         onClick={openFolderPicker}
-        className="text-primary-foreground bg-primary hover:bg-primary/90 focus:ring-4 focus:outline-hidden focus:ring-ring font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2"
+        className="inline-flex items-center justify-center gap-2
+          px-5 py-2 text-sm font-semibold
+          text-primary-foreground bg-primary hover:bg-primary/90
+          rounded-lg shadow-sm hover:shadow
+          focus:ring-4 focus:outline-none focus:ring-ring
+          transition-colors duration-200 flex-shrink-0"
       >
         Select Destination
       </button>
       {selectedFolder ? (
-        <p className="text-sm text-foreground mt-2">Destination: {selectedFolder}</p>
+        <div className="flex-1 min-w-0 px-3 py-2 bg-card border border-border rounded-lg overflow-hidden">
+          <p className="text-sm font-medium text-foreground truncate" title={selectedFolder}>
+            {selectedFolder}
+          </p>
+        </div>
       ) : (
-        <p className="text-sm text-foreground mt-2"></p>
+        <div className="flex-1 min-w-0 px-3 py-2 bg-muted/20 border border-dashed border-border rounded-lg">
+          <p className="text-sm text-muted-foreground italic">
+            No destination selected
+          </p>
+        </div>
       )}
     </div>
   )
