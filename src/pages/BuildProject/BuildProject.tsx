@@ -125,7 +125,7 @@ const BuildProject: React.FC = () => {
     <div className="">
       {/* Project Configuration & File Explorer */}
       <div className="w-full pb-4 border-b mb-4">
-        <h2 className="px-4 text-2xl font-semibold">Build a Project</h2>
+        <h1 className="px-4 text-2xl font-semibold">Build a Project</h1>
         <div className="px-4 mx-4">
           <ProjectInputs
             title={title}
@@ -161,10 +161,10 @@ const BuildProject: React.FC = () => {
           {/* 🔹 Post-completion actions - shown after project completion */}
           {completed && !loading && selectedFolder && title && (
             <div className="pt-6 space-y-4 animate-fadeIn">
-              <div className="mx-4 p-6 bg-linear-to-r from-success/10 to-info/10 border border-success/20 rounded-xl shadow-xs">
-                <h3 className="text-lg font-semibold text-success mb-4 text-center">
+              <div className="mx-4 p-6 bg-gradient-to-r from-success/10 to-info/10 border border-success/20 rounded-xl shadow-xs">
+                <h2 className="text-lg font-semibold text-success mb-4 text-center">
                   Project Created Successfully! 🎉
-                </h3>
+                </h2>
 
                 {/* Trello Cards Manager */}
                 <TrelloCardsManager

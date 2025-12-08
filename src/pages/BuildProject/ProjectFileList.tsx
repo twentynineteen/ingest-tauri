@@ -33,12 +33,13 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
           key={`${item.file.path}-${idx}`} // Ensures unique key
           className="my-4 text-sm text-foreground flex justify-between items-center"
         >
-          <span className="px-4 truncate w-[200px] text-start">{item.file.name}</span>
-          <span className="nowrap truncate italic w-[300px]">({item.file.path})</span>
+          <span className="px-4 truncate w-48 text-start">{item.file.name}</span>
+          <span className="truncate italic w-72">({item.file.path})</span>
 
           <div className="flex justify-center px-4 grid-cols-2 gap-4 flex-row items-center">
             {/* Camera select dropdown */}
             <select
+              aria-label={`Select camera for ${item.file.name}`}
               className="ml-2 border border-input bg-background text-foreground p-1 rounded mb-2 focus:ring-2 focus:ring-ring focus:border-input"
               value={item.camera}
               onChange={e => onUpdateCamera(idx, Number(e.target.value))}
@@ -53,6 +54,7 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
             {/* Delete Button */}
             <button
               onClick={() => onDeleteFile(idx)}
+              aria-label={`Delete ${item.file.name}`}
               className="ml-2 text-destructive hover:text-destructive/80 transition-colors"
             >
               <Trash2 />
