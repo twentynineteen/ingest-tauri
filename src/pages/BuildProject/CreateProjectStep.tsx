@@ -1,6 +1,6 @@
-import { FolderPlus } from 'lucide-react'
-import { STEP_CARD_ANIMATION } from '@constants/animations'
 import { Button } from '@components/ui/button'
+import { STEP_CARD_ANIMATION } from '@constants/animations'
+import { FolderPlus } from 'lucide-react'
 
 interface CreateProjectStepProps {
   showSuccess: boolean
@@ -57,11 +57,11 @@ export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
                   ? 'Please enter a project title and select a folder'
                   : undefined
               }
+              animationStyle="glow"
               className="px-6 py-2.5 font-semibold text-white
                 bg-gradient-to-r from-chart-4 to-chart-5
-                hover:from-chart-4/90 hover:to-chart-5/90
                 disabled:from-muted disabled:to-muted
-                shadow-md hover:shadow-lg"
+                shadow-md"
             >
               <FolderPlus className="w-4 h-4" />
               Create Project

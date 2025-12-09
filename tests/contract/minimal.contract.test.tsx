@@ -1,5 +1,5 @@
 import React from 'react'
-import { renderWithQueryClient } from '@utils/query-test-utils.ts'
+import { renderWithQueryClient } from '@tests/utils/query-test-utils'
 import { queryKeys } from '@lib/query-keys'
 
 describe('Minimal Contract Test', () => {

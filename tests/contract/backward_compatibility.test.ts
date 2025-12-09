@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { invoke } from '@tauri-apps/api/core'
 import { setupTauriMocks } from '../setup/tauri-mocks'
-import { createTestBreadcrumbs } from '@utils/test-helpers'
+import { createTestBreadcrumbs } from '@tests/utils/test-helpers'
 import type { BreadcrumbsFile } from '@/types/baker'
 
 describe('Backward Compatibility Contract', () => {

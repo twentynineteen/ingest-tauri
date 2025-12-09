@@ -152,6 +152,16 @@ export const BUTTON_ANIMATIONS = {
     easing: EASING.easeOut,
     shadowFrom: 'md', // Tailwind shadow class
     shadowTo: 'lg' // Grows to larger shadow
+  },
+  // Glow/shine effect for gradient buttons
+  glow: {
+    duration: DURATION.normal,
+    easing: EASING.easeOut,
+    brightnessFrom: 1.0,
+    brightnessTo: 1.1,
+    saturateFrom: 1.0,
+    saturateTo: 1.2,
+    scale: 1.03
   }
 } as const
 

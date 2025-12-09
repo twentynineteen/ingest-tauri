@@ -33,7 +33,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 import { Button } from '@/components/ui/button'
 import { BUTTON_ANIMATIONS, DURATION, EASING } from '@/constants/animations'
-import { mockReducedMotion } from '@utils/animation-testing'
+import { mockReducedMotion } from '@tests/utils/animation-testing'
 
 describe('Button Animations', () => {
   describe('Animation Presence', () => {

@@ -52,8 +52,8 @@ src/
 
 ```typescript
 import { useQuery } from '@tanstack/react-query'
-import { createQueryOptions, createQueryError, shouldRetry } from '../lib/query-utils'
-import { queryKeys } from '../lib/query-keys'
+import { createQueryOptions, createQueryError, shouldRetry } from '@lib/query-utils'
+import { queryKeys } from '@lib/query-keys'
 
 function useUserData(userId: string) {
   return useQuery({

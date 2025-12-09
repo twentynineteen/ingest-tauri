@@ -36,6 +36,13 @@ const buttonVariants = cva(
   }
 )
 
+interface ButtonProps
+  extends React.ComponentProps<'button'>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+  animationStyle?: 'scale' | 'lift' | 'glow' | 'none'
+}
+
 function Button({
   className,
   variant,
@@ -43,11 +50,7 @@ function Button({
   asChild = false,
   animationStyle = 'scale',
   ...props
-}: React.ComponentProps<'button'> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-    animationStyle?: 'scale' | 'lift' | 'none'
-  }) {
+}: ButtonProps) {
   const shouldReduceMotion = useReducedMotion()
 
   // If asChild, we can't wrap with motion
@@ -73,18 +76,41 @@ function Button({
       return { y: BUTTON_ANIMATIONS.lift.y }
     }
 
+    if (animationStyle === 'glow') {
+      return {
+        filter: `brightness(${BUTTON_ANIMATIONS.glow.brightnessTo}) saturate(${BUTTON_ANIMATIONS.glow.saturateTo})`
+      }
+    }
+
     return { scale: BUTTON_ANIMATIONS.hover.scale }
+  }
+
+  // Get initial animation state
+  const getInitialAnimation = () => {
+    if (animationStyle === 'glow') {
+      return {
+        filter: `brightness(${BUTTON_ANIMATIONS.glow.brightnessFrom}) saturate(${BUTTON_ANIMATIONS.glow.saturateFrom})`
+      }
+    }
+    return {}
   }
 
   return (
     <MotionButton
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(
+        buttonVariants({ variant, size }),
+        // For glow animation, remove transition-all to prevent conflict with Framer Motion
+        animationStyle === 'glow' && '[transition:none]',
+        className
+      )}
       style={{
         // Prevent layout shift during scale animation
         transformOrigin: 'center',
         ...props.style
       }}
+      initial={getInitialAnimation()}
+      animate={getInitialAnimation()}
       whileHover={getHoverAnimation()}
       whileTap={
         !shouldReduceMotion && !props.disabled
@@ -99,7 +125,10 @@ function Button({
               duration: 0
             }
           : {
-              duration: BUTTON_ANIMATIONS.hover.duration / 1000, // Convert ms to seconds
+              duration:
+                animationStyle === 'glow'
+                  ? BUTTON_ANIMATIONS.glow.duration / 1000
+                  : BUTTON_ANIMATIONS.hover.duration / 1000,
               ease: [0.0, 0.0, 0.2, 1] // easeOut cubic-bezier
             }
       }
