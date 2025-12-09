@@ -55,7 +55,10 @@ function createDownloadHandler() {
 }
 
 // Extract update installation logic to reduce nesting
-async function installUpdateAndRelaunch(update: any) {
+async function installUpdateAndRelaunch(update: {
+  version: string
+  downloadAndInstall: (handler: (event: DownloadEvent) => void) => Promise<void>
+}) {
   log.info(`Found update: ${update.version}`)
 
   const downloadHandler = createDownloadHandler()

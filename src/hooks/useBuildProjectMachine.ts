@@ -32,7 +32,7 @@ export function useBuildProjectMachine() {
           if (!isMounted) return
           send({ type: 'COPY_COMPLETE' })
         })
-      } catch (error) {
+      } catch {
         // Silently handle listener setup errors
       }
     }
@@ -47,7 +47,7 @@ export function useBuildProjectMachine() {
         try {
           if (unlistenProgress) unlistenProgress()
           if (unlistenComplete) unlistenComplete()
-        } catch (error) {
+        } catch {
           // Silently handle cleanup errors
         }
       }, 0)

@@ -61,8 +61,7 @@ export function usePremiereIntegration() {
    * Show completion dialog and optionally open folder
    */
   const showCompletionDialog = async ({
-    projectFolder,
-    projectTitle
+    projectFolder
   }: DialogParams): Promise<void> => {
     try {
       await invoke('show_confirmation_dialog', {

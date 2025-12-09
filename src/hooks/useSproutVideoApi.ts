@@ -5,7 +5,6 @@
  * Parses Sprout Video URLs and fetches metadata from Sprout API via Tauri command
  */
 
-import { logger } from '@/utils/logger'
 import { useMutation } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 import type { SproutVideoDetails } from '../types/media'
