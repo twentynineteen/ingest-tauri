@@ -13,11 +13,11 @@
 
 import { describe, test, expect } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
-import { useScriptDownload } from '../../../src/hooks/useScriptDownload'
-import type { ScriptDocument } from '../../../src/types/scriptFormatter'
+import { useScriptDownload } from '@hooks/useScriptDownload'
+import type { ScriptDocument } from '@/types/scriptFormatter'
 
 // Mock useDocxGenerator
-vi.mock('../../../src/hooks/useDocxGenerator', () => ({
+vi.mock('@hooks/useDocxGenerator', () => ({
   useDocxGenerator: () => ({
     generateFile: vi.fn().mockResolvedValue(undefined),
     isGenerating: false,

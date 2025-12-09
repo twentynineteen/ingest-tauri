@@ -4,8 +4,6 @@
  */
 
 import { logger } from '@/utils/logger'
-import { writeTextFile } from '@tauri-apps/plugin-fs'
-import { open } from '@tauri-apps/plugin-shell'
 import {
   useAppendBreadcrumbs,
   useAppendVideoInfo,
@@ -15,19 +13,21 @@ import {
   useTrelloBoardId,
   useTrelloCardDetails,
   useVideoInfoBlock
-} from 'hooks'
+} from '@/hooks'
+import { appStore } from '@store/useAppStore'
+import { writeTextFile } from '@tauri-apps/plugin-fs'
+import { open } from '@tauri-apps/plugin-shell'
+import { TrelloCard } from '@utils/TrelloCards'
+import { SproutUploadResponse } from '@utils/types'
 import { useMemo, useState } from 'react'
-import { appStore } from 'store/useAppStore'
-import { TrelloCard } from 'utils/TrelloCards'
-import { SproutUploadResponse } from 'utils/types'
 import {
   useCardDetailsSync,
   useCardValidation
-} from '../pages/UploadTrello/UploadTrelloHooks'
+} from '@pages/UploadTrello/UploadTrelloHooks'
 import {
   createDefaultSproutUploadResponse,
   SelectedCard
-} from '../pages/UploadTrello/UploadTrelloTypes'
+} from '@pages/UploadTrello/UploadTrelloTypes'
 
 export function useUploadTrello() {
   const [selectedCard, setSelectedCard] = useState<SelectedCard | null>(null)

@@ -7,9 +7,9 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, useRef } from 'react'
-import type { VideoLink } from '../types/baker'
-import { createNamespacedLogger } from '../utils/logger'
-import type { SproutUploadResponse } from '../utils/types'
+import type { VideoLink } from '@/types/baker'
+import { createNamespacedLogger } from '@utils/logger'
+import type { SproutUploadResponse } from '@utils/types'
 
 const logger = createNamespacedLogger('useSproutVideoProcessor')
 

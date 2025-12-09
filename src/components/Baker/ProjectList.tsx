@@ -12,7 +12,7 @@ import type {
   BreadcrumbsFile,
   BreadcrumbsPreview,
   ProjectFolder
-} from '../../types/baker'
+} from '@/types/baker'
 
 interface ProjectListProps {
   projects: ProjectFolder[]

@@ -1,6 +1,6 @@
 import { renderHook } from '@testing-library/react'
-import { renderWithQueryClient, testHookContract, type HookTestContract } from '../utils/query-test-utils.ts'
-import { queryKeys } from '../../src/lib/query-keys'
+import { renderWithQueryClient, testHookContract, type HookTestContract } from '@utils/query-test-utils.ts'
+import { queryKeys } from '@lib/query-keys'
 
 // This test defines the contract for migrating useBreadcrumb from useEffect to React Query
 describe('useBreadcrumb Contract Tests', () => {

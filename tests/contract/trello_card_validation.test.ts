@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { validateTrelloCard, extractTrelloCardId } from '../../src/utils/validation'
-import { createMockTrelloCard } from '../utils/test-helpers'
-import type { TrelloCard } from '../../src/types/media'
+import { validateTrelloCard, extractTrelloCardId } from '@utils/validation'
+import { createMockTrelloCard } from '@utils/test-helpers'
+import type { TrelloCard } from '@/types/media'
 
 describe('TrelloCard Validation Contract', () => {
   describe('Valid TrelloCard', () => {

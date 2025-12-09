@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { TrelloCard } from 'utils/TrelloCards'
+import { TrelloCard } from '@utils/TrelloCards'
 import { SelectedCard } from './UploadTrelloTypes'
 
 export const useCardDetailsSync = (

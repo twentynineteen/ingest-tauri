@@ -6,7 +6,7 @@
 
 import { invoke } from '@tauri-apps/api/core'
 import { useCallback, useState } from 'react'
-import type { BreadcrumbsFile } from '../types/baker'
+import type { BreadcrumbsFile } from '@/types/baker'
 
 interface UseBreadcrumbsReaderResult {
   breadcrumbs: BreadcrumbsFile | null

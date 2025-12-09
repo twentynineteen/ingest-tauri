@@ -8,7 +8,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import { describe, test, expect, beforeAll } from 'vitest'
 import { setupTauriMocks } from '../setup/tauri-mocks'
-import type { ProjectFolder } from '../../src/types/baker'
+import type { ProjectFolder } from '@/types/baker'
 import { resolve } from 'path'
 
 describe('baker_validate_folder Contract', () => {

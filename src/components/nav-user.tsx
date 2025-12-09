@@ -15,9 +15,9 @@ import { core } from '@tauri-apps/api'
 import { getVersion } from '@tauri-apps/api/app'
 import { ChevronsUpDown, LogOut } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { CACHE } from '../constants/timing'
-import { queryKeys } from '../lib/query-keys'
-import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
+import { CACHE } from '@constants/timing'
+import { queryKeys } from '@lib/query-keys'
+import { createQueryError, createQueryOptions, shouldRetry } from '@lib/query-utils'
 
 type Props = {
   user: {

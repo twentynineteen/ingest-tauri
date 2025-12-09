@@ -5,7 +5,7 @@
 
 import { Edit, Minus, Plus } from 'lucide-react'
 import React from 'react'
-import type { BatchUpdateSummary } from '../../utils/batchUpdateSummary'
+import type { BatchUpdateSummary } from '@utils/batchUpdateSummary'
 
 interface ChangesSummaryProps {
   summary: BatchUpdateSummary

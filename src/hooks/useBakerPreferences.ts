@@ -7,7 +7,7 @@
 
 import { logger } from '@/utils/logger'
 import { useCallback, useState } from 'react'
-import type { ScanPreferences, UseBakerPreferencesResult } from '../types/baker'
+import type { ScanPreferences, UseBakerPreferencesResult } from '@/types/baker'
 
 const STORAGE_KEY = 'baker-preferences'
 

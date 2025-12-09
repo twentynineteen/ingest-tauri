@@ -5,13 +5,13 @@
  */
 
 import { useState } from 'react'
-import { getDefaultConfig, providerRegistry } from '../services/ai/providerConfig'
-import { useAppStore } from '../store/useAppStore'
+import { getDefaultConfig, providerRegistry } from '@services/ai/providerConfig'
+import { useAppStore } from '@store/useAppStore'
 import {
   STORAGE_KEYS,
   type AIProvider,
   type ProviderConfiguration
-} from '../types/scriptFormatter'
+} from '@/types/scriptFormatter'
 
 interface UseAIProviderResult {
   activeProvider: AIProvider | null

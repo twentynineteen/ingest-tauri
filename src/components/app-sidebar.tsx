@@ -9,9 +9,9 @@ import {
   SidebarHeader,
   SidebarRail
 } from '@components/ui/sidebar'
-import { useAuth } from 'hooks/useAuth'
-import { useUpdateManager } from 'hooks/useUpdateManager'
-import { useUsername } from 'hooks/useUsername'
+import { useAuth } from '@hooks/useAuth'
+import { useUpdateManager } from '@hooks/useUpdateManager'
+import { useUsername } from '@hooks/useUsername'
 import { Clapperboard, FileText, HardDriveUpload, Save, Settings } from 'lucide-react'
 import * as React from 'react'
 

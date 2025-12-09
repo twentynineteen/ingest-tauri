@@ -1,6 +1,7 @@
-import { FootageFile } from 'hooks/useCameraAutoRemap'
+import { FootageFile } from '@hooks/useCameraAutoRemap'
 import { RefreshCw, Upload } from 'lucide-react'
-import { STEP_CARD_ANIMATION } from '../../constants/animations'
+import { STEP_CARD_ANIMATION } from '@constants/animations'
+import { Button } from '@components/ui/button'
 import ProjectFileList from './ProjectFileList'
 
 interface AddFootageStepProps {
@@ -57,32 +58,25 @@ export const AddFootageStep: React.FC<AddFootageStepProps> = ({
         </div>
         {!showSuccess && (
           <div className="flex gap-2">
-            <button
+            <Button
               onClick={onSelectFiles}
-              className="inline-flex items-center justify-center gap-1.5
-                px-4 py-1.5 text-xs font-semibold
-                text-primary-foreground bg-primary hover:bg-primary/90
-                rounded-lg shadow-sm hover:shadow
-                focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background
-                transition-colors duration-200"
+              size="sm"
+              className="gap-1.5 shadow-sm hover:shadow"
             >
               <Upload className="w-3.5 h-3.5" />
               Select Files
-            </button>
+            </Button>
             {files.length > 0 && (
-              <button
+              <Button
                 onClick={onClearAll}
-                className="inline-flex items-center justify-center gap-1.5
-                  px-3 py-1.5 text-xs font-medium
-                  text-muted-foreground border border-border bg-background
-                  hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30
-                  rounded-lg
-                  focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background
-                  transition-colors duration-200"
+                variant="outline"
+                size="sm"
+                className="gap-1.5
+                  hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 Clear
-              </button>
+              </Button>
             )}
           </div>
         )}

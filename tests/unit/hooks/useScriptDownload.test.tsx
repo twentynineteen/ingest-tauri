@@ -11,15 +11,15 @@
 
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useScriptDownload } from '../../../src/hooks/useScriptDownload'
-import type { ScriptDocument } from '../../../src/types/scriptFormatter'
+import { useScriptDownload } from '@hooks/useScriptDownload'
+import type { ScriptDocument } from '@/types/scriptFormatter'
 
 // Mock dependencies
-vi.mock('../../../src/hooks/useDocxGenerator', () => ({
+vi.mock('@hooks/useDocxGenerator', () => ({
   useDocxGenerator: vi.fn()
 }))
 
-vi.mock('../../../src/utils/logger', () => ({
+vi.mock('@utils/logger', () => ({
   createNamespacedLogger: () => ({
     debug: vi.fn(),
     info: vi.fn(),
@@ -28,7 +28,7 @@ vi.mock('../../../src/utils/logger', () => ({
   })
 }))
 
-import { useDocxGenerator } from '../../../src/hooks/useDocxGenerator'
+import { useDocxGenerator } from '@hooks/useDocxGenerator'
 
 describe('useScriptDownload', () => {
   const mockGenerateFile = vi.fn()

@@ -144,6 +144,14 @@ export const BUTTON_ANIMATIONS = {
     opacity: 0.5,
     duration: DURATION.normal,
     easing: EASING.easeOut
+  },
+  // Lift effect for premium buttons (gradient CTAs)
+  lift: {
+    y: -3, // Lift up 3px
+    duration: DURATION.fast,
+    easing: EASING.easeOut,
+    shadowFrom: 'md', // Tailwind shadow class
+    shadowTo: 'lg' // Grows to larger shadow
   }
 } as const
 

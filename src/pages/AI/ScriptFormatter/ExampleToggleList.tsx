@@ -5,7 +5,7 @@
 
 import { CheckCircle2, Circle } from 'lucide-react'
 import React from 'react'
-import type { ExampleWithMetadata } from '../../../types/exampleEmbeddings'
+import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
 
 interface ExampleToggleListProps {
   examples: ExampleWithMetadata[]

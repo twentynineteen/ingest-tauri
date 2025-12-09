@@ -2,7 +2,7 @@
 
 import { Film, Trash2, Video } from 'lucide-react'
 import React from 'react'
-import { FILE_LIST_ANIMATION } from '../../constants/animations'
+import { FILE_LIST_ANIMATION } from '@constants/animations'
 
 interface FootageFile {
   file: {

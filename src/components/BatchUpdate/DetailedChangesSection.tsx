@@ -5,7 +5,7 @@
 
 import { ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react'
 import React, { useState } from 'react'
-import type { BreadcrumbsPreview } from '../../types/baker'
+import type { BreadcrumbsPreview } from '@/types/baker'
 import { ProjectChangeDetailView } from '../ProjectChangeDetailView'
 import { Button } from '../ui/button'
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { FootageData } from 'utils/types'
+import { FootageData } from '@utils/types'
 
 interface Props {
   files: FootageData[]

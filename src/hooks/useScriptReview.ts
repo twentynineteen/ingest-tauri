@@ -11,8 +11,8 @@
  */
 
 import { useCallback, useMemo, useState } from 'react'
-import type { ProcessedOutput } from '../types/scriptFormatter'
-import { createNamespacedLogger } from '../utils/logger'
+import type { ProcessedOutput } from '@/types/scriptFormatter'
+import { createNamespacedLogger } from '@utils/logger'
 
 const log = createNamespacedLogger('ScriptReview')
 

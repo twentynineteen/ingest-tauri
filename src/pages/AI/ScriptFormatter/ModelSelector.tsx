@@ -6,7 +6,7 @@
 
 import { Brain, Loader2, Wrench, Zap } from 'lucide-react'
 import React from 'react'
-import type { AIModel } from '../../../types/scriptFormatter'
+import type { AIModel } from '@/types/scriptFormatter'
 
 interface ModelSelectorProps {
   models: AIModel[]

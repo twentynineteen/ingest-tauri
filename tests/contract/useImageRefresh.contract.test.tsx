@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react'
-import { renderWithQueryClient, testHookContract, type HookTestContract } from '../utils/query-test-utils.ts'
-import { queryKeys } from '../../src/lib/query-keys'
+import { renderWithQueryClient, testHookContract, type HookTestContract } from '@utils/query-test-utils.ts'
+import { queryKeys } from '@lib/query-keys'
 
 describe('useImageRefresh Contract Tests', () => {
   const mockSproutResponse = {

@@ -7,8 +7,8 @@
 
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { describe, test, expect, vi, beforeEach } from 'vitest'
-import { useBakerScan } from '../../src/hooks/useBakerScan'
-import type { ScanOptions, ScanResult } from '../../src/types/baker'
+import { useBakerScan } from '@hooks/useBakerScan'
+import type { ScanOptions, ScanResult } from '@/types/baker'
 
 // Mock Tauri invoke function
 vi.mock('@tauri-apps/api/core', () => ({

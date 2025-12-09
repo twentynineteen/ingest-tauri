@@ -1,7 +1,10 @@
 import { cn } from '@components/lib/utils'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { motion } from 'framer-motion'
 import * as React from 'react'
+import { useReducedMotion } from '@hooks/useReducedMotion'
+import { BUTTON_ANIMATIONS } from '@constants/animations'
 
 const buttonVariants = cva(
   "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
@@ -38,17 +41,68 @@ function Button({
   variant,
   size,
   asChild = false,
+  animationStyle = 'scale',
   ...props
 }: React.ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
+    animationStyle?: 'scale' | 'lift' | 'none'
   }) {
-  const Comp = asChild ? Slot : 'button'
+  const shouldReduceMotion = useReducedMotion()
+
+  // If asChild, we can't wrap with motion
+  if (asChild) {
+    return (
+      <Slot
+        data-slot="button"
+        className={cn(buttonVariants({ variant, size, className }))}
+        {...props}
+      />
+    )
+  }
+
+  const MotionButton = motion.button
+
+  // Determine hover animation based on animationStyle
+  const getHoverAnimation = () => {
+    if (shouldReduceMotion || props.disabled || animationStyle === 'none') {
+      return undefined
+    }
+
+    if (animationStyle === 'lift') {
+      return { y: BUTTON_ANIMATIONS.lift.y }
+    }
+
+    return { scale: BUTTON_ANIMATIONS.hover.scale }
+  }
 
   return (
-    <Comp
+    <MotionButton
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      style={{
+        // Prevent layout shift during scale animation
+        transformOrigin: 'center',
+        ...props.style
+      }}
+      whileHover={getHoverAnimation()}
+      whileTap={
+        !shouldReduceMotion && !props.disabled
+          ? {
+              scale: BUTTON_ANIMATIONS.press.scale
+            }
+          : undefined
+      }
+      transition={
+        shouldReduceMotion
+          ? {
+              duration: 0
+            }
+          : {
+              duration: BUTTON_ANIMATIONS.hover.duration / 1000, // Convert ms to seconds
+              ease: [0.0, 0.0, 0.2, 1] // easeOut cubic-bezier
+            }
+      }
       {...props}
     />
   )

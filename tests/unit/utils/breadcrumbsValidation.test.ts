@@ -5,8 +5,8 @@ import {
   hasSchemaIssues,
   getErrorMessage,
   type ValidationResult
-} from '../../../src/utils/breadcrumbsValidation'
-import type { BreadcrumbsFile, FileInfo } from '../../../src/types/baker'
+} from '@utils/breadcrumbsValidation'
+import type { BreadcrumbsFile, FileInfo } from '@/types/baker'
 
 describe('breadcrumbsValidation', () => {
   describe('validateBreadcrumbs', () => {

@@ -14,8 +14,8 @@ import {
   User
 } from 'lucide-react'
 import React from 'react'
-import type { BreadcrumbsFile } from '../../types/baker'
-import { formatBreadcrumbDateSimple } from '../../utils/breadcrumbsComparison'
+import type { BreadcrumbsFile } from '@/types/baker'
+import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
 import { TrelloCardsManager } from '../Baker/TrelloCardsManager'
 import { VideoLinksManager } from '../Baker/VideoLinksManager'
 import { Button } from '../ui/button'

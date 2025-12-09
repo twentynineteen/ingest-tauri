@@ -5,8 +5,8 @@
 
 import { Edit, Minus, Plus } from 'lucide-react'
 import React from 'react'
-import type { FieldChange } from '../../types/baker'
-import { formatFieldValue } from '../../utils/breadcrumbsComparison'
+import type { FieldChange } from '@/types/baker'
+import { formatFieldValue } from '@utils/breadcrumbsComparison'
 
 export const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 B'

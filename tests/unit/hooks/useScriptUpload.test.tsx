@@ -11,15 +11,15 @@
 
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useScriptUpload } from '../../../src/hooks/useScriptUpload'
-import type { ScriptDocument } from '../../../src/types/scriptFormatter'
+import { useScriptUpload } from '@hooks/useScriptUpload'
+import type { ScriptDocument } from '@/types/scriptFormatter'
 
 // Mock dependencies
-vi.mock('../../../src/hooks/useDocxParser', () => ({
+vi.mock('@hooks/useDocxParser', () => ({
   useDocxParser: vi.fn()
 }))
 
-vi.mock('../../../src/utils/logger', () => ({
+vi.mock('@utils/logger', () => ({
   createNamespacedLogger: () => ({
     debug: vi.fn(),
     info: vi.fn(),
@@ -28,7 +28,7 @@ vi.mock('../../../src/utils/logger', () => ({
   })
 }))
 
-import { useDocxParser } from '../../../src/hooks/useDocxParser'
+import { useDocxParser } from '@hooks/useDocxParser'
 
 describe('useScriptUpload', () => {
   const mockParseFile = vi.fn()

@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react'
-import { PROJECT_LIMITS } from '../constants/project'
-import { createNamespacedLogger } from '../utils/logger'
+import { PROJECT_LIMITS } from '@constants/project'
+import { createNamespacedLogger } from '@utils/logger'
 import { FootageFile } from './useCameraAutoRemap'
 import { selectFiles } from './useFileSelector'
 

@@ -8,12 +8,12 @@
 
 import { AlertTriangle, CheckCircle, Clock } from 'lucide-react'
 import React from 'react'
-import type { BreadcrumbsPreview } from '../types/baker'
+import type { BreadcrumbsPreview } from '@/types/baker'
 import {
   calculateBatchUpdateSummary,
   hasAnyChanges,
   type BatchUpdateSummary
-} from '../utils/batchUpdateSummary'
+} from '@utils/batchUpdateSummary'
 import {
   ChangesSummary,
   CommonUpdates,

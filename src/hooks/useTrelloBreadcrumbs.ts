@@ -6,8 +6,8 @@
 import { logger } from '@/utils/logger'
 import { writeTextFile } from '@tauri-apps/plugin-fs'
 import { useCallback } from 'react'
-import { appStore } from '../store/useAppStore'
-import type { TrelloCard } from '../utils/TrelloCards'
+import { appStore } from '@store/useAppStore'
+import type { TrelloCard } from '@utils/TrelloCards'
 import { useAppendBreadcrumbs } from './useAppendBreadcrumbs'
 import { useParsedTrelloDescription } from './useParsedTrelloDescription'
 

@@ -1,7 +1,7 @@
 import { mockIPC } from '@tauri-apps/api/mocks'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
-import type { BreadcrumbsFile, VideoLink, TrelloCard } from '../../src/types/baker'
+import type { BreadcrumbsFile, VideoLink, TrelloCard } from '@/types/baker'
 
 export function setupTauriMocks() {
   // Mock breadcrumbs file storage (in-memory)

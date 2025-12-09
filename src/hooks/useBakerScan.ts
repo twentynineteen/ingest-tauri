@@ -15,7 +15,7 @@ import type {
   ScanProgressEvent,
   ScanResult,
   UseBakerScanResult
-} from '../types/baker'
+} from '@/types/baker'
 
 export function useBakerScan(): UseBakerScanResult {
   const [scanResult, setScanResult] = useState<ScanResult | null>(null)

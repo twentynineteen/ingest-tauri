@@ -12,27 +12,27 @@
 
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useAIProcessing } from '../../../src/hooks/useAIProcessing'
-import type { ProcessedOutput, ProviderConfiguration } from '../../../src/types/scriptFormatter'
+import { useAIProcessing } from '@hooks/useAIProcessing'
+import type { ProcessedOutput, ProviderConfiguration } from '@/types/scriptFormatter'
 
 // Mock dependencies
-vi.mock('../../../src/hooks/useAIProvider', () => ({
+vi.mock('@hooks/useAIProvider', () => ({
   useAIProvider: vi.fn()
 }))
 
-vi.mock('../../../src/hooks/useAIModels', () => ({
+vi.mock('@hooks/useAIModels', () => ({
   useAIModels: vi.fn()
 }))
 
-vi.mock('../../../src/hooks/useScriptProcessor', () => ({
+vi.mock('@hooks/useScriptProcessor', () => ({
   useScriptProcessor: vi.fn()
 }))
 
-vi.mock('../../../src/hooks/useExampleManagement', () => ({
+vi.mock('@hooks/useExampleManagement', () => ({
   useExampleManagement: vi.fn()
 }))
 
-vi.mock('../../../src/utils/logger', () => ({
+vi.mock('@utils/logger', () => ({
   createNamespacedLogger: () => ({
     debug: vi.fn(),
     info: vi.fn(),
@@ -41,10 +41,10 @@ vi.mock('../../../src/utils/logger', () => ({
   })
 }))
 
-import { useAIProvider } from '../../../src/hooks/useAIProvider'
-import { useAIModels } from '../../../src/hooks/useAIModels'
-import { useScriptProcessor } from '../../../src/hooks/useScriptProcessor'
-import { useExampleManagement } from '../../../src/hooks/useExampleManagement'
+import { useAIProvider } from '@hooks/useAIProvider'
+import { useAIModels } from '@hooks/useAIModels'
+import { useScriptProcessor } from '@hooks/useScriptProcessor'
+import { useExampleManagement } from '@hooks/useExampleManagement'
 
 describe('useAIProcessing', () => {
   const mockProvider = {

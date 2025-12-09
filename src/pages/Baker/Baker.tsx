@@ -5,6 +5,7 @@
  * Refactored to separate concerns into focused components and hooks.
  */
 
+import { useTrelloBoard } from '@/hooks'
 import { logger } from '@/utils/logger'
 import { BakerPreferences } from '@components/Baker/BakerPreferences'
 import { BatchActions } from '@components/Baker/BatchActions'
@@ -17,11 +18,10 @@ import { Button } from '@components/ui/button'
 import { useBakerPreferences } from '@hooks/useBakerPreferences'
 import { useBakerScan } from '@hooks/useBakerScan'
 import { useBakerTrelloIntegration } from '@hooks/useBakerTrelloIntegration'
+import { useBreadcrumb } from '@hooks/useBreadcrumb'
 import { useBreadcrumbsManager } from '@hooks/useBreadcrumbsManager'
 import { useBreadcrumbsPreview } from '@hooks/useBreadcrumbsPreview'
 import { useLiveBreadcrumbsReader } from '@hooks/useLiveBreadcrumbsReader'
-import { useTrelloBoard } from 'hooks'
-import { useBreadcrumb } from 'hooks/useBreadcrumb'
 import { AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react'
 import React, { useCallback, useState } from 'react'
 

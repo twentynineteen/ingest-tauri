@@ -7,7 +7,7 @@
  */
 
 import { test, expect } from '../fixtures/app.fixture'
-import { ExampleEmbeddingsPage } from '../pages/example.page'
+import { ExampleEmbeddingsPage } from '@pages/example.page'
 import { setupTauriMocks } from '../fixtures/mocks.fixture'
 
 test.describe('Example Management - Upload Workflow', () => {

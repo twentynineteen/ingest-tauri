@@ -1,7 +1,7 @@
+import { useAppStore } from '@store/useAppStore'
 import { useQuery } from '@tanstack/react-query'
 import { readDir } from '@tauri-apps/plugin-fs'
 import { useCallback, useState } from 'react'
-import { useAppStore } from 'store/useAppStore'
 
 interface BackgroundFolderData {
   files: string[]

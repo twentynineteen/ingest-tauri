@@ -20,7 +20,7 @@ import {
   User
 } from 'lucide-react'
 import React, { useState } from 'react'
-import type { DetailedFieldChange, ProjectChangeDetail } from '../types/baker'
+import type { DetailedFieldChange, ProjectChangeDetail } from '@/types/baker'
 
 interface ProjectChangeDetailViewProps {
   changeDetail: ProjectChangeDetail

@@ -8,7 +8,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import { describe, test, expect, beforeAll, beforeEach, afterEach } from 'vitest'
 import { setupTauriMocks } from '../setup/tauri-mocks'
-import type { BatchUpdateResult } from '../../src/types/baker'
+import type { BatchUpdateResult } from '@/types/baker'
 import { resolve } from 'path'
 
 describe('baker_update_breadcrumbs Contract', () => {

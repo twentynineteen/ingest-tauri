@@ -24,14 +24,18 @@ import { useEffect, useState } from 'react'
 export const useReducedMotion = (): boolean => {
   const [shouldReduceMotion, setShouldReduceMotion] = useState(() => {
     // Initialize with media query result
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && window.matchMedia) {
       const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-      return mediaQuery.matches
+      return mediaQuery?.matches || false
     }
     return false
   })
 
   useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) {
+      return
+    }
+
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
 
     // Update state when preference changes

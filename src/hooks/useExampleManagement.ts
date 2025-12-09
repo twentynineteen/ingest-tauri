@@ -11,7 +11,7 @@ import type {
   ExampleWithMetadata,
   ReplaceRequest,
   UploadRequest
-} from '../types/exampleEmbeddings'
+} from '@/types/exampleEmbeddings'
 
 export function useExampleManagement() {
   const queryClient = useQueryClient()

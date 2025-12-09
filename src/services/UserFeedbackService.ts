@@ -3,8 +3,8 @@
  * Provides interactive user feedback and notifications during updates
  */
 
-import { TIMEOUTS } from '../constants/timing'
-import { logger } from '../utils/logger'
+import { TIMEOUTS } from '@constants/timing'
+import { logger } from '@utils/logger'
 import { ProgressTracker, ProgressUpdate } from './ProgressTracker'
 
 export interface FeedbackOptions {

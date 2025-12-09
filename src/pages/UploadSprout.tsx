@@ -1,15 +1,15 @@
 import { Button } from '@components/ui/button'
 import { Progress } from '@components/ui/progress'
-import { useSproutVideoApiKey } from 'hooks/useApiKeys'
-import { useBreadcrumb } from 'hooks/useBreadcrumb'
-import { useFileUpload } from 'hooks/useFileUpload'
-import { useImageRefresh } from 'hooks/useImageRefresh'
-import { useUploadEvents } from 'hooks/useUploadEvents'
+import { useSproutVideoApiKey } from '@hooks/useApiKeys'
+import { useBreadcrumb } from '@hooks/useBreadcrumb'
+import { useFileUpload } from '@hooks/useFileUpload'
+import { useImageRefresh } from '@hooks/useImageRefresh'
+import { useUploadEvents } from '@hooks/useUploadEvents'
+import EmbedCodeInput from '@utils/EmbedCodeInput'
+import ExternalLink from '@utils/ExternalLink'
+import FormattedDate from '@utils/FormattedDate'
 import { Sprout } from 'lucide-react'
 import React from 'react'
-import ExternalLink from 'utils/ExternalLink'
-import FormattedDate from 'utils/FormattedDate'
-import EmbedCodeInput from '../utils/EmbedCodeInput'
 
 const UploadSprout = () => {
   // Custom hooks

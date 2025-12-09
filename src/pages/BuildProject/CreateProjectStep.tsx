@@ -1,5 +1,6 @@
 import { FolderPlus } from 'lucide-react'
-import { STEP_CARD_ANIMATION } from '../../constants/animations'
+import { STEP_CARD_ANIMATION } from '@constants/animations'
+import { Button } from '@components/ui/button'
 
 interface CreateProjectStepProps {
   showSuccess: boolean
@@ -46,7 +47,7 @@ export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
         </div>
         {!showSuccess && (
           <>
-            <button
+            <Button
               onClick={onCreateProject}
               disabled={isDisabled}
               aria-disabled={isDisabled}
@@ -56,18 +57,15 @@ export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
                   ? 'Please enter a project title and select a folder'
                   : undefined
               }
-              className="inline-flex items-center justify-center gap-2
-                px-6 py-2.5 text-sm font-semibold text-white
+              className="px-6 py-2.5 font-semibold text-white
                 bg-gradient-to-r from-chart-4 to-chart-5
                 hover:from-chart-4/90 hover:to-chart-5/90
-                disabled:from-muted disabled:to-muted disabled:cursor-not-allowed disabled:opacity-50
-                rounded-lg shadow-md hover:shadow-lg
-                focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background
-                transition-colors duration-200"
+                disabled:from-muted disabled:to-muted
+                shadow-md hover:shadow-lg"
             >
               <FolderPlus className="w-4 h-4" />
               Create Project
-            </button>
+            </Button>
             {isDisabled && (
               <span id="create-btn-requirements" className="sr-only">
                 Requires project title and selected folder

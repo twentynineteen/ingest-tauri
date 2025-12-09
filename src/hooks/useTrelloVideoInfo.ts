@@ -4,8 +4,8 @@
  */
 
 import { useCallback, useMemo } from 'react'
-import { appStore } from '../store/useAppStore'
-import type { TrelloCard } from '../utils/TrelloCards'
+import { appStore } from '@store/useAppStore'
+import type { TrelloCard } from '@utils/TrelloCards'
 import { useAppendVideoInfo } from './useAppendVideoInfo'
 import { useVideoInfoBlock } from './useVideoInfoBlock'
 

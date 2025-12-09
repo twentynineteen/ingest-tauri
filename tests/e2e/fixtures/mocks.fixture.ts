@@ -4,8 +4,8 @@ import type {
   BreadcrumbsFile,
   ProjectFolder,
   ScanResult,
-} from '../../../src/types/baker'
-import type { ExampleWithMetadata } from '../../../src/types/exampleEmbeddings'
+} from '@/types/baker'
+import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
 
 /**
  * Mock data and helpers for Tauri API mocking

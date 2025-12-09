@@ -7,8 +7,8 @@
 
 import { renderHook, act } from '@testing-library/react'
 import { describe, test, expect, vi, beforeEach } from 'vitest'
-import { useBakerPreferences } from '../../src/hooks/useBakerPreferences'
-import type { ScanPreferences } from '../../src/types/baker'
+import { useBakerPreferences } from '@hooks/useBakerPreferences'
+import type { ScanPreferences } from '@/types/baker'
 
 // Mock localStorage
 const mockLocalStorage = {

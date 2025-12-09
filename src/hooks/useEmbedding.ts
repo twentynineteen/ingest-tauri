@@ -7,7 +7,7 @@
 import { logger } from '@/utils/logger'
 import { pipeline, type Pipeline } from '@xenova/transformers'
 import { useEffect, useRef, useState } from 'react'
-import { createNamespacedLogger } from '../utils/logger'
+import { createNamespacedLogger } from '@utils/logger'
 
 const log = createNamespacedLogger('Embedding')
 

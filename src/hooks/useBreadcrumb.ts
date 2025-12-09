@@ -1,9 +1,9 @@
+import { CACHE } from '@constants/timing'
+import { useBreadcrumbStore } from '@store/useBreadcrumbStore'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useEffect } from 'react'
-import { useBreadcrumbStore } from 'store/useBreadcrumbStore'
-import { CACHE } from '../constants/timing'
-import { queryKeys } from '../lib/query-keys'
-import { createQueryOptions } from '../lib/query-utils'
+import { queryKeys } from '@lib/query-keys'
+import { createQueryOptions } from '@lib/query-utils'
 
 interface BreadcrumbItem {
   label: string

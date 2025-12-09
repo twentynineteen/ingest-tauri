@@ -18,9 +18,9 @@ import {
 } from 'hooks'
 import { ExternalLink, Search } from 'lucide-react'
 import React, { useEffect, useMemo, useState } from 'react'
-import { appStore } from 'store/useAppStore'
-import TrelloCardList from '../../utils/trello/TrelloCardList'
-import { TrelloCard } from '../../utils/TrelloCards'
+import { appStore } from '@store/useAppStore'
+import TrelloCardList from '@utils/trello/TrelloCardList'
+import { TrelloCard } from '@utils/TrelloCards'
 
 interface TrelloIntegrationModalProps {
   isOpen: boolean

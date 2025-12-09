@@ -5,7 +5,7 @@
  */
 
 import type { LanguageModel } from 'ai'
-import type { ProviderConfiguration } from '../../types/scriptFormatter'
+import type { ProviderConfiguration } from '@/types/scriptFormatter'
 import { providerRegistry } from './providerConfig'
 import type { ModelCreationOptions } from './types'
 

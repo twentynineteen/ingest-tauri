@@ -8,7 +8,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import { describe, test, expect, beforeAll } from 'vitest'
 import { setupTauriMocks } from '../setup/tauri-mocks'
-import type { ScanOptions } from '../../src/types/baker'
+import type { ScanOptions } from '@/types/baker'
 
 describe('baker_start_scan Contract', () => {
   beforeAll(() => {

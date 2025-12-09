@@ -7,7 +7,7 @@
 
 import { tool } from 'ai'
 import { z } from 'zod'
-import type { SimilarExample } from '../hooks/useScriptRetrieval'
+import type { SimilarExample } from '@hooks/useScriptRetrieval'
 import { createNamespacedLogger } from './logger'
 
 const logger = createNamespacedLogger('buildRAGPrompt')

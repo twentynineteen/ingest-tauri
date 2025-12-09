@@ -5,7 +5,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
-import type { BreadcrumbsFile, VideoLink } from '../types/baker'
+import type { BreadcrumbsFile, VideoLink } from '@/types/baker'
 
 interface UseBreadcrumbsVideoLinksOptions {
   projectPath: string

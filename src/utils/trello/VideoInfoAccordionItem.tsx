@@ -4,7 +4,7 @@ import {
   AccordionTrigger
 } from '@components/ui/accordion'
 import React from 'react'
-import { VideoInfoData } from '../../hooks/useVideoInfoBlock'
+import { VideoInfoData } from '@hooks/useVideoInfoBlock'
 import KeyValueRow from './KeyValueRow'
 import VideoThumbnail from './VideoThumbnail'
 

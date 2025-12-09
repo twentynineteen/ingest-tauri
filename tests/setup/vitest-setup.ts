@@ -1,20 +1,31 @@
 import '@testing-library/jest-dom'
-import { beforeAll, afterEach, afterAll } from 'vitest'
+import { beforeAll, afterEach, afterAll, vi } from 'vitest'
 
-// Mock matchMedia IMMEDIATELY at module load time (before next-themes can access it)
+// Mock matchMedia IMMEDIATELY at module load time
+// This is required for both our code and Framer Motion's reduced motion detection
+const mockMatchMedia = (query: string) => ({
+  matches: false,
+  media: query,
+  onchange: null,
+  addListener: vi.fn(), // deprecated
+  removeListener: vi.fn(), // deprecated
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  dispatchEvent: vi.fn()
+})
+
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
-  value: vi.fn().mockImplementation(query => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(), // deprecated
-    removeListener: vi.fn(), // deprecated
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
+  value: vi.fn().mockImplementation(mockMatchMedia)
 })
+
+// Also ensure global.matchMedia exists for Node environment
+if (typeof global !== 'undefined') {
+  Object.defineProperty(global, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation(mockMatchMedia)
+  })
+}
 
 // Mock Tauri APIs
 const mockTauriApis = () => {

@@ -13,14 +13,14 @@
 
 import { renderHook, act, waitFor } from '@testing-library/react'
 import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
-import { useBakerScan } from '../../src/hooks/useBakerScan'
+import { useBakerScan } from '@hooks/useBakerScan'
 import type {
   ScanOptions,
   ScanResult,
   ScanCompleteEvent,
   ScanErrorEvent,
   ProjectFolder
-} from '../../src/types/baker'
+} from '@/types/baker'
 
 // Mock Tauri invoke function
 vi.mock('@tauri-apps/api/core', () => ({

@@ -2,7 +2,7 @@
 import { logger } from '@/utils/logger'
 import { invoke } from '@tauri-apps/api/core'
 import React, { useState } from 'react'
-import { GetFoldersResponse, SproutFolder } from '../utils/types'
+import { GetFoldersResponse, SproutFolder } from '@utils/types'
 
 interface FolderTreeSproutProps {
   folder: SproutFolder

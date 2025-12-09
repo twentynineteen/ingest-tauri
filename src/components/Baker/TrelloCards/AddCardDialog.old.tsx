@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { AlertCircle, Loader2, Plus, Search } from 'lucide-react'
-import TrelloCardList from '../../../utils/trello/TrelloCardList'
+import TrelloCardList from '@utils/trello/TrelloCardList'
 
 interface AddCardDialogProps {
   isOpen: boolean

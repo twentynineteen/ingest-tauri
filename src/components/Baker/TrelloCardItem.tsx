@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { logger } from '@/utils/logger'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ExternalLink, RefreshCw, Trash2 } from 'lucide-react'
-import type { TrelloCard } from '../../types/baker'
+import type { TrelloCard } from '@/types/baker'
 
 interface TrelloCardItemProps {
   trelloCard: TrelloCard

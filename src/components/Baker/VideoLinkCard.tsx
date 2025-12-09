@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { logger } from '@/utils/logger'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ChevronDown, ChevronUp, ExternalLink, Trash2, Video } from 'lucide-react'
-import type { VideoLink } from '../../types/baker'
+import type { VideoLink } from '@/types/baker'
 
 interface VideoLinkCardProps {
   videoLink: VideoLink

@@ -89,7 +89,7 @@ vi.mock('@tauri-apps/plugin-dialog', () => ({
 
 // Import after mocks
 import { useBakerScan } from '@hooks/useBakerScan'
-import BakerPage from '../../src/pages/Baker/Baker'
+import BakerPage from '@pages/Baker/Baker'
 
 // Helper to render with providers
 function renderWithProviders(ui: React.ReactElement) {

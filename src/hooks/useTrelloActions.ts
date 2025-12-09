@@ -5,7 +5,7 @@
 
 import { open } from '@tauri-apps/plugin-shell'
 import { useCallback } from 'react'
-import { SelectedCard } from '../pages/UploadTrello/UploadTrelloTypes'
+import { SelectedCard } from '@pages/UploadTrello/UploadTrelloTypes'
 
 export function useTrelloActions(
   selectedCard: SelectedCard | null,

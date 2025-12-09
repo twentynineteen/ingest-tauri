@@ -5,7 +5,7 @@
 
 import { AlertCircle } from 'lucide-react'
 import React, { useState } from 'react'
-import { ExampleCategory } from '../../../types/exampleEmbeddings'
+import { ExampleCategory } from '@/types/exampleEmbeddings'
 
 interface SaveExampleDialogProps {
   isOpen: boolean

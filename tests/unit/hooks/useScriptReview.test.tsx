@@ -12,10 +12,10 @@
 
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useScriptReview } from '../../../src/hooks/useScriptReview'
-import type { ProcessedOutput } from '../../../src/types/scriptFormatter'
+import { useScriptReview } from '@hooks/useScriptReview'
+import type { ProcessedOutput } from '@/types/scriptFormatter'
 
-vi.mock('../../../src/utils/logger', () => ({
+vi.mock('@utils/logger', () => ({
   createNamespacedLogger: () => ({
     debug: vi.fn(),
     info: vi.fn(),

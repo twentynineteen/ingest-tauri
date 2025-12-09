@@ -8,11 +8,11 @@
 import { logger } from '@/utils/logger'
 import { invoke } from '@tauri-apps/api/core'
 import { useCallback, useState } from 'react'
-import type { BreadcrumbsFile, BreadcrumbsPreview, ProjectFolder } from '../types/baker'
+import type { BreadcrumbsFile, BreadcrumbsPreview, ProjectFolder } from '@/types/baker'
 import {
   compareBreadcrumbsMeaningful,
   generateBreadcrumbsPreview
-} from '../utils/breadcrumbsComparison'
+} from '@utils/breadcrumbsComparison'
 
 interface UseBreadcrumbsPreviewResult {
   // State

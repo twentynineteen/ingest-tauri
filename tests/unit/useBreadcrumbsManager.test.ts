@@ -7,8 +7,8 @@
 
 import { renderHook, act } from '@testing-library/react'
 import { describe, test, expect, vi, beforeEach } from 'vitest'
-import { useBreadcrumbsManager } from '../../src/hooks/useBreadcrumbsManager'
-import type { BatchUpdateResult } from '../../src/types/baker'
+import { useBreadcrumbsManager } from '@hooks/useBreadcrumbsManager'
+import type { BatchUpdateResult } from '@/types/baker'
 
 // Mock Tauri invoke function
 vi.mock('@tauri-apps/api/core', () => ({

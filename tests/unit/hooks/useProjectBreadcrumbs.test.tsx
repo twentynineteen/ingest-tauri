@@ -23,7 +23,7 @@ vi.mock('@tauri-apps/plugin-fs', () => ({
   writeTextFile: vi.fn()
 }))
 
-vi.mock('store/useAppStore', () => ({
+vi.mock('@store/useAppStore', () => ({
   appStore: {
     getState: vi.fn(() => ({
       setBreadcrumbs: vi.fn()
@@ -33,7 +33,7 @@ vi.mock('store/useAppStore', () => ({
 
 import { invoke } from '@tauri-apps/api/core'
 import { writeTextFile } from '@tauri-apps/plugin-fs'
-import { appStore } from 'store/useAppStore'
+import { appStore } from '@store/useAppStore'
 
 describe('useProjectBreadcrumbs', () => {
   const mockFiles: FootageFile[] = [

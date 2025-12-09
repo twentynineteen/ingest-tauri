@@ -1,4 +1,4 @@
-import type { BreadcrumbsFile, VideoLink, TrelloCard } from '../../src/types/baker'
+import type { BreadcrumbsFile, VideoLink, TrelloCard } from '@/types/baker'
 
 export function createTestBreadcrumbs(
   overrides?: Partial<BreadcrumbsFile>

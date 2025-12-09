@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { createQueryError, inferErrorType, calculateProgress } from '../../src/lib/query-utils'
+import { createQueryError, inferErrorType, calculateProgress } from '@lib/query-utils'
 
 describe('Query Utils', () => {
   describe('inferErrorType', () => {

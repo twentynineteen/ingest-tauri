@@ -17,8 +17,8 @@ import {
   User
 } from 'lucide-react'
 import React from 'react'
-import type { BreadcrumbsPreview, FieldChange } from '../../types/baker'
-import { formatBreadcrumbDateSimple } from '../../utils/breadcrumbsComparison'
+import type { BreadcrumbsPreview, FieldChange } from '@/types/baker'
+import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
 import { Field, formatFileSize } from './fieldUtils'
 
 interface PreviewComparisonProps {

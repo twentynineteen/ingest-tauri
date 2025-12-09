@@ -6,11 +6,11 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { ExampleList } from '../../../src/pages/AI/ExampleEmbeddings/ExampleList'
-import type { ExampleWithMetadata } from '../../../src/types/exampleEmbeddings'
+import { ExampleList } from '@pages/AI/ExampleEmbeddings/ExampleList'
+import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
 
 // Mock the ExampleCard component to simplify testing
-vi.mock('../../../src/pages/AI/ExampleEmbeddings/ExampleCard', () => ({
+vi.mock('@pages/AI/ExampleEmbeddings/ExampleCard', () => ({
   ExampleCard: ({ example, onDelete, onReplace }: any) => (
     <div data-testid={`example-card-${example.id}`}>
       <span>{example.title}</span>

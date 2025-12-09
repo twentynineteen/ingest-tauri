@@ -7,8 +7,8 @@
 import { logger } from '@/utils/logger'
 import { invoke } from '@tauri-apps/api/core'
 import { useState } from 'react'
-import type { BreadcrumbsFile, VideoLink } from '../types/baker'
-import { validateVideoLink } from '../utils/validation'
+import type { BreadcrumbsFile, VideoLink } from '@/types/baker'
+import { validateVideoLink } from '@utils/validation'
 import { useSproutVideoApiKey, useTrelloApiKeys } from './useApiKeys'
 import {
   generateBreadcrumbsBlock,

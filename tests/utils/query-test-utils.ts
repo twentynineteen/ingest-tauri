@@ -2,7 +2,7 @@ import * as React from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, RenderOptions, RenderResult } from '@testing-library/react'
 import { ReactElement, ReactNode } from 'react'
-import { type QueryKey } from '../../src/lib/query-utils'
+import { type QueryKey } from '@lib/query-utils'
 
 export interface QueryTestOptions {
   queryClient?: QueryClient

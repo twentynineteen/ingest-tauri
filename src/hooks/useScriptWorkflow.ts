@@ -12,8 +12,8 @@
 
 import { logger } from '@/utils/logger'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { ProcessedOutput, WorkflowStep } from '../types/scriptFormatter'
-import { createNamespacedLogger } from '../utils/logger'
+import type { ProcessedOutput, WorkflowStep } from '@/types/scriptFormatter'
+import { createNamespacedLogger } from '@utils/logger'
 import { useAIProcessing } from './useAIProcessing'
 import { useScriptDownload } from './useScriptDownload'
 import { useScriptReview } from './useScriptReview'

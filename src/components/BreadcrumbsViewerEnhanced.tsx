@@ -7,7 +7,7 @@
 
 import { Eye, EyeOff, File } from 'lucide-react'
 import React from 'react'
-import type { BreadcrumbsViewerProps } from '../types/baker'
+import type { BreadcrumbsViewerProps } from '@/types/baker'
 import { NormalView } from './BreadcrumbsViewer/NormalView'
 import { PreviewComparison } from './BreadcrumbsViewer/PreviewComparison'
 import { Button } from './ui/button'

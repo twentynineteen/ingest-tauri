@@ -6,7 +6,7 @@
 
 import { CheckCircle, Loader2, XCircle, Zap } from 'lucide-react'
 import React from 'react'
-import type { AIProvider, ProviderConfiguration } from '../../../types/scriptFormatter'
+import type { AIProvider, ProviderConfiguration } from '@/types/scriptFormatter'
 
 interface ProviderSelectorProps {
   providers: AIProvider[]

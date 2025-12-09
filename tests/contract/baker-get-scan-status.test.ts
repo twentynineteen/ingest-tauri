@@ -8,7 +8,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import { describe, test, expect, beforeAll } from 'vitest'
 import { setupTauriMocks } from '../setup/tauri-mocks'
-import type { ScanResult } from '../../src/types/baker'
+import type { ScanResult } from '@/types/baker'
 
 describe('baker_get_scan_status Contract', () => {
   let mockScanId: string

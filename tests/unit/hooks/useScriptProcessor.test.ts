@@ -12,7 +12,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { MockLanguageModelV2, simulateReadableStream } from 'ai/test'
 
 // Import the hook (will fail during RED phase - not implemented yet)
-// import { useScriptProcessor } from '../../../src/hooks/useScriptProcessor'
+// import { useScriptProcessor } from '@hooks/useScriptProcessor'
 
 // Mock language model for testing
 const createMockModel = () => {

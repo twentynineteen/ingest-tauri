@@ -4,7 +4,7 @@
  */
 
 import { useMemo } from 'react'
-import type { TrelloCard } from '../utils/TrelloCards'
+import type { TrelloCard } from '@utils/TrelloCards'
 import { useFuzzySearch } from './useFuzzySearch'
 
 /**

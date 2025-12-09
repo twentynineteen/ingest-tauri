@@ -10,8 +10,8 @@
  */
 
 import { useCallback, useState } from 'react'
-import type { ScriptDocument } from '../types/scriptFormatter'
-import { createNamespacedLogger } from '../utils/logger'
+import type { ScriptDocument } from '@/types/scriptFormatter'
+import { createNamespacedLogger } from '@utils/logger'
 import { useDocxGenerator } from './useDocxGenerator'
 
 const log = createNamespacedLogger('ScriptDownload')

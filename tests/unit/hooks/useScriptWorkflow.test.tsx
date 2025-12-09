@@ -12,27 +12,27 @@
 
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { useScriptWorkflow } from '../../../src/hooks/useScriptWorkflow'
-import type { WorkflowStep } from '../../../src/types/scriptFormatter'
+import { useScriptWorkflow } from '@hooks/useScriptWorkflow'
+import type { WorkflowStep } from '@/types/scriptFormatter'
 
 // Mock all sub-hooks
-vi.mock('../../../src/hooks/useScriptUpload', () => ({
+vi.mock('@hooks/useScriptUpload', () => ({
   useScriptUpload: vi.fn()
 }))
 
-vi.mock('../../../src/hooks/useAIProcessing', () => ({
+vi.mock('@hooks/useAIProcessing', () => ({
   useAIProcessing: vi.fn()
 }))
 
-vi.mock('../../../src/hooks/useScriptReview', () => ({
+vi.mock('@hooks/useScriptReview', () => ({
   useScriptReview: vi.fn()
 }))
 
-vi.mock('../../../src/hooks/useScriptDownload', () => ({
+vi.mock('@hooks/useScriptDownload', () => ({
   useScriptDownload: vi.fn()
 }))
 
-vi.mock('../../../src/utils/logger', () => ({
+vi.mock('@utils/logger', () => ({
   logger: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -49,10 +49,10 @@ vi.mock('../../../src/utils/logger', () => ({
   })
 }))
 
-import { useScriptUpload } from '../../../src/hooks/useScriptUpload'
-import { useAIProcessing } from '../../../src/hooks/useAIProcessing'
-import { useScriptReview } from '../../../src/hooks/useScriptReview'
-import { useScriptDownload } from '../../../src/hooks/useScriptDownload'
+import { useScriptUpload } from '@hooks/useScriptUpload'
+import { useAIProcessing } from '@hooks/useAIProcessing'
+import { useScriptReview } from '@hooks/useScriptReview'
+import { useScriptDownload } from '@hooks/useScriptDownload'
 
 describe('useScriptWorkflow', () => {
   const mockUploadHook = {

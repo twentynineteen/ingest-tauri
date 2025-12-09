@@ -8,7 +8,7 @@
 import { invoke } from '@tauri-apps/api/core'
 import { describe, test, expect, beforeAll } from 'vitest'
 import { setupTauriMocks } from '../setup/tauri-mocks'
-import type { BreadcrumbsFile } from '../../src/types/baker'
+import type { BreadcrumbsFile } from '@/types/baker'
 import { resolve } from 'path'
 
 describe('baker_read_breadcrumbs Contract', () => {

@@ -1,7 +1,7 @@
 import { logger } from '@/utils/logger'
 import { useQuery } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
-import { CACHE } from '../constants/timing'
+import { CACHE } from '@constants/timing'
 
 interface AuthCheckResult {
   isAuthenticated: boolean

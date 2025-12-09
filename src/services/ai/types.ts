@@ -5,7 +5,7 @@
  */
 
 import type { LanguageModel } from 'ai'
-import type { ProviderConfiguration, ProviderType } from '../../types/scriptFormatter'
+import type { ProviderConfiguration, ProviderType } from '@types/scriptFormatter'
 
 // ============================================================================
 // Provider Interface

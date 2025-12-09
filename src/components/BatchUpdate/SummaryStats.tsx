@@ -4,7 +4,7 @@
  */
 
 import React from 'react'
-import type { BatchUpdateSummary } from '../../utils/batchUpdateSummary'
+import type { BatchUpdateSummary } from '@utils/batchUpdateSummary'
 
 interface SummaryStatsProps {
   summary: BatchUpdateSummary

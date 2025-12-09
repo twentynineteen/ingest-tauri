@@ -10,8 +10,8 @@
  */
 
 import { useCallback, useState } from 'react'
-import type { ScriptDocument } from '../types/scriptFormatter'
-import { createNamespacedLogger } from '../utils/logger'
+import type { ScriptDocument } from '@/types/scriptFormatter'
+import { createNamespacedLogger } from '@utils/logger'
 import { useDocxParser } from './useDocxParser'
 
 const log = createNamespacedLogger('ScriptUpload')
