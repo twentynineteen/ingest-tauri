@@ -33,7 +33,7 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
           <div className="rounded-full bg-muted p-3 mb-3">
             <Film className="w-6 h-6 text-muted-foreground" />
           </div>
-          <h3 className="text-base font-semibold text-foreground mb-1">
+          <h3 className="text-sm font-semibold text-foreground mb-1">
             No files selected yet
           </h3>
           <p className="text-xs text-muted-foreground text-center">
@@ -87,7 +87,7 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
               {/* Camera Badge/Selector */}
               <select
                 aria-label={`Select camera for ${item.file.name}`}
-                className="text-xs font-medium border border-input bg-secondary text-secondary-foreground px-3 py-1.5 rounded-md hover:bg-secondary/80 focus:ring-2 focus:ring-ring focus:outline-none transition-colors cursor-pointer"
+                className="text-xs border border-input bg-secondary text-secondary-foreground px-3 py-1.5 rounded-md hover:bg-secondary/80 focus:ring-2 focus:ring-ring focus:outline-none transition-colors cursor-pointer"
                 value={item.camera}
                 onChange={e => onUpdateCamera(idx, Number(e.target.value))}
               >

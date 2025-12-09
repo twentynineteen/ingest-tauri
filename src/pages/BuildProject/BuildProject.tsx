@@ -4,6 +4,7 @@ import { useBuildProjectMachine } from 'hooks/useBuildProjectMachine'
 import { useCreateProjectWithMachine } from 'hooks/useCreateProjectWithMachine'
 import { usePostProjectCompletion } from 'hooks/usePostProjectCompletion'
 import { useEffect, useMemo } from 'react'
+import { toast } from 'sonner'
 import { createNamespacedLogger } from '../../utils/logger'
 import { AddFootageStep } from './AddFootageStep'
 import { CreateProjectStep } from './CreateProjectStep'
@@ -107,10 +108,13 @@ const BuildProject: React.FC = () => {
     send({ type: 'RESET' })
   }
 
-  // Show error alerts
+  // Show error toasts
   useEffect(() => {
     if (error) {
-      alert(error)
+      toast.error(error, {
+        duration: 5000,
+        description: 'Please try again or contact support if the issue persists.'
+      })
     }
   }, [error])
 

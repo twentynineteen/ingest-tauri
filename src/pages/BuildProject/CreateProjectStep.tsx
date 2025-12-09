@@ -14,9 +14,11 @@ export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
   selectedFolder,
   onCreateProject
 }) => {
+  const isDisabled = !title.trim() || !selectedFolder
+
   return (
     <div
-      className="bg-card border-2 border-primary/20 rounded-xl shadow-sm max-w-full transition-all overflow-hidden"
+      className="bg-card border border-border rounded-xl shadow-sm max-w-full transition-all overflow-hidden"
       style={{
         maxHeight: showSuccess
           ? STEP_CARD_ANIMATION.collapsedHeight
@@ -43,21 +45,35 @@ export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
           </div>
         </div>
         {!showSuccess && (
-          <button
-            onClick={onCreateProject}
-            disabled={!title || !selectedFolder}
-            className="inline-flex items-center justify-center gap-2
-              px-6 py-2.5 text-sm font-semibold text-white
-              bg-gradient-to-r from-chart-4 to-chart-5
-              hover:from-chart-4/90 hover:to-chart-5/90
-              disabled:from-muted disabled:to-muted disabled:cursor-not-allowed disabled:opacity-50
-              rounded-lg shadow-md hover:shadow-lg
-              focus:ring-4 focus:outline-none focus:ring-chart-4/50
-              transition-colors duration-200"
-          >
-            <FolderPlus className="w-4 h-4" />
-            Create Project
-          </button>
+          <>
+            <button
+              onClick={onCreateProject}
+              disabled={isDisabled}
+              aria-disabled={isDisabled}
+              aria-describedby={isDisabled ? 'create-btn-requirements' : undefined}
+              title={
+                isDisabled
+                  ? 'Please enter a project title and select a folder'
+                  : undefined
+              }
+              className="inline-flex items-center justify-center gap-2
+                px-6 py-2.5 text-sm font-semibold text-white
+                bg-gradient-to-r from-chart-4 to-chart-5
+                hover:from-chart-4/90 hover:to-chart-5/90
+                disabled:from-muted disabled:to-muted disabled:cursor-not-allowed disabled:opacity-50
+                rounded-lg shadow-md hover:shadow-lg
+                focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background
+                transition-colors duration-200"
+            >
+              <FolderPlus className="w-4 h-4" />
+              Create Project
+            </button>
+            {isDisabled && (
+              <span id="create-btn-requirements" className="sr-only">
+                Requires project title and selected folder
+              </span>
+            )}
+          </>
         )}
       </div>
     </div>

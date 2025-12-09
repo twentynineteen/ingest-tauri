@@ -12,7 +12,14 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress, completed }) => {
   }
 
   return (
-    <div className="w-full bg-secondary rounded-lg overflow-hidden h-8 relative">
+    <div
+      className="w-full bg-secondary rounded-lg overflow-hidden h-8 relative"
+      role="progressbar"
+      aria-valuenow={Math.round(progress)}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label="Project creation progress"
+    >
       <div
         className="bg-primary h-full flex items-center justify-center text-sm font-semibold text-primary-foreground transition-all duration-300"
         style={{ width: `${progress}%` }}

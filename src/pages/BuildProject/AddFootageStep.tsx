@@ -41,7 +41,14 @@ export const AddFootageStep: React.FC<AddFootageStepProps> = ({
           <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex-shrink-0">
             2
           </div>
-          <h2 className="text-sm font-semibold text-foreground">Add Footage</h2>
+          <div className="flex-1">
+            <h2 className="text-sm font-semibold text-foreground">Add Footage</h2>
+            {!showSuccess && (
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Select footage files and assign camera numbers
+              </p>
+            )}
+          </div>
           {showSuccess && files.length > 0 && (
             <span className="text-xs text-muted-foreground">
               ({files.length} file{files.length !== 1 ? 's' : ''})
@@ -56,7 +63,7 @@ export const AddFootageStep: React.FC<AddFootageStepProps> = ({
                 px-4 py-1.5 text-xs font-semibold
                 text-primary-foreground bg-primary hover:bg-primary/90
                 rounded-lg shadow-sm hover:shadow
-                focus:ring-2 focus:outline-none focus:ring-ring
+                focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background
                 transition-colors duration-200"
             >
               <Upload className="w-3.5 h-3.5" />
@@ -70,7 +77,7 @@ export const AddFootageStep: React.FC<AddFootageStepProps> = ({
                   text-muted-foreground border border-border bg-background
                   hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30
                   rounded-lg
-                  focus:ring-2 focus:outline-none focus:ring-ring
+                  focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background
                   transition-colors duration-200"
               >
                 <RefreshCw className="w-3.5 h-3.5" />

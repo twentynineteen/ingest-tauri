@@ -41,9 +41,9 @@ const ProjectInputs: React.FC<ProjectInputsProps> = ({
           placeholder="e.g. DBA - IB1234 - J Doe - Introductions 060626"
         />
         {showSanitizationWarning ? (
-          <div className="flex items-start gap-1.5 mt-1.5 p-1.5 bg-warning/10 border border-warning/30 rounded-md">
+          <div className="flex items-start gap-1.5 mt-1.5 p-1.5 bg-warning/20 border border-warning/40 rounded-md">
             <AlertCircle className="w-3.5 h-3.5 text-warning flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-warning">
+            <p className="text-xs text-warning-foreground">
               Some characters were changed to hyphens (/ \ : * ? &quot; &lt; &gt; |) to
               ensure compatibility
             </p>
@@ -60,15 +60,16 @@ const ProjectInputs: React.FC<ProjectInputsProps> = ({
           className="flex items-center gap-1.5 mb-1.5 text-xs font-semibold text-foreground"
         >
           <Camera className="w-3.5 h-3.5 text-primary" />
-          Cameras
+          Number of Cameras
         </label>
         <input
           type="number"
           id="number-input"
           min={PROJECT_LIMITS.MIN_CAMERAS}
           max={PROJECT_LIMITS.MAX_CAMERAS}
+          step="1"
           className="bg-secondary border border-input
-            text-foreground text-sm rounded-lg font-semibold
+            text-foreground text-sm rounded-lg font-medium
             focus:ring-2 focus:ring-info focus:border-info
             hover:border-input/80
             block w-full px-3 py-2
@@ -78,7 +79,6 @@ const ProjectInputs: React.FC<ProjectInputsProps> = ({
           onChange={e => onNumCamerasChange(Number(e.target.value))}
           required
         />
-        <p className="mt-1 text-xs text-muted-foreground">Number of cameras</p>
       </div>
     </div>
   )
