@@ -88,11 +88,13 @@ To visualize the state machine in development:
 
 1. Install [@xstate/inspect](https://stately.ai/docs/inspector)
 2. Add to `main.tsx`:
+
    ```ts
    import { inspect } from '@xstate/inspect'
 
    inspect({ iframe: false })
    ```
+
 3. Open browser devtools → XState tab
 4. See real-time state transitions
 
