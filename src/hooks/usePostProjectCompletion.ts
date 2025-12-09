@@ -1,9 +1,9 @@
 // hooks/usePostProjectCompletion.ts
 
 import { logger } from '@/utils/logger'
+import type { BuildProjectEvent } from '@machines/buildProjectMachine'
 import { invoke } from '@tauri-apps/api/core'
 import { useEffect, useRef } from 'react'
-import type { BuildProjectEvent } from '@machines/buildProjectMachine'
 
 interface UsePostProjectCompletionOptions {
   isCreatingTemplate: boolean

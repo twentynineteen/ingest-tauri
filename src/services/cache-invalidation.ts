@@ -1,7 +1,7 @@
 import { logger } from '@/utils/logger'
-import { QueryClient } from '@tanstack/react-query'
 import { CACHE } from '@constants/timing'
 import { queryKeys } from '@lib/query-keys'
+import { QueryClient } from '@tanstack/react-query'
 
 /**
  * Cache Invalidation Service

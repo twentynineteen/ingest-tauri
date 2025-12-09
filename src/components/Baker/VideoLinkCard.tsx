@@ -4,10 +4,10 @@
  */
 
 import { Button } from '@/components/ui/button'
+import type { VideoLink } from '@/types/baker'
 import { logger } from '@/utils/logger'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ChevronDown, ChevronUp, ExternalLink, Trash2, Video } from 'lucide-react'
-import type { VideoLink } from '@/types/baker'
 
 interface VideoLinkCardProps {
   videoLink: VideoLink
@@ -45,40 +45,75 @@ export function VideoLinkCard({
   }
 
   return (
-    <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-4 shadow-sm transition-shadow hover:shadow-md">
+    <div className="flex flex-col rounded-lg border border-border bg-card overflow-hidden shadow-sm transition-shadow hover:shadow-md group">
       {/* Thumbnail */}
-      <div className="flex-shrink-0">
+      <div className="relative aspect-video w-full bg-muted">
         {videoLink.thumbnailUrl ? (
           <img
             src={videoLink.thumbnailUrl}
             alt={videoLink.title}
-            className="h-20 w-32 rounded object-cover"
+            className="h-full w-full object-cover"
           />
         ) : (
-          <div className="flex h-20 w-32 items-center justify-center rounded bg-muted">
-            <Video className="h-8 w-8 text-muted-foreground" />
+          <div className="flex h-full w-full items-center justify-center">
+            <Video className="h-12 w-12 text-muted-foreground" />
           </div>
         )}
+
+        {/* Action buttons overlay */}
+        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={onMoveUp}
+            disabled={!canMoveUp}
+            className="h-7 w-7 bg-background/90 backdrop-blur-sm"
+            title="Move up"
+          >
+            <ChevronUp className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={onMoveDown}
+            disabled={!canMoveDown}
+            className="h-7 w-7 bg-background/90 backdrop-blur-sm"
+            title="Move down"
+          >
+            <ChevronDown className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={onRemove}
+            className="h-7 w-7 bg-destructive/90 text-destructive-foreground backdrop-blur-sm hover:bg-destructive"
+            title="Remove video"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0">
-        <h3 className="font-medium text-foreground truncate">{videoLink.title}</h3>
+      <div className="flex-1 p-3 space-y-2">
+        <h3 className="font-medium text-sm text-foreground line-clamp-2" title={videoLink.title}>
+          {videoLink.title}
+        </h3>
 
         {videoLink.sproutVideoId && (
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground">
             ID: {videoLink.sproutVideoId}
           </p>
         )}
 
-        <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
+        <div className="space-y-1 text-xs text-muted-foreground">
           {videoLink.uploadDate && (
-            <span>Uploaded: {formatDate(videoLink.uploadDate)}</span>
+            <p>Uploaded: {formatDate(videoLink.uploadDate)}</p>
           )}
           {videoLink.sourceRenderFile && (
-            <span className="truncate" title={videoLink.sourceRenderFile}>
+            <p className="truncate" title={videoLink.sourceRenderFile}>
               Source: {videoLink.sourceRenderFile}
-            </span>
+            </p>
           )}
         </div>
 
@@ -86,43 +121,10 @@ export function VideoLinkCard({
           variant="ghost"
           size="sm"
           onClick={openInBrowser}
-          className="mt-2 h-7 text-xs"
+          className="w-full h-8 text-xs mt-2"
         >
-          <ExternalLink className="mr-1 h-3 w-3" />
+          <ExternalLink className="mr-1.5 h-3 w-3" />
           Open in Sprout Video
-        </Button>
-      </div>
-
-      {/* Actions */}
-      <div className="flex flex-col gap-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onMoveUp}
-          disabled={!canMoveUp}
-          className="h-8 w-8"
-          title="Move up"
-        >
-          <ChevronUp className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onMoveDown}
-          disabled={!canMoveDown}
-          className="h-8 w-8"
-          title="Move down"
-        >
-          <ChevronDown className="h-4 w-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onRemove}
-          className="h-8 w-8 text-destructive hover:text-destructive/90"
-          title="Remove video"
-        >
-          <Trash2 className="h-4 w-4" />
         </Button>
       </div>
     </div>

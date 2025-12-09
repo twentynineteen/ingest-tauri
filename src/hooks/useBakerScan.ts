@@ -5,9 +5,6 @@
  * Handles scan initiation, progress tracking, and cancellation.
  */
 
-import { invoke } from '@tauri-apps/api/core'
-import { listen } from '@tauri-apps/api/event'
-import { useCallback, useEffect, useState } from 'react'
 import type {
   ScanCompleteEvent,
   ScanErrorEvent,
@@ -16,6 +13,9 @@ import type {
   ScanResult,
   UseBakerScanResult
 } from '@/types/baker'
+import { invoke } from '@tauri-apps/api/core'
+import { listen } from '@tauri-apps/api/event'
+import { useCallback, useEffect, useState } from 'react'
 
 export function useBakerScan(): UseBakerScanResult {
   const [scanResult, setScanResult] = useState<ScanResult | null>(null)

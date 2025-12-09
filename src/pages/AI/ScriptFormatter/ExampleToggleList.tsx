@@ -3,9 +3,9 @@
  * Displays a list of script examples with toggle controls
  */
 
+import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
 import { CheckCircle2, Circle } from 'lucide-react'
 import React from 'react'
-import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
 
 interface ExampleToggleListProps {
   examples: ExampleWithMetadata[]

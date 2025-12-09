@@ -1,6 +1,7 @@
 import { logger } from '@/utils/logger'
 import { Button } from '@components/ui/button'
 import { CACHE } from '@constants/timing'
+import { useAIProvider } from '@hooks/useAIProvider'
 import { useBreadcrumb } from '@hooks/useBreadcrumb'
 import { queryKeys } from '@lib/query-keys'
 import { createQueryError, createQueryOptions, shouldRetry } from '@lib/query-utils'
@@ -12,7 +13,6 @@ import ApiKeyInput from '@utils/ApiKeyInput'
 import { ApiKeys, loadApiKeys, saveApiKeys } from '@utils/storage'
 import { CheckCircle, Loader2, XCircle } from 'lucide-react'
 import React, { useState } from 'react'
-import { useAIProvider } from '@hooks/useAIProvider'
 
 const Settings: React.FC = () => {
   const queryClient = useQueryClient()

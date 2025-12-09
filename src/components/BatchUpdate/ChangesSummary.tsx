@@ -3,9 +3,9 @@
  * Extracted from BatchUpdateConfirmationDialog (DEBT-002)
  */
 
+import type { BatchUpdateSummary } from '@utils/batchUpdateSummary'
 import { Edit, Minus, Plus } from 'lucide-react'
 import React from 'react'
-import type { BatchUpdateSummary } from '@utils/batchUpdateSummary'
 
 interface ChangesSummaryProps {
   summary: BatchUpdateSummary

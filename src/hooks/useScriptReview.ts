@@ -10,9 +10,9 @@
  * - Unsaved changes warnings
  */
 
-import { useCallback, useMemo, useState } from 'react'
 import type { ProcessedOutput } from '@/types/scriptFormatter'
 import { createNamespacedLogger } from '@utils/logger'
+import { useCallback, useMemo, useState } from 'react'
 
 const log = createNamespacedLogger('ScriptReview')
 

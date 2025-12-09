@@ -327,3 +327,158 @@ export const DRAG_ANIMATIONS = {
     elastic: 0.1 // Resistance at boundaries
   }
 } as const
+
+/**
+ * Baker Page Animations
+ * Animations specific to the Baker workflow page
+ */
+export const BAKER_ANIMATIONS = {
+  // Project list stagger entrance
+  projectList: {
+    container: {
+      hidden: { opacity: 0 },
+      show: {
+        opacity: 1,
+        transition: { staggerChildren: 0.05 }
+      }
+    },
+    item: {
+      hidden: { opacity: 0, y: 10 },
+      show: {
+        opacity: 1,
+        y: 0,
+        transition: {
+          duration: DURATION.normal / 1000,
+          ease: [0.25, 0.1, 0.25, 1] // appleEase as array
+        }
+      }
+    }
+  },
+
+  // Project selection row hover
+  projectRow: {
+    hover: {
+      scale: 1.005,
+      duration: DURATION.fast,
+      easing: EASING.easeOut
+    },
+    selected: {
+      duration: DURATION.normal,
+      easing: EASING.easeOut
+    }
+  },
+
+  // Detail panel transition
+  detailPanel: {
+    enter: {
+      opacity: 0,
+      x: 20
+    },
+    show: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        duration: DURATION.normal / 1000,
+        ease: [0.25, 0.1, 0.25, 1] // appleEase as array
+      }
+    },
+    exit: {
+      opacity: 0,
+      x: -20,
+      transition: {
+        duration: DURATION.fast / 1000
+      }
+    }
+  },
+
+  // Status badge pulse (for warnings)
+  statusBadge: {
+    pulse: {
+      scale: [1, 1.05, 1] as number[],
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        ease: [0.4, 0.0, 0.2, 1] // easeInOut as array
+      }
+    }
+  },
+
+  // Scan results celebration
+  scanResults: {
+    enter: {
+      opacity: 0,
+      scale: 0.95,
+      y: 20
+    },
+    show: {
+      opacity: 1,
+      scale: 1,
+      y: 0,
+      transition: {
+        type: 'spring' as const,
+        stiffness: 300,
+        damping: 25
+      }
+    }
+  },
+
+  // Checkbox check animation
+  checkbox: {
+    check: {
+      pathLength: [0, 1],
+      duration: DURATION.normal,
+      ease: [0.25, 0.1, 0.25, 1] // appleEase as array
+    },
+    scale: {
+      checked: 1.1,
+      unchecked: 1,
+      duration: DURATION.fast
+    }
+  },
+
+  // Alert/toast slide-in
+  alert: {
+    enter: {
+      x: 400,
+      opacity: 0
+    },
+    show: {
+      x: 0,
+      opacity: 1,
+      transition: {
+        type: 'spring' as const,
+        stiffness: 400,
+        damping: 30
+      }
+    },
+    exit: {
+      x: 400,
+      opacity: 0,
+      transition: {
+        duration: DURATION.fast / 1000
+      }
+    }
+  },
+
+  // Navigation tabs
+  navTab: {
+    hover: {
+      scale: 1.02,
+      duration: DURATION.fast,
+      easing: EASING.easeOut
+    },
+    active: {
+      duration: DURATION.normal,
+      easing: EASING.easeOut
+    }
+  },
+
+  // File list items
+  fileItem: {
+    hover: {
+      backgroundColor: 'hsl(var(--accent) / 0.5)',
+      scale: 1.002,
+      duration: DURATION.fast
+    }
+  }
+} as const

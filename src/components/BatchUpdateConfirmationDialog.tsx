@@ -6,20 +6,15 @@
  * multiple projects before applying batch updates.
  */
 
-import { AlertTriangle, CheckCircle, Clock } from 'lucide-react'
-import React from 'react'
 import type { BreadcrumbsPreview } from '@/types/baker'
 import {
   calculateBatchUpdateSummary,
   hasAnyChanges,
   type BatchUpdateSummary
 } from '@utils/batchUpdateSummary'
-import {
-  ChangesSummary,
-  CommonUpdates,
-  DetailedChangesSection,
-  SummaryStats
-} from './BatchUpdate'
+import { AlertTriangle, CheckCircle, Clock } from 'lucide-react'
+import React from 'react'
+import { DetailedChangesSection } from './BatchUpdate'
 import { Button } from './ui/button'
 import {
   Dialog,
@@ -76,26 +71,78 @@ export const BatchUpdateConfirmationDialog: React.FC<
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Overview Stats */}
-          <SummaryStats summary={calculatedSummary} />
-
           {hasChanges && (
             <>
-              {/* Change Summary */}
-              <ChangesSummary summary={calculatedSummary} />
-
-              {/* Common Operations */}
-              <CommonUpdates summary={calculatedSummary} />
-
-              {/* Estimated Duration */}
-              <div className="bg-info/10 border border-info/20 rounded-lg p-3">
-                <div className="flex items-center text-info">
-                  <Clock className="h-4 w-4 mr-2" />
-                  <span className="text-sm">
-                    Estimated completion time:{' '}
-                    <strong>{calculatedSummary.estimatedDuration}</strong>
-                  </span>
+              {/* Compact Summary Header */}
+              <div className="bg-muted rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground">Projects:</span>
+                      <span className="font-semibold text-warning">
+                        {calculatedSummary.projectsWithChanges}
+                      </span>
+                    </div>
+                    <div className="h-3 w-px bg-border" />
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-muted-foreground">Total:</span>
+                      <span className="font-semibold text-foreground">
+                        {calculatedSummary.totalChanges.added +
+                          calculatedSummary.totalChanges.modified +
+                          calculatedSummary.totalChanges.removed}
+                      </span>
+                    </div>
+                    {calculatedSummary.totalChanges.added > 0 && (
+                      <>
+                        <div className="h-3 w-px bg-border" />
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-muted-foreground">Added:</span>
+                          <span className="font-semibold text-success">
+                            {calculatedSummary.totalChanges.added}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                    {calculatedSummary.totalChanges.modified > 0 && (
+                      <>
+                        <div className="h-3 w-px bg-border" />
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-muted-foreground">Modified:</span>
+                          <span className="font-semibold text-warning">
+                            {calculatedSummary.totalChanges.modified}
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <Clock className="h-3.5 w-3.5" />
+                    <span>{calculatedSummary.estimatedDuration}</span>
+                  </div>
                 </div>
+
+                {/* Common changes as inline pills */}
+                {(calculatedSummary.commonChanges.folderSizeCalculated > 0 ||
+                  calculatedSummary.commonChanges.filesUpdated > 0 ||
+                  calculatedSummary.commonChanges.timestampsUpdated > 0) && (
+                  <div className="flex flex-wrap gap-2">
+                    {calculatedSummary.commonChanges.folderSizeCalculated > 0 && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                        {calculatedSummary.commonChanges.folderSizeCalculated} size calculations
+                      </span>
+                    )}
+                    {calculatedSummary.commonChanges.filesUpdated > 0 && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                        {calculatedSummary.commonChanges.filesUpdated} file updates
+                      </span>
+                    )}
+                    {calculatedSummary.commonChanges.timestampsUpdated > 0 && (
+                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                        {calculatedSummary.commonChanges.timestampsUpdated} timestamp updates
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Warning for large operations */}
@@ -112,7 +159,7 @@ export const BatchUpdateConfirmationDialog: React.FC<
                 </div>
               )}
 
-              {/* Detailed Changes */}
+              {/* Simplified Detailed Changes */}
               <DetailedChangesSection
                 previews={previews}
                 selectedProjects={selectedProjects}

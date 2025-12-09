@@ -38,16 +38,25 @@ export const useReducedMotion = (): boolean => {
 
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
 
+    // Check if media query is valid
+    if (!mediaQuery) {
+      return
+    }
+
     // Update state when preference changes
     const handleChange = (event: MediaQueryListEvent) => {
       setShouldReduceMotion(event.matches)
     }
 
     // Modern browsers
-    mediaQuery.addEventListener('change', handleChange)
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener('change', handleChange)
+    }
 
     return () => {
-      mediaQuery.removeEventListener('change', handleChange)
+      if (mediaQuery.removeEventListener) {
+        mediaQuery.removeEventListener('change', handleChange)
+      }
     }
   }, [])
 

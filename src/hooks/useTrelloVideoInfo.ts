@@ -3,9 +3,9 @@
  * Handles uploading and parsing video information
  */
 
-import { useCallback, useMemo } from 'react'
 import { appStore } from '@store/useAppStore'
 import type { TrelloCard } from '@utils/TrelloCards'
+import { useCallback, useMemo } from 'react'
 import { useAppendVideoInfo } from './useAppendVideoInfo'
 import { useVideoInfoBlock } from './useVideoInfoBlock'
 

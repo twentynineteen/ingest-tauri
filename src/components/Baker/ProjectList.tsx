@@ -4,15 +4,11 @@
  * Displays list of discovered projects with selection and breadcrumb viewing.
  */
 
+import type { BreadcrumbsFile, BreadcrumbsPreview, ProjectFolder } from '@/types/baker'
 import { BreadcrumbsViewerEnhanced } from '@components/BreadcrumbsViewerEnhanced'
 import { Button } from '@components/ui/button'
 import { AlertTriangle, Eye, RefreshCw } from 'lucide-react'
 import React from 'react'
-import type {
-  BreadcrumbsFile,
-  BreadcrumbsPreview,
-  ProjectFolder
-} from '@/types/baker'
 
 interface ProjectListProps {
   projects: ProjectFolder[]
@@ -47,18 +43,28 @@ export const ProjectList: React.FC<ProjectListProps> = ({
 }) => {
   if (projects.length === 0) {
     return (
-      <div className="border rounded-lg p-6 text-center text-muted-foreground">
+      <div className="bg-card border border-border rounded-xl shadow-sm p-4 text-center text-muted-foreground">
         No projects found
       </div>
     )
   }
 
   return (
-    <div className="border rounded-lg p-6 space-y-4">
-      <h3 className="text-lg font-medium">Found Projects ({projects.length})</h3>
+    <div className="bg-card border border-border rounded-xl shadow-sm p-4 space-y-4">
+      <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex-shrink-0">
+          3
+        </div>
+        <h2 className="text-sm font-semibold text-foreground">
+          Found Projects ({projects.length})
+        </h2>
+      </div>
       <div className="space-y-2 max-h-96 overflow-y-auto">
         {projects.map((project: ProjectFolder) => (
-          <div key={project.path} className="border rounded">
+          <div
+            key={project.path}
+            className="border border-border rounded-lg bg-background/50 hover:bg-background transition-colors"
+          >
             <div className="flex items-center justify-between p-3">
               <div className="flex items-center space-x-3">
                 <input
@@ -111,9 +117,9 @@ export const ProjectList: React.FC<ProjectListProps> = ({
                     variant="outline"
                     size="sm"
                     onClick={() => onViewBreadcrumbs(project.path)}
-                    className="ml-2"
+                    className="ml-2 gap-1.5"
                   >
-                    <Eye className="h-4 w-4 mr-1" />
+                    <Eye className="w-3.5 h-3.5" />
                     {expandedProject === project.path
                       ? 'Hide'
                       : project.invalidBreadcrumbs

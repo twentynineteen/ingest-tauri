@@ -4,10 +4,10 @@
  * Purpose: Parse .docx files using mammoth.js with validation
  */
 
+import type { FormattingMetadata, ScriptDocument } from '@/types/scriptFormatter'
 import { logger } from '@/utils/logger'
 import mammoth from 'mammoth'
 import { useState } from 'react'
-import type { FormattingMetadata, ScriptDocument } from '@/types/scriptFormatter'
 
 interface UseDocxParserResult {
   parseFile: (file: File) => Promise<ScriptDocument>
