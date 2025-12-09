@@ -25,3 +25,11 @@ export const SUCCESS_ANIMATION = {
   fadeInDuration: 600, // ms
   fadeInEasing: 'ease-out'
 } as const
+
+export const FILE_LIST_ANIMATION = {
+  // Individual file item fade-in animation
+  name: 'fadeInUp',
+  duration: 300, // ms (0.3s)
+  easing: 'ease-out',
+  staggerDelay: 50 // ms (0.05s) - delay between each item
+} as const

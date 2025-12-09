@@ -2,6 +2,7 @@
 
 import { Film, Trash2, Video } from 'lucide-react'
 import React from 'react'
+import { FILE_LIST_ANIMATION } from '../../constants/animations'
 
 interface FootageFile {
   file: {
@@ -32,7 +33,9 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
           <div className="rounded-full bg-muted p-3 mb-3">
             <Film className="w-6 h-6 text-muted-foreground" />
           </div>
-          <h3 className="text-base font-semibold text-foreground mb-1">No files selected yet</h3>
+          <h3 className="text-base font-semibold text-foreground mb-1">
+            No files selected yet
+          </h3>
           <p className="text-xs text-muted-foreground text-center">
             Click &quot;Select Files&quot; to add footage to your project
           </p>
@@ -47,7 +50,9 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
         <div
           key={`${item.file.path}-${idx}`}
           className="group relative bg-card border border-border rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow duration-200 w-full max-w-full"
-          style={{ animation: `fadeInUp 0.3s ease-out ${idx * 0.05}s both` }}
+          style={{
+            animation: `${FILE_LIST_ANIMATION.name} ${FILE_LIST_ANIMATION.duration}ms ${FILE_LIST_ANIMATION.easing} ${idx * FILE_LIST_ANIMATION.staggerDelay}ms both`
+          }}
         >
           {/* File Icon and Info */}
           <div className="flex items-start gap-3 w-full max-w-full min-w-0">
@@ -57,13 +62,22 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
               </div>
             </div>
 
-            <div className="flex-1 min-w-0 overflow-hidden" style={{ maxWidth: '100%', width: 0 }}>
+            <div
+              className="flex-1 min-w-0 overflow-hidden"
+              style={{ maxWidth: '100%', width: 0 }}
+            >
               {/* File Name */}
-              <h4 className="text-sm font-semibold text-foreground mb-1 truncate" title={item.file.name}>
+              <h4
+                className="text-sm font-semibold text-foreground mb-1 truncate"
+                title={item.file.name}
+              >
                 {item.file.name}
               </h4>
               {/* File Path */}
-              <p className="text-xs text-muted-foreground italic truncate" title={item.file.path}>
+              <p
+                className="text-xs text-muted-foreground italic truncate"
+                title={item.file.path}
+              >
                 {item.file.path}
               </p>
             </div>

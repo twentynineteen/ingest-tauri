@@ -45,15 +45,16 @@ const FolderTree: React.FC<Props> = ({ onSelect, selectedFolder }) => {
       </button>
       {selectedFolder ? (
         <div className="flex-1 min-w-0 px-3 py-2 bg-card border border-border rounded-lg overflow-hidden">
-          <p className="text-sm font-medium text-foreground truncate" title={selectedFolder}>
+          <p
+            className="text-sm font-medium text-foreground truncate"
+            title={selectedFolder}
+          >
             {selectedFolder}
           </p>
         </div>
       ) : (
         <div className="flex-1 min-w-0 px-3 py-2 bg-muted/20 border border-dashed border-border rounded-lg">
-          <p className="text-sm text-muted-foreground italic">
-            No destination selected
-          </p>
+          <p className="text-sm text-muted-foreground italic">No destination selected</p>
         </div>
       )}
     </div>

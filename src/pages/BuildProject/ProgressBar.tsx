@@ -1,7 +1,4 @@
 import React from 'react'
-import { createNamespacedLogger } from '../../utils/logger'
-
-const logger = createNamespacedLogger('ProgressBar')
 
 interface ProgressBarProps {
   progress: number
@@ -9,16 +6,8 @@ interface ProgressBarProps {
 }
 
 const ProgressBar: React.FC<ProgressBarProps> = ({ progress, completed }) => {
-  logger.log('ProgressBar received props:', { progress, completed })
-
   // Show progress bar when progress is 0 or greater, but hide when completed
   if (progress < 0 || completed) {
-    logger.log(
-      'ProgressBar returning null - progress:',
-      progress,
-      'completed:',
-      completed
-    )
     return null
   }
 

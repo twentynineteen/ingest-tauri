@@ -1,5 +1,6 @@
 import { AlertCircle, Camera, FileText } from 'lucide-react'
 import React from 'react'
+import { PROJECT_LIMITS } from '../../constants/project'
 
 interface ProjectInputsProps {
   title: string
@@ -64,15 +65,15 @@ const ProjectInputs: React.FC<ProjectInputsProps> = ({
         <input
           type="number"
           id="number-input"
-          min="1"
-          max="10"
+          min={PROJECT_LIMITS.MIN_CAMERAS}
+          max={PROJECT_LIMITS.MAX_CAMERAS}
           className="bg-secondary border border-input
             text-foreground text-sm rounded-lg font-semibold
             focus:ring-2 focus:ring-info focus:border-info
             hover:border-input/80
             block w-full px-3 py-2
             transition-all duration-200"
-          placeholder="2"
+          placeholder={String(PROJECT_LIMITS.DEFAULT_CAMERAS)}
           value={numCameras}
           onChange={e => onNumCamerasChange(Number(e.target.value))}
           required

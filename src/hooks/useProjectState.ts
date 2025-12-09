@@ -1,7 +1,8 @@
-import { useState } from 'react'
-import { selectFiles } from './useFileSelector'
-import { FootageFile } from './useCameraAutoRemap'
+import { useCallback, useMemo, useState } from 'react'
+import { PROJECT_LIMITS } from '../constants/project'
 import { createNamespacedLogger } from '../utils/logger'
+import { FootageFile } from './useCameraAutoRemap'
+import { selectFiles } from './useFileSelector'
 
 const logger = createNamespacedLogger('useProjectState')
 
@@ -11,79 +12,105 @@ const logger = createNamespacedLogger('useProjectState')
  */
 export function useProjectState() {
   const [title, setTitle] = useState('')
-  const [numCameras, setNumCameras] = useState(2)
+  const [numCameras, setNumCameras] = useState(PROJECT_LIMITS.DEFAULT_CAMERAS)
   const [files, setFiles] = useState<FootageFile[]>([])
   const [selectedFolder, setSelectedFolder] = useState<string>('')
   const [titleSanitized, setTitleSanitized] = useState(false)
 
   // Sanitize title to prevent folder creation from forward slashes and other OS-unsafe characters
-  const sanitizeTitle = (input: string): string => {
+  const sanitizeTitle = useCallback((input: string): string => {
     // Only replace OS-unsafe characters, preserve spaces as-is
     return input.replace(/[/\\:*?"<>|]/g, '-')
-  }
+  }, [])
 
   // Handle title change with sanitization
-  const handleTitleChange = (newTitle: string) => {
-    const sanitized = sanitizeTitle(newTitle)
-    const wasSanitized = sanitized !== newTitle
-    setTitle(sanitized)
-    setTitleSanitized(wasSanitized)
-  }
+  const handleTitleChange = useCallback(
+    (newTitle: string) => {
+      const sanitized = sanitizeTitle(newTitle)
+      const wasSanitized = sanitized !== newTitle
+      setTitle(sanitized)
+      setTitleSanitized(wasSanitized)
+    },
+    [sanitizeTitle]
+  )
 
   // Select and add files to the project
-  const handleSelectFiles = async () => {
+  const handleSelectFiles = useCallback(async () => {
     const newFiles = await selectFiles()
     setFiles(prev => [...prev, ...newFiles])
-  }
+  }, [])
 
   // Logic to mark a given file with the camera number
-  const updateFileCamera = (index: number, camera: number) => {
-    // Validate camera number is within valid range
-    if (camera < 1 || camera > numCameras) {
-      logger.warn(`Invalid camera number ${camera}. Must be between 1 and ${numCameras}`)
-      return
-    }
+  const updateFileCamera = useCallback(
+    (index: number, camera: number) => {
+      // Validate camera number is within valid range
+      if (camera < PROJECT_LIMITS.MIN_CAMERAS || camera > numCameras) {
+        logger.warn(
+          `Invalid camera number ${camera}. Must be between ${PROJECT_LIMITS.MIN_CAMERAS} and ${numCameras}`
+        )
+        return
+      }
 
-    const updatedFiles = files.map((item, idx) =>
-      idx === index ? { ...item, camera } : item
-    )
-    setFiles(updatedFiles)
-  }
+      setFiles(currentFiles => {
+        const updatedFiles = currentFiles.map((item, idx) =>
+          idx === index ? { ...item, camera } : item
+        )
+        return updatedFiles
+      })
+    },
+    [numCameras]
+  )
 
   // Removes the selected file from the folder tree
-  const handleDeleteFile = (index: number) => {
+  const handleDeleteFile = useCallback((index: number) => {
     setFiles(prevFiles => {
       const updatedFiles = prevFiles.filter((_, idx) => idx !== index)
-      logger.log('Updated files:', updatedFiles)
+      if (import.meta.env.DEV) {
+        logger.log('Updated files:', updatedFiles)
+      }
       return updatedFiles
     })
-  }
+  }, [])
 
   // Clears all the fields to their initial state (does NOT reset completion state)
-  const clearAllFields = () => {
+  const clearAllFields = useCallback(() => {
     setTitle('')
-    setNumCameras(2)
+    setNumCameras(PROJECT_LIMITS.DEFAULT_CAMERAS)
     setFiles([])
     setSelectedFolder('')
     setTitleSanitized(false)
-  }
+  }, [])
 
-  return {
-    // State
-    title,
-    numCameras,
-    files,
-    selectedFolder,
-    titleSanitized,
-    // Setters (for direct updates)
-    setNumCameras,
-    setSelectedFolder,
-    setFiles, // Exposed for useCameraAutoRemap
-    // Handlers (with business logic)
-    handleTitleChange,
-    handleSelectFiles,
-    updateFileCamera,
-    handleDeleteFile,
-    clearAllFields
-  }
+  return useMemo(
+    () => ({
+      // State
+      title,
+      numCameras,
+      files,
+      selectedFolder,
+      titleSanitized,
+      // Setters (for direct updates)
+      setNumCameras,
+      setSelectedFolder,
+      setFiles, // Exposed for useCameraAutoRemap
+      // Handlers (with business logic)
+      handleTitleChange,
+      handleSelectFiles,
+      updateFileCamera,
+      handleDeleteFile,
+      clearAllFields
+    }),
+    [
+      title,
+      numCameras,
+      files,
+      selectedFolder,
+      titleSanitized,
+      handleTitleChange,
+      handleSelectFiles,
+      updateFileCamera,
+      handleDeleteFile,
+      clearAllFields
+    ]
+  )
 }
