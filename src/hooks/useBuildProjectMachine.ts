@@ -11,6 +11,7 @@ export function useBuildProjectMachine() {
   const listenersSetup = useRef(false)
 
   // Set up Tauri event listeners to feed events into the state machine
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (listenersSetup.current) return
     listenersSetup.current = true
@@ -52,7 +53,7 @@ export function useBuildProjectMachine() {
         }
       }, 0)
     }
-  }, [send])
+  }, [])
 
   return useMemo(
     () => ({

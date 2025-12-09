@@ -72,7 +72,7 @@ export const buildProjectMachine = setup({
       }
     }),
 
-    // Reset all state
+    // Reset progress state (preserves project configuration like title, files, etc.)
     resetContext: assign({
       copyProgress: 0,
       projectFolder: null,
@@ -184,20 +184,6 @@ export const buildProjectMachine = setup({
           actions: 'resetContext'
         },
         // Allow starting a new project from showingSuccess state
-        VALIDATION_SUCCESS: {
-          target: 'creatingFolders',
-          actions: ['resetContext', 'storeProjectFolder']
-        }
-      }
-    },
-
-    completed: {
-      on: {
-        RESET: {
-          target: 'idle',
-          actions: 'resetContext'
-        },
-        // Allow starting a new project from completed state
         VALIDATION_SUCCESS: {
           target: 'creatingFolders',
           actions: ['resetContext', 'storeProjectFolder']
