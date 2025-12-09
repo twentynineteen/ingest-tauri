@@ -83,7 +83,7 @@ export const SuccessSection: React.FC<SuccessSectionProps> = ({
 
         {/* Trello Cards Manager */}
         <TrelloCardsManager
-          projectPath={`${selectedFolder}/${title}`}
+          projectPath={selectedFolder}
           trelloApiKey={trelloApiKey}
           trelloApiToken={trelloApiToken}
           autoSyncToTrello={true}
