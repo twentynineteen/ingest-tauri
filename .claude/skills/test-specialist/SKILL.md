@@ -28,32 +28,31 @@ describe('ExpenseCalculator', () => {
         { amount: 100, category: 'food' },
         { amount: 50, category: 'transport' },
         { amount: 25, category: 'entertainment' }
-      ]
+      ];
 
       // Act
-      const total = calculateTotal(expenses)
+      const total = calculateTotal(expenses);
 
       // Assert
-      expect(total).toBe(175)
-    })
+      expect(total).toBe(175);
+    });
 
     test('handles empty expense list', () => {
-      expect(calculateTotal([])).toBe(0)
-    })
+      expect(calculateTotal([])).toBe(0);
+    });
 
     test('handles negative amounts', () => {
       const expenses = [
         { amount: 100, category: 'food' },
         { amount: -50, category: 'refund' }
-      ]
-      expect(calculateTotal(expenses)).toBe(50)
-    })
-  })
-})
+      ];
+      expect(calculateTotal(expenses)).toBe(50);
+    });
+  });
+});
 ```
 
 **Key principles:**
-
 - Test one behavior per test
 - Cover happy path, edge cases, and error conditions
 - Use descriptive test names that explain the scenario
@@ -66,17 +65,17 @@ Test how components work together, including database, API, and service interact
 ```typescript
 describe('ExpenseAPI Integration', () => {
   beforeAll(async () => {
-    await database.connect(TEST_DB_URL)
-  })
+    await database.connect(TEST_DB_URL);
+  });
 
   afterAll(async () => {
-    await database.disconnect()
-  })
+    await database.disconnect();
+  });
 
   beforeEach(async () => {
-    await database.clear()
-    await seedTestData()
-  })
+    await database.clear();
+    await seedTestData();
+  });
 
   test('POST /expenses creates expense and updates total', async () => {
     const response = await request(app)
@@ -86,19 +85,19 @@ describe('ExpenseAPI Integration', () => {
         category: 'food',
         description: 'Lunch'
       })
-      .expect(201)
+      .expect(201);
 
     expect(response.body).toMatchObject({
       id: expect.any(Number),
       amount: 50,
       category: 'food'
-    })
+    });
 
     // Verify database state
-    const total = await getTotalExpenses()
-    expect(total).toBe(50)
-  })
-})
+    const total = await getTotalExpenses();
+    expect(total).toBe(50);
+  });
+});
 ```
 
 #### End-to-End Testing Approach
@@ -108,19 +107,19 @@ Test complete user workflows using tools like Playwright or Cypress:
 ```typescript
 test('user can track expense from start to finish', async ({ page }) => {
   // Navigate to app
-  await page.goto('/')
+  await page.goto('/');
 
   // Add new expense
-  await page.click('[data-testid="add-expense-btn"]')
-  await page.fill('[data-testid="amount"]', '50.00')
-  await page.selectOption('[data-testid="category"]', 'food')
-  await page.fill('[data-testid="description"]', 'Lunch')
-  await page.click('[data-testid="submit"]')
+  await page.click('[data-testid="add-expense-btn"]');
+  await page.fill('[data-testid="amount"]', '50.00');
+  await page.selectOption('[data-testid="category"]', 'food');
+  await page.fill('[data-testid="description"]', 'Lunch');
+  await page.click('[data-testid="submit"]');
 
   // Verify expense appears in list
-  await expect(page.locator('[data-testid="expense-item"]')).toContainText('Lunch')
-  await expect(page.locator('[data-testid="total"]')).toContainText('$50.00')
-})
+  await expect(page.locator('[data-testid="expense-item"]')).toContainText('Lunch');
+  await expect(page.locator('[data-testid="total"]')).toContainText('$50.00');
+});
 ```
 
 ### 2. Systematic Bug Analysis
@@ -157,44 +156,44 @@ Apply structured debugging methodology to identify and fix issues.
 #### Common Bug Patterns
 
 **Race Conditions:**
-
 ```typescript
 // Test concurrent operations
 test('handles concurrent updates correctly', async () => {
-  const promises = Array.from({ length: 100 }, () => incrementExpenseCount())
+  const promises = Array.from({ length: 100 }, () =>
+    incrementExpenseCount()
+  );
 
-  await Promise.all(promises)
-  expect(getExpenseCount()).toBe(100)
-})
+  await Promise.all(promises);
+  expect(getExpenseCount()).toBe(100);
+});
 ```
 
 **Null/Undefined Errors:**
-
 ```typescript
 // Test null safety
-test.each([null, undefined, '', 0, false])('handles invalid input: %p', input => {
-  expect(() => processExpense(input)).toThrow('Invalid expense')
-})
+test.each([null, undefined, '', 0, false])
+  ('handles invalid input: %p', (input) => {
+    expect(() => processExpense(input)).toThrow('Invalid expense');
+  });
 ```
 
 **Off-by-One Errors:**
-
 ```typescript
 // Test boundaries explicitly
 describe('pagination', () => {
   test('handles empty list', () => {
-    expect(paginate([], 1, 10)).toEqual([])
-  })
+    expect(paginate([], 1, 10)).toEqual([]);
+  });
 
   test('handles single item', () => {
-    expect(paginate([item], 1, 10)).toEqual([item])
-  })
+    expect(paginate([item], 1, 10)).toEqual([item]);
+  });
 
   test('handles last page with partial items', () => {
-    const items = Array.from({ length: 25 }, (_, i) => i)
-    expect(paginate(items, 3, 10)).toHaveLength(5)
-  })
-})
+    const items = Array.from({ length: 25 }, (_, i) => i);
+    expect(paginate(items, 3, 10)).toHaveLength(5);
+  });
+});
 ```
 
 ### 3. Identifying Potential Issues
@@ -208,20 +207,25 @@ Test for common security issues:
 ```typescript
 describe('security', () => {
   test('prevents SQL injection', async () => {
-    const malicious = "'; DROP TABLE expenses; --"
-    await expect(searchExpenses(malicious)).resolves.not.toThrow()
-  })
+    const malicious = "'; DROP TABLE expenses; --";
+    await expect(
+      searchExpenses(malicious)
+    ).resolves.not.toThrow();
+  });
 
   test('sanitizes XSS in descriptions', () => {
-    const xss = '<script>alert("xss")</script>'
-    const expense = createExpense({ description: xss })
-    expect(expense.description).not.toContain('<script>')
-  })
+    const xss = '<script>alert("xss")</script>';
+    const expense = createExpense({ description: xss });
+    expect(expense.description).not.toContain('<script>');
+  });
 
   test('requires authentication for expense operations', async () => {
-    await request(app).post('/api/expenses').send({ amount: 50 }).expect(401)
-  })
-})
+    await request(app)
+      .post('/api/expenses')
+      .send({ amount: 50 })
+      .expect(401);
+  });
+});
 ```
 
 #### Performance Issues
@@ -233,15 +237,15 @@ test('processes large expense list efficiently', () => {
   const largeList = Array.from({ length: 10000 }, (_, i) => ({
     amount: i,
     category: 'test'
-  }))
+  }));
 
-  const start = performance.now()
-  const total = calculateTotal(largeList)
-  const duration = performance.now() - start
+  const start = performance.now();
+  const total = calculateTotal(largeList);
+  const duration = performance.now() - start;
 
-  expect(duration).toBeLessThan(100) // Should complete in <100ms
-  expect(total).toBe(49995000)
-})
+  expect(duration).toBeLessThan(100); // Should complete in <100ms
+  expect(total).toBe(49995000);
+});
 ```
 
 #### Logic Errors
@@ -255,11 +259,11 @@ test.each([
   [[0, 0, 0], 0, 'all zeros'],
   [[-10, 20, -5], 5, 'mixed positive and negative'],
   [[0.1, 0.2], 0.3, 'decimal precision'],
-  [[Number.MAX_SAFE_INTEGER], Number.MAX_SAFE_INTEGER, 'large numbers']
+  [[Number.MAX_SAFE_INTEGER], Number.MAX_SAFE_INTEGER, 'large numbers'],
 ])('calculateTotal(%p) = %p (%s)', (amounts, expected, description) => {
-  const expenses = amounts.map(amount => ({ amount, category: 'test' }))
-  expect(calculateTotal(expenses)).toBeCloseTo(expected)
-})
+  const expenses = amounts.map(amount => ({ amount, category: 'test' }));
+  expect(calculateTotal(expenses)).toBeCloseTo(expected);
+});
 ```
 
 ### 4. Test Coverage Analysis
@@ -275,14 +279,12 @@ python3 scripts/find_untested_code.py src
 ```
 
 The script will:
-
 - Scan source directory for all code files
 - Identify which files lack corresponding test files
 - Categorize untested files by type (components, services, utils, etc.)
 - Prioritize files that need testing most
 
 **Interpretation:**
-
 - **API/Services**: High priority - test business logic and data operations
 - **Models**: High priority - test data validation and transformations
 - **Hooks**: Medium priority - test stateful behavior
@@ -294,21 +296,19 @@ The script will:
 Run the coverage analysis script after generating coverage:
 
 ```bash
-# Generate coverage (using Jest example)
-npm test -- --coverage
+# Generate coverage
+bun test --coverage
 
 # Analyze coverage gaps
 python3 scripts/analyze_coverage.py coverage/coverage-final.json
 ```
 
 The script identifies:
-
 - Files below coverage threshold (default 80%)
 - Statement, branch, and function coverage percentages
 - Priority files to improve
 
 **Coverage targets:**
-
 - Critical paths: 90%+ coverage
 - Business logic: 85%+ coverage
 - UI components: 75%+ coverage
@@ -321,7 +321,6 @@ Ensure tests remain valuable and maintainable.
 #### Test Code Quality Principles
 
 **DRY (Don't Repeat Yourself):**
-
 ```typescript
 // Extract common setup
 function createTestExpense(overrides = {}) {
@@ -331,52 +330,50 @@ function createTestExpense(overrides = {}) {
     description: 'Test expense',
     date: new Date('2024-01-01'),
     ...overrides
-  }
+  };
 }
 
 test('filters by category', () => {
   const expenses = [
     createTestExpense({ category: 'food' }),
-    createTestExpense({ category: 'transport' })
-  ]
+    createTestExpense({ category: 'transport' }),
+  ];
   // ...
-})
+});
 ```
 
 **Clear test data:**
-
 ```typescript
 // Bad: Magic numbers
-expect(calculateDiscount(100, 0.15)).toBe(85)
+expect(calculateDiscount(100, 0.15)).toBe(85);
 
 // Good: Named constants
-const ORIGINAL_PRICE = 100
-const DISCOUNT_RATE = 0.15
-const EXPECTED_PRICE = 85
-expect(calculateDiscount(ORIGINAL_PRICE, DISCOUNT_RATE)).toBe(EXPECTED_PRICE)
+const ORIGINAL_PRICE = 100;
+const DISCOUNT_RATE = 0.15;
+const EXPECTED_PRICE = 85;
+expect(calculateDiscount(ORIGINAL_PRICE, DISCOUNT_RATE)).toBe(EXPECTED_PRICE);
 ```
 
 **Avoid test interdependence:**
-
 ```typescript
 // Bad: Tests depend on execution order
-let sharedState
+let sharedState;
 test('test 1', () => {
-  sharedState = { value: 1 }
-})
+  sharedState = { value: 1 };
+});
 test('test 2', () => {
-  expect(sharedState.value).toBe(1) // Depends on test 1
-})
+  expect(sharedState.value).toBe(1); // Depends on test 1
+});
 
 // Good: Independent tests
 test('test 1', () => {
-  const state = { value: 1 }
-  expect(state.value).toBe(1)
-})
+  const state = { value: 1 };
+  expect(state.value).toBe(1);
+});
 test('test 2', () => {
-  const state = { value: 1 }
-  expect(state.value).toBe(1)
-})
+  const state = { value: 1 };
+  expect(state.value).toBe(1);
+});
 ```
 
 ## Workflow Decision Tree
@@ -419,19 +416,16 @@ Follow this decision tree to determine the testing approach:
 ### Recommended Stack
 
 **Unit/Integration Testing:**
-
 - Jest or Vitest for test runner
 - Testing Library for React components
 - Supertest for API testing
 - MSW (Mock Service Worker) for API mocking
 
 **E2E Testing:**
-
 - Playwright or Cypress
 - Page Object Model pattern
 
 **Coverage:**
-
 - Istanbul (built into Jest/Vitest)
 - Coverage reports in JSON format
 
@@ -439,19 +433,19 @@ Follow this decision tree to determine the testing approach:
 
 ```bash
 # Run all tests
-npm test
+bun test
 
 # Run with coverage
-npm test -- --coverage
+bun test --coverage
 
 # Run specific test file
-npm test -- ExpenseCalculator.test.ts
+bun test ExpenseCalculator.test.ts
 
 # Run in watch mode
-npm test -- --watch
+bun test --watch
 
 # Run E2E tests
-npm run test:e2e
+bun run test:e2e
 ```
 
 ## Reference Documentation
@@ -462,7 +456,6 @@ For detailed patterns and techniques, refer to:
 - `references/bug_analysis.md` - In-depth bug analysis framework, common bug patterns, and debugging techniques
 
 These references contain extensive examples and advanced techniques. Load them when:
-
 - Dealing with complex testing scenarios
 - Need specific pattern implementations
 - Debugging unusual issues
@@ -481,7 +474,6 @@ python3 scripts/analyze_coverage.py [coverage-file]
 Automatically finds common coverage file locations if not specified.
 
 **Output:**
-
 - Files below coverage threshold
 - Statement, branch, and function coverage percentages
 - Priority files to improve
@@ -495,7 +487,6 @@ python3 scripts/find_untested_code.py [src-dir] [--pattern test|spec]
 ```
 
 **Output:**
-
 - Total source and test file counts
 - Test file coverage percentage
 - Untested files categorized by type (API, services, components, etc.)

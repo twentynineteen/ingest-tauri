@@ -45,15 +45,10 @@ export default defineConfig({
 
   // Run local dev server before starting tests
   webServer: {
-    command: 'npm run dev',
+    command: 'bun run dev',
     url: 'http://localhost:1422',
     timeout: 60 * 1000,
-    reuseExistingServer: !process.env.CI,
-    // Suppress npm warnings by clearing npm-related environment variables
-    env: {
-      ...process.env,
-      npm_config_project: undefined
-    }
+    reuseExistingServer: !process.env.CI
   },
 
   // Output directory for test artifacts

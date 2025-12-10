@@ -5,7 +5,6 @@ This reference contains professionally designed color palettes optimized for mod
 ## Modern Professional Palettes
 
 ### Palette 1: Corporate Blue
-
 - **Primary**: `#2563EB` (Blue 600)
 - **Primary Hover**: `#1D4ED8` (Blue 700)
 - **Secondary**: `#64748B` (Slate 500)
@@ -20,7 +19,6 @@ This reference contains professionally designed color palettes optimized for mod
 - **Border**: `#E2E8F0` (Slate 200)
 
 ### Palette 2: Vibrant Purple
-
 - **Primary**: `#8B5CF6` (Violet 500)
 - **Primary Hover**: `#7C3AED` (Violet 600)
 - **Secondary**: `#EC4899` (Pink 500)
@@ -35,7 +33,6 @@ This reference contains professionally designed color palettes optimized for mod
 - **Border**: `#E7E5E4` (Stone 200)
 
 ### Palette 3: Minimalist Gray
-
 - **Primary**: `#18181B` (Zinc 900)
 - **Primary Hover**: `#27272A` (Zinc 800)
 - **Secondary**: `#71717A` (Zinc 500)
@@ -50,7 +47,6 @@ This reference contains professionally designed color palettes optimized for mod
 - **Border**: `#E4E4E7` (Zinc 200)
 
 ### Palette 4: Warm Sunset
-
 - **Primary**: `#EA580C` (Orange 600)
 - **Primary Hover**: `#C2410C` (Orange 700)
 - **Secondary**: `#F97316` (Orange 500)
@@ -65,7 +61,6 @@ This reference contains professionally designed color palettes optimized for mod
 - **Border**: `#FDE68A` (Amber 200)
 
 ### Palette 5: Ocean Fresh
-
 - **Primary**: `#0891B2` (Cyan 600)
 - **Primary Hover**: `#0E7490` (Cyan 700)
 - **Secondary**: `#06B6D4` (Cyan 500)
@@ -80,7 +75,6 @@ This reference contains professionally designed color palettes optimized for mod
 - **Border**: `#99F6E4` (Teal 200)
 
 ### Palette 6: Dark Mode
-
 - **Primary**: `#3B82F6` (Blue 500)
 - **Primary Hover**: `#2563EB` (Blue 600)
 - **Secondary**: `#6366F1` (Indigo 500)
@@ -108,11 +102,11 @@ module.exports = {
           primary: '#2563EB',
           'primary-hover': '#1D4ED8',
           secondary: '#64748B',
-          accent: '#F59E0B'
-        }
-      }
-    }
-  }
+          accent: '#F59E0B',
+        },
+      },
+    },
+  },
 }
 ```
 
@@ -122,17 +116,17 @@ For vanilla CSS or CSS-in-JS, use CSS custom properties:
 
 ```css
 :root {
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-secondary: #64748b;
-  --color-accent: #f59e0b;
-  --color-background: #f8fafc;
-  --color-surface: #ffffff;
-  --color-text-primary: #0f172a;
+  --color-primary: #2563EB;
+  --color-primary-hover: #1D4ED8;
+  --color-secondary: #64748B;
+  --color-accent: #F59E0B;
+  --color-background: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-text-primary: #0F172A;
   --color-text-secondary: #475569;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-border: #e2e8f0;
+  --color-success: #10B981;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-border: #E2E8F0;
 }
 ```

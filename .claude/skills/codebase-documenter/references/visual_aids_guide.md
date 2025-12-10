@@ -5,7 +5,6 @@ This guide provides patterns and techniques for creating effective visual aids i
 ## Why Visual Aids Matter
 
 Visual aids help users:
-
 - **Understand structure** - See how components fit together
 - **Follow flows** - Trace data and process flows
 - **Navigate codebases** - Understand directory organization
@@ -30,7 +29,6 @@ project-root/
 ```
 
 **Characters to use:**
-
 - `├──` for branches (items with siblings below)
 - `└──` for last item in a list
 - `│   ` for vertical connection
@@ -121,7 +119,6 @@ Show how major pieces fit together:
 ```
 
 **Symbols:**
-
 - `┌─┐` `│` `└─┘` - Boxes for components
 - `◄────►` - Bidirectional communication
 - `────►` - Unidirectional flow
@@ -528,18 +525,18 @@ Phase 1: Planning    Phase 2: Development    Phase 3: Testing    Phase 4: Launch
 
 ### Choose the Right Visual
 
-| When you need to show... | Use...                           |
-| ------------------------ | -------------------------------- |
-| Code organization        | File tree structure              |
-| System components        | Architecture diagram             |
-| Process steps            | Flow diagram or sequence diagram |
-| Data movement            | Data flow diagram                |
-| Conditional logic        | Decision tree or flowchart       |
-| State changes            | State diagram                    |
-| Database structure       | ER diagram                       |
-| Module relationships     | Dependency graph                 |
-| Time-based changes       | Timeline or Gantt chart          |
-| Feature comparison       | Table or matrix                  |
+| When you need to show... | Use... |
+|--------------------------|--------|
+| Code organization | File tree structure |
+| System components | Architecture diagram |
+| Process steps | Flow diagram or sequence diagram |
+| Data movement | Data flow diagram |
+| Conditional logic | Decision tree or flowchart |
+| State changes | State diagram |
+| Database structure | ER diagram |
+| Module relationships | Dependency graph |
+| Time-based changes | Timeline or Gantt chart |
+| Feature comparison | Table or matrix |
 
 ### Keep It Simple
 
@@ -569,14 +566,12 @@ Phase 1: Planning    Phase 2: Development    Phase 3: Testing    Phase 4: Launch
 ### ASCII Art (Recommended for Documentation)
 
 **Pros:**
-
 - Works in any text editor
 - Version control friendly
 - Always renders correctly
 - Accessible to screen readers
 
 **Cons:**
-
 - Time-consuming to create
 - Limited visual appeal
 - Hard to create complex diagrams
@@ -594,13 +589,11 @@ graph TD
 ```
 
 **Pros:**
-
 - Text-based (version control friendly)
 - Renders as nice graphics
 - Supports many diagram types
 
 **Cons:**
-
 - Requires Mermaid renderer
 - Learning curve for syntax
 - Not all platforms support it
@@ -610,13 +603,11 @@ graph TD
 ### Draw.io / Lucidchart (Visual Tools)
 
 **Pros:**
-
 - Professional appearance
 - Easy to create complex diagrams
 - Many templates available
 
 **Cons:**
-
 - Binary files (not version control friendly)
 - Requires separate tool
 - Can become outdated
@@ -670,7 +661,6 @@ App
 ## Summary
 
 Effective visual aids:
-
 - **Clarify complex concepts** faster than text alone
 - **Show relationships** between components
 - **Guide users** through processes and flows
@@ -678,7 +668,6 @@ Effective visual aids:
 - **Improve retention** of information
 
 Choose diagrams that:
-
 - **Match the concept** being explained
 - **Stay simple** and focused
 - **Use consistent notation**

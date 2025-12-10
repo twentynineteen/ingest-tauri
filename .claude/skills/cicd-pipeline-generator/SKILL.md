@@ -74,7 +74,6 @@ cache:
 #### Environment Variables
 
 Configure necessary environment variables:
-
 - `NODE_ENV`: Set to `production` for builds
 - Platform-specific tokens: Store as secrets
 - Build-time variables: Pass to build process
@@ -84,7 +83,6 @@ Configure necessary environment variables:
 Use provided templates from `assets/` directory:
 
 **GitHub Actions Template** (`assets/github-actions-nodejs.yml`):
-
 - Multi-job workflow with lint, test, build, deploy
 - Matrix builds for multiple Node.js versions (optional)
 - Vercel deployment integration
@@ -92,7 +90,6 @@ Use provided templates from `assets/` directory:
 - Code coverage reporting
 
 **GitLab CI Template** (`assets/gitlab-ci-nodejs.yml`):
-
 - Multi-stage pipeline
 - Dependency caching
 - Manual production deployment
@@ -100,7 +97,6 @@ Use provided templates from `assets/` directory:
 - Coverage reporting
 
 To use a template:
-
 1. Copy the appropriate template file
 2. Place in the correct location:
    - GitHub Actions: `.github/workflows/ci.yml`
@@ -113,7 +109,6 @@ To use a template:
 #### Vercel Deployment
 
 For GitHub Actions:
-
 ```yaml
 - uses: amondnet/vercel-action@v25
   with:
@@ -124,7 +119,6 @@ For GitHub Actions:
 ```
 
 **Required Secrets**:
-
 - `VERCEL_TOKEN`: Get from Vercel account settings
 - `VERCEL_ORG_ID`: From Vercel project settings
 - `VERCEL_PROJECT_ID`: From Vercel project settings
@@ -159,7 +153,6 @@ For GitHub Actions:
 Configure test execution with proper reporting:
 
 **Jest Configuration**:
-
 ```yaml
 - name: Run tests with coverage
   run: npm test -- --coverage --coverageReporters=text --coverageReporters=lcov
@@ -172,12 +165,11 @@ Configure test execution with proper reporting:
 ```
 
 **Fail Fast Strategy**:
-
 ```yaml
 # Run quick tests first
 jobs:
-  lint: # Fails in ~30 seconds
-  test: # Fails in ~2 minutes
+  lint:  # Fails in ~30 seconds
+  test:  # Fails in ~2 minutes
   build: # Fails in ~5 minutes
     needs: [lint, test]
   deploy:
@@ -189,26 +181,22 @@ jobs:
 Implement different behaviors per branch:
 
 **Feature Branches / PRs**:
-
 - Run lint + test only
 - No deployment
 - Add PR comments with test results
 
 **Develop Branch**:
-
 - Run lint + test + build
 - Deploy to staging environment
 - Automatic deployment
 
 **Main Branch**:
-
 - Run lint + test + build
 - Deploy to production
 - Manual approval (optional)
 - Create release tags
 
 **Example**:
-
 ```yaml
 deploy_staging:
   if: github.ref == 'refs/heads/develop'
@@ -216,7 +204,7 @@ deploy_staging:
 
 deploy_production:
   if: github.ref == 'refs/heads/main'
-  environment: production # Requires manual approval
+  environment: production  # Requires manual approval
   # Deploy to production
 ```
 
@@ -256,7 +244,6 @@ Follow this decision tree to generate the appropriate pipeline:
 ## Best Practices
 
 ### Security
-
 - Store all secrets in platform secret management (never in code)
 - Use least-privilege tokens (read-only when possible)
 - Rotate secrets regularly
@@ -264,7 +251,6 @@ Follow this decision tree to generate the appropriate pipeline:
 - Never log secrets (use `***` masking)
 
 ### Performance
-
 - Cache dependencies aggressively
 - Parallelize independent jobs
 - Use matrix builds for multi-version testing
@@ -272,7 +258,6 @@ Follow this decision tree to generate the appropriate pipeline:
 - Optimize Docker layer caching
 
 ### Reliability
-
 - Pin exact Node.js versions (`18.x` not just `18`)
 - Commit lockfiles (`package-lock.json`)
 - Add retry logic for flaky external services
@@ -280,7 +265,6 @@ Follow this decision tree to generate the appropriate pipeline:
 - Use `continue-on-error` for non-critical steps
 
 ### Maintainability
-
 - Add comments explaining complex logic
 - Use reusable workflows/templates
 - Keep configs DRY (Don't Repeat Yourself)
@@ -290,7 +274,6 @@ Follow this decision tree to generate the appropriate pipeline:
 ## Common Patterns
 
 ### Multi-Environment Deployment
-
 ```yaml
 deploy_staging:
   environment: staging
@@ -303,7 +286,6 @@ deploy_production:
 ```
 
 ### Matrix Testing
-
 ```yaml
 strategy:
   matrix:
@@ -312,7 +294,6 @@ strategy:
 ```
 
 ### Conditional Steps
-
 ```yaml
 - name: Deploy
   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -320,7 +301,6 @@ strategy:
 ```
 
 ### Artifact Management
-
 ```yaml
 - name: Upload build
   uses: actions/upload-artifact@v4
@@ -338,21 +318,18 @@ strategy:
 ## Troubleshooting
 
 ### Pipeline Failures
-
 1. Check action/job logs for error messages
 2. Verify environment variables and secrets are set
 3. Test commands locally before adding to pipeline
 4. Check for platform-specific issues in documentation
 
 ### Slow Builds
-
 1. Verify cache is working (check cache hit/miss logs)
 2. Parallelize independent jobs
 3. Use faster runners if available
 4. Optimize dependency installation
 
 ### Deployment Failures
-
 1. Verify deployment tokens are valid
 2. Check platform status pages
 3. Review deployment logs
@@ -361,12 +338,10 @@ strategy:
 ## Resources
 
 ### Templates (`assets/`)
-
 - `github-actions-nodejs.yml`: Complete GitHub Actions workflow
 - `gitlab-ci-nodejs.yml`: Complete GitLab CI pipeline
 
 ### Reference Documentation (`references/`)
-
 - `platform-comparison.md`: Detailed comparison of CI/CD platforms, deployment targets, best practices, and common patterns
 
 ## Example Usage
@@ -374,7 +349,6 @@ strategy:
 **User Request**: "Create a GitHub Actions workflow that runs tests and deploys to Vercel"
 
 **Steps**:
-
 1. Copy `assets/github-actions-nodejs.yml` template
 2. Create `.github/workflows/` directory if it doesn't exist
 3. Save as `.github/workflows/ci.yml`
@@ -388,7 +362,6 @@ strategy:
 **User Request**: "Set up GitLab CI with staging and production environments"
 
 **Steps**:
-
 1. Copy `assets/gitlab-ci-nodejs.yml` template
 2. Save as `.gitlab-ci.yml` in repository root
 3. Configure GitLab CI/CD variables:
@@ -400,7 +373,6 @@ strategy:
 ## Advanced Configuration
 
 ### Monorepo Support
-
 ```yaml
 paths:
   - 'apps/frontend/**'
@@ -408,15 +380,13 @@ paths:
 ```
 
 ### Scheduled Runs
-
 ```yaml
 on:
   schedule:
-    - cron: '0 2 * * *' # Daily at 2 AM
+    - cron: '0 2 * * *'  # Daily at 2 AM
 ```
 
 ### External Service Integration
-
 ```yaml
 - name: Notify Slack
   uses: 8398a7/action-slack@v3
@@ -426,7 +396,6 @@ on:
 ```
 
 ### Security Scanning
-
 ```yaml
 - name: Run security audit
   run: npm audit --audit-level=moderate

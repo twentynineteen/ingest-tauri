@@ -300,21 +300,23 @@ describe('Example Management Integration - Upload Workflow (T019)', () => {
 
     renderWithProviders(<ExampleEmbeddings />)
 
-    // Wait for load
+    // Wait for initial load - ensure examples are loaded
     await waitFor(() => {
-      expect(screen.getByText('Example Embeddings')).toBeInTheDocument()
+      expect(screen.getByRole('tab', { name: /all \(2\)/i })).toBeInTheDocument()
     })
 
     // Open dialog
     const uploadButton = screen.getByRole('button', { name: /upload example/i })
     await user.click(uploadButton)
 
+    // Wait for dialog to open with explicit waitFor
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
 
-    // Cancel button should be present and functional
     const dialog = screen.getByRole('dialog')
+
+    // Cancel button should be present and functional
     const cancelButton = within(dialog).getByRole('button', { name: /cancel/i })
     expect(cancelButton).toBeInTheDocument()
     expect(cancelButton).not.toBeDisabled()

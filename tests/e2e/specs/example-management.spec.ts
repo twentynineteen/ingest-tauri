@@ -6,9 +6,9 @@
  * for the AI Script Example Embedding Management feature.
  */
 
-import { ExampleEmbeddingsPage } from '@pages/example.page'
 import { expect, test } from '../fixtures/app.fixture'
 import { setupTauriMocks } from '../fixtures/mocks.fixture'
+import { ExampleEmbeddingsPage } from '../pages/example.page'
 
 test.describe('Example Management - Upload Workflow', () => {
   let examplePage: ExampleEmbeddingsPage

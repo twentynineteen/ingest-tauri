@@ -28,37 +28,29 @@ When documenting code for new users, follow these fundamental principles:
 **When to create:** For project root directories, major feature modules, or standalone components.
 
 **Structure to follow:**
-
 ```markdown
 # Project Name
 
 ## What This Does
-
 [1-2 sentence plain-English explanation]
 
 ## Quick Start
-
 [Get users running the project in < 5 minutes]
 
 ## Project Structure
-
 [Visual file tree with explanations]
 
 ## Key Concepts
-
 [Core concepts users need to understand]
 
 ## Common Tasks
-
 [Step-by-step guides for frequent operations]
 
 ## Troubleshooting
-
 [Common issues and solutions]
 ```
 
 **Best practices:**
-
 - Lead with the project's value proposition
 - Include setup instructions that actually work (test them!)
 - Provide a visual overview of the project structure
@@ -70,37 +62,29 @@ When documenting code for new users, follow these fundamental principles:
 **When to create:** For projects with multiple modules, complex data flows, or non-obvious design decisions.
 
 **Structure to follow:**
-
 ```markdown
 # Architecture Overview
 
 ## System Design
-
 [High-level diagram and explanation]
 
 ## Directory Structure
-
 [Detailed breakdown with purpose of each directory]
 
 ## Data Flow
-
 [How data moves through the system]
 
 ## Key Design Decisions
-
 [Why certain architectural choices were made]
 
 ## Module Dependencies
-
 [How different parts interact]
 
 ## Extension Points
-
 [Where and how to add new features]
 ```
 
 **Best practices:**
-
 - Use diagrams to show system components and relationships
 - Explain the "why" behind architectural decisions
 - Document both the happy path and error handling
@@ -114,7 +98,6 @@ When documenting code for new users, follow these fundamental principles:
 **Annotation patterns:**
 
 **Function/Method Documentation:**
-
 ```javascript
 /**
  * Calculates the prorated subscription cost for a partial billing period.
@@ -135,7 +118,6 @@ When documenting code for new users, follow these fundamental principles:
 ```
 
 **Complex Logic Documentation:**
-
 ```python
 # Why this check exists: The API returns null for deleted users,
 # but empty string for users who never set a name. We need to
@@ -149,7 +131,6 @@ elif user_name == "":
 ```
 
 **Best practices:**
-
 - Explain "why" not "what" - the code shows what it does
 - Document edge cases and business logic
 - Add examples for complex functions
@@ -166,40 +147,31 @@ elif user_name == "":
 ## Endpoint Name
 
 ### What It Does
-
 [Plain-English explanation of the endpoint's purpose]
 
 ### Endpoint
-
 `POST /api/v1/resource`
 
 ### Authentication
-
 [What auth is required and how to provide it]
 
 ### Request Format
-
 [JSON schema or example request]
 
 ### Response Format
-
 [JSON schema or example response]
 
 ### Example Usage
-
 [Concrete example with curl/code]
 
 ### Common Errors
-
 [Error codes and what they mean]
 
 ### Related Endpoints
-
 [Links to related operations]
 ```
 
 **Best practices:**
-
 - Provide working curl examples
 - Show both success and error responses
 - Explain authentication clearly
@@ -281,7 +253,6 @@ For detailed documentation best practices, style guidelines, and advanced patter
 - `references/visual_aids_guide.md` - How to create effective diagrams and file trees
 
 Load these references when:
-
 - Creating documentation for complex enterprise codebases
 - Dealing with multiple stakeholder requirements
 - Needing advanced documentation patterns
@@ -338,13 +309,11 @@ Capture the "why" behind architectural choices:
 authentication state, shopping cart, and UI preferences.
 
 **Reasoning:**
-
 - Context API causes unnecessary re-renders with this many components
 - Redux DevTools helps debug complex state changes
 - Team has existing Redux expertise
 
 **Trade-offs:**
-
 - More boilerplate code
 - Steeper learning curve for new developers
 - Worth it for: performance, debugging, team familiarity

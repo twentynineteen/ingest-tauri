@@ -27,6 +27,103 @@ if (typeof global !== 'undefined') {
   })
 }
 
+// Mock framer-motion to avoid animation-related issues in tests
+vi.mock('framer-motion', () => {
+  const React = require('react')
+  return {
+    motion: new Proxy(
+      {},
+      {
+        get:
+          (_target, prop) =>
+          ({ children, ...props }: any) => {
+            // Strip out framer-motion specific props to avoid React warnings
+            const {
+              initial,
+              animate,
+              exit,
+              variants,
+              transition,
+              whileHover,
+              whileTap,
+              whileFocus,
+              whileDrag,
+              whileInView,
+              drag,
+              dragConstraints,
+              dragElastic,
+              dragMomentum,
+              layout,
+              layoutId,
+              onAnimationStart,
+              onAnimationComplete,
+              ...domProps
+            } = props
+            // Add data-projection-id to simulate framer-motion element
+            return React.createElement(prop, { ...domProps, 'data-projection-id': '1' }, children)
+          }
+      }
+    ),
+    AnimatePresence: ({ children }: any) => children,
+    useAnimation: () => ({
+      start: vi.fn(),
+      stop: vi.fn(),
+      set: vi.fn()
+    }),
+    useMotionValue: (initial: any) => ({ get: () => initial, set: vi.fn() }),
+    useTransform: () => ({ get: () => 0, set: vi.fn() }),
+    useSpring: () => ({ get: () => 0, set: vi.fn() }),
+    useScroll: () => ({
+      scrollX: { get: () => 0 },
+      scrollY: { get: () => 0 },
+      scrollXProgress: { get: () => 0 },
+      scrollYProgress: { get: () => 0 }
+    }),
+    useVelocity: () => ({ get: () => 0 }),
+    useInView: () => true,
+    useDragControls: () => ({
+      start: vi.fn()
+    }),
+    MotionConfig: ({ children }: any) => children,
+    LazyMotion: ({ children }: any) => children,
+    domAnimation: {},
+    domMax: {},
+    m: new Proxy(
+      {},
+      {
+        get:
+          (_target, prop) =>
+          ({ children, ...props }: any) => {
+            const React = require('react')
+            const {
+              initial,
+              animate,
+              exit,
+              variants,
+              transition,
+              whileHover,
+              whileTap,
+              whileFocus,
+              whileDrag,
+              whileInView,
+              drag,
+              dragConstraints,
+              dragElastic,
+              dragMomentum,
+              layout,
+              layoutId,
+              onAnimationStart,
+              onAnimationComplete,
+              ...domProps
+            } = props
+            // Add data-projection-id to simulate framer-motion element
+            return React.createElement(prop, { ...domProps, 'data-projection-id': '1' }, children)
+          }
+      }
+    )
+  }
+})
+
 // Mock Tauri APIs
 const mockTauriApis = () => {
   // Note: We don't mock @tauri-apps/api/core here because mockIPC() from
@@ -70,6 +167,19 @@ const mockTauriApis = () => {
     set: vi.fn(),
     del: vi.fn()
   }))
+
+  // Mock Tauri path APIs (used by storage utilities)
+  vi.mock('@tauri-apps/api/path', () => ({
+    appDataDir: vi.fn().mockResolvedValue('/mock/app/data'),
+    appConfigDir: vi.fn().mockResolvedValue('/mock/app/config'),
+    appCacheDir: vi.fn().mockResolvedValue('/mock/app/cache'),
+    appLocalDataDir: vi.fn().mockResolvedValue('/mock/app/local-data')
+  }))
+
+  // Don't globally mock @tauri-apps/api/core here, because:
+  // 1. Contract tests use mockIPC() from @tauri-apps/api/mocks which handles invoke()
+  // 2. Unit tests that need invoke() mocking should do it locally with vi.mock()
+  // 3. Global mocking prevents mockIPC() from working properly
 }
 
 // Mock browser APIs
@@ -88,9 +198,23 @@ const mockBrowserApis = () => {
     global.TextDecoder = TextDecoder
   }
 
+  // Mock Element.prototype.scrollTo for smooth scrolling in tests
+  if (typeof Element.prototype.scrollTo === 'undefined') {
+    Element.prototype.scrollTo = vi.fn()
+  }
+
   // Mock fetch if not available
   if (typeof global.fetch === 'undefined') {
     global.fetch = vi.fn()
+  }
+
+  // Polyfill AbortSignal.timeout for Node.js test environment
+  if (typeof AbortSignal.timeout === 'undefined') {
+    AbortSignal.timeout = function (ms: number): AbortSignal {
+      const controller = new AbortController()
+      setTimeout(() => controller.abort(new Error('TimeoutError')), ms)
+      return controller.signal
+    }
   }
 }
 

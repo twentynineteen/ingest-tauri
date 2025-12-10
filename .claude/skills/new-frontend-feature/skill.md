@@ -449,7 +449,7 @@ Add new top-level section to `navMain` array:
 1. **Run the test suite:**
 
    ```bash
-   npm run test -- {FeatureName}.test.tsx
+   bun run test -- {FeatureName}.test.tsx
    ```
 
 2. **Check test results:**
