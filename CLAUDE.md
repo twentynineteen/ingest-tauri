@@ -124,6 +124,27 @@ All file operations go through Tauri backend with progress tracking. Key pattern
 
 ### Recent Features
 
+#### Phase 008: Native macOS Window Styling (Branch: 008-macos-window-styling)
+
+- **Status**: Implementation Complete
+- **Summary**: Transform window appearance to match native macOS applications with platform-specific styling
+- **Key Features**:
+  - Transparent title bar with overlay mode
+  - Native macOS traffic light controls positioned at (20, 20)
+  - Sidebar vibrancy effects (blur/translucency) using native 'Sidebar' material
+  - Custom title bar component with draggable regions
+  - System theme integration (automatic light/dark mode switching)
+  - Window state persistence (position and size across sessions)
+  - Advanced macOS integration (window tabbing, standard click behavior)
+  - Graceful fallback on Windows/Linux platforms
+- **Components**: [TitleBar.tsx](src/components/TitleBar.tsx)
+- **Hooks**: [useMacOSEffects.ts](src/hooks/useMacOSEffects.ts), [useSystemTheme.ts](src/hooks/useSystemTheme.ts), [useWindowState.ts](src/hooks/useWindowState.ts)
+- **Configuration**: [tauri.conf.json](src-tauri/tauri.conf.json) with `titleBarStyle: "Overlay"`, `transparent: true`, `trafficLightPosition`
+- **Documentation**: [macos-window-styling.md](docs/macos-window-styling.md), [macos-window-styling-plan.md](macos-window-styling-plan.md)
+- **Platform**: macOS only (graceful fallback on other platforms)
+- **App Store**: Not compatible (uses `macOSPrivateApi: true` for transparency)
+- **Phases Implemented**: All 5 phases (transparent title bar, vibrancy, custom overlay, theme integration, advanced polish)
+
 #### Phase 007: AI Script Example Embedding Management (Branch: 007-frontend-script-example)
 
 - **Status**: Implementation Complete

@@ -10,6 +10,7 @@ import {
   SidebarRail
 } from '@components/ui/sidebar'
 import { useAuth } from '@hooks/useAuth'
+import { useMacOSEffects } from '@hooks/useMacOSEffects'
 import { useUpdateManager } from '@hooks/useUpdateManager'
 import { useUsername } from '@hooks/useUsername'
 import {
@@ -114,6 +115,9 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { logout } = useAuth()
   const { data: username } = useUsername()
+
+  // Apply macOS sidebar vibrancy effect
+  useMacOSEffects({ effects: ['Sidebar'] })
 
   // Create the update manager hook instance.
   const updateManager = useUpdateManager()
