@@ -117,21 +117,25 @@ export const AppRouter: React.FC = () => {
           {/* <Route path="*" element={<Navigate to="/ingest/build" />} /> */}
           <Route path="/" element={<Page />}>
             <Route path="ingest">
+              <Route index element={<Navigate to="/ingest/build" replace />} />
               <Route path="history" element={<IngestHistory />} />
               <Route path="build" element={<BuildProject />} />
               <Route path="baker" element={<Baker />} />
             </Route>
             <Route path="ai-tools">
+              <Route index element={<Navigate to="/ai-tools/script-formatter" replace />} />
               <Route path="script-formatter" element={<ScriptFormatter />} />
               <Route path="example-embeddings" element={<ExampleEmbeddings />} />
             </Route>
             <Route path="upload">
+              <Route index element={<Navigate to="/upload/sprout" replace />} />
               <Route path="sprout" element={<UploadSprout />} />
               <Route path="posterframe" element={<Posterframe />} />
               <Route path="trello" element={<UploadTrello />} />
               <Route path="otter" element={<UploadOtter />} />
             </Route>
             <Route path="settings">
+              <Route index element={<Navigate to="/settings/general" replace />} />
               <Route path="general" element={<Settings />} />
               <Route path="connected-apps" element={<ConnectedApps />} />
             </Route>

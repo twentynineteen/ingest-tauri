@@ -5,17 +5,10 @@
  */
 
 import type { BreadcrumbsPreview } from '@/types/baker'
-import {
-  AlertCircle,
-  ChevronRight,
-  Edit,
-  Info,
-  Minus,
-  Plus
-} from 'lucide-react'
+import { cn } from '@components/lib/utils'
+import { AlertCircle, ChevronRight, Edit, Info, Minus, Plus } from 'lucide-react'
 import React, { useState } from 'react'
 import { Button } from '../ui/button'
-import { cn } from '@components/lib/utils'
 
 interface DetailedChangesSectionProps {
   previews: BreadcrumbsPreview[]

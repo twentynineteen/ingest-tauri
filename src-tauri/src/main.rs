@@ -69,6 +69,7 @@ fn main() {
             baker_associate_trello_card,
             baker_remove_trello_card,
             baker_fetch_trello_card_details,
+            fetch_trello_boards,
             // Feature 004 Phase 2: Sprout Video URL auto-fetch
             fetch_sprout_video_details,
             // Feature 006: AI-Powered Autocue Script Formatter

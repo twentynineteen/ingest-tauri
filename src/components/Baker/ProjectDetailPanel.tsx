@@ -5,27 +5,27 @@
  * Part of master-detail layout pattern.
  */
 
+import { formatFileSize } from '@/components/BreadcrumbsViewer/fieldUtils'
+import { Button } from '@/components/ui/button'
 import type { BreadcrumbsFile, BreadcrumbsPreview } from '@/types/baker'
+import { open } from '@tauri-apps/plugin-shell'
 import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
 import {
   AlertTriangle,
   Calendar,
   Camera,
+  CreditCard,
   ExternalLink,
   File,
   FolderOpen,
   HardDrive,
   RefreshCw,
   User,
-  Video,
-  CreditCard
+  Video
 } from 'lucide-react'
 import React, { useRef } from 'react'
 import { TrelloCardsManager } from './TrelloCardsManager'
 import { VideoLinksManager } from './VideoLinksManager'
-import { Button } from '@/components/ui/button'
-import { formatFileSize } from '@/components/BreadcrumbsViewer/fieldUtils'
-import { open } from '@tauri-apps/plugin-shell'
 
 interface ProjectDetailPanelProps {
   selectedProject: string | null
@@ -112,7 +112,9 @@ export const ProjectDetailPanel: React.FC<ProjectDetailPanelProps> = ({
   return (
     <div className="h-full flex flex-col">
       <div className="p-4 border-b border-border">
-        <h3 className="font-semibold text-foreground truncate">{breadcrumbs.projectTitle}</h3>
+        <h3 className="font-semibold text-foreground truncate">
+          {breadcrumbs.projectTitle}
+        </h3>
         <p className="text-xs text-muted-foreground truncate mt-0.5">
           {breadcrumbs.parentFolder}
         </p>
@@ -251,13 +253,17 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({ breadcrumbs }) => {
         <div className="grid grid-cols-2 gap-4">
           {breadcrumbs.lastModified && (
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Last Modified</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Last Modified
+              </label>
               <p className="text-foreground">{formatDate(breadcrumbs.lastModified)}</p>
             </div>
           )}
           {breadcrumbs.scannedBy && (
             <div>
-              <label className="text-xs font-medium text-muted-foreground">Scanned By</label>
+              <label className="text-xs font-medium text-muted-foreground">
+                Scanned By
+              </label>
               <p className="text-foreground">{breadcrumbs.scannedBy}</p>
             </div>
           )}
@@ -271,7 +277,9 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({ breadcrumbs }) => {
             Legacy Trello Card
           </label>
           <div className="flex items-center gap-2">
-            <p className="text-foreground text-xs truncate flex-1">{breadcrumbs.trelloCardUrl}</p>
+            <p className="text-foreground text-xs truncate flex-1">
+              {breadcrumbs.trelloCardUrl}
+            </p>
             <Button
               variant="outline"
               size="sm"

@@ -63,7 +63,9 @@ export function TrelloCardItem({ trelloCard, onRemove, onRefresh }: TrelloCardIt
             </div>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-medium text-sm text-foreground truncate">{trelloCard.title}</p>
+            <p className="font-medium text-sm text-foreground truncate">
+              {trelloCard.title}
+            </p>
             <p className="text-xs text-muted-foreground">ID: {trelloCard.cardId}</p>
           </div>
         </div>
@@ -72,7 +74,9 @@ export function TrelloCardItem({ trelloCard, onRemove, onRefresh }: TrelloCardIt
       {/* Board */}
       <td className="px-4 py-3">
         <p className="text-sm text-foreground truncate">
-          {trelloCard.boardName || <span className="text-muted-foreground italic">Unknown</span>}
+          {trelloCard.boardName || (
+            <span className="text-muted-foreground italic">Unknown</span>
+          )}
         </p>
       </td>
 

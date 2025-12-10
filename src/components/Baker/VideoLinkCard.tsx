@@ -96,20 +96,19 @@ export function VideoLinkCard({
 
       {/* Content */}
       <div className="flex-1 p-3 space-y-2">
-        <h3 className="font-medium text-sm text-foreground line-clamp-2" title={videoLink.title}>
+        <h3
+          className="font-medium text-sm text-foreground line-clamp-2"
+          title={videoLink.title}
+        >
           {videoLink.title}
         </h3>
 
         {videoLink.sproutVideoId && (
-          <p className="text-xs text-muted-foreground">
-            ID: {videoLink.sproutVideoId}
-          </p>
+          <p className="text-xs text-muted-foreground">ID: {videoLink.sproutVideoId}</p>
         )}
 
         <div className="space-y-1 text-xs text-muted-foreground">
-          {videoLink.uploadDate && (
-            <p>Uploaded: {formatDate(videoLink.uploadDate)}</p>
-          )}
+          {videoLink.uploadDate && <p>Uploaded: {formatDate(videoLink.uploadDate)}</p>}
           {videoLink.sourceRenderFile && (
             <p className="truncate" title={videoLink.sourceRenderFile}>
               Source: {videoLink.sourceRenderFile}

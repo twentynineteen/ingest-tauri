@@ -65,7 +65,9 @@ export const ScanResults: React.FC<ScanResultsProps> = ({ scanResult, isScanning
         <div className="flex items-center gap-4 text-xs">
           <div className="flex items-center gap-1.5">
             <span className="text-muted-foreground">Scanned:</span>
-            <span className="font-semibold text-foreground">{scanResult.totalFolders}</span>
+            <span className="font-semibold text-foreground">
+              {scanResult.totalFolders}
+            </span>
           </div>
           <div className="h-3 w-px bg-border" />
           <div className="flex items-center gap-1.5">
@@ -79,7 +81,9 @@ export const ScanResults: React.FC<ScanResultsProps> = ({ scanResult, isScanning
             {invalidBreadcrumbs > 0 && (
               <>
                 <span className="text-muted-foreground">/</span>
-                <span className="font-semibold text-destructive">{invalidBreadcrumbs}</span>
+                <span className="font-semibold text-destructive">
+                  {invalidBreadcrumbs}
+                </span>
               </>
             )}
             {missingBreadcrumbs > 0 && (
@@ -101,7 +105,9 @@ export const ScanResults: React.FC<ScanResultsProps> = ({ scanResult, isScanning
               <div className="h-3 w-px bg-border" />
               <div className="flex items-center gap-1.5">
                 <span className="text-muted-foreground">Errors:</span>
-                <span className="font-semibold text-destructive">{scanResult.errors.length}</span>
+                <span className="font-semibold text-destructive">
+                  {scanResult.errors.length}
+                </span>
               </div>
             </>
           )}

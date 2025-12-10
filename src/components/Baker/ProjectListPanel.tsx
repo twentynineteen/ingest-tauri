@@ -11,11 +11,11 @@
  * - Pulse animation for warning badges
  */
 
-import type { ProjectFolder } from '@/types/baker'
-import React from 'react'
-import { motion } from 'framer-motion'
 import { BAKER_ANIMATIONS } from '@/constants/animations'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
+import type { ProjectFolder } from '@/types/baker'
+import { motion } from 'framer-motion'
+import React from 'react'
 
 // Utility function for conditional class names
 const cn = (...classes: (string | undefined | null | boolean)[]) => {
@@ -71,7 +71,9 @@ export const ProjectListPanel: React.FC<ProjectListPanelProps> = ({
           return (
             <motion.div
               key={project.path}
-              variants={shouldReduceMotion ? undefined : BAKER_ANIMATIONS.projectList.item}
+              variants={
+                shouldReduceMotion ? undefined : BAKER_ANIMATIONS.projectList.item
+              }
               className={cn(
                 'border-b border-border p-3 cursor-pointer transition-colors',
                 'hover:bg-accent/50',

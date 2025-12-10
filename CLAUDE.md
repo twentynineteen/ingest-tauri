@@ -167,3 +167,37 @@ All file operations go through Tauri backend with progress tracking. Key pattern
 - **Package Manager**: Bun (primary) + npm (audit compatibility, maintains dual lock files)
 - **Platform**: Cross-platform desktop app, primary development on macOS
 - **Security**: Uses argon2 for password hashing, JWT for auth, Tauri stronghold for secure storage
+
+## Development Skills
+
+Custom Claude Code skills available in `.claude/skills/` for specialized tasks:
+
+### new-frontend-feature
+**Purpose**: Scaffold new frontend pages/features with TDD approach
+
+**When to use**: Creating new pages or tools in the Bucket app
+
+**What it does**:
+1. Interactively gathers feature requirements (name, section, icon, description)
+2. Generates comprehensive test suite FIRST (90%+ coverage) using test-specialist
+3. Creates production-ready page component following BuildProject/Baker patterns
+4. Automatically updates routing in app-sidebar.tsx
+5. Verifies all tests pass before completion
+
+**Features**:
+- TDD workflow (tests before implementation)
+- Follows established UI patterns (header, numbered steps, error boundaries)
+- Automatic breadcrumb integration
+- Smart icon suggestions based on feature name
+- Master-detail or multi-step layouts
+- Full TypeScript and accessibility support
+
+**Usage**:
+```
+Use the new-frontend-feature skill to create a [feature name]
+```
+
+**Related Skills**:
+- `test-specialist`: Comprehensive testing and bug fixing
+- `ui-analyzer`: UI consistency audits across pages
+- `ux-animation-guru`: Polish animations and micro-interactions
