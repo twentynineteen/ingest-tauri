@@ -405,7 +405,7 @@ export function hasSchemaIssues(data: unknown): boolean {
 export function getErrorMessage(validation: ValidationResult): string {
   if (validation.isValid) return ''
 
-  const criticalErrors = validation.errors.filter(e => e.severity === 'error')
+  const criticalErrors = validation.errors.filter((e) => e.severity === 'error')
 
   if (criticalErrors.length === 1) {
     return criticalErrors[0].message

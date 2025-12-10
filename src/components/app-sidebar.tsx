@@ -1,3 +1,12 @@
+import * as React from 'react'
+import {
+  Clapperboard,
+  FileText,
+  HardDriveUpload,
+  Puzzle,
+  Save,
+  Settings
+} from 'lucide-react'
 import { NavMain } from '@components/nav-main'
 import { NavUser } from '@components/nav-user'
 import { TeamSwitcher } from '@components/team-switcher'
@@ -12,15 +21,6 @@ import {
 import { useAuth } from '@hooks/useAuth'
 import { useUpdateManager } from '@hooks/useUpdateManager'
 import { useUsername } from '@hooks/useUsername'
-import {
-  Clapperboard,
-  FileText,
-  HardDriveUpload,
-  Puzzle,
-  Save,
-  Settings
-} from 'lucide-react'
-import * as React from 'react'
 
 // This is sample data. User data is located just before function return statement
 const data = {

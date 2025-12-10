@@ -5,11 +5,11 @@
  * Replaces useEffect pattern with React Query mutation for better state management
  */
 
-import type { VideoLink } from '@/types/baker'
+import { useEffect, useRef } from 'react'
 import { useMutation } from '@tanstack/react-query'
+import type { VideoLink } from '@/types/baker'
 import { createNamespacedLogger } from '@utils/logger'
 import type { SproutUploadResponse } from '@utils/types'
-import { useEffect, useRef } from 'react'
 
 const logger = createNamespacedLogger('useSproutVideoProcessor')
 
@@ -97,7 +97,7 @@ export function useSproutVideoProcessor(options: UseSproutVideoProcessorOptions)
     }) => {
       return processUploadResponse(response, selectedFile)
     },
-    onSuccess: result => {
+    onSuccess: (result) => {
       if (result.error) {
         onError(result.error)
       } else if (result.shouldAdd && result.videoLink) {

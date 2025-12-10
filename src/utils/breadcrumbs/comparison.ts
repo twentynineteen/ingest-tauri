@@ -29,7 +29,7 @@ function deepEqual(a: unknown, b: unknown): boolean {
 
     if (keysA.length !== keysB.length) return false
 
-    return keysA.every(key => deepEqual(a[key], b[key]))
+    return keysA.every((key) => deepEqual(a[key], b[key]))
   }
 
   return false
@@ -157,7 +157,7 @@ export function compareBreadcrumbsMeaningful(
   const fullDiff = compareBreadcrumbs(current, updated, true)
 
   // Filter out maintenance changes
-  const meaningfulChanges = fullDiff.changes.filter(change => {
+  const meaningfulChanges = fullDiff.changes.filter((change) => {
     // Always exclude scannedBy (pure maintenance)
     if (change.field === 'scannedBy') {
       return false

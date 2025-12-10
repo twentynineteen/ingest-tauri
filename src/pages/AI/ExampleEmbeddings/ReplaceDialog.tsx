@@ -7,6 +7,9 @@
  * Supports both .txt and .docx files
  */
 
+import { useState } from 'react'
+import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -21,9 +24,6 @@ import { Label } from '@/components/ui/label'
 import { useDocxParser } from '@/hooks/useDocxParser'
 import { useOllamaEmbedding } from '@/hooks/useOllamaEmbedding'
 import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
-import { AlertCircle, CheckCircle, Loader2 } from 'lucide-react'
-import { useState } from 'react'
-import { toast } from 'sonner'
 
 interface ReplaceDialogProps {
   open: boolean
@@ -62,7 +62,7 @@ export function ReplaceDialog({ open, example, onClose, onReplace }: ReplaceDial
     const file = e.target.files?.[0] || null
     setBeforeFile(file)
     if (file) {
-      setErrors(prev => ({ ...prev, beforeFile: '' }))
+      setErrors((prev) => ({ ...prev, beforeFile: '' }))
     }
   }
 
@@ -70,7 +70,7 @@ export function ReplaceDialog({ open, example, onClose, onReplace }: ReplaceDial
     const file = e.target.files?.[0] || null
     setAfterFile(file)
     if (file) {
-      setErrors(prev => ({ ...prev, afterFile: '' }))
+      setErrors((prev) => ({ ...prev, afterFile: '' }))
     }
   }
 
@@ -221,7 +221,7 @@ export function ReplaceDialog({ open, example, onClose, onReplace }: ReplaceDial
           <>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-success" />
+                <CheckCircle className="text-success h-5 w-5" />
                 Replace Successful!
               </DialogTitle>
               <DialogDescription>
@@ -230,21 +230,21 @@ export function ReplaceDialog({ open, example, onClose, onReplace }: ReplaceDial
             </DialogHeader>
 
             <div className="space-y-4 py-4">
-              <div className="rounded-md border border-success/20 bg-success/10 p-4">
-                <p className="text-sm font-medium text-success">Replaced Example</p>
-                <p className="text-lg font-semibold text-success/90 mt-1">
+              <div className="border-success/20 bg-success/10 rounded-md border p-4">
+                <p className="text-success text-sm font-medium">Replaced Example</p>
+                <p className="text-success/90 mt-1 text-lg font-semibold">
                   {example.title}
                 </p>
               </div>
 
               <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   ✓ Example content updated in the database
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   ✓ Metadata preserved (title, category, tags, quality score)
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   ✓ New embedding generated for improved matching
                 </p>
               </div>
@@ -282,28 +282,28 @@ export function ReplaceDialog({ open, example, onClose, onReplace }: ReplaceDial
                   <div className="flex items-center gap-2">
                     {isCheckingModel ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin text-info" />
-                        <span className="text-sm text-info">
+                        <Loader2 className="text-info h-4 w-4 animate-spin" />
+                        <span className="text-info text-sm">
                           Checking embedding model...
                         </span>
                       </>
                     ) : isModelReady ? (
                       <>
-                        <CheckCircle className="h-4 w-4 text-success" />
-                        <span className="text-sm text-success">
+                        <CheckCircle className="text-success h-4 w-4" />
+                        <span className="text-success text-sm">
                           Embedding model ready:{' '}
                           <code className="font-mono">{modelName}</code>
                         </span>
                       </>
                     ) : (
                       <>
-                        <AlertCircle className="h-4 w-4 text-destructive" />
+                        <AlertCircle className="text-destructive h-4 w-4" />
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-destructive">
+                          <p className="text-destructive text-sm font-medium">
                             Embedding model not available
                           </p>
                           {modelError && (
-                            <p className="text-xs text-destructive/90 mt-1">
+                            <p className="text-destructive/90 mt-1 text-xs">
                               {modelError.message}
                             </p>
                           )}
@@ -314,9 +314,9 @@ export function ReplaceDialog({ open, example, onClose, onReplace }: ReplaceDial
                 </div>
 
                 {/* Current example info */}
-                <div className="rounded-md border border-muted p-3 bg-muted/30">
-                  <p className="text-sm font-medium mb-2">Current Example</p>
-                  <div className="space-y-1 text-sm text-muted-foreground">
+                <div className="border-muted bg-muted/30 rounded-md border p-3">
+                  <p className="mb-2 text-sm font-medium">Current Example</p>
+                  <div className="text-muted-foreground space-y-1 text-sm">
                     <p>
                       <span className="font-medium">Title:</span> {example.title}
                     </p>
@@ -349,13 +349,13 @@ export function ReplaceDialog({ open, example, onClose, onReplace }: ReplaceDial
                     disabled={isLoading}
                   />
                   {beforeFile && (
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-muted-foreground mt-1 text-sm">
                       Selected: {beforeFile.name} ({(beforeFile.size / 1024).toFixed(1)}{' '}
                       KB)
                     </p>
                   )}
                   {errors.beforeFile && (
-                    <p className="text-sm text-destructive mt-1">{errors.beforeFile}</p>
+                    <p className="text-destructive mt-1 text-sm">{errors.beforeFile}</p>
                   )}
                 </div>
 
@@ -370,12 +370,12 @@ export function ReplaceDialog({ open, example, onClose, onReplace }: ReplaceDial
                     disabled={isLoading}
                   />
                   {afterFile && (
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-muted-foreground mt-1 text-sm">
                       Selected: {afterFile.name} ({(afterFile.size / 1024).toFixed(1)} KB)
                     </p>
                   )}
                   {errors.afterFile && (
-                    <p className="text-sm text-destructive mt-1">{errors.afterFile}</p>
+                    <p className="text-destructive mt-1 text-sm">{errors.afterFile}</p>
                   )}
                 </div>
               </div>

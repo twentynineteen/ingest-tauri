@@ -1,5 +1,5 @@
-import { Button } from '@components/ui/button'
 import React from 'react'
+import { Button } from '@components/ui/button'
 
 interface TrelloIntegrationButtonProps {
   onClick: () => void
@@ -15,7 +15,7 @@ const TrelloIntegrationButton: React.FC<TrelloIntegrationButtonProps> = ({
       onClick={onClick}
       disabled={disabled}
       size="lg"
-      className="bg-info hover:bg-info/90 text-white focus:ring-4 focus:ring-info/30 font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+      className="bg-info hover:bg-info/90 focus:ring-info/30 font-medium text-white shadow-lg transition-all duration-200 hover:shadow-xl focus:ring-4"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

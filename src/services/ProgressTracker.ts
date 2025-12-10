@@ -198,10 +198,10 @@ export class ProgressTracker {
     const overallProgress = this.calculateOverallProgress()
     const timeElapsed = this.startTime ? Date.now() - this.startTime.getTime() : 0
 
-    const errors = this.progressHistory.filter(p =>
+    const errors = this.progressHistory.filter((p) =>
       p.message.toLowerCase().includes('error')
     ).length
-    const warnings = this.progressHistory.filter(p =>
+    const warnings = this.progressHistory.filter((p) =>
       p.message.toLowerCase().includes('warning')
     ).length
 

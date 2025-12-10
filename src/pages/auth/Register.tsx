@@ -1,7 +1,7 @@
-import { logger } from '@/utils/logger'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
+import { logger } from '@/utils/logger'
 
 const registerSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
@@ -45,32 +45,32 @@ export default function Register() {
   }
 
   return (
-    <div className="flex flex-col p-6 max-w-sm mx-auto bg-white shadow-md rounded-xl">
-      <h2 className="text-xl font-semibold mb-4">Register</h2>
+    <div className="mx-auto flex max-w-sm flex-col rounded-xl bg-white p-6 shadow-md">
+      <h2 className="mb-4 text-xl font-semibold">Register</h2>
       {error && <p className="text-destructive text-sm">{error}</p>}
       <input
         type="text"
         placeholder="Username"
         value={username}
-        onChange={e => setUsername(e.target.value)}
-        className="border p-2 rounded w-full mb-2"
+        onChange={(e) => setUsername(e.target.value)}
+        className="mb-2 w-full rounded border p-2"
       />
       <input
         type="password"
         placeholder="Password"
         value={password}
-        onChange={e => setPassword(e.target.value)}
-        className="border p-2 rounded w-full mb-2"
+        onChange={(e) => setPassword(e.target.value)}
+        className="mb-2 w-full rounded border p-2"
       />
       <button
         onClick={handleRegister}
-        className="bg-primary text-primary-foreground p-2 rounded w-full hover:bg-primary/90"
+        className="bg-primary text-primary-foreground hover:bg-primary/90 w-full rounded p-2"
       >
         Register
       </button>
       <p className="mt-3">
         Registered? Click{' '}
-        <Link to="/login" className="font-bold text-primary">
+        <Link to="/login" className="text-primary font-bold">
           here
         </Link>{' '}
         to log in.

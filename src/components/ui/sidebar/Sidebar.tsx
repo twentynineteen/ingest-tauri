@@ -1,10 +1,10 @@
 'use client'
 
+import * as React from 'react'
+import { PanelLeft } from 'lucide-react'
 import { cn } from '@components/lib/utils'
 import { Button } from '@components/ui/button'
 import { Sheet, SheetContent } from '@components/ui/sheet'
-import { PanelLeft } from 'lucide-react'
-import * as React from 'react'
 import { useSidebar } from '../use-sidebar'
 
 const SIDEBAR_WIDTH_MOBILE = '18rem'
@@ -34,7 +34,7 @@ export const Sidebar = React.forwardRef<
       return (
         <div
           className={cn(
-            'flex h-full w-(--sidebar-width) flex-col bg-sidebar text-sidebar-foreground',
+            'bg-sidebar text-sidebar-foreground flex h-full w-(--sidebar-width) flex-col',
             className
           )}
           ref={ref}
@@ -51,7 +51,7 @@ export const Sidebar = React.forwardRef<
           <SheetContent
             data-sidebar="sidebar"
             data-mobile="true"
-            className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+            className="bg-sidebar text-sidebar-foreground w-(--sidebar-width) p-0 [&>button]:hidden"
             style={
               {
                 '--sidebar-width': SIDEBAR_WIDTH_MOBILE
@@ -68,7 +68,7 @@ export const Sidebar = React.forwardRef<
     return (
       <div
         ref={ref}
-        className="group peer hidden text-sidebar-foreground md:block"
+        className="group peer text-sidebar-foreground hidden md:block"
         data-state={state}
         data-collapsible={state === 'collapsed' ? collapsible : undefined}
         data-variant={variant}
@@ -101,7 +101,7 @@ export const Sidebar = React.forwardRef<
         >
           <div
             data-sidebar="sidebar"
-            className="flex h-full w-full flex-col bg-sidebar group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm"
+            className="bg-sidebar group-data-[variant=floating]:border-sidebar-border flex h-full w-full flex-col group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:shadow-sm"
           >
             {children}
           </div>
@@ -125,7 +125,7 @@ export const SidebarTrigger = React.forwardRef<
       variant="ghost"
       size="icon"
       className={cn('h-7 w-7', className)}
-      onClick={event => {
+      onClick={(event) => {
         onClick?.(event)
         toggleSidebar()
       }}
@@ -153,10 +153,10 @@ export const SidebarRail = React.forwardRef<
       onClick={toggleSidebar}
       title="Toggle Sidebar"
       className={cn(
-        'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex',
+        'hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex',
         'in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize',
         '[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
-        'group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full hover:group-data-[collapsible=offcanvas]:bg-sidebar',
+        'hover:group-data-[collapsible=offcanvas]:bg-sidebar group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full',
         '[[data-side=left][data-collapsible=offcanvas]_&]:-right-2',
         '[[data-side=right][data-collapsible=offcanvas]_&]:-left-2',
         className
@@ -175,8 +175,8 @@ export const SidebarInset = React.forwardRef<
     <main
       ref={ref}
       className={cn(
-        'relative flex min-h-svh flex-1 flex-col bg-background',
-        'peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm',
+        'bg-background relative flex min-h-svh flex-1 flex-col',
+        'peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-2',
         className
       )}
       {...props}

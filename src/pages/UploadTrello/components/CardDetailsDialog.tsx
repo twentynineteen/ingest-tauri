@@ -3,6 +3,8 @@
  * Extracted from UploadTrello.tsx (DEBT-002)
  */
 
+import React from 'react'
+import { ExternalLink } from 'lucide-react'
 import { Button } from '@components/ui/button'
 import {
   Dialog,
@@ -12,14 +14,12 @@ import {
   DialogTitle
 } from '@components/ui/dialog'
 import { VideoInfoData } from '@hooks/useVideoInfoBlock'
-import { appStore } from '@store/useAppStore'
 import CardDetailsAccordion from '@utils/trello/CardDetailsAccordion'
 import TooltipPreview from '@utils/trello/TooltipPreview'
 import VideoInfoTooltip from '@utils/trello/VideoInfoTooltip'
 import { TrelloCard, TrelloMember } from '@utils/TrelloCards'
 import { Breadcrumb, SproutUploadResponse } from '@utils/types'
-import { ExternalLink } from 'lucide-react'
-import React from 'react'
+import { appStore } from '@store/useAppStore'
 import { SelectedCard } from '../UploadTrelloTypes'
 
 interface CardDetailsDialogProps {
@@ -112,8 +112,8 @@ interface MembersListProps {
 const MembersList: React.FC<MembersListProps> = ({ members }) => (
   <div>
     <h3 className="font-semibold">Members</h3>
-    <ul className="list-disc ml-5 text-sm">
-      {members.map(member => (
+    <ul className="ml-5 list-disc text-sm">
+      {members.map((member) => (
         <li key={member.id}>{member.fullName}</li>
       ))}
     </ul>
@@ -133,7 +133,7 @@ const DialogActions: React.FC<DialogActionsProps> = ({
   onOpenInTrello,
   onClose
 }) => (
-  <div className="pt-4 flex justify-between gap-4 items-center">
+  <div className="flex items-center justify-between gap-4 pt-4">
     <TooltipPreview
       trigger={<Button onClick={onAppendBreadcrumbs}>Append Breadcrumbs</Button>}
       content={

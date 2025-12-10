@@ -9,9 +9,9 @@
  * - Generation error handling
  */
 
+import { useCallback, useState } from 'react'
 import type { ScriptDocument } from '@/types/scriptFormatter'
 import { createNamespacedLogger } from '@utils/logger'
-import { useCallback, useState } from 'react'
 import { useDocxGenerator } from './useDocxGenerator'
 
 const log = createNamespacedLogger('ScriptDownload')
@@ -72,8 +72,8 @@ export function useScriptDownload(options?: UseScriptDownloadOptions) {
         // Convert markdown to HTML with paragraph wrapping
         const htmlContent = markdownText
           .split('\n')
-          .filter(line => line.trim()) // Filter out empty lines
-          .map(line => `<p>${convertMarkdownToHtml(line)}</p>`)
+          .filter((line) => line.trim()) // Filter out empty lines
+          .map((line) => `<p>${convertMarkdownToHtml(line)}</p>`)
           .join('')
 
         log.debug('HTML content generated, length:', htmlContent.length)

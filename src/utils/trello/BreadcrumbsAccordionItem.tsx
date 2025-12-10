@@ -1,10 +1,10 @@
+import React from 'react'
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger
 } from '@components/ui/accordion'
 import { Breadcrumb } from '@utils/types'
-import React from 'react'
 import { formatBreadcrumbDate } from '../breadcrumbsComparison'
 import FileList from './FileList'
 import KeyValueRow from './KeyValueRow'
@@ -20,7 +20,7 @@ const BreadcrumbsAccordionItem: React.FC<Props> = ({ data }) => {
     <AccordionItem value="breadcrumbs">
       <AccordionTrigger className="font-semibold">Breadcrumbs</AccordionTrigger>
       <AccordionContent>
-        <div className="space-y-2 text-sm text-muted-foreground">
+        <div className="text-muted-foreground space-y-2 text-sm">
           {data.projectTitle && (
             <KeyValueRow label="Project Title" value={data.projectTitle} />
           )}

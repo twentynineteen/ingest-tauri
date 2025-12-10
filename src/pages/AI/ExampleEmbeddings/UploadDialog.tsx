@@ -6,6 +6,7 @@
  * Supports both .txt and .docx files
  */
 
+import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -25,7 +26,6 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { ExampleCategory } from '@/types/exampleEmbeddings'
-import { Loader2 } from 'lucide-react'
 import { FileInputField, ModelStatusIndicator, UploadSuccessView } from './components'
 import { useUploadDialogForm, type UploadData } from './hooks/useUploadDialogForm'
 
@@ -128,12 +128,12 @@ export function UploadDialog({ open, onClose, onUpload }: UploadDialogProps) {
                   <Input
                     id="title"
                     value={title}
-                    onChange={e => setTitle(e.target.value)}
+                    onChange={(e) => setTitle(e.target.value)}
                     placeholder="e.g., Tech Conference Keynote"
                     disabled={isLoading}
                   />
                   {errors.title && (
-                    <p className="text-sm text-destructive mt-1">{errors.title}</p>
+                    <p className="text-destructive mt-1 text-sm">{errors.title}</p>
                   )}
                 </div>
 
@@ -142,7 +142,7 @@ export function UploadDialog({ open, onClose, onUpload }: UploadDialogProps) {
                   <Label htmlFor="category">Category</Label>
                   <Select
                     value={category}
-                    onValueChange={value => setCategory(value as ExampleCategory)}
+                    onValueChange={(value) => setCategory(value as ExampleCategory)}
                     disabled={isLoading}
                   >
                     <SelectTrigger>
@@ -169,11 +169,11 @@ export function UploadDialog({ open, onClose, onUpload }: UploadDialogProps) {
                   <Input
                     id="tags"
                     value={tags.join(', ')}
-                    onChange={e => handleTagsChange(e.target.value)}
+                    onChange={(e) => handleTagsChange(e.target.value)}
                     placeholder="technical, formal, presentation"
                     disabled={isLoading}
                   />
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-muted-foreground mt-1 text-xs">
                     Separate tags with commas (max 10 tags)
                   </p>
                 </div>
@@ -187,10 +187,10 @@ export function UploadDialog({ open, onClose, onUpload }: UploadDialogProps) {
                     min={1}
                     max={5}
                     value={qualityScore}
-                    onChange={e => setQualityScore(Number(e.target.value))}
+                    onChange={(e) => setQualityScore(Number(e.target.value))}
                     disabled={isLoading}
                   />
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-muted-foreground mt-1 text-xs">
                     Higher scores will prioritize this example in AI suggestions
                   </p>
                 </div>

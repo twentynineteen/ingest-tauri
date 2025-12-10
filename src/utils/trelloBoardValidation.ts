@@ -20,7 +20,7 @@ export function validateBoardAccess(
     return false
   }
 
-  return availableBoards.some(board => board.id === boardId)
+  return availableBoards.some((board) => board.id === boardId)
 }
 
 /**
@@ -50,7 +50,7 @@ export function categorizeBoardStatus(
   }
 
   // Check if board exists in available boards
-  const isAccessible = boards.some(board => board.id === boardId)
+  const isAccessible = boards.some((board) => board.id === boardId)
   return isAccessible ? 'accessible' : 'inaccessible'
 }
 
@@ -65,7 +65,7 @@ export function findBoardById(
   boardId: string,
   boards: TrelloBoard[]
 ): TrelloBoard | undefined {
-  return boards.find(board => board.id === boardId)
+  return boards.find((board) => board.id === boardId)
 }
 
 /**

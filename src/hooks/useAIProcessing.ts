@@ -10,9 +10,9 @@
  * - Processing error handling and cancellation
  */
 
+import { useCallback, useEffect, useState } from 'react'
 import type { ProcessedOutput, ProviderConfiguration } from '@/types/scriptFormatter'
 import { createNamespacedLogger } from '@utils/logger'
-import { useCallback, useEffect, useState } from 'react'
 import { useAIModels } from './useAIModels'
 import { useAIProvider } from './useAIProvider'
 import { useExampleManagement } from './useExampleManagement'
@@ -67,7 +67,7 @@ export function useAIProcessing(options?: UseAIProcessingOptions) {
   // Initialize enabled examples when examples are loaded
   useEffect(() => {
     if (allExamples.length > 0 && enabledExampleIds.size === 0) {
-      setEnabledExampleIds(new Set(allExamples.map(ex => ex.id)))
+      setEnabledExampleIds(new Set(allExamples.map((ex) => ex.id)))
     }
   }, [allExamples, enabledExampleIds.size])
 
@@ -117,7 +117,7 @@ export function useAIProcessing(options?: UseAIProcessingOptions) {
           providerId: activeProvider.id,
           configuration: activeProvider.configuration,
           enabledExampleIds,
-          onProgress: prog => {
+          onProgress: (prog) => {
             log.debug(`Progress: ${prog}%`)
             setProgress(prog)
           },
@@ -156,7 +156,7 @@ export function useAIProcessing(options?: UseAIProcessingOptions) {
   )
 
   const handleExampleToggle = useCallback((exampleId: string) => {
-    setEnabledExampleIds(prev => {
+    setEnabledExampleIds((prev) => {
       const newSet = new Set(prev)
       if (newSet.has(exampleId)) {
         newSet.delete(exampleId)

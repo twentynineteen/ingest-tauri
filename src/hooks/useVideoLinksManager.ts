@@ -4,11 +4,11 @@
  * Extracted to reduce component complexity (DEBT-002)
  */
 
+import { useState } from 'react'
+import { invoke } from '@tauri-apps/api/core'
 import type { BreadcrumbsFile, VideoLink } from '@/types/baker'
 import { logger } from '@/utils/logger'
-import { invoke } from '@tauri-apps/api/core'
 import { validateVideoLink } from '@utils/validation'
-import { useState } from 'react'
 import { useSproutVideoApiKey, useTrelloApiKeys } from './useApiKeys'
 import {
   generateBreadcrumbsBlock,
@@ -74,13 +74,13 @@ export function useVideoLinksManager({ projectPath }: UseVideoLinksManagerProps)
     selectedFile,
     uploading,
     enabled: addMode === 'upload',
-    onVideoReady: videoLink => {
+    onVideoReady: (videoLink) => {
       addVideoLink(videoLink)
       if (trelloCards && trelloCards.length > 0 && trelloApiKey && trelloToken) {
         setIsTrelloDialogOpen(true)
       }
     },
-    onError: error => {
+    onError: (error) => {
       setValidationErrors([error])
     }
   })
@@ -178,7 +178,7 @@ export function useVideoLinksManager({ projectPath }: UseVideoLinksManagerProps)
 
     const breadcrumbsBlock = generateBreadcrumbsBlock(breadcrumbsData)
 
-    const updatePromises = selectedCardIndexes.map(async index => {
+    const updatePromises = selectedCardIndexes.map(async (index) => {
       const card = trelloCards[index]
       const response = await fetch(
         `https://api.trello.com/1/cards/${card.cardId}?key=${trelloApiKey}&token=${trelloToken}`
@@ -226,7 +226,7 @@ export function useVideoLinksManager({ projectPath }: UseVideoLinksManagerProps)
   }
 
   const updateFormField = (field: keyof FormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }))
     if (field === 'url') {
       setFetchError(null)
     }

@@ -1,6 +1,6 @@
-import { logger } from '@/utils/logger'
-import { open } from '@tauri-apps/plugin-dialog'
 import React from 'react'
+import { open } from '@tauri-apps/plugin-dialog'
+import { logger } from '@/utils/logger'
 
 type Props = {
   onSelect: (folderPath: string) => void
@@ -34,27 +34,22 @@ const FolderTree: React.FC<Props> = ({ onSelect, selectedFolder }) => {
     <div className="flex items-center gap-3 rounded-lg py-2">
       <button
         onClick={openFolderPicker}
-        className="inline-flex items-center justify-center gap-2
-          px-5 py-2 text-sm font-semibold
-          text-primary-foreground bg-primary hover:bg-primary/90
-          rounded-lg shadow-sm hover:shadow
-          focus:ring-4 focus:outline-none focus:ring-ring
-          transition-colors duration-200 flex-shrink-0"
+        className="text-primary-foreground bg-primary hover:bg-primary/90 focus:ring-ring inline-flex flex-shrink-0 items-center justify-center gap-2 rounded-lg px-5 py-2 text-sm font-semibold shadow-sm transition-colors duration-200 hover:shadow focus:ring-4 focus:outline-none"
       >
         Select Destination
       </button>
       {selectedFolder ? (
-        <div className="flex-1 min-w-0 px-3 py-2 bg-card border border-border rounded-lg overflow-hidden">
+        <div className="bg-card border-border min-w-0 flex-1 overflow-hidden rounded-lg border px-3 py-2">
           <p
-            className="text-sm font-medium text-foreground truncate"
+            className="text-foreground truncate text-sm font-medium"
             title={selectedFolder}
           >
             {selectedFolder}
           </p>
         </div>
       ) : (
-        <div className="flex-1 min-w-0 px-3 py-2 bg-muted/20 border border-dashed border-border rounded-lg">
-          <p className="text-sm text-muted-foreground italic">No destination selected</p>
+        <div className="bg-muted/20 border-border min-w-0 flex-1 rounded-lg border border-dashed px-3 py-2">
+          <p className="text-muted-foreground text-sm italic">No destination selected</p>
         </div>
       )}
     </div>

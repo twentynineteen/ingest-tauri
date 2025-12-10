@@ -5,9 +5,9 @@
  * Based on: specs/006-i-wish-to/data-model.md section 6
  */
 
-import type { SimilarExample } from '@hooks/useScriptRetrieval'
 import { tool } from 'ai'
 import { z } from 'zod'
+import type { SimilarExample } from '@hooks/useScriptRetrieval'
 import { createNamespacedLogger } from './logger'
 
 const logger = createNamespacedLogger('buildRAGPrompt')
@@ -83,7 +83,7 @@ export const formatParagraphTool = tool({
     if (capitalizationStyle === 'upper') {
       formatted = formatted.toUpperCase()
     } else if (capitalizationStyle === 'title') {
-      formatted = formatted.replace(/\b\w/g, char => char.toUpperCase())
+      formatted = formatted.replace(/\b\w/g, (char) => char.toUpperCase())
     }
 
     // Break into lines
@@ -168,7 +168,7 @@ export const highlightNamesCapsTool = tool({
 
     // Auto-detect names (words that start with capital letter)
     if (autoDetect) {
-      result = result.replace(/\b[A-Z][a-z]+\b/g, match => {
+      result = result.replace(/\b[A-Z][a-z]+\b/g, (match) => {
         // Skip common words
         const commonWords = [
           'The',

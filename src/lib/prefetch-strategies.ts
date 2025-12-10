@@ -1,10 +1,10 @@
-import { CACHE } from '@constants/timing'
 import { QueryClient } from '@tanstack/react-query'
 import { core } from '@tauri-apps/api'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { createNamespacedLogger } from '@utils/logger'
 import { loadApiKeys } from '@utils/storage'
+import { CACHE } from '@constants/timing'
 import { queryKeys } from './query-keys'
 import { createQueryError, createQueryOptions, shouldRetry } from './query-utils'
 
@@ -37,7 +37,7 @@ export class QueryPrefetchManager {
     // Run all prefetches concurrently, but don't block app startup on failures
     const results = await Promise.allSettled(prefetchPromises)
 
-    const failures = results.filter(result => result.status === 'rejected')
+    const failures = results.filter((result) => result.status === 'rejected')
     if (failures.length > 0) {
       logger.log('Some startup data prefetching failed:', failures)
     }
@@ -344,7 +344,7 @@ export class QueryPrefetchManager {
     // If user has visited settings recently, they might go back
     const hasVisitedSettingsRecently = previousRoutes
       .slice(-5) // Check last 5 routes
-      .some(route => route.includes('settings'))
+      .some((route) => route.includes('settings'))
 
     // If user is on build project page, they might need to configure settings
     const onBuildProjectPage = currentRoute.includes('build-project')
@@ -360,7 +360,7 @@ export class QueryPrefetchManager {
     const queries = queryCache.getAll()
     const now = Date.now()
 
-    queries.forEach(query => {
+    queries.forEach((query) => {
       // Remove queries that are very old and not actively used
       const queryAge = now - (query.state.dataUpdatedAt || 0)
       const maxAge = CACHE.EXTENDED // 1 hour

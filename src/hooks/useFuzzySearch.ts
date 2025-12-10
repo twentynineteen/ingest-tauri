@@ -1,5 +1,5 @@
-import Fuse from 'fuse.js'
 import { useMemo, useState } from 'react'
+import Fuse from 'fuse.js'
 
 interface UseFuzzySearchOptions {
   keys: string[]
@@ -24,7 +24,7 @@ export function useFuzzySearch<T>(items: T[], options: UseFuzzySearchOptions) {
     if (!searchTerm.trim()) {
       return items
     }
-    return fuse.search(searchTerm).map(result => result.item)
+    return fuse.search(searchTerm).map((result) => result.item)
   }, [fuse, searchTerm, items])
 
   return {

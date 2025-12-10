@@ -4,9 +4,9 @@
  * Purpose: Monaco Editor for viewing and editing formatted output
  */
 
+import React, { useEffect, useRef, useState } from 'react'
 import Editor from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
-import React, { useEffect, useRef, useState } from 'react'
 
 // Monaco is bundled locally via vite-plugin-monaco-editor
 // The plugin automatically configures workers for Tauri environment
@@ -53,23 +53,23 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
   }, [])
 
   return (
-    <div className="border border-border rounded-lg overflow-hidden mb-2 flex flex-col h-[calc(100vh-300px)]">
-      <div className="bg-muted px-4 py-2 border-b border-border flex items-center justify-between shrink-0">
-        <span className="text-sm font-medium text-foreground">
+    <div className="border-border mb-2 flex h-[calc(100vh-300px)] flex-col overflow-hidden rounded-lg border">
+      <div className="bg-muted border-border flex shrink-0 items-center justify-between border-b px-4 py-2">
+        <span className="text-foreground text-sm font-medium">
           Formatted Script (Editable)
         </span>
-        <span className="text-xs text-muted-foreground">
+        <span className="text-muted-foreground text-xs">
           Use **text** for bold formatting
         </span>
       </div>
 
-      <div ref={containerRef} className="flex-1 relative">
+      <div ref={containerRef} className="relative flex-1">
         {!isEditorReady && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background z-10">
+          <div className="bg-background absolute inset-0 z-10 flex items-center justify-center">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-foreground mx-auto mb-4"></div>
-              <p className="text-sm text-muted-foreground">Loading editor...</p>
-              <p className="text-xs text-muted-foreground/70 mt-1">
+              <div className="border-foreground mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2"></div>
+              <p className="text-muted-foreground text-sm">Loading editor...</p>
+              <p className="text-muted-foreground/70 mt-1 text-xs">
                 This may take a few seconds
               </p>
             </div>
@@ -84,11 +84,11 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
           onChange={handleEditorChange}
           onMount={handleEditorDidMount}
           loading={
-            <div className="flex items-center justify-center h-full">
+            <div className="flex h-full items-center justify-center">
               <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-foreground mx-auto mb-4"></div>
-                <p className="text-sm text-muted-foreground">Loading Monaco Editor...</p>
-                <p className="text-xs text-muted-foreground/70 mt-2">
+                <div className="border-foreground mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2"></div>
+                <p className="text-muted-foreground text-sm">Loading Monaco Editor...</p>
+                <p className="text-muted-foreground/70 mt-2 text-xs">
                   If this persists, check browser console for errors
                 </p>
               </div>

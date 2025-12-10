@@ -1,3 +1,5 @@
+import { ChevronRight, type LucideIcon } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import {
   Collapsible,
   CollapsibleContent,
@@ -13,8 +15,6 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem
 } from '@components/ui/sidebar'
-import { ChevronRight, type LucideIcon } from 'lucide-react'
-import { Link } from 'react-router-dom'
 
 export function NavMain({
   items
@@ -34,7 +34,7 @@ export function NavMain({
     <SidebarGroup>
       <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map(item => (
+        {items.map((item) => (
           <Collapsible
             key={item.title}
             asChild
@@ -51,7 +51,7 @@ export function NavMain({
               </CollapsibleTrigger>
               <CollapsibleContent>
                 <SidebarMenuSub>
-                  {item.items?.map(subItem => (
+                  {item.items?.map((subItem) => (
                     <SidebarMenuSubItem key={subItem.title}>
                       <SidebarMenuSubButton asChild>
                         <Link to={subItem.url}>

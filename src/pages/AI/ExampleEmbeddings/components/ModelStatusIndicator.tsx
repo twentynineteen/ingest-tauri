@@ -30,25 +30,25 @@ export function ModelStatusIndicator({
       <div className="flex items-center gap-2">
         {isCheckingModel ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin text-info" />
-            <span className="text-sm text-info">Checking embedding model...</span>
+            <Loader2 className="text-info h-4 w-4 animate-spin" />
+            <span className="text-info text-sm">Checking embedding model...</span>
           </>
         ) : isModelReady ? (
           <>
-            <CheckCircle className="h-4 w-4 text-success" />
-            <span className="text-sm text-success">
+            <CheckCircle className="text-success h-4 w-4" />
+            <span className="text-success text-sm">
               Embedding model ready: <code className="font-mono">{modelName}</code>
             </span>
           </>
         ) : (
           <>
-            <AlertCircle className="h-4 w-4 text-destructive" />
+            <AlertCircle className="text-destructive h-4 w-4" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-destructive">
+              <p className="text-destructive text-sm font-medium">
                 Embedding model not available
               </p>
               {modelError && (
-                <p className="text-xs text-destructive/90 mt-1">{modelError.message}</p>
+                <p className="text-destructive/90 mt-1 text-xs">{modelError.message}</p>
               )}
             </div>
           </>

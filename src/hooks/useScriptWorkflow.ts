@@ -10,10 +10,10 @@
  * - Navigation warnings for unsaved work
  */
 
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ProcessedOutput, WorkflowStep } from '@/types/scriptFormatter'
 import { logger } from '@/utils/logger'
 import { createNamespacedLogger } from '@utils/logger'
-import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useAIProcessing } from './useAIProcessing'
 import { useScriptDownload } from './useScriptDownload'
 import { useScriptReview } from './useScriptReview'
@@ -61,30 +61,30 @@ export function useScriptWorkflow() {
 
   // Sub-hooks
   const uploadHook = useScriptUpload({
-    onSuccess: document => {
+    onSuccess: (document) => {
       log.info('File uploaded successfully:', document.filename)
       // Automatically advance to model selection step
       setCurrentStep('select-model')
     },
-    onError: error => {
+    onError: (error) => {
       logger.error('File upload failed:', error.message)
     }
   })
 
   const processingHook = useAIProcessing({
-    onSuccess: output => {
+    onSuccess: (output) => {
       log.info('Script processing completed')
       reviewHook.loadOutput(output)
       goToStep('review')
     },
-    onError: error => {
+    onError: (error) => {
       logger.error('Script processing failed:', error.message)
     }
   })
 
   const reviewHook = useScriptReview({
     initialOutput: processingHook.processedOutput,
-    onChange: text => {
+    onChange: (text) => {
       log.debug('Script text modified, length:', text.length)
     }
   })
@@ -93,7 +93,7 @@ export function useScriptWorkflow() {
     onSuccess: () => {
       log.info('File downloaded successfully')
     },
-    onError: error => {
+    onError: (error) => {
       logger.error('File download failed:', error.message)
     }
   })

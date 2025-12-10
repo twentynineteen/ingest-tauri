@@ -1,6 +1,6 @@
+import { FolderPlus } from 'lucide-react'
 import { Button } from '@components/ui/button'
 import { STEP_CARD_ANIMATION } from '@constants/animations'
-import { FolderPlus } from 'lucide-react'
 
 interface CreateProjectStepProps {
   showSuccess: boolean
@@ -19,7 +19,7 @@ export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
 
   return (
     <div
-      className="bg-card border border-border rounded-xl shadow-sm max-w-full transition-all overflow-hidden"
+      className="bg-card border-border max-w-full overflow-hidden rounded-xl border shadow-sm transition-all"
       style={{
         maxHeight: showSuccess
           ? STEP_CARD_ANIMATION.collapsedHeight
@@ -33,13 +33,13 @@ export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex-shrink-0">
+          <div className="bg-primary/10 text-primary flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold">
             3
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-foreground">Create Project</h2>
+            <h2 className="text-foreground text-sm font-semibold">Create Project</h2>
             {!showSuccess && (
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <p className="text-muted-foreground mt-0.5 text-xs">
                 Review and create your project
               </p>
             )}
@@ -58,12 +58,9 @@ export const CreateProjectStep: React.FC<CreateProjectStepProps> = ({
                   : undefined
               }
               animationStyle="glow"
-              className="px-6 py-2.5 font-semibold text-white
-                bg-gradient-to-r from-chart-4 to-chart-5
-                disabled:from-muted disabled:to-muted
-                shadow-md"
+              className="from-chart-4 to-chart-5 disabled:from-muted disabled:to-muted bg-gradient-to-r px-6 py-2.5 font-semibold text-white shadow-md"
             >
-              <FolderPlus className="w-4 h-4" />
+              <FolderPlus className="h-4 w-4" />
               Create Project
             </Button>
             {isDisabled && (

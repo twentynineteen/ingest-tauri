@@ -1,9 +1,9 @@
-import { logger } from '@/utils/logger'
-import { CACHE, getBackoffDelay, RETRY, SECONDS } from '@constants/timing'
 import { QueryClient } from '@tanstack/react-query'
 import { persistQueryClient } from '@tanstack/react-query-persist-client'
 import { del, get, set } from '@tauri-apps/plugin-store'
+import { logger } from '@/utils/logger'
 import { createNamespacedLogger } from '@utils/logger'
+import { CACHE, getBackoffDelay, RETRY, SECONDS } from '@constants/timing'
 
 const logger = createNamespacedLogger('QueryClient')
 
@@ -129,7 +129,7 @@ export function createPersistedQueryClient(
           return failureCount < RETRY.DEFAULT_ATTEMPTS
         },
         // Exponential backoff with jitter
-        retryDelay: attemptIndex => {
+        retryDelay: (attemptIndex) => {
           const baseDelay = getBackoffDelay(attemptIndex, RETRY.MAX_DELAY_DEFAULT)
           const jitter = Math.random() * 0.3 * baseDelay // 30% jitter
           return baseDelay + jitter
@@ -154,7 +154,7 @@ export function createPersistedQueryClient(
           }
           return failureCount < 2
         },
-        retryDelay: attemptIndex => {
+        retryDelay: (attemptIndex) => {
           const baseDelay = getBackoffDelay(attemptIndex, RETRY.MAX_DELAY_MUTATION)
           const jitter = Math.random() * 0.3 * baseDelay
           return baseDelay + jitter
@@ -225,7 +225,7 @@ export class QueryClientOptimizer {
     let removedCount = 0
     let errorCount = 0
 
-    queries.forEach(query => {
+    queries.forEach((query) => {
       const hasActiveObservers = query.getObserversCount() > 0
       const queryAge = now - (query.state.dataUpdatedAt || 0)
       const isStale = query.isStale()
@@ -271,7 +271,7 @@ export class QueryClientOptimizer {
     const queries = queryCache.getAll()
     const mutations = mutationCache.getAll()
 
-    const querySizes = queries.map(query => {
+    const querySizes = queries.map((query) => {
       try {
         return JSON.stringify(query.state.data).length * 2 // Rough estimate in bytes
       } catch {
@@ -284,10 +284,10 @@ export class QueryClientOptimizer {
     return {
       totalQueries: queries.length,
       totalMutations: mutations.length,
-      activeQueries: queries.filter(q => q.getObserversCount() > 0).length,
-      staleQueries: queries.filter(q => q.isStale()).length,
-      errorQueries: queries.filter(q => q.state.status === 'error').length,
-      loadingQueries: queries.filter(q => q.state.status === 'pending').length,
+      activeQueries: queries.filter((q) => q.getObserversCount() > 0).length,
+      staleQueries: queries.filter((q) => q.isStale()).length,
+      errorQueries: queries.filter((q) => q.state.status === 'error').length,
+      loadingQueries: queries.filter((q) => q.state.status === 'pending').length,
       estimatedSizeBytes: totalSize,
       estimatedSizeFormatted: this.formatBytes(totalSize)
     }

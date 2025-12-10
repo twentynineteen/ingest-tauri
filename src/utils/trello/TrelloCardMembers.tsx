@@ -13,7 +13,7 @@ const TrelloCardMembers: React.FC<{ cardId: string; apiKey: string; token: strin
 
   return (
     <ul>
-      {members.map(member => (
+      {members.map((member) => (
         <li key={member.id}>{member.username}</li>
       ))}
     </ul>

@@ -3,8 +3,8 @@
  * Extracted from BatchUpdateConfirmationDialog (DEBT-002)
  */
 
-import type { BatchUpdateSummary } from '@utils/batchUpdateSummary'
 import React from 'react'
+import type { BatchUpdateSummary } from '@utils/batchUpdateSummary'
 
 interface SummaryStatsProps {
   summary: BatchUpdateSummary
@@ -12,22 +12,22 @@ interface SummaryStatsProps {
 
 export const SummaryStats: React.FC<SummaryStatsProps> = ({ summary }) => {
   return (
-    <div className="grid grid-cols-3 gap-4 p-4 bg-muted rounded-lg">
+    <div className="bg-muted grid grid-cols-3 gap-4 rounded-lg p-4">
       <div className="text-center">
-        <div className="text-2xl font-bold text-foreground">{summary.totalProjects}</div>
-        <div className="text-xs text-muted-foreground">Total Projects</div>
+        <div className="text-foreground text-2xl font-bold">{summary.totalProjects}</div>
+        <div className="text-muted-foreground text-xs">Total Projects</div>
       </div>
       <div className="text-center">
-        <div className="text-2xl font-bold text-warning">
+        <div className="text-warning text-2xl font-bold">
           {summary.projectsWithChanges}
         </div>
-        <div className="text-xs text-muted-foreground">Will Be Updated</div>
+        <div className="text-muted-foreground text-xs">Will Be Updated</div>
       </div>
       <div className="text-center">
-        <div className="text-2xl font-bold text-success">
+        <div className="text-success text-2xl font-bold">
           {summary.projectsWithoutChanges}
         </div>
-        <div className="text-xs text-muted-foreground">No Changes</div>
+        <div className="text-muted-foreground text-xs">No Changes</div>
       </div>
     </div>
   )

@@ -3,6 +3,7 @@
  * Extracted from TrelloCardsManager to reduce complexity (DEBT-002)
  */
 
+import { AlertCircle, Loader2, Plus, Search } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,7 +19,6 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import TrelloCardList from '@utils/trello/TrelloCardList'
-import { AlertCircle, Loader2, Plus, Search } from 'lucide-react'
 
 interface AddCardDialogProps {
   isOpen: boolean
@@ -75,7 +75,7 @@ export function AddCardDialog({
           Add Card
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Trello Card</DialogTitle>
           <DialogDescription>
@@ -85,7 +85,10 @@ export function AddCardDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={addMode} onValueChange={v => onAddModeChange(v as 'url' | 'select')}>
+        <Tabs
+          value={addMode}
+          onValueChange={(v) => onAddModeChange(v as 'url' | 'select')}
+        >
           {hasApiCredentials && (
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="select">Select from Board</TabsTrigger>
@@ -156,18 +159,18 @@ function SelectFromBoardContent({
       <div className="space-y-2">
         <Label htmlFor="search">Search Cards</Label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <Input
             id="search"
             placeholder="Search by name or description..."
             value={searchTerm}
-            onChange={e => onSearchTermChange(e.target.value)}
+            onChange={(e) => onSearchTermChange(e.target.value)}
             className="pl-10"
           />
         </div>
       </div>
 
-      <div className="max-h-[400px] overflow-y-auto border rounded-md p-4">
+      <div className="max-h-[400px] overflow-y-auto rounded-md border p-4">
         {isFetchingCard ? (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
@@ -204,7 +207,7 @@ function UrlInputContent({
           id="card-url"
           placeholder="https://trello.com/c/abc12345/card-name"
           value={cardUrl}
-          onChange={e => onCardUrlChange(e.target.value)}
+          onChange={(e) => onCardUrlChange(e.target.value)}
         />
         <p className="text-xs text-gray-500">
           {hasApiCredentials
@@ -247,7 +250,7 @@ function ErrorDisplay({
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <ul className="list-disc pl-4 space-y-1">
+            <ul className="list-disc space-y-1 pl-4">
               {validationErrors.map((err, i) => (
                 <li key={i}>{err}</li>
               ))}

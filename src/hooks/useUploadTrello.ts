@@ -3,6 +3,17 @@
  * Extracted from UploadTrello.tsx (DEBT-002)
  */
 
+import { useMemo, useState } from 'react'
+import {
+  useCardDetailsSync,
+  useCardValidation
+} from '@pages/UploadTrello/UploadTrelloHooks'
+import {
+  createDefaultSproutUploadResponse,
+  SelectedCard
+} from '@pages/UploadTrello/UploadTrelloTypes'
+import { writeTextFile } from '@tauri-apps/plugin-fs'
+import { open } from '@tauri-apps/plugin-shell'
 import {
   useAppendBreadcrumbs,
   useAppendVideoInfo,
@@ -15,20 +26,9 @@ import {
 } from '@/hooks'
 import { useTrelloBoards } from '@/hooks/useTrelloBoards'
 import { logger } from '@/utils/logger'
-import {
-  useCardDetailsSync,
-  useCardValidation
-} from '@pages/UploadTrello/UploadTrelloHooks'
-import {
-  createDefaultSproutUploadResponse,
-  SelectedCard
-} from '@pages/UploadTrello/UploadTrelloTypes'
-import { appStore } from '@store/useAppStore'
-import { writeTextFile } from '@tauri-apps/plugin-fs'
-import { open } from '@tauri-apps/plugin-shell'
 import { TrelloCard } from '@utils/TrelloCards'
 import { SproutUploadResponse } from '@utils/types'
-import { useMemo, useState } from 'react'
+import { appStore } from '@store/useAppStore'
 
 export function useUploadTrello() {
   const [selectedCard, setSelectedCard] = useState<SelectedCard | null>(null)
@@ -39,13 +39,13 @@ export function useUploadTrello() {
 
   // Fetch all boards to get the selected board's name
   const { boards } = useTrelloBoards()
-  const selectedBoard = boards.find(board => board.id === boardId)
+  const selectedBoard = boards.find((board) => board.id === boardId)
   const boardName = selectedBoard?.name || 'Small Projects'
 
   // Flatten all cards for search
   const allCards = useMemo(() => {
     const cards: TrelloCard[] = []
-    Object.values(grouped).forEach(cardList => {
+    Object.values(grouped).forEach((cardList) => {
       cards.push(...cardList)
     })
     return cards
@@ -68,9 +68,9 @@ export function useUploadTrello() {
     }
 
     const result: Record<string, TrelloCard[]> = {}
-    filteredCards.forEach(card => {
+    filteredCards.forEach((card) => {
       Object.entries(grouped).forEach(([listName, cards]) => {
-        if (cards.some(c => c.id === card.id)) {
+        if (cards.some((c) => c.id === card.id)) {
           if (!result[listName]) {
             result[listName] = []
           }

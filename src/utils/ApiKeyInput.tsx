@@ -1,6 +1,6 @@
+import React, { useState } from 'react'
 import { Button } from '@components/ui/button'
 import { Input } from '@components/ui/input' // Adjust this import if your Input component is located elsewhere.
-import React, { useState } from 'react'
 
 type Props = {
   apiKey: string
@@ -29,12 +29,15 @@ const ApiKeyInput: React.FC<Props> = ({
         id={id}
         type={inputType === 'text' ? 'text' : showApiKey ? 'text' : 'password'}
         value={apiKey}
-        onChange={e => setApiKey(e.target.value)}
+        onChange={(e) => setApiKey(e.target.value)}
         placeholder={placeholder}
         style={{ flex: 1 }}
       />
       {/* Button to toggle visibility */}
-      <Button onClick={() => setShowApiKey(prev => !prev)} style={{ marginLeft: '8px' }}>
+      <Button
+        onClick={() => setShowApiKey((prev) => !prev)}
+        style={{ marginLeft: '8px' }}
+      >
         {showApiKey ? 'Hide' : 'Show'}
       </Button>
       {/* Button to save the API key */}

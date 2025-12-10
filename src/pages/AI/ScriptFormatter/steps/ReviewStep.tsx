@@ -3,8 +3,8 @@
  * Step 4: Review and Edit Formatted Script
  */
 
-import { Database, Download, Save } from 'lucide-react'
 import React from 'react'
+import { Database, Download, Save } from 'lucide-react'
 import { DiffEditor } from '../DiffEditor'
 
 interface ReviewStepProps {
@@ -31,11 +31,11 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
   return (
     <div className="w-full space-y-6">
       {/* Header with actions */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+      <div className="flex flex-col justify-between gap-3 lg:flex-row lg:items-center">
         <div className="flex items-center gap-3">
-          <h3 className="text-lg font-medium text-foreground">Review and Edit</h3>
+          <h3 className="text-foreground text-lg font-medium">Review and Edit</h3>
           {examplesCount > 0 && (
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-info/10 border border-info/20 rounded-full text-xs text-info">
+            <div className="bg-info/10 border-info/20 text-info flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs">
               <Database className="h-3 w-3" />
               <span className="hidden sm:inline">
                 Enhanced with {examplesCount} example{examplesCount > 1 ? 's' : ''}
@@ -47,7 +47,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={onOpenSaveDialog}
-            className="flex-1 lg:flex-initial px-3 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 flex flex-1 items-center justify-center gap-2 rounded-lg px-3 py-2 whitespace-nowrap disabled:opacity-50 lg:flex-initial"
             title="Save this script as an example for future RAG-enhanced formatting"
           >
             <Save className="h-4 w-4" />
@@ -56,7 +56,7 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
           <button
             onClick={onDownload}
             disabled={isGenerating}
-            className="flex-1 lg:flex-initial px-4 py-2 bg-success text-success-foreground rounded-lg hover:bg-success/90 disabled:opacity-50 flex items-center justify-center gap-2 whitespace-nowrap"
+            className="bg-success text-success-foreground hover:bg-success/90 flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2 whitespace-nowrap disabled:opacity-50 lg:flex-initial"
           >
             <Download className="h-4 w-4" />
             <span className="hidden md:inline">
@@ -76,8 +76,8 @@ export const ReviewStep: React.FC<ReviewStepProps> = ({
 
       {/* Error Display */}
       {generateError && (
-        <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-          <p className="text-sm text-destructive">{generateError.message}</p>
+        <div className="bg-destructive/10 border-destructive/20 rounded-lg border p-4">
+          <p className="text-destructive text-sm">{generateError.message}</p>
         </div>
       )}
     </div>

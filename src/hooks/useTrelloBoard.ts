@@ -1,8 +1,8 @@
-import { logger } from '@/utils/logger'
-import { CACHE } from '@constants/timing'
+import { useMemo } from 'react'
 import { queryKeys } from '@lib/query-keys'
 import { createQueryError, createQueryOptions, shouldRetry } from '@lib/query-utils'
 import { useQuery } from '@tanstack/react-query'
+import { logger } from '@/utils/logger'
 import { loadApiKeys } from '@utils/storage'
 import {
   fetchTrelloCards,
@@ -10,7 +10,7 @@ import {
   groupCardsByList,
   TrelloCard
 } from '@utils/TrelloCards'
-import { useMemo } from 'react'
+import { CACHE } from '@constants/timing'
 
 interface TrelloBoardData {
   grouped: Record<string, TrelloCard[]>

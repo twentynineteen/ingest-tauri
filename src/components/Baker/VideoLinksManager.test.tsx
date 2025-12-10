@@ -6,6 +6,9 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '@testing-library/jest-dom'
+import { render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as useApiKeysModule from '@hooks/useApiKeys'
 import * as useBreadcrumbsTrelloCardsModule from '@hooks/useBreadcrumbsTrelloCards'
 import * as useBreadcrumbsVideoLinksModule from '@hooks/useBreadcrumbsVideoLinks'
@@ -13,10 +16,7 @@ import * as useFileUploadModule from '@hooks/useFileUpload'
 import * as useSproutVideoApiModule from '@hooks/useSproutVideoApi'
 import * as useSproutVideoProcessorModule from '@hooks/useSproutVideoProcessor'
 import * as useUploadEventsModule from '@hooks/useUploadEvents'
-import { render, screen, waitFor, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import type { SproutUploadResponse } from '@utils/types'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { VideoLinksManager } from './VideoLinksManager'
 
 // Mock hooks
@@ -200,7 +200,7 @@ describe('VideoLinksManager - Upload Toggle Enhancement', () => {
 
     // Mock useSproutVideoProcessor - implement callback behavior
     vi.mocked(useSproutVideoProcessorModule.useSproutVideoProcessor).mockImplementation(
-      options => {
+      (options) => {
         // Simulate auto-processing when enabled and valid response provided
         if (
           options.enabled &&

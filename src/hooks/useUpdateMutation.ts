@@ -1,9 +1,9 @@
-import { logger } from '@/utils/logger'
 import { useMutation } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 import { ask, message } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { check } from '@tauri-apps/plugin-updater'
+import { logger } from '@/utils/logger'
 import { useVersionCheck } from './useVersionCheck'
 
 /**

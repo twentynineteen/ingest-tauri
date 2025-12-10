@@ -35,11 +35,11 @@ export function FileInputField({
         disabled={disabled}
       />
       {file && (
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-muted-foreground mt-1 text-sm">
           Selected: {file.name} ({(file.size / 1024).toFixed(1)} KB)
         </p>
       )}
-      {error && <p className="text-sm text-destructive mt-1">{error}</p>}
+      {error && <p className="text-destructive mt-1 text-sm">{error}</p>}
     </div>
   )
 }

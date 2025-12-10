@@ -4,10 +4,10 @@
  * Refactored: 2025-11-18 - Flattened nesting from 6 levels to 2 levels
  */
 
+import React, { useState } from 'react'
+import { ChevronRight, Edit, Info, Minus, Plus } from 'lucide-react'
 import type { BreadcrumbsPreview } from '@/types/baker'
 import { cn } from '@components/lib/utils'
-import { ChevronRight, Edit, Info, Minus, Plus } from 'lucide-react'
-import React, { useState } from 'react'
 
 interface DetailedChangesSectionProps {
   previews: BreadcrumbsPreview[]
@@ -17,13 +17,13 @@ interface DetailedChangesSectionProps {
 const getChangeIcon = (type: string) => {
   switch (type) {
     case 'added':
-      return <Plus className="h-3 w-3 text-success" />
+      return <Plus className="text-success h-3 w-3" />
     case 'modified':
-      return <Edit className="h-3 w-3 text-warning" />
+      return <Edit className="text-warning h-3 w-3" />
     case 'removed':
-      return <Minus className="h-3 w-3 text-destructive" />
+      return <Minus className="text-destructive h-3 w-3" />
     default:
-      return <Info className="h-3 w-3 text-muted-foreground" />
+      return <Info className="text-muted-foreground h-3 w-3" />
   }
 }
 
@@ -32,21 +32,21 @@ export const DetailedChangesSection: React.FC<DetailedChangesSectionProps> = ({
 }) => {
   const [expandedProject, setExpandedProject] = useState<string | null>(null)
 
-  const projectsWithChanges = previews.filter(p => p.detailedChanges?.hasChanges)
+  const projectsWithChanges = previews.filter((p) => p.detailedChanges?.hasChanges)
 
   return (
-    <div className="border rounded-lg overflow-hidden">
-      <div className="bg-muted px-4 py-3 border-b border-border">
+    <div className="overflow-hidden rounded-lg border">
+      <div className="bg-muted border-border border-b px-4 py-3">
         <div className="flex items-center justify-between">
-          <h4 className="font-medium text-foreground">Project-by-Project Changes</h4>
-          <span className="text-sm text-muted-foreground">
+          <h4 className="text-foreground font-medium">Project-by-Project Changes</h4>
+          <span className="text-muted-foreground text-sm">
             {projectsWithChanges.length} projects with changes
           </span>
         </div>
       </div>
 
       {/* Simplified project list - no nesting */}
-      <div className="divide-y divide-border max-h-96 overflow-y-auto">
+      <div className="divide-border max-h-96 divide-y overflow-y-auto">
         {projectsWithChanges.map((preview, index) => {
           if (!preview.detailedChanges) return null
 
@@ -64,56 +64,56 @@ export const DetailedChangesSection: React.FC<DetailedChangesSectionProps> = ({
               {/* Compact project header with inline summary */}
               <button
                 onClick={() => setExpandedProject(isExpanded ? null : detail.projectPath)}
-                className="w-full px-4 py-3 flex items-center justify-between hover:bg-accent/50 transition-colors"
+                className="hover:bg-accent/50 flex w-full items-center justify-between px-4 py-3 transition-colors"
               >
-                <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
                   <ChevronRight
                     className={cn(
-                      'h-4 w-4 text-muted-foreground transition-transform flex-shrink-0',
+                      'text-muted-foreground h-4 w-4 flex-shrink-0 transition-transform',
                       isExpanded && 'rotate-90'
                     )}
                   />
                   <div className="min-w-0 flex-1 text-left">
-                    <p className="font-medium text-sm text-foreground truncate">
+                    <p className="text-foreground truncate text-sm font-medium">
                       {detail.projectName}
                     </p>
-                    <div className="flex items-center gap-2 mt-0.5">
+                    <div className="mt-0.5 flex items-center gap-2">
                       {detail.summary.contentChanges > 0 && (
-                        <span className="text-xs bg-destructive/20 text-destructive px-1.5 py-0.5 rounded">
+                        <span className="bg-destructive/20 text-destructive rounded px-1.5 py-0.5 text-xs">
                           {detail.summary.contentChanges} content
                         </span>
                       )}
                       {detail.summary.metadataChanges > 0 && (
-                        <span className="text-xs bg-warning/20 text-warning px-1.5 py-0.5 rounded">
+                        <span className="bg-warning/20 text-warning rounded px-1.5 py-0.5 text-xs">
                           {detail.summary.metadataChanges} metadata
                         </span>
                       )}
                     </div>
                   </div>
                 </div>
-                <span className="text-sm text-muted-foreground ml-2">
+                <span className="text-muted-foreground ml-2 text-sm">
                   {detail.summary.totalChanges} changes
                 </span>
               </button>
 
               {/* Inline field changes - no category grouping */}
               {isExpanded && (
-                <div className="px-4 pb-4 space-y-2">
+                <div className="space-y-2 px-4 pb-4">
                   {allChanges.map((change, changeIndex) => (
                     <div
                       key={`${change.field}-${changeIndex}`}
-                      className="flex items-start gap-2 text-sm bg-muted/50 rounded-lg p-2"
+                      className="bg-muted/50 flex items-start gap-2 rounded-lg p-2 text-sm"
                     >
                       {getChangeIcon(change.type)}
-                      <div className="flex-1 min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-foreground">
+                          <span className="text-foreground font-medium">
                             {change.fieldDisplayName}
                           </span>
                           {change.impact !== 'low' && (
                             <span
                               className={cn(
-                                'text-xs px-1.5 py-0.5 rounded font-medium',
+                                'rounded px-1.5 py-0.5 text-xs font-medium',
                                 change.impact === 'high'
                                   ? 'bg-destructive/20 text-destructive'
                                   : 'bg-warning/20 text-warning'
@@ -124,16 +124,16 @@ export const DetailedChangesSection: React.FC<DetailedChangesSectionProps> = ({
                           )}
                         </div>
                         {change.type === 'modified' && (
-                          <div className="mt-1 text-xs space-y-0.5">
+                          <div className="mt-1 space-y-0.5 text-xs">
                             <div className="flex items-center gap-2">
                               <span className="text-muted-foreground">From:</span>
-                              <span className="font-mono text-destructive line-through">
+                              <span className="text-destructive font-mono line-through">
                                 {change.formattedOldValue}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="text-muted-foreground">To:</span>
-                              <span className="font-mono text-success">
+                              <span className="text-success font-mono">
                                 {change.formattedNewValue}
                               </span>
                             </div>
@@ -141,14 +141,14 @@ export const DetailedChangesSection: React.FC<DetailedChangesSectionProps> = ({
                         )}
                         {change.type === 'added' && (
                           <div className="mt-1 text-xs">
-                            <span className="font-mono text-success">
+                            <span className="text-success font-mono">
                               {change.formattedNewValue}
                             </span>
                           </div>
                         )}
                         {change.type === 'removed' && (
                           <div className="mt-1 text-xs">
-                            <span className="font-mono text-destructive line-through">
+                            <span className="text-destructive font-mono line-through">
                               {change.formattedOldValue}
                             </span>
                           </div>

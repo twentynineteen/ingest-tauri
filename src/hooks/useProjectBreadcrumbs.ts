@@ -12,11 +12,11 @@
  * Lines: ~110
  */
 
-import { logger } from '@/utils/logger'
-import { appStore } from '@store/useAppStore'
 import { invoke } from '@tauri-apps/api/core'
 import { writeTextFile } from '@tauri-apps/plugin-fs'
+import { logger } from '@/utils/logger'
 import { Breadcrumb } from '@utils/types'
+import { appStore } from '@store/useAppStore'
 import { FootageFile } from './useCameraAutoRemap'
 
 interface CreateBreadcrumbsParams {
@@ -69,7 +69,7 @@ export function useProjectBreadcrumbs() {
     const breadcrumbs: Breadcrumb = {
       projectTitle: title,
       numberOfCameras: numCameras,
-      files: files.map(f => ({
+      files: files.map((f) => ({
         camera: f.camera,
         name: f.file.name,
         path: f.file.path

@@ -3,11 +3,11 @@
  * Feature: 004-embed-multiple-video
  */
 
+import { openUrl } from '@tauri-apps/plugin-opener'
+import { ExternalLink, RefreshCw, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { TrelloCard } from '@/types/baker'
 import { logger } from '@/utils/logger'
-import { openUrl } from '@tauri-apps/plugin-opener'
-import { ExternalLink, RefreshCw, Trash2 } from 'lucide-react'
 
 interface TrelloCardItemProps {
   trelloCard: TrelloCard
@@ -56,24 +56,24 @@ export function TrelloCardItem({ trelloCard, onRemove, onRefresh }: TrelloCardIt
       <td className="px-4 py-3">
         <div className="flex items-center gap-2">
           <div className="flex-shrink-0">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-info/10">
-              <svg viewBox="0 0 24 24" className="h-4 w-4 text-info" fill="currentColor">
+            <div className="bg-info/10 flex h-8 w-8 items-center justify-center rounded">
+              <svg viewBox="0 0 24 24" className="text-info h-4 w-4" fill="currentColor">
                 <path d="M21 0H3C1.343 0 0 1.343 0 3v18c0 1.656 1.343 3 3 3h18c1.656 0 3-1.344 3-3V3c0-1.657-1.344-3-3-3zM10.44 18.18c0 .795-.645 1.44-1.44 1.44H4.56c-.795 0-1.44-.646-1.44-1.44V4.56c0-.795.645-1.44 1.44-1.44H9c.795 0 1.44.645 1.44 1.44v13.62zm10.44-6c0 .794-.645 1.44-1.44 1.44H15c-.795 0-1.44-.646-1.44-1.44V4.56c0-.795.645-1.44 1.44-1.44h4.44c.795 0 1.44.645 1.44 1.44v7.62z" />
               </svg>
             </div>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="font-medium text-sm text-foreground truncate">
+            <p className="text-foreground truncate text-sm font-medium">
               {trelloCard.title}
             </p>
-            <p className="text-xs text-muted-foreground">ID: {trelloCard.cardId}</p>
+            <p className="text-muted-foreground text-xs">ID: {trelloCard.cardId}</p>
           </div>
         </div>
       </td>
 
       {/* Board */}
       <td className="px-4 py-3">
-        <p className="text-sm text-foreground truncate">
+        <p className="text-foreground truncate text-sm">
           {trelloCard.boardName || (
             <span className="text-muted-foreground italic">Unknown</span>
           )}
@@ -87,10 +87,10 @@ export function TrelloCardItem({ trelloCard, onRemove, onRefresh }: TrelloCardIt
             <p className={`text-sm ${stale ? 'text-warning' : 'text-foreground'}`}>
               {getRelativeTime(trelloCard.lastFetched)}
             </p>
-            {stale && <p className="text-xs text-warning">Stale</p>}
+            {stale && <p className="text-warning text-xs">Stale</p>}
           </div>
         ) : (
-          <span className="text-sm text-muted-foreground italic">Never</span>
+          <span className="text-muted-foreground text-sm italic">Never</span>
         )}
       </td>
 
@@ -121,7 +121,7 @@ export function TrelloCardItem({ trelloCard, onRemove, onRefresh }: TrelloCardIt
             variant="ghost"
             size="icon"
             onClick={onRemove}
-            className="h-7 w-7 text-destructive hover:text-destructive/90"
+            className="text-destructive hover:text-destructive/90 h-7 w-7"
             title="Remove card"
           >
             <Trash2 className="h-3.5 w-3.5" />

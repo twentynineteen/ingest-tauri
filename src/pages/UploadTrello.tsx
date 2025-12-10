@@ -1,9 +1,9 @@
+import React from 'react'
+import { Search } from 'lucide-react'
 import { Input } from '@components/ui/input'
 import { useBreadcrumb } from '@hooks/useBreadcrumb'
 import { useUploadTrello } from '@hooks/useUploadTrello'
 import TrelloCardList from '@utils/trello/TrelloCardList'
-import { Search } from 'lucide-react'
-import React from 'react'
 import { CardDetailsDialog } from './UploadTrello/components/CardDetailsDialog'
 
 // Trello icon SVG component
@@ -56,18 +56,18 @@ const UploadTrello = () => {
 
   return (
     <>
-      <div className="w-full pb-4 border-b mb-4">
-        <h2 className="px-4 text-2xl font-semibold flex items-center gap-4">
+      <div className="mb-4 w-full border-b pb-4">
+        <h2 className="flex items-center gap-4 px-4 text-2xl font-semibold">
           <TrelloIcon />
           Trello: {boardName}
         </h2>
-        <div className="px-4 mx-4 mt-4 space-y-4">
+        <div className="mx-4 mt-4 space-y-4 px-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
+            <Search className="text-muted-foreground/50 absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               placeholder="Search cards by name or description..."
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>
@@ -75,7 +75,7 @@ const UploadTrello = () => {
             {Object.keys(filteredGrouped).length > 0 ? (
               <TrelloCardList grouped={filteredGrouped} onSelect={setSelectedCard} />
             ) : (
-              <p className="text-center text-muted-foreground py-8">
+              <p className="text-muted-foreground py-8 text-center">
                 {searchTerm.trim()
                   ? 'No cards found matching your search.'
                   : 'No cards available.'}

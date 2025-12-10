@@ -13,7 +13,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress, completed }) => {
 
   return (
     <div
-      className="w-full bg-secondary rounded-lg overflow-hidden h-8 relative"
+      className="bg-secondary relative h-8 w-full overflow-hidden rounded-lg"
       role="progressbar"
       aria-valuenow={Math.round(progress)}
       aria-valuemin={0}
@@ -21,11 +21,11 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ progress, completed }) => {
       aria-label="Project creation progress"
     >
       <div
-        className="bg-primary h-full flex items-center justify-center text-sm font-semibold text-primary-foreground transition-all duration-300"
+        className="bg-primary text-primary-foreground flex h-full items-center justify-center text-sm font-semibold transition-all duration-300"
         style={{ width: `${progress}%` }}
       />
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-sm font-semibold text-foreground drop-shadow-sm">
+        <span className="text-foreground text-sm font-semibold drop-shadow-sm">
           {progress.toFixed(1)}%
         </span>
       </div>

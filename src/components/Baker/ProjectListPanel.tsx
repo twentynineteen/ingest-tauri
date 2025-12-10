@@ -11,11 +11,11 @@
  * - Pulse animation for warning badges
  */
 
+import React from 'react'
+import { motion } from 'framer-motion'
 import { BAKER_ANIMATIONS } from '@/constants/animations'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import type { ProjectFolder } from '@/types/baker'
-import { motion } from 'framer-motion'
-import React from 'react'
 
 // Utility function for conditional class names
 const cn = (...classes: (string | undefined | null | boolean)[]) => {
@@ -41,19 +41,19 @@ export const ProjectListPanel: React.FC<ProjectListPanelProps> = ({
 
   if (projects.length === 0) {
     return (
-      <div className="h-full flex items-center justify-center text-muted-foreground text-sm">
+      <div className="text-muted-foreground flex h-full items-center justify-center text-sm">
         No projects found
       </div>
     )
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex items-center gap-2 p-4 border-b border-border">
-        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex-shrink-0">
+    <div className="flex h-full flex-col">
+      <div className="border-border flex items-center gap-2 border-b p-4">
+        <div className="bg-primary/10 text-primary flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold">
           3
         </div>
-        <h2 className="text-sm font-semibold text-foreground">
+        <h2 className="text-foreground text-sm font-semibold">
           Found Projects ({projects.length})
         </h2>
       </div>
@@ -75,7 +75,7 @@ export const ProjectListPanel: React.FC<ProjectListPanelProps> = ({
                 shouldReduceMotion ? undefined : BAKER_ANIMATIONS.projectList.item
               }
               className={cn(
-                'border-b border-border p-3 cursor-pointer transition-colors',
+                'border-border cursor-pointer border-b p-3 transition-colors',
                 'hover:bg-accent/50',
                 isSelected && 'bg-accent'
               )}
@@ -99,21 +99,21 @@ export const ProjectListPanel: React.FC<ProjectListPanelProps> = ({
                 <input
                   type="checkbox"
                   checked={isChecked}
-                  onChange={e => {
+                  onChange={(e) => {
                     e.stopPropagation()
                     onProjectSelection(project.path, e.target.checked)
                   }}
-                  onClick={e => e.stopPropagation()}
+                  onClick={(e) => e.stopPropagation()}
                   className="mt-0.5 flex-shrink-0"
                 />
 
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <p className="font-medium text-sm truncate">{project.name}</p>
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <p className="truncate text-sm font-medium">{project.name}</p>
 
                   <div className="flex flex-wrap gap-1.5">
                     <span
                       className={cn(
-                        'inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium',
+                        'inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium',
                         project.isValid
                           ? 'bg-success/20 text-success'
                           : 'bg-destructive/20 text-destructive'
@@ -123,7 +123,7 @@ export const ProjectListPanel: React.FC<ProjectListPanelProps> = ({
                     </span>
 
                     {project.invalidBreadcrumbs && (
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-destructive/20 text-destructive">
+                      <span className="bg-destructive/20 text-destructive inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium">
                         Invalid BC
                       </span>
                     )}
@@ -131,7 +131,7 @@ export const ProjectListPanel: React.FC<ProjectListPanelProps> = ({
                     {project.hasBreadcrumbs && !project.invalidBreadcrumbs && (
                       <motion.span
                         className={cn(
-                          'inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium',
+                          'inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium',
                           project.staleBreadcrumbs
                             ? 'bg-warning/20 text-warning'
                             : 'bg-success/20 text-success'
@@ -154,12 +154,12 @@ export const ProjectListPanel: React.FC<ProjectListPanelProps> = ({
                     )}
 
                     {!project.hasBreadcrumbs && !project.invalidBreadcrumbs && (
-                      <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground">
+                      <span className="bg-muted text-muted-foreground inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium">
                         No BC
                       </span>
                     )}
 
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-muted text-muted-foreground">
+                    <span className="bg-muted text-muted-foreground inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium">
                       {project.cameraCount} cam{project.cameraCount !== 1 ? 's' : ''}
                     </span>
                   </div>

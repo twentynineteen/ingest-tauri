@@ -1,9 +1,9 @@
-import { CACHE } from '@constants/timing'
+import { useEffect, useMemo, useRef } from 'react'
 import { queryKeys } from '@lib/query-keys'
 import { createQueryError, createQueryOptions, shouldRetry } from '@lib/query-utils'
 import { useQuery } from '@tanstack/react-query'
 import { debounce } from '@utils/debounce'
-import { useEffect, useMemo, useRef } from 'react'
+import { CACHE } from '@constants/timing'
 
 interface AutoRedrawProps {
   draw: (imageUrl: string, title: string) => Promise<void>

@@ -3,11 +3,11 @@
  * Feature: 004-embed-multiple-video
  */
 
+import { openUrl } from '@tauri-apps/plugin-opener'
+import { ChevronDown, ChevronUp, ExternalLink, Trash2, Video } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { VideoLink } from '@/types/baker'
 import { logger } from '@/utils/logger'
-import { openUrl } from '@tauri-apps/plugin-opener'
-import { ChevronDown, ChevronUp, ExternalLink, Trash2, Video } from 'lucide-react'
 
 interface VideoLinkCardProps {
   videoLink: VideoLink
@@ -45,9 +45,9 @@ export function VideoLinkCard({
   }
 
   return (
-    <div className="flex flex-col rounded-lg border border-border bg-card overflow-hidden shadow-sm transition-shadow hover:shadow-md group">
+    <div className="border-border bg-card group flex flex-col overflow-hidden rounded-lg border shadow-sm transition-shadow hover:shadow-md">
       {/* Thumbnail */}
-      <div className="relative aspect-video w-full bg-muted">
+      <div className="bg-muted relative aspect-video w-full">
         {videoLink.thumbnailUrl ? (
           <img
             src={videoLink.thumbnailUrl}
@@ -56,18 +56,18 @@ export function VideoLinkCard({
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center">
-            <Video className="h-12 w-12 text-muted-foreground" />
+            <Video className="text-muted-foreground h-12 w-12" />
           </div>
         )}
 
         {/* Action buttons overlay */}
-        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-2 right-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
           <Button
             variant="secondary"
             size="icon"
             onClick={onMoveUp}
             disabled={!canMoveUp}
-            className="h-7 w-7 bg-background/90 backdrop-blur-sm"
+            className="bg-background/90 h-7 w-7 backdrop-blur-sm"
             title="Move up"
           >
             <ChevronUp className="h-3.5 w-3.5" />
@@ -77,7 +77,7 @@ export function VideoLinkCard({
             size="icon"
             onClick={onMoveDown}
             disabled={!canMoveDown}
-            className="h-7 w-7 bg-background/90 backdrop-blur-sm"
+            className="bg-background/90 h-7 w-7 backdrop-blur-sm"
             title="Move down"
           >
             <ChevronDown className="h-3.5 w-3.5" />
@@ -86,7 +86,7 @@ export function VideoLinkCard({
             variant="secondary"
             size="icon"
             onClick={onRemove}
-            className="h-7 w-7 bg-destructive/90 text-destructive-foreground backdrop-blur-sm hover:bg-destructive"
+            className="bg-destructive/90 text-destructive-foreground hover:bg-destructive h-7 w-7 backdrop-blur-sm"
             title="Remove video"
           >
             <Trash2 className="h-3.5 w-3.5" />
@@ -95,19 +95,19 @@ export function VideoLinkCard({
       </div>
 
       {/* Content */}
-      <div className="flex-1 p-3 space-y-2">
+      <div className="flex-1 space-y-2 p-3">
         <h3
-          className="font-medium text-sm text-foreground line-clamp-2"
+          className="text-foreground line-clamp-2 text-sm font-medium"
           title={videoLink.title}
         >
           {videoLink.title}
         </h3>
 
         {videoLink.sproutVideoId && (
-          <p className="text-xs text-muted-foreground">ID: {videoLink.sproutVideoId}</p>
+          <p className="text-muted-foreground text-xs">ID: {videoLink.sproutVideoId}</p>
         )}
 
-        <div className="space-y-1 text-xs text-muted-foreground">
+        <div className="text-muted-foreground space-y-1 text-xs">
           {videoLink.uploadDate && <p>Uploaded: {formatDate(videoLink.uploadDate)}</p>}
           {videoLink.sourceRenderFile && (
             <p className="truncate" title={videoLink.sourceRenderFile}>
@@ -120,7 +120,7 @@ export function VideoLinkCard({
           variant="ghost"
           size="sm"
           onClick={openInBrowser}
-          className="w-full h-8 text-xs mt-2"
+          className="mt-2 h-8 w-full text-xs"
         >
           <ExternalLink className="mr-1.5 h-3 w-3" />
           Open in Sprout Video

@@ -1,7 +1,7 @@
-import { CACHE } from '@constants/timing'
 import { useQuery } from '@tanstack/react-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { isUpdateAvailable, normalizeVersion } from '@utils/versionUtils'
+import { CACHE } from '@constants/timing'
 
 interface GitHubRelease {
   tag_name: string

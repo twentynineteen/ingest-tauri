@@ -3,8 +3,8 @@
  * Step 3: Script Processing with Progress
  */
 
-import { AlertCircle, Database, Sparkles } from 'lucide-react'
 import React from 'react'
+import { AlertCircle, Database, Sparkles } from 'lucide-react'
 
 interface ProcessingStepProps {
   progress: number
@@ -22,20 +22,20 @@ export const ProcessingStep: React.FC<ProcessingStepProps> = ({
   onRetry
 }) => {
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="p-8 border border-border rounded-lg text-center">
-        <Sparkles className="h-16 w-16 text-foreground mx-auto mb-4 animate-pulse" />
-        <h3 className="text-lg font-medium text-foreground mb-2">
+    <div className="mx-auto max-w-2xl space-y-6">
+      <div className="border-border rounded-lg border p-8 text-center">
+        <Sparkles className="text-foreground mx-auto mb-4 h-16 w-16 animate-pulse" />
+        <h3 className="text-foreground mb-2 text-lg font-medium">
           Formatting your script...
         </h3>
-        <p className="text-sm text-muted-foreground mb-4">
+        <p className="text-muted-foreground mb-4 text-sm">
           Using AI to optimize for autocue readability
         </p>
 
         {/* RAG Status */}
         {ragStatus && (
-          <div className="mb-4 p-3 bg-info/10 border border-info/20 rounded-lg">
-            <div className="flex items-center justify-center gap-2 text-sm text-info">
+          <div className="bg-info/10 border-info/20 mb-4 rounded-lg border p-3">
+            <div className="text-info flex items-center justify-center gap-2 text-sm">
               <Database className="h-4 w-4" />
               <span>{ragStatus}</span>
             </div>
@@ -43,17 +43,17 @@ export const ProcessingStep: React.FC<ProcessingStepProps> = ({
         )}
 
         {/* Progress Bar */}
-        <div className="w-full bg-secondary rounded-full h-2 mb-2">
+        <div className="bg-secondary mb-2 h-2 w-full rounded-full">
           <div
             className="bg-primary h-2 rounded-full transition-all duration-300"
             style={{ width: `${Math.round(progress)}%` }}
           />
         </div>
-        <p className="text-xs text-muted-foreground">{Math.round(progress)}% complete</p>
+        <p className="text-muted-foreground text-xs">{Math.round(progress)}% complete</p>
 
         <button
           onClick={onCancel}
-          className="mt-4 px-4 py-2 text-sm text-destructive border border-destructive/30 rounded hover:bg-destructive/10"
+          className="text-destructive border-destructive/30 hover:bg-destructive/10 mt-4 rounded border px-4 py-2 text-sm"
         >
           Cancel Processing
         </button>
@@ -61,19 +61,19 @@ export const ProcessingStep: React.FC<ProcessingStepProps> = ({
 
       {/* Error Display */}
       {processingError && (
-        <div className="p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
-          <div className="flex items-start gap-2 mb-3">
-            <AlertCircle className="h-5 w-5 text-destructive flex-shrink-0" />
+        <div className="bg-destructive/10 border-destructive/20 rounded-lg border p-4">
+          <div className="mb-3 flex items-start gap-2">
+            <AlertCircle className="text-destructive h-5 w-5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-destructive">Processing Error</p>
-              <p className="text-sm text-destructive/90 mt-1">
+              <p className="text-destructive text-sm font-medium">Processing Error</p>
+              <p className="text-destructive/90 mt-1 text-sm">
                 {processingError.message}
               </p>
             </div>
           </div>
           <button
             onClick={onRetry}
-            className="w-full px-4 py-2 text-sm bg-destructive text-destructive-foreground rounded hover:bg-destructive/90"
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90 w-full rounded px-4 py-2 text-sm"
           >
             Try Again
           </button>

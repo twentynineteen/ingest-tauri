@@ -6,14 +6,14 @@
  * multiple projects before applying batch updates.
  */
 
+import React from 'react'
+import { AlertTriangle, CheckCircle, Clock } from 'lucide-react'
 import type { BreadcrumbsPreview } from '@/types/baker'
 import {
   calculateBatchUpdateSummary,
   hasAnyChanges,
   type BatchUpdateSummary
 } from '@utils/batchUpdateSummary'
-import { AlertTriangle, CheckCircle, Clock } from 'lucide-react'
-import React from 'react'
 import { DetailedChangesSection } from './BatchUpdate'
 import { Button } from './ui/button'
 import {
@@ -54,13 +54,13 @@ export const BatchUpdateConfirmationDialog: React.FC<
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center">
             {hasChanges ? (
-              <AlertTriangle className="h-5 w-5 text-warning mr-2" />
+              <AlertTriangle className="text-warning mr-2 h-5 w-5" />
             ) : (
-              <CheckCircle className="h-5 w-5 text-success mr-2" />
+              <CheckCircle className="text-success mr-2 h-5 w-5" />
             )}
             Confirm Batch Update
           </DialogTitle>
@@ -75,18 +75,18 @@ export const BatchUpdateConfirmationDialog: React.FC<
             <>
               {/* Compact Summary Header */}
               <div className="bg-muted rounded-lg p-4">
-                <div className="flex items-center justify-between mb-3">
+                <div className="mb-3 flex items-center justify-between">
                   <div className="flex items-center gap-4 text-sm">
                     <div className="flex items-center gap-1.5">
                       <span className="text-muted-foreground">Projects:</span>
-                      <span className="font-semibold text-warning">
+                      <span className="text-warning font-semibold">
                         {calculatedSummary.projectsWithChanges}
                       </span>
                     </div>
-                    <div className="h-3 w-px bg-border" />
+                    <div className="bg-border h-3 w-px" />
                     <div className="flex items-center gap-1.5">
                       <span className="text-muted-foreground">Total:</span>
-                      <span className="font-semibold text-foreground">
+                      <span className="text-foreground font-semibold">
                         {calculatedSummary.totalChanges.added +
                           calculatedSummary.totalChanges.modified +
                           calculatedSummary.totalChanges.removed}
@@ -94,10 +94,10 @@ export const BatchUpdateConfirmationDialog: React.FC<
                     </div>
                     {calculatedSummary.totalChanges.added > 0 && (
                       <>
-                        <div className="h-3 w-px bg-border" />
+                        <div className="bg-border h-3 w-px" />
                         <div className="flex items-center gap-1.5">
                           <span className="text-muted-foreground">Added:</span>
-                          <span className="font-semibold text-success">
+                          <span className="text-success font-semibold">
                             {calculatedSummary.totalChanges.added}
                           </span>
                         </div>
@@ -105,17 +105,17 @@ export const BatchUpdateConfirmationDialog: React.FC<
                     )}
                     {calculatedSummary.totalChanges.modified > 0 && (
                       <>
-                        <div className="h-3 w-px bg-border" />
+                        <div className="bg-border h-3 w-px" />
                         <div className="flex items-center gap-1.5">
                           <span className="text-muted-foreground">Modified:</span>
-                          <span className="font-semibold text-warning">
+                          <span className="text-warning font-semibold">
                             {calculatedSummary.totalChanges.modified}
                           </span>
                         </div>
                       </>
                     )}
                   </div>
-                  <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                  <div className="text-muted-foreground flex items-center gap-1.5 text-sm">
                     <Clock className="h-3.5 w-3.5" />
                     <span>{calculatedSummary.estimatedDuration}</span>
                   </div>
@@ -127,18 +127,18 @@ export const BatchUpdateConfirmationDialog: React.FC<
                   calculatedSummary.commonChanges.timestampsUpdated > 0) && (
                   <div className="flex flex-wrap gap-2">
                     {calculatedSummary.commonChanges.folderSizeCalculated > 0 && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                      <span className="bg-primary/10 text-primary inline-flex items-center rounded-full px-2 py-1 text-xs font-medium">
                         {calculatedSummary.commonChanges.folderSizeCalculated} size
                         calculations
                       </span>
                     )}
                     {calculatedSummary.commonChanges.filesUpdated > 0 && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                      <span className="bg-primary/10 text-primary inline-flex items-center rounded-full px-2 py-1 text-xs font-medium">
                         {calculatedSummary.commonChanges.filesUpdated} file updates
                       </span>
                     )}
                     {calculatedSummary.commonChanges.timestampsUpdated > 0 && (
-                      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary">
+                      <span className="bg-primary/10 text-primary inline-flex items-center rounded-full px-2 py-1 text-xs font-medium">
                         {calculatedSummary.commonChanges.timestampsUpdated} timestamp
                         updates
                       </span>
@@ -149,9 +149,9 @@ export const BatchUpdateConfirmationDialog: React.FC<
 
               {/* Warning for large operations */}
               {calculatedSummary.totalProjects > 20 && (
-                <div className="bg-warning/10 border border-warning/20 rounded-lg p-3">
-                  <div className="flex items-start text-warning">
-                    <AlertTriangle className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
+                <div className="bg-warning/10 border-warning/20 rounded-lg border p-3">
+                  <div className="text-warning flex items-start">
+                    <AlertTriangle className="mt-0.5 mr-2 h-4 w-4 flex-shrink-0" />
                     <div className="text-sm">
                       <strong>Large batch operation:</strong> You're updating{' '}
                       {calculatedSummary.totalProjects} projects. Consider running this
@@ -170,9 +170,9 @@ export const BatchUpdateConfirmationDialog: React.FC<
           )}
 
           {!hasChanges && (
-            <div className="text-center py-8 text-muted-foreground">
-              <CheckCircle className="h-12 w-12 mx-auto mb-3 text-success" />
-              <p className="text-lg font-medium text-foreground mb-1">
+            <div className="text-muted-foreground py-8 text-center">
+              <CheckCircle className="text-success mx-auto mb-3 h-12 w-12" />
+              <p className="text-foreground mb-1 text-lg font-medium">
                 No Changes Required
               </p>
               <p className="text-sm">

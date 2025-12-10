@@ -5,11 +5,8 @@
  * Part of master-detail layout pattern.
  */
 
-import { formatFileSize } from '@/components/BreadcrumbsViewer/fieldUtils'
-import { Button } from '@/components/ui/button'
-import type { BreadcrumbsFile, BreadcrumbsPreview } from '@/types/baker'
+import React, { useRef } from 'react'
 import { open } from '@tauri-apps/plugin-shell'
-import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
 import {
   AlertTriangle,
   Calendar,
@@ -23,7 +20,10 @@ import {
   User,
   Video
 } from 'lucide-react'
-import React, { useRef } from 'react'
+import { formatFileSize } from '@/components/BreadcrumbsViewer/fieldUtils'
+import { Button } from '@/components/ui/button'
+import type { BreadcrumbsFile, BreadcrumbsPreview } from '@/types/baker'
+import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
 import { TrelloCardsManager } from './TrelloCardsManager'
 import { VideoLinksManager } from './VideoLinksManager'
 
@@ -70,9 +70,9 @@ export const ProjectDetailPanel: React.FC<ProjectDetailPanelProps> = ({
   // Early returns after hooks
   if (!selectedProject) {
     return (
-      <div className="h-full flex items-center justify-center text-muted-foreground">
+      <div className="text-muted-foreground flex h-full items-center justify-center">
         <div className="text-center">
-          <FolderOpen className="h-12 w-12 mx-auto mb-3 opacity-50" />
+          <FolderOpen className="mx-auto mb-3 h-12 w-12 opacity-50" />
           <p className="text-sm">Select a project to view details</p>
         </div>
       </div>
@@ -81,8 +81,8 @@ export const ProjectDetailPanel: React.FC<ProjectDetailPanelProps> = ({
 
   if (isLoadingBreadcrumbs) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="flex items-center gap-2 text-muted-foreground">
+      <div className="flex h-full items-center justify-center">
+        <div className="text-muted-foreground flex items-center gap-2">
           <RefreshCw className="h-4 w-4 animate-spin" />
           <span className="text-sm">Loading breadcrumbs...</span>
         </div>
@@ -92,8 +92,8 @@ export const ProjectDetailPanel: React.FC<ProjectDetailPanelProps> = ({
 
   if (breadcrumbsError) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="flex items-center gap-2 text-destructive">
+      <div className="flex h-full items-center justify-center">
+        <div className="text-destructive flex items-center gap-2">
           <AlertTriangle className="h-4 w-4" />
           <span className="text-sm">{breadcrumbsError}</span>
         </div>
@@ -103,25 +103,25 @@ export const ProjectDetailPanel: React.FC<ProjectDetailPanelProps> = ({
 
   if (!breadcrumbs) {
     return (
-      <div className="h-full flex items-center justify-center text-muted-foreground">
+      <div className="text-muted-foreground flex h-full items-center justify-center">
         <p className="text-sm">No breadcrumbs data found</p>
       </div>
     )
   }
 
   return (
-    <div className="h-full flex flex-col">
-      <div className="p-4 border-b border-border">
-        <h3 className="font-semibold text-foreground truncate">
+    <div className="flex h-full flex-col">
+      <div className="border-border border-b p-4">
+        <h3 className="text-foreground truncate font-semibold">
           {breadcrumbs.projectTitle}
         </h3>
-        <p className="text-xs text-muted-foreground truncate mt-0.5">
+        <p className="text-muted-foreground mt-0.5 truncate text-xs">
           {breadcrumbs.parentFolder}
         </p>
       </div>
 
       {/* Navigation Menu */}
-      <div className="border-b border-border px-4 py-2">
+      <div className="border-border border-b px-4 py-2">
         <div className="flex gap-1">
           <Button
             variant="ghost"
@@ -129,7 +129,7 @@ export const ProjectDetailPanel: React.FC<ProjectDetailPanelProps> = ({
             onClick={() => scrollToSection(overviewRef)}
             className="h-8 text-xs"
           >
-            <Camera className="h-3 w-3 mr-1.5" />
+            <Camera className="mr-1.5 h-3 w-3" />
             Overview
           </Button>
           <Button
@@ -138,7 +138,7 @@ export const ProjectDetailPanel: React.FC<ProjectDetailPanelProps> = ({
             onClick={() => scrollToSection(filesRef)}
             className="h-8 text-xs"
           >
-            <File className="h-3 w-3 mr-1.5" />
+            <File className="mr-1.5 h-3 w-3" />
             Files ({breadcrumbs.files?.length || 0})
           </Button>
           <Button
@@ -147,7 +147,7 @@ export const ProjectDetailPanel: React.FC<ProjectDetailPanelProps> = ({
             onClick={() => scrollToSection(videosRef)}
             className="h-8 text-xs"
           >
-            <Video className="h-3 w-3 mr-1.5" />
+            <Video className="mr-1.5 h-3 w-3" />
             Videos
           </Button>
           <Button
@@ -156,18 +156,18 @@ export const ProjectDetailPanel: React.FC<ProjectDetailPanelProps> = ({
             onClick={() => scrollToSection(trelloRef)}
             className="h-8 text-xs"
           >
-            <CreditCard className="h-3 w-3 mr-1.5" />
+            <CreditCard className="mr-1.5 h-3 w-3" />
             Trello
           </Button>
         </div>
       </div>
 
       {/* Scrollable Content */}
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-4 space-y-6">
+      <div ref={scrollContainerRef} className="flex-1 space-y-6 overflow-y-auto p-4">
         {/* Overview Section */}
         <div ref={overviewRef}>
-          <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center">
-            <Camera className="h-4 w-4 mr-2" />
+          <h4 className="text-foreground mb-3 flex items-center text-sm font-semibold">
+            <Camera className="mr-2 h-4 w-4" />
             Overview
           </h4>
           <ProjectOverview breadcrumbs={breadcrumbs} />
@@ -175,8 +175,8 @@ export const ProjectDetailPanel: React.FC<ProjectDetailPanelProps> = ({
 
         {/* Files Section */}
         <div ref={filesRef} className="pt-2">
-          <h4 className="text-sm font-semibold text-foreground mb-3 flex items-center">
-            <File className="h-4 w-4 mr-2" />
+          <h4 className="text-foreground mb-3 flex items-center text-sm font-semibold">
+            <File className="mr-2 h-4 w-4" />
             Files ({breadcrumbs.files?.length || 0})
           </h4>
           <FilesList files={breadcrumbs.files} />
@@ -213,15 +213,15 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({ breadcrumbs }) => {
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="flex items-center text-xs font-medium text-muted-foreground">
-            <Camera className="h-3 w-3 mr-1" />
+          <label className="text-muted-foreground flex items-center text-xs font-medium">
+            <Camera className="mr-1 h-3 w-3" />
             Cameras
           </label>
           <p className="text-foreground">{breadcrumbs.numberOfCameras}</p>
         </div>
         <div>
-          <label className="flex items-center text-xs font-medium text-muted-foreground">
-            <HardDrive className="h-3 w-3 mr-1" />
+          <label className="text-muted-foreground flex items-center text-xs font-medium">
+            <HardDrive className="mr-1 h-3 w-3" />
             Folder Size
           </label>
           <p className="text-foreground">
@@ -234,15 +234,15 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({ breadcrumbs }) => {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="flex items-center text-xs font-medium text-muted-foreground">
-            <User className="h-3 w-3 mr-1" />
+          <label className="text-muted-foreground flex items-center text-xs font-medium">
+            <User className="mr-1 h-3 w-3" />
             Created By
           </label>
           <p className="text-foreground">{breadcrumbs.createdBy}</p>
         </div>
         <div>
-          <label className="flex items-center text-xs font-medium text-muted-foreground">
-            <Calendar className="h-3 w-3 mr-1" />
+          <label className="text-muted-foreground flex items-center text-xs font-medium">
+            <Calendar className="mr-1 h-3 w-3" />
             Created
           </label>
           <p className="text-foreground">{formatDate(breadcrumbs.creationDateTime)}</p>
@@ -253,7 +253,7 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({ breadcrumbs }) => {
         <div className="grid grid-cols-2 gap-4">
           {breadcrumbs.lastModified && (
             <div>
-              <label className="text-xs font-medium text-muted-foreground">
+              <label className="text-muted-foreground text-xs font-medium">
                 Last Modified
               </label>
               <p className="text-foreground">{formatDate(breadcrumbs.lastModified)}</p>
@@ -261,7 +261,7 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({ breadcrumbs }) => {
           )}
           {breadcrumbs.scannedBy && (
             <div>
-              <label className="text-xs font-medium text-muted-foreground">
+              <label className="text-muted-foreground text-xs font-medium">
                 Scanned By
               </label>
               <p className="text-foreground">{breadcrumbs.scannedBy}</p>
@@ -272,12 +272,12 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({ breadcrumbs }) => {
 
       {breadcrumbs.trelloCardUrl && (
         <div>
-          <label className="flex items-center text-xs font-medium text-muted-foreground mb-2">
-            <ExternalLink className="h-3 w-3 mr-1" />
+          <label className="text-muted-foreground mb-2 flex items-center text-xs font-medium">
+            <ExternalLink className="mr-1 h-3 w-3" />
             Legacy Trello Card
           </label>
           <div className="flex items-center gap-2">
-            <p className="text-foreground text-xs truncate flex-1">
+            <p className="text-foreground flex-1 truncate text-xs">
               {breadcrumbs.trelloCardUrl}
             </p>
             <Button
@@ -286,9 +286,9 @@ const ProjectOverview: React.FC<ProjectOverviewProps> = ({ breadcrumbs }) => {
               onClick={async () => {
                 await open(breadcrumbs.trelloCardUrl!)
               }}
-              className="text-xs px-2 py-1 h-6 flex-shrink-0"
+              className="h-6 flex-shrink-0 px-2 py-1 text-xs"
             >
-              <ExternalLink className="h-3 w-3 mr-1" />
+              <ExternalLink className="mr-1 h-3 w-3" />
               Open
             </Button>
           </div>
@@ -305,8 +305,8 @@ interface FilesListProps {
 const FilesList: React.FC<FilesListProps> = ({ files }) => {
   if (!files || files.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <File className="h-12 w-12 mx-auto mb-3 opacity-50" />
+      <div className="text-muted-foreground py-8 text-center">
+        <File className="mx-auto mb-3 h-12 w-12 opacity-50" />
         <p className="text-sm">No files recorded in breadcrumbs</p>
       </div>
     )
@@ -317,13 +317,13 @@ const FilesList: React.FC<FilesListProps> = ({ files }) => {
       {files.map((file, index) => (
         <div
           key={index}
-          className="flex items-center justify-between bg-background border border-border rounded-lg p-3 hover:bg-accent/50 transition-colors"
+          className="bg-background border-border hover:bg-accent/50 flex items-center justify-between rounded-lg border p-3 transition-colors"
         >
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{file.name}</p>
-            <p className="text-xs text-muted-foreground truncate">{file.path}</p>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium">{file.name}</p>
+            <p className="text-muted-foreground truncate text-xs">{file.path}</p>
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground ml-3">
+          <div className="text-muted-foreground ml-3 flex items-center gap-1.5 text-xs">
             <Camera className="h-3.5 w-3.5" />
             <span className="font-medium">{file.camera}</span>
           </div>

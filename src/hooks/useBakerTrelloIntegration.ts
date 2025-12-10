@@ -4,9 +4,9 @@
  * Handles complex Trello card updating logic for Baker batch operations.
  */
 
-import { logger } from '@/utils/logger'
-import { readTextFile } from '@tauri-apps/plugin-fs'
 import { useCallback } from 'react'
+import { readTextFile } from '@tauri-apps/plugin-fs'
+import { logger } from '@/utils/logger'
 
 interface TrelloError {
   project: string
@@ -76,8 +76,8 @@ async function updateProjectTrelloCards(
 
   if (trelloCards && trelloCards.length > 0) {
     // Update all cards in the array asynchronously
-    const updatePromises = trelloCards.map(card =>
-      updateSingleTrelloCard(card.cardId, block, apiKey, token).catch(err => {
+    const updatePromises = trelloCards.map((card) =>
+      updateSingleTrelloCard(card.cardId, block, apiKey, token).catch((err) => {
         logger.warn(`Failed to update Trello card ${card.cardId}:`, err)
         throw err // Re-throw to be caught by Promise.allSettled
       })

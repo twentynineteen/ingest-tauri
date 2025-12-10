@@ -5,6 +5,8 @@
  * Refactored to separate concerns into focused components and hooks.
  */
 
+import React, { useCallback, useState } from 'react'
+import { AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react'
 import { useTrelloBoard } from '@/hooks'
 import { logger } from '@/utils/logger'
 import { BakerPreferences } from '@components/Baker/BakerPreferences'
@@ -23,8 +25,6 @@ import { useBreadcrumb } from '@hooks/useBreadcrumb'
 import { useBreadcrumbsManager } from '@hooks/useBreadcrumbsManager'
 import { useBreadcrumbsPreview } from '@hooks/useBreadcrumbsPreview'
 import { useLiveBreadcrumbsReader } from '@hooks/useLiveBreadcrumbsReader'
-import { AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react'
-import React, { useCallback, useState } from 'react'
 
 const BakerPageContent: React.FC = () => {
   // Set breadcrumbs for navigation
@@ -94,11 +94,11 @@ const BakerPageContent: React.FC = () => {
 
   const handleProjectSelection = useCallback(
     (projectPath: string, isSelected: boolean) => {
-      setSelectedProjects(prev => {
+      setSelectedProjects((prev) => {
         if (isSelected) {
           return [...prev, projectPath]
         } else {
-          return prev.filter(path => path !== projectPath)
+          return prev.filter((path) => path !== projectPath)
         }
       })
     },
@@ -107,7 +107,7 @@ const BakerPageContent: React.FC = () => {
 
   const handleSelectAll = useCallback(() => {
     if (scanResult?.projects) {
-      setSelectedProjects(scanResult.projects.map(p => p.path))
+      setSelectedProjects(scanResult.projects.map((p) => p.path))
     }
   }, [scanResult])
 
@@ -123,7 +123,7 @@ const BakerPageContent: React.FC = () => {
 
     // Generate previews for selected projects before showing confirmation dialog
     if (scanResult?.projects) {
-      const selectedProjectData = scanResult.projects.filter(p =>
+      const selectedProjectData = scanResult.projects.filter((p) =>
         selectedProjects.includes(p.path)
       )
       await generateBatchPreviews(selectedProjectData)
@@ -176,7 +176,7 @@ const BakerPageContent: React.FC = () => {
         setPreviewProject(null)
       } else {
         setPreviewProject(projectPath)
-        const project = scanResult?.projects.find(p => p.path === projectPath)
+        const project = scanResult?.projects.find((p) => p.path === projectPath)
         if (project && !getPreview(projectPath)) {
           await generatePreview(projectPath, project)
         }
@@ -186,14 +186,14 @@ const BakerPageContent: React.FC = () => {
   )
 
   return (
-    <div className="w-full h-full overflow-y-auto overflow-x-hidden">
+    <div className="h-full w-full overflow-x-hidden overflow-y-auto">
       <div className="w-full max-w-full pb-4">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-border bg-card/50">
+        <div className="border-border bg-card/50 border-b px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Baker</h1>
-              <p className="text-xs text-muted-foreground mt-0.5">
+              <h1 className="text-foreground text-2xl font-bold">Baker</h1>
+              <p className="text-muted-foreground mt-0.5 text-xs">
                 Scan directories for BuildProject folders and manage breadcrumbs files
               </p>
             </div>
@@ -207,7 +207,7 @@ const BakerPageContent: React.FC = () => {
           </div>
         </div>
 
-        <div className="px-6 py-4 space-y-4 max-w-full">
+        <div className="max-w-full space-y-4 px-6 py-4">
           {/* Folder Selection */}
           <FolderSelector
             selectedFolder={selectedFolder}
@@ -221,9 +221,9 @@ const BakerPageContent: React.FC = () => {
 
           {/* Error Display */}
           {error && (
-            <div className="border border-red-200 bg-red-50 rounded-lg p-4">
+            <div className="rounded-lg border border-red-200 bg-red-50 p-4">
               <div className="flex items-center">
-                <AlertTriangle className="h-4 w-4 text-red-600 mr-2" />
+                <AlertTriangle className="mr-2 h-4 w-4 text-red-600" />
                 <span className="text-red-800">{error}</span>
               </div>
             </div>
@@ -234,18 +234,18 @@ const BakerPageContent: React.FC = () => {
 
           {/* Project Results - Master-Detail Layout */}
           {scanResult?.projects && (
-            <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
-              <div className="flex items-center gap-2 p-4 border-b border-border">
-                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex-shrink-0">
+            <div className="bg-card border-border overflow-hidden rounded-xl border shadow-sm">
+              <div className="border-border flex items-center gap-2 border-b p-4">
+                <div className="bg-primary/10 text-primary flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold">
                   3
                 </div>
-                <h2 className="text-sm font-semibold text-foreground">
+                <h2 className="text-foreground text-sm font-semibold">
                   Found Projects ({scanResult.projects.length})
                 </h2>
               </div>
               <div className="flex h-[600px]">
                 {/* Left Panel - Project List */}
-                <div className="w-2/5 border-r border-border">
+                <div className="border-border w-2/5 border-r">
                   <ProjectListPanel
                     projects={scanResult.projects}
                     selectedProjects={selectedProjects}
@@ -287,9 +287,9 @@ const BakerPageContent: React.FC = () => {
 
           {/* Update Results */}
           {lastUpdateResult && (
-            <div className="border border-green-200 bg-green-50 rounded-lg p-4">
+            <div className="rounded-lg border border-green-200 bg-green-50 p-4">
               <div className="flex items-center">
-                <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                <CheckCircle className="mr-2 h-4 w-4 text-green-600" />
                 <span className="text-green-800">
                   Update complete: {lastUpdateResult.successful.length} successful,{' '}
                   {lastUpdateResult.failed.length} failed
@@ -311,7 +311,7 @@ const BakerPageContent: React.FC = () => {
         onConfirm={handleConfirmBatchUpdate}
         selectedProjects={selectedProjects}
         previews={selectedProjects
-          .map(path => getPreview(path))
+          .map((path) => getPreview(path))
           .filter((preview): preview is NonNullable<typeof preview> => preview !== null)}
         isLoading={isUpdating}
       />
@@ -323,23 +323,23 @@ const BakerPage: React.FC = () => {
   return (
     <ErrorBoundary
       fallback={(error, retry) => (
-        <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center">
+        <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
           <div className="max-w-md">
-            <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold text-foreground mb-4">Baker Error</h2>
+            <AlertTriangle className="text-destructive mx-auto mb-4 h-12 w-12" />
+            <h2 className="text-foreground mb-4 text-2xl font-semibold">Baker Error</h2>
             <div className="text-muted-foreground mb-6">
               <p>An error occurred while loading the Baker page. This could be due to:</p>
-              <ul className="text-left mt-2 space-y-1">
+              <ul className="mt-2 space-y-1 text-left">
                 <li>• File system access issues</li>
                 <li>• Invalid scan configuration</li>
                 <li>• Memory or performance constraints</li>
               </ul>
               {error && process.env.NODE_ENV === 'development' && (
-                <details className="mt-4 text-left bg-muted/50 p-4 rounded-md text-sm border border-border">
-                  <summary className="cursor-pointer font-medium text-foreground">
+                <details className="bg-muted/50 border-border mt-4 rounded-md border p-4 text-left text-sm">
+                  <summary className="text-foreground cursor-pointer font-medium">
                     Technical Details
                   </summary>
-                  <div className="mt-2 text-muted-foreground">
+                  <div className="text-muted-foreground mt-2">
                     <p>
                       <strong className="text-foreground">Error:</strong> {error.message}
                     </p>
@@ -347,9 +347,9 @@ const BakerPage: React.FC = () => {
                 </details>
               )}
             </div>
-            <div className="flex gap-2 justify-center">
+            <div className="flex justify-center gap-2">
               <Button onClick={retry} className="flex-1">
-                <RefreshCw className="h-4 w-4 mr-2" />
+                <RefreshCw className="mr-2 h-4 w-4" />
                 Retry
               </Button>
               <Button

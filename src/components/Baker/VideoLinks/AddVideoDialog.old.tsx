@@ -3,6 +3,7 @@
  * Extracted from VideoLinksManager to reduce complexity (DEBT-002)
  */
 
+import { AlertCircle, Loader2, Plus, Upload as UploadIcon } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,7 +18,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { AlertCircle, Loader2, Plus, Upload as UploadIcon } from 'lucide-react'
 
 interface FormData {
   url: string
@@ -193,7 +193,7 @@ function UrlEntryContent({
             id="video-url"
             placeholder="https://sproutvideo.com/videos/..."
             value={formData.url}
-            onChange={e => onFormFieldChange('url', e.target.value)}
+            onChange={(e) => onFormFieldChange('url', e.target.value)}
             className="flex-1"
           />
           <Button
@@ -229,7 +229,7 @@ function UrlEntryContent({
           id="video-title"
           placeholder="Video title"
           value={formData.title}
-          onChange={e => onFormFieldChange('title', e.target.value)}
+          onChange={(e) => onFormFieldChange('title', e.target.value)}
           maxLength={200}
         />
       </div>
@@ -240,7 +240,7 @@ function UrlEntryContent({
           id="sprout-id"
           placeholder="abc123xyz"
           value={formData.sproutVideoId}
-          onChange={e => onFormFieldChange('sproutVideoId', e.target.value)}
+          onChange={(e) => onFormFieldChange('sproutVideoId', e.target.value)}
         />
       </div>
 
@@ -250,7 +250,7 @@ function UrlEntryContent({
           id="thumbnail-url"
           placeholder="https://..."
           value={formData.thumbnailUrl}
-          onChange={e => onFormFieldChange('thumbnailUrl', e.target.value)}
+          onChange={(e) => onFormFieldChange('thumbnailUrl', e.target.value)}
         />
       </div>
 
@@ -258,7 +258,7 @@ function UrlEntryContent({
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <ul className="list-disc pl-4 space-y-1">
+            <ul className="list-disc space-y-1 pl-4">
               {validationErrors.map((err, i) => (
                 <li key={i}>{err}</li>
               ))}

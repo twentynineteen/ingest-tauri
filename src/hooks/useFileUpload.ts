@@ -1,10 +1,10 @@
-import { logger } from '@/utils/logger'
-import { appStore } from '@store/useAppStore'
+import { useState } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { open } from '@tauri-apps/plugin-dialog'
+import { logger } from '@/utils/logger'
 import { SproutUploadResponse } from '@utils/types'
-import { useState } from 'react'
+import { appStore } from '@store/useAppStore'
 
 interface UseFileUploadReturn {
   selectedFile: string | null
@@ -90,13 +90,13 @@ export const useFileUpload = (): UseFileUploadReturn => {
         ) // 45 minutes
 
         // Listen for the upload_complete event and resolve with its payload
-        completeUnlisten = listen('upload_complete', async event => {
+        completeUnlisten = listen('upload_complete', async (event) => {
           await cleanup()
           resolve(event.payload as SproutUploadResponse)
         })
 
         // Listen for the upload_error event and reject with its payload
-        errorUnlisten = listen('upload_error', async event => {
+        errorUnlisten = listen('upload_error', async (event) => {
           await cleanup()
           reject(event.payload)
         })
@@ -106,7 +106,7 @@ export const useFileUpload = (): UseFileUploadReturn => {
           filePath: selectedFile,
           apiKey: apiKey,
           folderId: selectedFolder
-        }).catch(async error => {
+        }).catch(async (error) => {
           await cleanup()
           reject(error)
         })

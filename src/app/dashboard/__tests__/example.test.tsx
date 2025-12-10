@@ -1,6 +1,6 @@
 // src/__tests__/example.test.tsx
-import { render } from '@testing-library/react'
 import React from 'react'
+import { render } from '@testing-library/react'
 import { vi } from 'vitest'
 import App from '../../../App'
 

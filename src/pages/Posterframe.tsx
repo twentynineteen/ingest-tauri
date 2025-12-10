@@ -1,3 +1,7 @@
+import React, { useRef, useState } from 'react'
+import { invoke } from '@tauri-apps/api/core'
+import { open } from '@tauri-apps/plugin-dialog'
+import { writeFile } from '@tauri-apps/plugin-fs'
 import { logger } from '@/utils/logger'
 import { useAutoFileSelection } from '@hooks/useAutoFileSelection'
 import { useBackgroundFolder } from '@hooks/useBackgroundFolder'
@@ -6,10 +10,6 @@ import { useFileSelection } from '@hooks/useFileSelection'
 import { usePosterframeAutoRedraw } from '@hooks/usePosterframeAutoRedraw'
 import { usePosterframeCanvas } from '@hooks/usePosterframeCanvas'
 import { useZoomPan } from '@hooks/useZoomPan'
-import { invoke } from '@tauri-apps/api/core'
-import { open } from '@tauri-apps/plugin-dialog'
-import { writeFile } from '@tauri-apps/plugin-fs'
-import React, { useRef, useState } from 'react'
 
 const Posterframe = () => {
   const [videoTitle, setVideoTitle] = useState('')
@@ -56,7 +56,7 @@ const Posterframe = () => {
     if (!canvasRef.current || !savePath || !videoTitle.trim()) return
 
     const canvas = canvasRef.current
-    canvas.toBlob(async blob => {
+    canvas.toBlob(async (blob) => {
       if (!blob) return
 
       const arrayBuffer = await blob.arrayBuffer()
@@ -99,15 +99,15 @@ const Posterframe = () => {
   }
 
   return (
-    <div className="w-full pb-4 border-b mb-4">
+    <div className="mb-4 w-full border-b pb-4">
       <h2 className="px-4 text-2xl font-semibold">Create a Posterframe</h2>
-      <div className="px-4 mx-4">
-        <div className="flex flex-col items-center space-y-4 mt-4">
-          <div className="flex gap-4 items-center">
+      <div className="mx-4 px-4">
+        <div className="mt-4 flex flex-col items-center space-y-4">
+          <div className="flex items-center gap-4">
             <button
               onClick={() =>
                 open({ directory: true }).then(
-                  path => typeof path === 'string' && loadFolder(path)
+                  (path) => typeof path === 'string' && loadFolder(path)
                 )
               }
               className="text-primary-foreground bg-primary hover:bg-primary/90 rounded-lg px-4 py-2 text-sm"
@@ -117,14 +117,14 @@ const Posterframe = () => {
 
             {backgroundFiles.length > 0 && (
               <select
-                className="border px-2 py-1 rounded w-80"
+                className="w-80 rounded border px-2 py-1"
                 value={selectedFilePath || ''}
-                onChange={e => {
+                onChange={(e) => {
                   const path = e.target.value
                   selectFile(path)
                 }}
               >
-                {backgroundFiles.map(file => (
+                {backgroundFiles.map((file) => (
                   <option key={file} value={file}>
                     {file.split('/').pop()}
                   </option>
@@ -143,13 +143,13 @@ const Posterframe = () => {
           </div>
 
           <div className="mt-4 text-center">
-            <h3 className="font-medium mb-2 text-sm text-muted-foreground">
+            <h3 className="text-muted-foreground mb-2 text-sm font-medium">
               Live Preview
             </h3>
 
             {selectedFileBlob ? (
               <div
-                className="relative border rounded shadow-sm overflow-hidden"
+                className="relative overflow-hidden rounded border shadow-sm"
                 style={{
                   width: '384px',
                   height: '216px',
@@ -179,12 +179,12 @@ const Posterframe = () => {
                       width: '100%',
                       height: '100%'
                     }}
-                    className="max-w-md w-full border rounded shadow-sm transition-transform"
+                    className="w-full max-w-md rounded border shadow-sm transition-transform"
                   />
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground italic">
+              <p className="text-muted-foreground text-sm italic">
                 Select a background to preview the thumbnail
               </p>
             )}
@@ -195,27 +195,27 @@ const Posterframe = () => {
             type="text"
             placeholder="Enter Video Title"
             value={videoTitle}
-            onChange={e => setVideoTitle(e.target.value)}
-            className="border px-2 py-1 rounded w-80"
+            onChange={(e) => setVideoTitle(e.target.value)}
+            className="w-80 rounded border px-2 py-1"
           />
 
           {/* Zoom Controls */}
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setZoomLevel(z => Math.max(0.25, z - 0.25))}
-              className="px-2 py-1 text-sm border rounded"
+              onClick={() => setZoomLevel((z) => Math.max(0.25, z - 0.25))}
+              className="rounded border px-2 py-1 text-sm"
             >
               Zoom Out
             </button>
             <button
               onClick={() => setZoomLevel(1)}
-              className="px-2 py-1 text-sm border rounded"
+              className="rounded border px-2 py-1 text-sm"
             >
               Reset Zoom
             </button>
             <button
-              onClick={() => setZoomLevel(z => Math.min(3, z + 0.25))}
-              className="px-2 py-1 text-sm border rounded"
+              onClick={() => setZoomLevel((z) => Math.min(3, z + 0.25))}
+              className="rounded border px-2 py-1 text-sm"
             >
               Zoom In
             </button>
@@ -225,31 +225,23 @@ const Posterframe = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={chooseSavePath}
-              className="bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-4 py-2"
             >
               Choose Save Path
             </button>
 
             <button
               onClick={generateThumbnail}
-              className="inline-flex items-center justify-center
-            p-0.5 me-2 overflow-hidden text-sm font-medium
-            text-foreground rounded-lg group bg-linear-to-br from-purple-500
-            to-pink-500 group-hover:from-purple-500 group-hover:to-pink-500
-            hover:text-white focus:ring-4 focus:outline-hidden
-            focus:ring-purple-200"
+              className="text-foreground group me-2 inline-flex items-center justify-center overflow-hidden rounded-lg bg-linear-to-br from-purple-500 to-pink-500 p-0.5 text-sm font-medium group-hover:from-purple-500 group-hover:to-pink-500 hover:text-white focus:ring-4 focus:ring-purple-200 focus:outline-hidden"
             >
-              <span
-                className="px-5 py-2.5 transition-all ease-in duration-75
-              bg-card rounded-md group-hover:bg-transparent"
-              >
+              <span className="bg-card rounded-md px-5 py-2.5 transition-all duration-75 ease-in group-hover:bg-transparent">
                 Generate Thumbnail
               </span>
             </button>
           </div>
 
           {savePath && (
-            <p className="text-sm text-muted-foreground mt-2 text-center">
+            <p className="text-muted-foreground mt-2 text-center text-sm">
               Save to: {savePath}
             </p>
           )}

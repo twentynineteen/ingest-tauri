@@ -1,8 +1,8 @@
-import { logger } from '@/utils/logger'
-import { useAuthCheck } from '@hooks/useAuthCheck'
+import React from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
-import React from 'react'
+import { logger } from '@/utils/logger'
+import { useAuthCheck } from '@hooks/useAuthCheck'
 import { AuthContext } from './AuthContext'
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

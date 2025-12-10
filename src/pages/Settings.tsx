@@ -1,19 +1,19 @@
-import { logger } from '@/utils/logger'
-import { TrelloBoardSelector } from '@components/Settings/TrelloBoardSelector'
-import { Button } from '@components/ui/button'
-import { CACHE } from '@constants/timing'
-import { useAIProvider } from '@hooks/useAIProvider'
-import { useBreadcrumb } from '@hooks/useBreadcrumb'
+import React, { useState } from 'react'
 import { queryKeys } from '@lib/query-keys'
 import { createQueryError, createQueryOptions, shouldRetry } from '@lib/query-utils'
-import { useAppStore } from '@store/useAppStore'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { open as openPath } from '@tauri-apps/plugin-dialog'
 import { open } from '@tauri-apps/plugin-shell'
+import { CheckCircle, Loader2, XCircle } from 'lucide-react'
+import { logger } from '@/utils/logger'
+import { TrelloBoardSelector } from '@components/Settings/TrelloBoardSelector'
+import { Button } from '@components/ui/button'
+import { useAIProvider } from '@hooks/useAIProvider'
+import { useBreadcrumb } from '@hooks/useBreadcrumb'
 import ApiKeyInput from '@utils/ApiKeyInput'
 import { ApiKeys, loadApiKeys, saveApiKeys } from '@utils/storage'
-import { CheckCircle, Loader2, XCircle } from 'lucide-react'
-import React, { useState } from 'react'
+import { CACHE } from '@constants/timing'
+import { useAppStore } from '@store/useAppStore'
 
 const Settings: React.FC = () => {
   const queryClient = useQueryClient()
@@ -63,21 +63,21 @@ const Settings: React.FC = () => {
         throw createQueryError(`Failed to save API keys: ${error}`, 'SETTINGS_SAVE')
       }
     },
-    onSuccess: updatedKeys => {
+    onSuccess: (updatedKeys) => {
       // Update the cache with the new keys
       queryClient.setQueryData(queryKeys.settings.apiKeys(), updatedKeys)
     }
   })
 
   // Add default folder input and store in zustand app store
-  const defaultBackgroundFolder = useAppStore(state => state.defaultBackgroundFolder)
+  const defaultBackgroundFolder = useAppStore((state) => state.defaultBackgroundFolder)
   const setDefaultBackgroundFolder = useAppStore(
-    state => state.setDefaultBackgroundFolder
+    (state) => state.setDefaultBackgroundFolder
   )
 
   // Ollama URL setting
-  const ollamaUrl = useAppStore(state => state.ollamaUrl)
-  const setOllamaUrl = useAppStore(state => state.setOllamaUrl)
+  const ollamaUrl = useAppStore((state) => state.ollamaUrl)
+  const setOllamaUrl = useAppStore((state) => state.setOllamaUrl)
 
   const handleSelectDefaultBackgroundFolder = async () => {
     const folder = await openPath({
@@ -198,21 +198,21 @@ const Settings: React.FC = () => {
 
   return (
     <div className="w-full pb-4">
-      <h2 className="px-4 text-2xl font-semibold mb-6">Settings</h2>
+      <h2 className="mb-6 px-4 text-2xl font-semibold">Settings</h2>
 
-      <div className="px-4 mx-4 space-y-8">
+      <div className="mx-4 space-y-8 px-4">
         {/* AI Models Section */}
-        <section className="space-y-4 border border-border rounded-lg p-6">
+        <section className="border-border space-y-4 rounded-lg border p-6">
           <div className="border-b pb-2">
-            <h3 className="text-lg font-semibold text-foreground">AI Models</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="text-foreground text-lg font-semibold">AI Models</h3>
+            <p className="text-muted-foreground text-sm">
               Configure AI provider settings for script formatting
             </p>
           </div>
           <div>
-            <label htmlFor="ollama-url-input" className="block text-sm font-medium mb-2">
+            <label htmlFor="ollama-url-input" className="mb-2 block text-sm font-medium">
               Ollama URL
-              <span className="text-xs text-muted-foreground ml-2">
+              <span className="text-muted-foreground ml-2 text-xs">
                 (Default: http://localhost:11434)
               </span>
             </label>
@@ -223,11 +223,11 @@ const Settings: React.FC = () => {
                 setApiKey={handleOllamaUrlChange}
                 onSave={handleSaveOllamaUrl}
               />
-              <div className="flex gap-2 items-center">
+              <div className="flex items-center gap-2">
                 <Button
                   onClick={handleTestConnection}
                   disabled={connectionStatus.status === 'testing'}
-                  className="px-3 py-1 border rounded flex items-center gap-2"
+                  className="flex items-center gap-2 rounded border px-3 py-1"
                 >
                   {connectionStatus.status === 'testing' && (
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -238,7 +238,7 @@ const Settings: React.FC = () => {
                 </Button>
 
                 {connectionStatus.status === 'success' && (
-                  <div className="flex items-center gap-2 text-success text-sm">
+                  <div className="text-success flex items-center gap-2 text-sm">
                     <CheckCircle className="h-4 w-4" />
                     <span>{connectionStatus.message}</span>
                     {connectionStatus.latencyMs && (
@@ -250,7 +250,7 @@ const Settings: React.FC = () => {
                 )}
 
                 {connectionStatus.status === 'error' && (
-                  <div className="flex items-center gap-2 text-destructive text-sm">
+                  <div className="text-destructive flex items-center gap-2 text-sm">
                     <XCircle className="h-4 w-4" />
                     <span>{connectionStatus.message}</span>
                   </div>
@@ -261,17 +261,17 @@ const Settings: React.FC = () => {
         </section>
 
         {/* Trello Section */}
-        <section className="space-y-4 border border-border rounded-lg p-6">
+        <section className="border-border space-y-4 rounded-lg border p-6">
           <div className="border-b pb-2">
-            <h3 className="text-lg font-semibold text-foreground">Trello</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="text-foreground text-lg font-semibold">Trello</h3>
+            <p className="text-muted-foreground text-sm">
               Configure Trello API integration for project management
             </p>
           </div>
           <div>
             <label
               htmlFor="trello-api-key-input"
-              className="block text-sm font-medium mb-2"
+              className="mb-2 block text-sm font-medium"
             >
               Trello API Key
             </label>
@@ -285,13 +285,13 @@ const Settings: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">Trello Auth</label>
+            <label className="mb-2 block text-sm font-medium">Trello Auth</label>
             <Button onClick={handleAuthorizeWithTrello}>Authorize with Trello</Button>
           </div>
           <div>
             <label
               htmlFor="trello-api-token-input"
-              className="block text-sm font-medium mb-2"
+              className="mb-2 block text-sm font-medium"
             >
               Trello API Token
             </label>
@@ -321,17 +321,17 @@ const Settings: React.FC = () => {
         </section>
 
         {/* SproutVideo Section */}
-        <section className="space-y-4 border border-border rounded-lg p-6">
+        <section className="border-border space-y-4 rounded-lg border p-6">
           <div className="border-b pb-2">
-            <h3 className="text-lg font-semibold text-foreground">SproutVideo</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="text-foreground text-lg font-semibold">SproutVideo</h3>
+            <p className="text-muted-foreground text-sm">
               Configure SproutVideo API for video hosting
             </p>
           </div>
           <div>
             <label
               htmlFor="sprout-video-api-key-input"
-              className="block text-sm font-medium mb-2"
+              className="mb-2 block text-sm font-medium"
             >
               SproutVideo API Key
             </label>
@@ -347,33 +347,33 @@ const Settings: React.FC = () => {
         </section>
 
         {/* Backgrounds Section */}
-        <section className="space-y-4 border border-border rounded-lg p-6">
+        <section className="border-border space-y-4 rounded-lg border p-6">
           <div className="border-b pb-2">
-            <h3 className="text-lg font-semibold text-foreground">Backgrounds</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="text-foreground text-lg font-semibold">Backgrounds</h3>
+            <p className="text-muted-foreground text-sm">
               Set default folder for background assets
             </p>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2">
+            <label className="mb-2 block text-sm font-medium">
               Default Background Folder
             </label>
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2">
               <Button
                 onClick={handleSelectDefaultBackgroundFolder}
-                className="px-3 py-1 border rounded"
+                className="rounded border px-3 py-1"
               >
                 Choose Folder
               </Button>
               <Button
                 onClick={handleSaveDefaultBackground}
-                className="px-3 py-1 border rounded"
+                className="rounded border px-3 py-1"
               >
                 Save
               </Button>
             </div>
             {defaultBackgroundFolder && (
-              <p className="text-sm mt-1 text-muted-foreground">
+              <p className="text-muted-foreground mt-1 text-sm">
                 {defaultBackgroundFolder}
               </p>
             )}

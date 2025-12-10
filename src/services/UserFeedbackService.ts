@@ -3,8 +3,8 @@
  * Provides interactive user feedback and notifications during updates
  */
 
-import { TIMEOUTS } from '@constants/timing'
 import { logger } from '@utils/logger'
+import { TIMEOUTS } from '@constants/timing'
 import { ProgressTracker, ProgressUpdate } from './ProgressTracker'
 
 export interface FeedbackOptions {
@@ -184,7 +184,7 @@ export class UserFeedbackService {
    * Prompt user for input with timeout
    */
   public async promptUser(prompt: UserPrompt): Promise<string | null> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       const timeoutMs = prompt.timeout || TIMEOUTS.USER_FEEDBACK // 30 second default timeout
 
       logger.log(`\n${prompt.message}`)
