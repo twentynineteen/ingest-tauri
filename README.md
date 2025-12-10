@@ -7,33 +7,42 @@
 
 <br />
 
+
+
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#table-of-contents)
 
 ## ➤ Table of Contents
 
-- [➤ Overview](#-overview)
-- [➤ Key Features](#-key-features)
-- [➤ Installation](#-installation)
-  - [Prerequisites](#prerequisites)
-  - [Quick Start](#quick-start)
-  - [Development Setup](#development-setup)
-- [➤ Ollama Setup](#-ollama-setup)
-  - [Installing Ollama](#installing-ollama)
-  - [Running Ollama](#running-ollama)
-  - [Installing AI Models](#installing-ai-models)
-  - [Configuring in Bucket](#configuring-in-bucket)
-  - [Troubleshooting Ollama](#troubleshooting-ollama)
-- [➤ How It Works](#-how-it-works)
-  - [AI Script Formatter Workflow](#ai-script-formatter-workflow)
-  - [Video Project Workflow](#video-project-workflow)
-- [➤ Tech Stack](#-tech-stack)
-- [➤ License](#-license)
+* [➤ Overview](#-overview)
+* [➤ Key Features](#-key-features)
+* [➤ Installation](#-installation)
+	* [Prerequisites](#prerequisites)
+	* [Quick Start](#quick-start)
+	* [Development Setup](#development-setup)
+* [➤ Ollama Setup](#-ollama-setup)
+	* [Installing Ollama](#installing-ollama)
+	* [Running Ollama](#running-ollama)
+	* [Installing AI Models](#installing-ai-models)
+	* [Configuring in Bucket](#configuring-in-bucket)
+	* [Troubleshooting Ollama](#troubleshooting-ollama)
+* [➤ How It Works](#-how-it-works)
+	* [AI Script Formatter Workflow](#ai-script-formatter-workflow)
+	* [Video Project Workflow](#video-project-workflow)
+* [➤ Tech Stack](#-tech-stack)
+* [➤ Premiere Pro Plugin Management](#-premiere-pro-plugin-management)
+	* [Bundled Plugins](#bundled-plugins)
+		* [BreadcrumbsPremiere](#breadcrumbspremiere)
+		* [Boring](#boring)
+	* [One-Click Installation](#one-click-installation)
+	* [Platform Support](#platform-support)
+* [➤ License](#-license)
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#overview)
 
 ## ➤ Overview
 
 Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScript) designed to streamline video editing workflows for professionals. It simplifies video file ingest, automates project creation, and seamlessly integrates with industry-standard tools like Adobe Premiere, Trello, and Sprout Video.
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#key-features)
 
@@ -52,6 +61,7 @@ Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScri
   - **Sprout Video**: Video hosting with custom posterframe generation
 - **Secure User Management**: Login/registration with encrypted data storage
 - **Cross-Platform**: Available for Windows, macOS, and Linux
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#installation)
 
@@ -95,6 +105,7 @@ To run in development mode:
 ```bash
 npm run dev:tauri
 ```
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#ollama-setup)
 
@@ -184,6 +195,7 @@ OLLAMA_HOST=0.0.0.0:11435 ollama serve
 
 Then update the URL in Bucket Settings to `http://localhost:11435`
 
+
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#how-it-works)
 
 ## ➤ How It Works
@@ -206,6 +218,7 @@ Then update the URL in Bucket Settings to `http://localhost:11435`
 5. **Track Progress**: Monitor file operations with real-time progress updates
 6. **Integrate & Upload**: Connect with Trello for project management or Sprout Video for hosting
 
+
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#tech-stack)
 
 ## ➤ Tech Stack
@@ -222,24 +235,52 @@ Then update the URL in Bucket Settings to `http://localhost:11435`
   - mammoth.js for Word document parsing
   - docx for document generation
 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#documentation)
 
-## ➤ Documentation
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#premiere-pro-plugin-management)
 
-### Feature Guides
+## ➤ Premiere Pro Plugin Management
 
-- **[Premiere Plugin Management](docs/PREMIERE_PLUGINS.md)** - Install and manage CEP extensions
-- **[Architecture](docs/ARCHITECTURE.md)** - System design and technical architecture
-- **[API Commands](docs/API_COMMANDS.md)** - Complete Tauri commands reference
+Bucket includes an **integrated plugin manager** for Premiere Pro CEP extensions. Install and update plugins with one click - no manual file operations required.
 
-### Developer Resources
+### Bundled Plugins
 
-- **[Onboarding Guide](docs/ONBOARDING.md)** - Get started with development
-- **[React Query Patterns](docs/react-query-patterns.md)** - Modern data fetching patterns
-- **[Security Audit](docs/security-audit.md)** - Security best practices
+#### BreadcrumbsPremiere
+
+Metadata management panel that syncs with Bucket's project system. View and edit breadcrumbs directly in your Premiere timeline.
+
+**Features**:
+
+- View and edit project metadata in Premiere Pro
+- Sync with Trello cards and Sprout Video
+- Quick access to project resources
+- Seamless integration with Bucket workflows
+
+#### Boring
+
+Premiere Pro extension for streamlined workflows.
+
+**Features**:
+
+- _(User to specify features)_
+
+### One-Click Installation
+
+1. Navigate to **Upload Content > Premiere Plugin Manager**
+2. Click **Install** on any plugin
+3. Restart Premiere Pro
+4. Access via **Window > Extensions**
+
+### Platform Support
+
+- **macOS**: Automatic debug mode configuration
+- **Windows**: Silent installation
+- **Cross-platform**: Works identically on both platforms
+
+[Read full documentation →](../PREMIERE_PLUGINS.md)
+
 
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#license)
 
 ## ➤ License
-
+	
 Licensed under [UNLICENSED](https://opensource.org/licenses/UNLICENSED).
