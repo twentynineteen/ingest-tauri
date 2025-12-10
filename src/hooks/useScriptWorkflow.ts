@@ -63,6 +63,8 @@ export function useScriptWorkflow() {
   const uploadHook = useScriptUpload({
     onSuccess: document => {
       log.info('File uploaded successfully:', document.filename)
+      // Automatically advance to model selection step
+      setCurrentStep('select-model')
     },
     onError: error => {
       logger.error('File upload failed:', error.message)

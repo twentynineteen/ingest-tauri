@@ -100,7 +100,7 @@ describe('PremierePluginManager', () => {
       renderWithProviders(<PremierePluginManager />)
 
       expect(useBreadcrumb).toHaveBeenCalledWith([
-        { label: 'Upload content', href: '/upload/sprout' },
+        { label: 'Premiere plugins', href: '/premiere/' },
         { label: 'Premiere Plugin Manager' }
       ])
     })

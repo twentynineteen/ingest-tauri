@@ -6,6 +6,15 @@
  */
 
 import ErrorBoundary from '@components/ErrorBoundary'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from '@components/ui/alert-dialog'
 import { Button } from '@components/ui/button'
 import { useBreadcrumb } from '@hooks/useBreadcrumb'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -18,7 +27,7 @@ import {
   Package,
   RefreshCw
 } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 import { toast } from 'sonner'
 
 interface PluginInfo {
@@ -43,11 +52,22 @@ interface InstallResult {
 const PremierePluginManagerContent: React.FC = () => {
   // Set breadcrumbs for navigation
   useBreadcrumb([
-    { label: 'Upload content', href: '/upload/sprout' },
+    { label: 'Premiere plugins', href: '/premiere/' },
     { label: 'Premiere Plugin Manager' }
   ])
 
   const queryClient = useQueryClient()
+  const [successDialog, setSuccessDialog] = useState<{
+    open: boolean
+    pluginName: string
+    displayName: string
+    installedPath: string
+  }>({
+    open: false,
+    pluginName: '',
+    displayName: '',
+    installedPath: ''
+  })
 
   // Fetch available plugins
   const {
@@ -63,14 +83,32 @@ const PremierePluginManagerContent: React.FC = () => {
 
   // Install plugin mutation
   const installMutation = useMutation({
-    mutationFn: async ({ filename, name }: { filename: string; name: string }) => {
-      return await invoke<InstallResult>('install_plugin', {
+    mutationFn: async ({
+      filename,
+      name,
+      displayName
+    }: {
+      filename: string
+      name: string
+      displayName: string
+    }) => {
+      const result = await invoke<InstallResult>('install_plugin', {
         pluginFilename: filename,
         pluginName: name
       })
+      return { ...result, displayName }
     },
     onSuccess: result => {
-      toast.success(result.message)
+      // Show temporary toast for debugging
+      toast.success(`Plugin installed to: ${result.installedPath}`)
+
+      // Show success dialog with restart instructions
+      setSuccessDialog({
+        open: true,
+        pluginName: result.pluginName,
+        displayName: result.displayName,
+        installedPath: result.installedPath
+      })
       queryClient.invalidateQueries({ queryKey: ['plugins'] })
     },
     onError: (error: Error) => {
@@ -178,10 +216,15 @@ const PremierePluginManagerContent: React.FC = () => {
                             </p>
                           </div>
 
-                          {plugin.installed && (
+                          {plugin.installed ? (
                             <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-success/20 text-success text-xs font-medium">
                               <CheckCircle className="w-3 h-3" />
                               Installed
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-muted-foreground text-xs font-medium">
+                              <Package className="w-3 h-3" />
+                              Not Installed
                             </div>
                           )}
                         </div>
@@ -211,14 +254,20 @@ const PremierePluginManagerContent: React.FC = () => {
                           onClick={() =>
                             installMutation.mutate({
                               filename: plugin.filename,
-                              name: plugin.name
+                              name: plugin.name,
+                              displayName: plugin.displayName
                             })
                           }
-                          disabled={installMutation.isPending || plugin.installed}
+                          disabled={
+                            (installMutation.isPending &&
+                              installMutation.variables?.name === plugin.name) ||
+                            plugin.installed
+                          }
                           size="sm"
                           className="gap-1.5"
                         >
-                          {installMutation.isPending ? (
+                          {installMutation.isPending &&
+                          installMutation.variables?.name === plugin.name ? (
                             <>
                               <Download className="w-3.5 h-3.5 animate-pulse" />
                               Installing...
@@ -283,6 +332,75 @@ const PremierePluginManagerContent: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Success Dialog */}
+      <AlertDialog
+        open={successDialog.open}
+        onOpenChange={open => setSuccessDialog(prev => ({ ...prev, open }))}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-success" />
+              Plugin Installed Successfully
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              <strong className="text-foreground">{successDialog.displayName}</strong> has
+              been installed to your Premiere Pro extensions folder.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="space-y-3">
+            <div className="bg-primary/10 border border-primary/20 rounded-lg p-3">
+              <p className="text-sm font-semibold text-foreground mb-1">Next Steps:</p>
+              <ol className="text-sm space-y-1.5 list-decimal list-inside">
+                <li>
+                  <strong className="text-foreground">Restart Premiere Pro</strong> if
+                  it's currently running
+                </li>
+                <li>
+                  Open the plugin from{' '}
+                  <strong className="text-foreground">Window → Extensions</strong>
+                </li>
+                <li>Start using the new features!</li>
+              </ol>
+            </div>
+
+            <details className="text-xs">
+              <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
+                Installation Details
+              </summary>
+              <div className="mt-2 space-y-2">
+                <div className="p-2 bg-muted rounded text-muted-foreground font-mono text-xs break-all">
+                  {successDialog.installedPath}
+                </div>
+                <Button
+                  onClick={async () => {
+                    try {
+                      await invoke('open_cep_folder')
+                    } catch (error) {
+                      toast.error(`Failed to open folder: ${error}`)
+                    }
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="w-full gap-1.5"
+                >
+                  <FolderOpen className="w-3.5 h-3.5" />
+                  Open Plugin Folder
+                </Button>
+              </div>
+            </details>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => setSuccessDialog(prev => ({ ...prev, open: false }))}
+            >
+              Got it!
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

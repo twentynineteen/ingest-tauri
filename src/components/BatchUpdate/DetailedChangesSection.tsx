@@ -6,9 +6,8 @@
 
 import type { BreadcrumbsPreview } from '@/types/baker'
 import { cn } from '@components/lib/utils'
-import { AlertCircle, ChevronRight, Edit, Info, Minus, Plus } from 'lucide-react'
+import { ChevronRight, Edit, Info, Minus, Plus } from 'lucide-react'
 import React, { useState } from 'react'
-import { Button } from '../ui/button'
 
 interface DetailedChangesSectionProps {
   previews: BreadcrumbsPreview[]
@@ -29,8 +28,7 @@ const getChangeIcon = (type: string) => {
 }
 
 export const DetailedChangesSection: React.FC<DetailedChangesSectionProps> = ({
-  previews,
-  selectedProjects
+  previews
 }) => {
   const [expandedProject, setExpandedProject] = useState<string | null>(null)
 

@@ -36,21 +36,32 @@ pub struct InstallResult {
 }
 
 /// Get CEP extensions directory path
-/// macOS: ~/Library/Application Support/Adobe/CEP/extensions/
-/// Windows: %AppData%\Roaming\Adobe\CEP\extensions\
+/// Prefers user-level directory (no admin required) over system-level
+/// macOS: ~/Library/Application Support/Adobe/CEP/extensions/ (user) or
+///        /Library/Application Support/Adobe/CEP/extensions/ (system)
+/// Windows: %AppData%\Roaming\Adobe\CEP\extensions\ (user) or
+///          C:\Program Files\Common Files\Adobe\CEP\extensions\ (system)
 fn get_cep_extensions_dir() -> Result<PathBuf, String> {
     #[cfg(target_os = "macos")]
     {
-        dirs::home_dir()
-            .ok_or_else(|| "Could not determine home directory".to_string())
-            .map(|home| home.join("Library/Application Support/Adobe/CEP/extensions"))
+        // Prefer user-level directory (no admin privileges required)
+        // Premiere Pro loads extensions from both user and system directories
+        let user_dir = dirs::home_dir()
+            .ok_or_else(|| "Could not determine home directory".to_string())?
+            .join("Library/Application Support/Adobe/CEP/extensions");
+
+        // Always use user directory - it doesn't require admin privileges
+        Ok(user_dir)
     }
 
     #[cfg(target_os = "windows")]
     {
-        dirs::data_dir()
-            .ok_or_else(|| "Could not determine AppData directory".to_string())
-            .map(|data| data.join("Adobe/CEP/extensions"))
+        // Prefer user-level directory (no admin privileges required)
+        let user_dir = dirs::data_dir()
+            .ok_or_else(|| "Could not determine AppData directory".to_string())?
+            .join("Adobe/CEP/extensions");
+
+        Ok(user_dir)
     }
 
     #[cfg(not(any(target_os = "macos", target_os = "windows")))]
@@ -60,12 +71,58 @@ fn get_cep_extensions_dir() -> Result<PathBuf, String> {
 }
 
 /// Check if a plugin is installed by verifying the plugin directory
-/// and manifest.xml file exist
+/// and manifest.xml file exist in either system or user directory
 fn check_plugin_installed_internal(plugin_name: &str) -> Result<bool, String> {
-    let cep_dir = get_cep_extensions_dir()?;
-    let plugin_dir = cep_dir.join(plugin_name);
+    #[cfg(target_os = "macos")]
+    {
+        // Check both system and user directories
+        let system_dir = PathBuf::from("/Library/Application Support/Adobe/CEP/extensions");
+        let system_plugin = system_dir.join(plugin_name);
 
-    Ok(plugin_dir.exists() && plugin_dir.join("CSXS/manifest.xml").exists())
+        if system_plugin.exists() && system_plugin.join("CSXS/manifest.xml").exists() {
+            return Ok(true);
+        }
+
+        // Check user directory
+        if let Some(home) = dirs::home_dir() {
+            let user_dir = home.join("Library/Application Support/Adobe/CEP/extensions");
+            let user_plugin = user_dir.join(plugin_name);
+
+            if user_plugin.exists() && user_plugin.join("CSXS/manifest.xml").exists() {
+                return Ok(true);
+            }
+        }
+
+        Ok(false)
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        // Check both system and user directories
+        let system_dir = PathBuf::from("C:/Program Files/Common Files/Adobe/CEP/extensions");
+        let system_plugin = system_dir.join(plugin_name);
+
+        if system_plugin.exists() && system_plugin.join("CSXS/manifest.xml").exists() {
+            return Ok(true);
+        }
+
+        // Check user directory
+        if let Some(data_dir) = dirs::data_dir() {
+            let user_dir = data_dir.join("Adobe/CEP/extensions");
+            let user_plugin = user_dir.join(plugin_name);
+
+            if user_plugin.exists() && user_plugin.join("CSXS/manifest.xml").exists() {
+                return Ok(true);
+            }
+        }
+
+        Ok(false)
+    }
+
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    {
+        Err("Unsupported operating system".to_string())
+    }
 }
 
 /// Get list of available plugins from assets
@@ -130,26 +187,35 @@ pub async fn install_plugin(
     plugin_filename: String,
     plugin_name: String,
 ) -> Result<InstallResult, String> {
+
     // Get ZXP file from assets
+    // In dev mode: src-tauri/target/debug/resources/plugins/
+    // In production: app.app/Contents/Resources/plugins/
     let resource_path = app_handle
         .path()
-        .resolve(&format!("assets/plugins/{}", plugin_filename), tauri::path::BaseDirectory::Resource)
-        .map_err(|e| format!("Could not resolve plugin path: {}", e))?;
+        .resolve(&format!("plugins/{}", plugin_filename), tauri::path::BaseDirectory::Resource)
+        .map_err(|e| {
+            let err_msg = format!("Could not resolve plugin path: {}", e);
+            err_msg
+        })?;
 
     if !resource_path.exists() {
-        return Err(format!(
-            "Plugin file not found: {}",
-            resource_path.display()
-        ));
+        let err_msg = format!("Plugin file not found: {}", resource_path.display());
+        return Err(err_msg);
     }
 
     // Get CEP directory
     let cep_dir = get_cep_extensions_dir()?;
+
     let target_dir = cep_dir.join(&plugin_name);
 
     // Create CEP extensions directory if it doesn't exist
     fs::create_dir_all(&cep_dir)
-        .map_err(|e| format!("Failed to create CEP directory: {}", e))?;
+        .map_err(|e| {
+            let err_msg = format!("Failed to create CEP directory: {} (Error: {})", cep_dir.display(), e);
+            err_msg
+        })?;
+
 
     // Backup existing installation
     if target_dir.exists() {
@@ -161,28 +227,46 @@ pub async fn install_plugin(
         let backup_dir = cep_dir.join(backup_name);
 
         fs::rename(&target_dir, &backup_dir)
-            .map_err(|e| format!("Failed to backup existing plugin: {}", e))?;
+            .map_err(|e| {
+                let err_msg = format!("Failed to backup existing plugin: {}", e);
+                err_msg
+            })?;
     }
 
     // Create target directory
     fs::create_dir_all(&target_dir)
-        .map_err(|e| format!("Failed to create plugin directory: {}", e))?;
+        .map_err(|e| {
+            let err_msg = format!("Failed to create plugin directory: {} (Error: {})", target_dir.display(), e);
+            err_msg
+        })?;
+
 
     // Extract ZXP (it's a ZIP file)
     let file = fs::File::open(&resource_path)
-        .map_err(|e| format!("Failed to open plugin file: {}", e))?;
+        .map_err(|e| {
+            let err_msg = format!("Failed to open plugin file: {}", e);
+            err_msg
+        })?;
 
     let mut archive =
-        ZipArchive::new(file).map_err(|e| format!("Failed to read plugin archive: {}", e))?;
+        ZipArchive::new(file).map_err(|e| {
+            let err_msg = format!("Failed to read plugin archive: {}", e);
+            err_msg
+        })?;
 
     archive
         .extract(&target_dir)
-        .map_err(|e| format!("Failed to extract plugin: {}", e))?;
+        .map_err(|e| {
+            let err_msg = format!("Failed to extract plugin: {}", e);
+            err_msg
+        })?;
+
 
     // macOS: Remove quarantine attribute
     #[cfg(target_os = "macos")]
     {
-        let _ = Command::new("xattr")
+
+        let output = Command::new("xattr")
             .args([
                 "-r",
                 "-d",
@@ -190,12 +274,23 @@ pub async fn install_plugin(
                 target_dir.to_str().unwrap(),
             ])
             .output();
+
+        match output {
+            Ok(_) => println!("[INSTALL] Quarantine attribute removed"),
+            Err(e) => println!("[INSTALL] Could not remove quarantine attribute: {}", e),
+        }
     }
 
     // Verify installation
-    if !target_dir.join("CSXS/manifest.xml").exists() {
-        return Err("Installation failed: Invalid plugin structure (missing CSXS/manifest.xml)".to_string());
+    let manifest_path = target_dir.join("CSXS/manifest.xml");
+
+
+    if !manifest_path.exists() {
+        let err_msg = format!("Installation failed: Invalid plugin structure (missing CSXS/manifest.xml at {})", manifest_path.display());
+
+        return Err(err_msg);
     }
+
 
     Ok(InstallResult {
         success: true,
