@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef } from 'react'
 import { buildProjectMachine } from '@machines/buildProjectMachine'
 import { listen } from '@tauri-apps/api/event'
 import { useMachine } from '@xstate/react'
+import { useEffect, useMemo, useRef } from 'react'
 
 /**
  * Hook that manages the BuildProject state machine and connects it to Tauri events

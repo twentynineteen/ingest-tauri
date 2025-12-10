@@ -1,5 +1,3 @@
-import React from 'react'
-import { Sprout } from 'lucide-react'
 import { Button } from '@components/ui/button'
 import { Progress } from '@components/ui/progress'
 import { useSproutVideoApiKey } from '@hooks/useApiKeys'
@@ -10,6 +8,8 @@ import { useUploadEvents } from '@hooks/useUploadEvents'
 import EmbedCodeInput from '@utils/EmbedCodeInput'
 import ExternalLink from '@utils/ExternalLink'
 import FormattedDate from '@utils/FormattedDate'
+import { Sprout } from 'lucide-react'
+import React from 'react'
 
 const UploadSprout = () => {
   // Custom hooks

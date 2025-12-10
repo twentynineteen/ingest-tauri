@@ -4,9 +4,9 @@
  * Handles project selection and batch update operations for Baker.
  */
 
-import React from 'react'
-import { CheckCircle, RefreshCw } from 'lucide-react'
 import { Button } from '@components/ui/button'
+import { CheckCircle, RefreshCw } from 'lucide-react'
+import React from 'react'
 
 interface BatchActionsProps {
   selectedProjects: string[]

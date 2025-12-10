@@ -4,10 +4,10 @@
  * Purpose: Generate .docx files from HTML using docx package
  */
 
-import { useState } from 'react'
 import { save } from '@tauri-apps/plugin-dialog'
 import { writeFile } from '@tauri-apps/plugin-fs'
 import { Document, HeadingLevel, Packer, Paragraph, TextRun } from 'docx'
+import { useState } from 'react'
 
 interface UseDocxGeneratorResult {
   generateFile: (html: string, defaultFilename: string) => Promise<void>

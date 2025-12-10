@@ -4,14 +4,15 @@
  * Purpose: Fetch models from active provider using React Query
  */
 
+import { REFRESH, SECONDS } from '@constants/timing'
 import { providerRegistry } from '@services/ai/providerConfig'
 import { useQuery } from '@tanstack/react-query'
+
 import {
   queryKeys,
   type AIModel,
   type ProviderConfiguration
 } from '@/types/scriptFormatter'
-import { REFRESH, SECONDS } from '@constants/timing'
 
 interface UseAIModelsOptions {
   providerId: string

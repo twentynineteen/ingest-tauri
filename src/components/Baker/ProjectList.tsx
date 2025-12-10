@@ -4,11 +4,12 @@
  * Displays list of discovered projects with selection and breadcrumb viewing.
  */
 
-import React from 'react'
-import { AlertTriangle, Eye, RefreshCw } from 'lucide-react'
-import type { BreadcrumbsFile, BreadcrumbsPreview, ProjectFolder } from '@/types/baker'
 import { BreadcrumbsViewerEnhanced } from '@components/BreadcrumbsViewerEnhanced'
 import { Button } from '@components/ui/button'
+import { AlertTriangle, Eye, RefreshCw } from 'lucide-react'
+import React from 'react'
+
+import type { BreadcrumbsFile, BreadcrumbsPreview, ProjectFolder } from '@/types/baker'
 
 interface ProjectListProps {
   projects: ProjectFolder[]

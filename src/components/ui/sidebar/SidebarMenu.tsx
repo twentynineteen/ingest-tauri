@@ -1,11 +1,12 @@
 'use client'
 
-import * as React from 'react'
-import { Slot } from '@radix-ui/react-slot'
-import { cva, VariantProps } from 'class-variance-authority'
 import { cn } from '@components/lib/utils'
 import { Skeleton } from '@components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@components/ui/tooltip'
+import { Slot } from '@radix-ui/react-slot'
+import { cva, VariantProps } from 'class-variance-authority'
+import * as React from 'react'
+
 import { useSidebar } from '../use-sidebar'
 
 export const SidebarMenu = React.forwardRef<HTMLUListElement, React.ComponentProps<'ul'>>(

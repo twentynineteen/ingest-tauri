@@ -5,10 +5,11 @@
  * Refactored: 2025-11-18 - Extracted state to useScriptFormatterState, step components to /steps
  */
 
-import React from 'react'
-import { FileText } from 'lucide-react'
 import { useBreadcrumb } from '@hooks/index'
 import { useScriptFormatterState } from '@hooks/useScriptFormatterState'
+import { FileText } from 'lucide-react'
+import React from 'react'
+
 import { FileUploader } from './FileUploader'
 import { SaveExampleDialog } from './SaveExampleDialog'
 import {

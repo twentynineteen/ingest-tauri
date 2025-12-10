@@ -3,8 +3,8 @@
  * Extracted from BreadcrumbsViewerEnhanced.tsx (DEBT-002)
  */
 
-import React from 'react'
 import { open } from '@tauri-apps/plugin-shell'
+import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
 import {
   Calendar,
   Camera,
@@ -14,8 +14,10 @@ import {
   HardDrive,
   User
 } from 'lucide-react'
+import React from 'react'
+
 import type { BreadcrumbsFile } from '@/types/baker'
-import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
+
 import { TrelloCardsManager } from '../Baker/TrelloCardsManager'
 import { VideoLinksManager } from '../Baker/VideoLinksManager'
 import { Button } from '../ui/button'

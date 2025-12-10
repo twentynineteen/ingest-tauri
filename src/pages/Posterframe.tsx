@@ -1,8 +1,3 @@
-import React, { useRef, useState } from 'react'
-import { invoke } from '@tauri-apps/api/core'
-import { open } from '@tauri-apps/plugin-dialog'
-import { writeFile } from '@tauri-apps/plugin-fs'
-import { logger } from '@/utils/logger'
 import { useAutoFileSelection } from '@hooks/useAutoFileSelection'
 import { useBackgroundFolder } from '@hooks/useBackgroundFolder'
 import { useBreadcrumb } from '@hooks/useBreadcrumb'
@@ -10,6 +5,12 @@ import { useFileSelection } from '@hooks/useFileSelection'
 import { usePosterframeAutoRedraw } from '@hooks/usePosterframeAutoRedraw'
 import { usePosterframeCanvas } from '@hooks/usePosterframeCanvas'
 import { useZoomPan } from '@hooks/useZoomPan'
+import { invoke } from '@tauri-apps/api/core'
+import { open } from '@tauri-apps/plugin-dialog'
+import { writeFile } from '@tauri-apps/plugin-fs'
+import React, { useRef, useState } from 'react'
+
+import { logger } from '@/utils/logger'
 
 const Posterframe = () => {
   const [videoTitle, setVideoTitle] = useState('')

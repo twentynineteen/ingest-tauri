@@ -1,5 +1,3 @@
-import React from 'react'
-import { Outlet } from 'react-router-dom'
 import { AppSidebar } from '@components/app-sidebar'
 import {
   Breadcrumb,
@@ -12,6 +10,8 @@ import {
 import { Separator } from '@components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@components/ui/sidebar'
 import { useBreadcrumbStore } from '@store/useBreadcrumbStore'
+import React from 'react'
+import { Outlet } from 'react-router-dom'
 
 // The Page component acts as the main provider of layout for this application
 // Child components are loaded underneath the header, via the Outlet component

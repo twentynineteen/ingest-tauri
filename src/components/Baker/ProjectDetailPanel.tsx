@@ -5,8 +5,8 @@
  * Part of master-detail layout pattern.
  */
 
-import React, { useRef } from 'react'
 import { open } from '@tauri-apps/plugin-shell'
+import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
 import {
   AlertTriangle,
   Calendar,
@@ -20,10 +20,12 @@ import {
   User,
   Video
 } from 'lucide-react'
+import React, { useRef } from 'react'
+
 import { formatFileSize } from '@/components/BreadcrumbsViewer/fieldUtils'
 import { Button } from '@/components/ui/button'
 import type { BreadcrumbsFile, BreadcrumbsPreview } from '@/types/baker'
-import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
+
 import { TrelloCardsManager } from './TrelloCardsManager'
 import { VideoLinksManager } from './VideoLinksManager'
 

@@ -4,8 +4,9 @@
  * Handles complex Trello card updating logic for Baker batch operations.
  */
 
-import { useCallback } from 'react'
 import { readTextFile } from '@tauri-apps/plugin-fs'
+import { useCallback } from 'react'
+
 import { logger } from '@/utils/logger'
 
 interface TrelloError {

@@ -3,8 +3,8 @@
  * Step 3: Script Processing with Progress
  */
 
-import React from 'react'
 import { AlertCircle, Database, Sparkles } from 'lucide-react'
+import React from 'react'
 
 interface ProcessingStepProps {
   progress: number

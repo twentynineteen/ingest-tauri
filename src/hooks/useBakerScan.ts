@@ -5,9 +5,10 @@
  * Handles scan initiation, progress tracking, and cancellation.
  */
 
-import { useCallback, useEffect, useState } from 'react'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
+import { useCallback, useEffect, useState } from 'react'
+
 import type {
   ScanCompleteEvent,
   ScanErrorEvent,

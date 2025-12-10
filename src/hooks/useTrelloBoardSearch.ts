@@ -3,8 +3,9 @@
  * Provides fuzzy search across card names and descriptions
  */
 
-import { useMemo } from 'react'
 import type { TrelloCard } from '@utils/TrelloCards'
+import { useMemo } from 'react'
+
 import { useFuzzySearch } from './useFuzzySearch'
 
 /**

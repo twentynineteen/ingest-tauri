@@ -4,7 +4,9 @@
  * Reduced from 19 individual parameters to 6 logical parameter groups
  */
 
+import TrelloCardList from '@utils/trello/TrelloCardList'
 import { AlertCircle, Loader2, Plus, Search } from 'lucide-react'
+
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,7 +21,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import TrelloCardList from '@utils/trello/TrelloCardList'
 
 // Type definitions for grouped parameters
 export interface DialogState {

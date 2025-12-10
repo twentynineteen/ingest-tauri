@@ -3,7 +3,6 @@
  * Extracted from UploadTrello.tsx (DEBT-002)
  */
 
-import { useMemo, useState } from 'react'
 import {
   useCardDetailsSync,
   useCardValidation
@@ -12,8 +11,13 @@ import {
   createDefaultSproutUploadResponse,
   SelectedCard
 } from '@pages/UploadTrello/UploadTrelloTypes'
+import { appStore } from '@store/useAppStore'
 import { writeTextFile } from '@tauri-apps/plugin-fs'
 import { open } from '@tauri-apps/plugin-shell'
+import { TrelloCard } from '@utils/TrelloCards'
+import { SproutUploadResponse } from '@utils/types'
+import { useMemo, useState } from 'react'
+
 import {
   useAppendBreadcrumbs,
   useAppendVideoInfo,
@@ -26,9 +30,6 @@ import {
 } from '@/hooks'
 import { useTrelloBoards } from '@/hooks/useTrelloBoards'
 import { logger } from '@/utils/logger'
-import { TrelloCard } from '@utils/TrelloCards'
-import { SproutUploadResponse } from '@utils/types'
-import { appStore } from '@store/useAppStore'
 
 export function useUploadTrello() {
   const [selectedCard, setSelectedCard] = useState<SelectedCard | null>(null)

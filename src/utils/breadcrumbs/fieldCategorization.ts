@@ -10,6 +10,7 @@ import type {
   FieldChange,
   ProjectChangeDetail
 } from '@/types/baker'
+
 import { logger } from '../logger'
 import { formatFieldName, formatFieldValue } from './displayFormatting'
 

@@ -4,8 +4,9 @@
  * Purpose: Select and validate AI provider
  */
 
-import React from 'react'
 import { CheckCircle, Loader2, XCircle, Zap } from 'lucide-react'
+import React from 'react'
+
 import type { AIProvider, ProviderConfiguration } from '@/types/scriptFormatter'
 
 interface ProviderSelectorProps {

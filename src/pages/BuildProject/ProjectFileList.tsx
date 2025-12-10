@@ -1,8 +1,8 @@
 // components/BuildProject/ProjectFileList.tsx
 
-import React from 'react'
-import { Film, Trash2, Video } from 'lucide-react'
 import { FILE_LIST_ANIMATION } from '@constants/animations'
+import { Film, Trash2, Video } from 'lucide-react'
+import React from 'react'
 
 interface FootageFile {
   file: {

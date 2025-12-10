@@ -3,12 +3,13 @@
  * Handles card selection state, fetching details, and validation
  */
 
-import { useState } from 'react'
 import {
   useCardDetailsSync,
   useCardValidation
 } from '@pages/UploadTrello/UploadTrelloHooks'
 import type { SelectedCard } from '@pages/UploadTrello/UploadTrelloTypes'
+import { useState } from 'react'
+
 import { useTrelloCardDetails } from './useTrelloCardDetails'
 
 /**

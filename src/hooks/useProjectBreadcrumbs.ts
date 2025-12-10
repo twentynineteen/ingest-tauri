@@ -12,11 +12,13 @@
  * Lines: ~110
  */
 
+import { appStore } from '@store/useAppStore'
 import { invoke } from '@tauri-apps/api/core'
 import { writeTextFile } from '@tauri-apps/plugin-fs'
-import { logger } from '@/utils/logger'
 import { Breadcrumb } from '@utils/types'
-import { appStore } from '@store/useAppStore'
+
+import { logger } from '@/utils/logger'
+
 import { FootageFile } from './useCameraAutoRemap'
 
 interface CreateBreadcrumbsParams {

@@ -6,14 +6,16 @@
  * multiple projects before applying batch updates.
  */
 
-import React from 'react'
-import { AlertTriangle, CheckCircle, Clock } from 'lucide-react'
-import type { BreadcrumbsPreview } from '@/types/baker'
 import {
   calculateBatchUpdateSummary,
   hasAnyChanges,
   type BatchUpdateSummary
 } from '@utils/batchUpdateSummary'
+import { AlertTriangle, CheckCircle, Clock } from 'lucide-react'
+import React from 'react'
+
+import type { BreadcrumbsPreview } from '@/types/baker'
+
 import { DetailedChangesSection } from './BatchUpdate'
 import { Button } from './ui/button'
 import {

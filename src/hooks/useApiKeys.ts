@@ -1,6 +1,6 @@
+import { CACHE } from '@constants/timing'
 import { useQuery } from '@tanstack/react-query'
 import { ApiKeys, loadApiKeys } from '@utils/storage'
-import { CACHE } from '@constants/timing'
 
 export const useApiKeys = () => {
   return useQuery<ApiKeys>({

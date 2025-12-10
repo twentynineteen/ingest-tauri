@@ -6,8 +6,10 @@
  */
 
 import { FileText } from 'lucide-react'
+
 import { Skeleton } from '@/components/ui/skeleton'
 import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
+
 import { ExampleCard } from './ExampleCard'
 
 interface ExampleListProps {

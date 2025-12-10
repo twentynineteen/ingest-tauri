@@ -4,10 +4,11 @@
  * Purpose: Upload .docx files with validation
  */
 
-import React, { useState } from 'react'
 import { open } from '@tauri-apps/plugin-dialog'
 import { readFile } from '@tauri-apps/plugin-fs'
 import { AlertCircle, FileText, Upload } from 'lucide-react'
+import React, { useState } from 'react'
+
 import { logger } from '@/utils/logger'
 
 interface FileUploaderProps {

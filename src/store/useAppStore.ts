@@ -1,5 +1,5 @@
-import { create } from 'zustand'
 import { Breadcrumb, SproutUploadResponse } from '@utils/types'
+import { create } from 'zustand'
 
 // Global state definition
 interface AppState {

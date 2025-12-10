@@ -4,9 +4,11 @@
  * Refactored: 2025-11-18 - Extracted state to useTrelloCardsManager, dialog to AddCardDialog
  */
 
-import { AlertCircle, Loader2 } from 'lucide-react'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useTrelloCardsManager } from '@hooks/useTrelloCardsManager'
+import { AlertCircle, Loader2 } from 'lucide-react'
+
+import { Alert, AlertDescription } from '@/components/ui/alert'
+
 import { TrelloCardItem } from './TrelloCardItem'
 import { AddCardDialog } from './TrelloCards/AddCardDialog'
 

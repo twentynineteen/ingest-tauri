@@ -6,6 +6,7 @@
  */
 
 import { useCallback, useState } from 'react'
+
 import type { ScanPreferences, UseBakerPreferencesResult } from '@/types/baker'
 import { logger } from '@/utils/logger'
 

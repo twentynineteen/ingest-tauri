@@ -11,8 +11,9 @@
  * - Pulse animation for warning badges
  */
 
-import React from 'react'
 import { motion } from 'framer-motion'
+import React from 'react'
+
 import { BAKER_ANIMATIONS } from '@/constants/animations'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
 import type { ProjectFolder } from '@/types/baker'

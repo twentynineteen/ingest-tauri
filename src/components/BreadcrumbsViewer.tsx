@@ -4,7 +4,7 @@
  * Displays the contents of a breadcrumbs.json file in a readable format.
  */
 
-import React from 'react'
+import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
 import {
   Calendar,
   Camera,
@@ -15,8 +15,10 @@ import {
   HardDrive,
   User
 } from 'lucide-react'
+import React from 'react'
+
 import type { BreadcrumbsViewerProps } from '@/types/baker'
-import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
+
 import { Button } from './ui/button'
 
 export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({

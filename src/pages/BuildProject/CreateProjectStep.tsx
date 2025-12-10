@@ -1,6 +1,6 @@
-import { FolderPlus } from 'lucide-react'
 import { Button } from '@components/ui/button'
 import { STEP_CARD_ANIMATION } from '@constants/animations'
+import { FolderPlus } from 'lucide-react'
 
 interface CreateProjectStepProps {
   showSuccess: boolean

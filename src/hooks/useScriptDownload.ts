@@ -9,9 +9,11 @@
  * - Generation error handling
  */
 
-import { useCallback, useState } from 'react'
-import type { ScriptDocument } from '@/types/scriptFormatter'
 import { createNamespacedLogger } from '@utils/logger'
+import { useCallback, useState } from 'react'
+
+import type { ScriptDocument } from '@/types/scriptFormatter'
+
 import { useDocxGenerator } from './useDocxGenerator'
 
 const log = createNamespacedLogger('ScriptDownload')

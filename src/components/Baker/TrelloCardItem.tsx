@@ -5,6 +5,7 @@
 
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ExternalLink, RefreshCw, Trash2 } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import type { TrelloCard } from '@/types/baker'
 import { logger } from '@/utils/logger'

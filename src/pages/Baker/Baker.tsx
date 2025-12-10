@@ -5,10 +5,6 @@
  * Refactored to separate concerns into focused components and hooks.
  */
 
-import React, { useCallback, useState } from 'react'
-import { AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react'
-import { useTrelloBoard } from '@/hooks'
-import { logger } from '@/utils/logger'
 import { BakerPreferences } from '@components/Baker/BakerPreferences'
 import { BatchActions } from '@components/Baker/BatchActions'
 import { FolderSelector } from '@components/Baker/FolderSelector'
@@ -25,6 +21,11 @@ import { useBreadcrumb } from '@hooks/useBreadcrumb'
 import { useBreadcrumbsManager } from '@hooks/useBreadcrumbsManager'
 import { useBreadcrumbsPreview } from '@hooks/useBreadcrumbsPreview'
 import { useLiveBreadcrumbsReader } from '@hooks/useLiveBreadcrumbsReader'
+import { AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react'
+import React, { useCallback, useState } from 'react'
+
+import { useTrelloBoard } from '@/hooks'
+import { logger } from '@/utils/logger'
 
 const BakerPageContent: React.FC = () => {
   // Set breadcrumbs for navigation

@@ -1,10 +1,11 @@
 'use client'
 
-import * as React from 'react'
-import { PanelLeft } from 'lucide-react'
 import { cn } from '@components/lib/utils'
 import { Button } from '@components/ui/button'
 import { Sheet, SheetContent } from '@components/ui/sheet'
+import { PanelLeft } from 'lucide-react'
+import * as React from 'react'
+
 import { useSidebar } from '../use-sidebar'
 
 const SIDEBAR_WIDTH_MOBILE = '18rem'

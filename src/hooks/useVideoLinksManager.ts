@@ -4,11 +4,13 @@
  * Extracted to reduce component complexity (DEBT-002)
  */
 
-import { useState } from 'react'
 import { invoke } from '@tauri-apps/api/core'
+import { validateVideoLink } from '@utils/validation'
+import { useState } from 'react'
+
 import type { BreadcrumbsFile, VideoLink } from '@/types/baker'
 import { logger } from '@/utils/logger'
-import { validateVideoLink } from '@utils/validation'
+
 import { useSproutVideoApiKey, useTrelloApiKeys } from './useApiKeys'
 import {
   generateBreadcrumbsBlock,

@@ -5,8 +5,9 @@
  * Handles batch updates, creation, and error management.
  */
 
-import { useCallback, useState } from 'react'
 import { invoke } from '@tauri-apps/api/core'
+import { useCallback, useState } from 'react'
+
 import type { BatchUpdateResult, UseBreadcrumbsManagerResult } from '@/types/baker'
 
 export function useBreadcrumbsManager(): UseBreadcrumbsManagerResult {

@@ -3,8 +3,9 @@
  * Step 2: AI Provider and Model Selection
  */
 
-import React from 'react'
 import { Database, Sparkles } from 'lucide-react'
+import React from 'react'
+
 import {
   Accordion,
   AccordionContent,
@@ -18,6 +19,7 @@ import type {
   ProviderConfiguration,
   ScriptDocument
 } from '@/types/scriptFormatter'
+
 import { ExampleToggleList } from '../ExampleToggleList'
 import { ModelSelector } from '../ModelSelector'
 import { ProviderSelector } from '../ProviderSelector'

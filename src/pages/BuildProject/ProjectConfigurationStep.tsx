@@ -1,4 +1,5 @@
 import { STEP_CARD_ANIMATION } from '@constants/animations'
+
 import FolderSelector from './FolderSelector'
 import ProjectInputs from './ProjectInputs'
 

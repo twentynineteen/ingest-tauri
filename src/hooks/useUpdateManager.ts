@@ -7,8 +7,10 @@ import { ask, message } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { relaunch } from '@tauri-apps/plugin-process'
 import { check } from '@tauri-apps/plugin-updater'
-import { logger } from '@/utils/logger'
 import { createNamespacedLogger } from '@utils/logger'
+
+import { logger } from '@/utils/logger'
+
 import { useVersionCheck } from './useVersionCheck'
 
 const log = createNamespacedLogger('UpdateManager')

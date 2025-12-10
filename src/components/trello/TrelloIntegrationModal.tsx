@@ -1,14 +1,3 @@
-import React, { useEffect, useMemo, useState } from 'react'
-import { writeTextFile } from '@tauri-apps/plugin-fs'
-import { open } from '@tauri-apps/plugin-shell'
-import {
-  useAppendBreadcrumbs,
-  useFuzzySearch,
-  useTrelloBoard,
-  useTrelloCardDetails
-} from 'hooks'
-import { ExternalLink, Search } from 'lucide-react'
-import { logger } from '@/utils/logger'
 import { Button } from '@components/ui/button'
 import {
   Dialog,
@@ -18,9 +7,21 @@ import {
   DialogTitle
 } from '@components/ui/dialog'
 import { Input } from '@components/ui/input'
+import { appStore } from '@store/useAppStore'
+import { writeTextFile } from '@tauri-apps/plugin-fs'
+import { open } from '@tauri-apps/plugin-shell'
 import TrelloCardList from '@utils/trello/TrelloCardList'
 import { TrelloCard } from '@utils/TrelloCards'
-import { appStore } from '@store/useAppStore'
+import {
+  useAppendBreadcrumbs,
+  useFuzzySearch,
+  useTrelloBoard,
+  useTrelloCardDetails
+} from 'hooks'
+import { ExternalLink, Search } from 'lucide-react'
+import React, { useEffect, useMemo, useState } from 'react'
+
+import { logger } from '@/utils/logger'
 
 interface TrelloIntegrationModalProps {
   isOpen: boolean

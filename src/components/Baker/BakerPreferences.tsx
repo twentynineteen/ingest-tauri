@@ -4,9 +4,6 @@
  * Settings dialog for configuring Baker scan and update behavior.
  */
 
-import React from 'react'
-import { Settings } from 'lucide-react'
-import type { ScanPreferences } from '@/types/baker'
 import { Button } from '@components/ui/button'
 import {
   Dialog,
@@ -16,6 +13,10 @@ import {
   DialogTitle,
   DialogTrigger
 } from '@components/ui/dialog'
+import { Settings } from 'lucide-react'
+import React from 'react'
+
+import type { ScanPreferences } from '@/types/baker'
 
 interface BakerPreferencesProps {
   preferences: ScanPreferences

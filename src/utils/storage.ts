@@ -1,6 +1,7 @@
+import { appStore } from '@store/useAppStore'
 import { appDataDir } from '@tauri-apps/api/path'
 import { exists, readTextFile, writeTextFile } from '@tauri-apps/plugin-fs'
-import { appStore } from '@store/useAppStore'
+
 import { logger } from './logger'
 
 const setSproutVideoApiKey = (state: string) =>

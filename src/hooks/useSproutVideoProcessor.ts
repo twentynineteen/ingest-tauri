@@ -5,11 +5,12 @@
  * Replaces useEffect pattern with React Query mutation for better state management
  */
 
-import { useEffect, useRef } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import type { VideoLink } from '@/types/baker'
 import { createNamespacedLogger } from '@utils/logger'
 import type { SproutUploadResponse } from '@utils/types'
+import { useEffect, useRef } from 'react'
+
+import type { VideoLink } from '@/types/baker'
 
 const logger = createNamespacedLogger('useSproutVideoProcessor')
 

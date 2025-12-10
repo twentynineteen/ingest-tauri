@@ -4,10 +4,11 @@
  * Displays scan progress and results summary for Baker.
  */
 
-import React from 'react'
-import { RefreshCw } from 'lucide-react'
-import type { ScanResult } from '@/types/baker'
 import { formatFileSize } from '@utils/breadcrumbsComparison'
+import { RefreshCw } from 'lucide-react'
+import React from 'react'
+
+import type { ScanResult } from '@/types/baker'
 
 interface ScanResultsProps {
   scanResult: ScanResult | null

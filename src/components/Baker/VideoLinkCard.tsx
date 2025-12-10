@@ -5,6 +5,7 @@
 
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ChevronDown, ChevronUp, ExternalLink, Trash2, Video } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import type { VideoLink } from '@/types/baker'
 import { logger } from '@/utils/logger'

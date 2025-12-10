@@ -1,6 +1,6 @@
-import React from 'react'
 import { QueryClient, QueryObserver } from '@tanstack/react-query'
 import { createNamespacedLogger } from '@utils/logger'
+import React from 'react'
 
 const logger = createNamespacedLogger('Performance')
 

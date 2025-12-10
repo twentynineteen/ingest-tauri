@@ -1,12 +1,13 @@
 // src/components/uploadTrello/TrelloCardList.tsx
 
-import React, { useState } from 'react'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger
 } from '@components/ui/accordion'
+import React, { useState } from 'react'
+
 import { logger } from '../logger'
 import { TrelloCard } from '../TrelloCards'
 

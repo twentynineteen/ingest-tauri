@@ -1,6 +1,6 @@
-import React from 'react'
-import { AlertCircle, Camera, FileText } from 'lucide-react'
 import { PROJECT_LIMITS } from '@constants/project'
+import { AlertCircle, Camera, FileText } from 'lucide-react'
+import React from 'react'
 
 interface ProjectInputsProps {
   title: string

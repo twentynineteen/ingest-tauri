@@ -7,6 +7,7 @@
  */
 
 import { Loader2 } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -26,6 +27,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { ExampleCategory } from '@/types/exampleEmbeddings'
+
 import { FileInputField, ModelStatusIndicator, UploadSuccessView } from './components'
 import { useUploadDialogForm, type UploadData } from './hooks/useUploadDialogForm'
 

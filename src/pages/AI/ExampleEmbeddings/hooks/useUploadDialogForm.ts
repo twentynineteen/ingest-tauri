@@ -6,6 +6,7 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
+
 import { useDocxParser } from '@/hooks/useDocxParser'
 import { useOllamaEmbedding } from '@/hooks/useOllamaEmbedding'
 import { ExampleCategory, type ExampleMetadata } from '@/types/exampleEmbeddings'

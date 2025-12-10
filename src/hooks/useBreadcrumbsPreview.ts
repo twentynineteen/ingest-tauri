@@ -5,14 +5,15 @@
  * Generates previews of changes Baker will make to breadcrumbs files.
  */
 
-import { useCallback, useState } from 'react'
 import { invoke } from '@tauri-apps/api/core'
-import type { BreadcrumbsFile, BreadcrumbsPreview, ProjectFolder } from '@/types/baker'
-import { logger } from '@/utils/logger'
 import {
   compareBreadcrumbsMeaningful,
   generateBreadcrumbsPreview
 } from '@utils/breadcrumbsComparison'
+import { useCallback, useState } from 'react'
+
+import type { BreadcrumbsFile, BreadcrumbsPreview, ProjectFolder } from '@/types/baker'
+import { logger } from '@/utils/logger'
 
 interface UseBreadcrumbsPreviewResult {
   // State

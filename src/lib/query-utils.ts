@@ -1,6 +1,7 @@
-import type { UseMutationOptions, UseQueryOptions } from '@tanstack/react-query'
-import { logger } from '@/utils/logger'
 import { CACHE, getBackoffDelay, MINUTES, RETRY, SECONDS } from '@constants/timing'
+import type { UseMutationOptions, UseQueryOptions } from '@tanstack/react-query'
+
+import { logger } from '@/utils/logger'
 
 export type QueryKey =
   | readonly [

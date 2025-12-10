@@ -1,10 +1,11 @@
-import React from 'react'
 import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger
 } from '@components/ui/accordion'
 import { VideoInfoData } from '@hooks/useVideoInfoBlock'
+import React from 'react'
+
 import KeyValueRow from './KeyValueRow'
 import VideoThumbnail from './VideoThumbnail'
 

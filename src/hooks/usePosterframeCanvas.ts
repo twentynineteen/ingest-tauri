@@ -1,6 +1,6 @@
-import { useCallback, useRef } from 'react'
-import type { Font } from 'opentype.js'
 import { loadFont } from '@utils/loadFont'
+import type { Font } from 'opentype.js'
+import { useCallback, useRef } from 'react'
 
 export function usePosterframeCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)

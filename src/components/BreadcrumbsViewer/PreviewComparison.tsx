@@ -3,7 +3,7 @@
  * Extracted from BreadcrumbsViewerEnhanced.tsx (DEBT-002)
  */
 
-import React from 'react'
+import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
 import {
   Calendar,
   Camera,
@@ -17,8 +17,10 @@ import {
   Plus,
   User
 } from 'lucide-react'
+import React from 'react'
+
 import type { BreadcrumbsPreview, FieldChange } from '@/types/baker'
-import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
+
 import { Field, formatFileSize } from './fieldUtils'
 
 interface PreviewComparisonProps {

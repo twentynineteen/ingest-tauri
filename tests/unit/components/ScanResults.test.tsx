@@ -19,6 +19,24 @@ import { render, screen } from '@testing-library/react'
 import React from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
+// Mock framer-motion to avoid animation issues in tests
+vi.mock('framer-motion', () => ({
+  motion: new Proxy(
+    {},
+    {
+      get: (_, prop) => {
+        const Component = React.forwardRef<any, any>((props, ref) => {
+          const { children, ...rest} = props
+          return React.createElement(prop as string, { ...rest, ref }, children)
+        })
+        Component.displayName = `motion.${String(prop)}`
+        return Component
+      }
+    }
+  ),
+  AnimatePresence: ({ children }: any) => children
+}))
+
 // Mock formatFileSize utility
 vi.mock('@utils/breadcrumbsComparison', () => ({
   formatFileSize: vi.fn((bytes: number) => {

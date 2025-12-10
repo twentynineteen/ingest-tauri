@@ -1,7 +1,8 @@
-import { RefreshCw, Upload } from 'lucide-react'
 import { Button } from '@components/ui/button'
-import { FootageFile } from '@hooks/useCameraAutoRemap'
 import { STEP_CARD_ANIMATION } from '@constants/animations'
+import { FootageFile } from '@hooks/useCameraAutoRemap'
+import { RefreshCw, Upload } from 'lucide-react'
+
 import ProjectFileList from './ProjectFileList'
 
 interface AddFootageStepProps {

@@ -4,14 +4,15 @@
  * Purpose: Provider management and switching (provider-agnostic architecture)
  */
 
-import { useState } from 'react'
 import { getDefaultConfig, providerRegistry } from '@services/ai/providerConfig'
+import { useAppStore } from '@store/useAppStore'
+import { useState } from 'react'
+
 import {
   STORAGE_KEYS,
   type AIProvider,
   type ProviderConfiguration
 } from '@/types/scriptFormatter'
-import { useAppStore } from '@store/useAppStore'
 
 interface UseAIProviderResult {
   activeProvider: AIProvider | null

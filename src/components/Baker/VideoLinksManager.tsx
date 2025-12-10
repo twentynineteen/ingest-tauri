@@ -4,9 +4,11 @@
  * Refactored: 2025-11-18 - Extracted state to useVideoLinksManager, dialog to AddVideoDialog
  */
 
-import { AlertCircle, Loader2 } from 'lucide-react'
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useVideoLinksManager } from '@hooks/useVideoLinksManager'
+import { AlertCircle, Loader2 } from 'lucide-react'
+
+import { Alert, AlertDescription } from '@/components/ui/alert'
+
 import { TrelloCardUpdateDialog } from './TrelloCardUpdateDialog'
 import { VideoLinkCard } from './VideoLinkCard'
 import { AddVideoDialog } from './VideoLinks/AddVideoDialog'

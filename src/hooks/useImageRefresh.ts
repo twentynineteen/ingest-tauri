@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { REFRESH } from '@constants/timing'
 import { queryKeys } from '@lib/query-keys'
 import { createQueryOptions } from '@lib/query-utils'
 import { useQuery } from '@tanstack/react-query'
 import { SproutUploadResponse } from '@utils/types'
-import { REFRESH } from '@constants/timing'
+import { useState } from 'react'
 
 interface UseImageRefreshReturn {
   thumbnailLoaded: boolean

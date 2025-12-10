@@ -4,12 +4,13 @@
  * Handles folder selection and scan initiation for Baker.
  */
 
-import React, { useCallback } from 'react'
-import { open } from '@tauri-apps/plugin-dialog'
-import { FolderOpen, Play, RefreshCw, Square } from 'lucide-react'
-import { logger } from '@/utils/logger'
 import { Button } from '@components/ui/button'
 import { Input } from '@components/ui/input'
+import { open } from '@tauri-apps/plugin-dialog'
+import { FolderOpen, Play, RefreshCw, Square } from 'lucide-react'
+import React, { useCallback } from 'react'
+
+import { logger } from '@/utils/logger'
 
 interface FolderSelectorProps {
   selectedFolder: string

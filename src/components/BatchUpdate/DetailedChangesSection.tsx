@@ -4,10 +4,11 @@
  * Refactored: 2025-11-18 - Flattened nesting from 6 levels to 2 levels
  */
 
-import React, { useState } from 'react'
-import { ChevronRight, Edit, Info, Minus, Plus } from 'lucide-react'
-import type { BreadcrumbsPreview } from '@/types/baker'
 import { cn } from '@components/lib/utils'
+import { ChevronRight, Edit, Info, Minus, Plus } from 'lucide-react'
+import React, { useState } from 'react'
+
+import type { BreadcrumbsPreview } from '@/types/baker'
 
 interface DetailedChangesSectionProps {
   previews: BreadcrumbsPreview[]

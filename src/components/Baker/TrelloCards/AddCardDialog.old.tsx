@@ -3,7 +3,9 @@
  * Extracted from TrelloCardsManager to reduce complexity (DEBT-002)
  */
 
+import TrelloCardList from '@utils/trello/TrelloCardList'
 import { AlertCircle, Loader2, Plus, Search } from 'lucide-react'
+
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,7 +20,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import TrelloCardList from '@utils/trello/TrelloCardList'
 
 interface AddCardDialogProps {
   isOpen: boolean

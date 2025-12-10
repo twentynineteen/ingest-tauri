@@ -1,9 +1,10 @@
 'use client'
 
-import * as React from 'react'
 import { useIsMobile } from '@components/hooks/use-mobile'
 import { cn } from '@components/lib/utils'
 import { TooltipProvider } from '@components/ui/tooltip'
+import * as React from 'react'
+
 import { SidebarContext } from '../use-sidebar'
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state'

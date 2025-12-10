@@ -1,5 +1,3 @@
-import React from 'react'
-import { TrelloBoard } from '@types/media'
 import { Label } from '@components/ui/label'
 import {
   Select,
@@ -12,11 +10,13 @@ import {
 } from '@components/ui/select'
 import { Skeleton } from '@components/ui/skeleton'
 import { useTrelloBoards } from '@hooks/useTrelloBoards'
+import { TrelloBoard } from '@types/media'
 import {
   categorizeBoardStatus,
   formatBoardDisplayName,
   groupBoardsByOrganization
 } from '@utils/trelloBoardValidation'
+import React from 'react'
 
 export interface TrelloBoardSelectorProps {
   /** Currently selected board ID */

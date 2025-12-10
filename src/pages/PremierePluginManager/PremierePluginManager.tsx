@@ -5,18 +5,6 @@
  * Automatically deploys plugin updates to your Premiere Pro installation.
  */
 
-import React, { useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { invoke } from '@tauri-apps/api/core'
-import {
-  AlertTriangle,
-  CheckCircle,
-  Download,
-  FolderOpen,
-  Package,
-  RefreshCw
-} from 'lucide-react'
-import { toast } from 'sonner'
 import ErrorBoundary from '@components/ErrorBoundary'
 import {
   AlertDialog,
@@ -29,6 +17,18 @@ import {
 } from '@components/ui/alert-dialog'
 import { Button } from '@components/ui/button'
 import { useBreadcrumb } from '@hooks/useBreadcrumb'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { invoke } from '@tauri-apps/api/core'
+import {
+  AlertTriangle,
+  CheckCircle,
+  Download,
+  FolderOpen,
+  Package,
+  RefreshCw
+} from 'lucide-react'
+import React, { useState } from 'react'
+import { toast } from 'sonner'
 
 interface PluginInfo {
   name: string

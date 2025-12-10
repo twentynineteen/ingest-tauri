@@ -1,5 +1,6 @@
-import React from 'react'
 import { open } from '@tauri-apps/plugin-dialog'
+import React from 'react'
+
 import { logger } from '@/utils/logger'
 
 type Props = {

@@ -3,9 +3,9 @@
  * Handles opening cards in browser and dialog management
  */
 
-import { useCallback } from 'react'
 import { SelectedCard } from '@pages/UploadTrello/UploadTrelloTypes'
 import { open } from '@tauri-apps/plugin-shell'
+import { useCallback } from 'react'
 
 export function useTrelloActions(
   selectedCard: SelectedCard | null,

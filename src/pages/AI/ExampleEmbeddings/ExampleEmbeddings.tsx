@@ -5,16 +5,18 @@
  * Main page for managing AI script example embeddings
  */
 
-import { useState } from 'react'
 import { save } from '@tauri-apps/plugin-dialog'
 import { mkdir, writeTextFile } from '@tauri-apps/plugin-fs'
 import { Download, Upload } from 'lucide-react'
+import { useState } from 'react'
 import { toast } from 'sonner'
+
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useBreadcrumb } from '@/hooks/useBreadcrumb'
 import { useExampleManagement } from '@/hooks/useExampleManagement'
 import type { ExampleCategory, ExampleSource } from '@/types/exampleEmbeddings'
+
 import { DeleteConfirm } from './DeleteConfirm'
 import { ExampleList } from './ExampleList'
 import { ReplaceDialog } from './ReplaceDialog'

@@ -1,5 +1,5 @@
-import React from 'react'
 import { openPath } from '@tauri-apps/plugin-opener'
+import React from 'react'
 
 // A custom component to open an external URL in the default browser.
 interface ExternalLinkProps {

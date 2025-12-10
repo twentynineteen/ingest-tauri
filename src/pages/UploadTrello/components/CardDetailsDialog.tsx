@@ -3,8 +3,6 @@
  * Extracted from UploadTrello.tsx (DEBT-002)
  */
 
-import React from 'react'
-import { ExternalLink } from 'lucide-react'
 import { Button } from '@components/ui/button'
 import {
   Dialog,
@@ -14,12 +12,15 @@ import {
   DialogTitle
 } from '@components/ui/dialog'
 import { VideoInfoData } from '@hooks/useVideoInfoBlock'
+import { appStore } from '@store/useAppStore'
 import CardDetailsAccordion from '@utils/trello/CardDetailsAccordion'
 import TooltipPreview from '@utils/trello/TooltipPreview'
 import VideoInfoTooltip from '@utils/trello/VideoInfoTooltip'
 import { TrelloCard, TrelloMember } from '@utils/TrelloCards'
 import { Breadcrumb, SproutUploadResponse } from '@utils/types'
-import { appStore } from '@store/useAppStore'
+import { ExternalLink } from 'lucide-react'
+import React from 'react'
+
 import { SelectedCard } from '../UploadTrelloTypes'
 
 interface CardDetailsDialogProps {

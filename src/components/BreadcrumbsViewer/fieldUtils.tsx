@@ -3,10 +3,11 @@
  * Extracted from BreadcrumbsViewerEnhanced.tsx (DEBT-002)
  */
 
-import React from 'react'
-import { Edit, Minus, Plus } from 'lucide-react'
-import type { FieldChange } from '@/types/baker'
 import { formatFieldValue } from '@utils/breadcrumbsComparison'
+import { Edit, Minus, Plus } from 'lucide-react'
+import React from 'react'
+
+import type { FieldChange } from '@/types/baker'
 
 export const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 B'

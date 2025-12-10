@@ -3,8 +3,8 @@
  * Step 5: Download Complete Success State
  */
 
-import React from 'react'
 import { Download } from 'lucide-react'
+import React from 'react'
 
 interface DownloadCompleteStepProps {
   onFormatAnother: () => void

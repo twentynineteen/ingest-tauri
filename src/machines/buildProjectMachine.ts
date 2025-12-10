@@ -1,5 +1,5 @@
-import { assign, setup } from 'xstate'
 import type { FootageFile } from '@hooks/useCameraAutoRemap'
+import { assign, setup } from 'xstate'
 
 // Context type - data that persists through state transitions
 export interface BuildProjectContext {

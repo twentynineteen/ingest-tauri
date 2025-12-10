@@ -3,8 +3,9 @@
  * Modal dialog for saving formatted scripts as RAG examples
  */
 
-import React, { useState } from 'react'
 import { AlertCircle } from 'lucide-react'
+import React, { useState } from 'react'
+
 import { ExampleCategory } from '@/types/exampleEmbeddings'
 
 interface SaveExampleDialogProps {

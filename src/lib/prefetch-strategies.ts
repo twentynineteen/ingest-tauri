@@ -1,10 +1,11 @@
+import { CACHE } from '@constants/timing'
 import { QueryClient } from '@tanstack/react-query'
 import { core } from '@tauri-apps/api'
 import { getVersion } from '@tauri-apps/api/app'
 import { invoke } from '@tauri-apps/api/core'
 import { createNamespacedLogger } from '@utils/logger'
 import { loadApiKeys } from '@utils/storage'
-import { CACHE } from '@constants/timing'
+
 import { queryKeys } from './query-keys'
 import { createQueryError, createQueryOptions, shouldRetry } from './query-utils'
 

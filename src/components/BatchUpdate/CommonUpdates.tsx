@@ -3,9 +3,9 @@
  * Extracted from BatchUpdateConfirmationDialog (DEBT-002)
  */
 
-import React from 'react'
-import { Clock, Edit, HardDrive, User } from 'lucide-react'
 import type { BatchUpdateSummary } from '@utils/batchUpdateSummary'
+import { Clock, Edit, HardDrive, User } from 'lucide-react'
+import React from 'react'
 
 interface CommonUpdatesProps {
   summary: BatchUpdateSummary

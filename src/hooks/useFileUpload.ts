@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { appStore } from '@store/useAppStore'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { open } from '@tauri-apps/plugin-dialog'
-import { logger } from '@/utils/logger'
 import { SproutUploadResponse } from '@utils/types'
-import { appStore } from '@store/useAppStore'
+import { useState } from 'react'
+
+import { logger } from '@/utils/logger'
 
 interface UseFileUploadReturn {
   selectedFile: string | null

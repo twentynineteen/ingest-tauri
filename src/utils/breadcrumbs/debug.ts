@@ -5,6 +5,7 @@
  */
 
 import type { BreadcrumbsFile } from '@/types/baker'
+
 import { createNamespacedLogger } from '../logger'
 import { compareBreadcrumbs, compareBreadcrumbsMeaningful } from './comparison'
 
