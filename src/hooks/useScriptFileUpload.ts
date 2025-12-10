@@ -5,10 +5,10 @@
  * Handles .txt file selection, reading, and validation for example uploads
  */
 
+import type { FileValidation, UploadError } from '@/types/exampleEmbeddings'
 import { open } from '@tauri-apps/plugin-dialog'
 import { readTextFile } from '@tauri-apps/plugin-fs'
 import { useState } from 'react'
-import type { FileValidation, UploadError } from '../types/exampleEmbeddings'
 
 interface UseScriptFileUploadReturn {
   isReading: boolean

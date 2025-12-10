@@ -14,12 +14,12 @@
  * Total: 15 tests
  */
 
+import type { TrelloCard } from '@/types/baker'
+import { TrelloCardUpdateDialog } from '@components/Baker/TrelloCardUpdateDialog'
 import { render, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { TrelloCardUpdateDialog } from '@components/Baker/TrelloCardUpdateDialog'
-import type { TrelloCard } from '@/types/baker'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 describe('TrelloCardUpdateDialog Component', () => {
   // Mock functions for callbacks
@@ -94,7 +94,9 @@ describe('TrelloCardUpdateDialog Component', () => {
 
       // Assert
       expect(screen.getByText('Update Trello Cards')).toBeInTheDocument()
-      expect(screen.getByText(/No Trello cards are linked to this project yet/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/No Trello cards are linked to this project yet/i)
+      ).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /skip for now/i })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /add trello card/i })).toBeInTheDocument()
     })
@@ -113,7 +115,9 @@ describe('TrelloCardUpdateDialog Component', () => {
 
       // Assert
       expect(screen.getByText('Update Trello Cards')).toBeInTheDocument()
-      expect(screen.getByText(/Select which Trello card\(s\) to update/i)).toBeInTheDocument()
+      expect(
+        screen.getByText(/Select which Trello card\(s\) to update/i)
+      ).toBeInTheDocument()
       expect(screen.getByText('Project Alpha - Video Edit')).toBeInTheDocument()
       expect(screen.getByText('Project Beta - Final Cut')).toBeInTheDocument()
       expect(screen.getByText('Project Gamma - Review')).toBeInTheDocument()

@@ -3,6 +3,8 @@
  * Extracted from BreadcrumbsViewerEnhanced.tsx (DEBT-002)
  */
 
+import type { BreadcrumbsPreview, FieldChange } from '@/types/baker'
+import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
 import {
   Calendar,
   Camera,
@@ -17,8 +19,6 @@ import {
   User
 } from 'lucide-react'
 import React from 'react'
-import type { BreadcrumbsPreview, FieldChange } from '../../types/baker'
-import { formatBreadcrumbDateSimple } from '../../utils/breadcrumbsComparison'
 import { Field, formatFileSize } from './fieldUtils'
 
 interface PreviewComparisonProps {
@@ -64,39 +64,39 @@ const ChangeSummary: React.FC<ChangeSummaryProps> = ({
   hasMeaningfulChanges
 }) => (
   <div
-    className={`border rounded-lg p-3 ${hasMeaningfulChanges ? 'bg-blue-50 border-blue-200' : 'bg-green-50 border-green-200'}`}
+    className={`border rounded-lg p-3 ${hasMeaningfulChanges ? 'bg-primary/10 border-primary/30' : 'bg-success/10 border-success/30'}`}
   >
     <h5
-      className={`font-medium mb-2 ${hasMeaningfulChanges ? 'text-blue-900' : 'text-green-900'}`}
+      className={`font-medium mb-2 ${hasMeaningfulChanges ? 'text-primary' : 'text-success'}`}
     >
       Change Summary
     </h5>
     <div
-      className={`text-sm space-y-1 ${hasMeaningfulChanges ? 'text-blue-800' : 'text-green-800'}`}
+      className={`text-sm space-y-1 ${hasMeaningfulChanges ? 'text-foreground' : 'text-success'}`}
     >
       {hasMeaningfulChanges ? (
         <>
           {summaryDiff.summary.added > 0 && (
             <div className="flex items-center">
-              <Plus className="h-3 w-3 text-green-600 mr-1" />
+              <Plus className="h-3 w-3 text-success mr-1" />
               {summaryDiff.summary.added} fields will be added
             </div>
           )}
           {summaryDiff.summary.modified > 0 && (
             <div className="flex items-center">
-              <Edit className="h-3 w-3 text-orange-600 mr-1" />
+              <Edit className="h-3 w-3 text-warning mr-1" />
               {summaryDiff.summary.modified} fields will be modified
             </div>
           )}
           {summaryDiff.summary.removed > 0 && (
             <div className="flex items-center">
-              <Minus className="h-3 w-3 text-red-600 mr-1" />
+              <Minus className="h-3 w-3 text-destructive mr-1" />
               {summaryDiff.summary.removed} fields will be removed
             </div>
           )}
         </>
       ) : (
-        <div className="flex items-center text-green-700">
+        <div className="flex items-center text-success">
           <CheckCircle className="h-3 w-3 mr-1" />
           No meaningful changes required - only maintenance updates
         </div>

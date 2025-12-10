@@ -5,6 +5,7 @@
 This skill should be used when analyzing and improving the visual consistency, text hierarchy, and accessibility of React/TypeScript UI components. It scans the codebase for all files that render visual interfaces, audits them against WCAG 2.1 Level AA standards, and automatically fixes issues to ensure a unified design system.
 
 Use this skill for:
+
 - Auditing text hierarchy (semantic HTML, visual hierarchy, ARIA labels)
 - Ensuring visual theme consistency (colors, spacing, typography, component patterns)
 - Validating accessibility compliance (WCAG 2.1 Level AA)
@@ -29,12 +30,14 @@ Use this skill for:
 ## Integration
 
 This skill can integrate with:
+
 - `test-specialist`: For automated accessibility testing
 - Other custom skills: For coordinated quality improvements
 
 ## Output
 
 Generates a markdown audit report with:
+
 - List of all UI files discovered
 - Text hierarchy issues and fixes
 - Visual theme inconsistencies and fixes

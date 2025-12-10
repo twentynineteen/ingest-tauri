@@ -1,8 +1,8 @@
-import { act, render, renderHook } from '@testing-library/react'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
-import React from 'react'
-import { SidebarProvider, useSidebar } from '@components/ui/sidebar'
 import * as useMobileHook from '@components/hooks/use-mobile'
+import { SidebarProvider, useSidebar } from '@components/ui/sidebar'
+import { act, render, renderHook } from '@testing-library/react'
+import React from 'react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock the use-mobile hook
 vi.mock('@components/hooks/use-mobile', () => ({

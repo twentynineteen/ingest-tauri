@@ -13,10 +13,10 @@
  */
 
 import { logger } from '@/utils/logger'
+import { appStore } from '@store/useAppStore'
 import { invoke } from '@tauri-apps/api/core'
 import { writeTextFile } from '@tauri-apps/plugin-fs'
-import { appStore } from 'store/useAppStore'
-import { Breadcrumb } from 'utils/types'
+import { Breadcrumb } from '@utils/types'
 import { FootageFile } from './useCameraAutoRemap'
 
 interface CreateBreadcrumbsParams {

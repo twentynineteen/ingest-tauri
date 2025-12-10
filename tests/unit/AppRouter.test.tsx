@@ -1,7 +1,7 @@
+import { AppRouter } from '@/AppRouter'
 import { render, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { BrowserRouter } from 'react-router-dom'
-import { AppRouter } from '../../src/AppRouter'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock Tauri plugins
 vi.mock('@tauri-apps/plugin-process', () => ({
@@ -13,59 +13,59 @@ vi.mock('@tauri-apps/plugin-updater', () => ({
 }))
 
 // Mock all page components
-vi.mock('../../src/app/dashboard/page', () => ({
+vi.mock('@/app/dashboard/page', () => ({
   default: () => <div data-testid="page-layout">Page Layout</div>
 }))
 
-vi.mock('../../src/pages/AI/ExampleEmbeddings/ExampleEmbeddings', () => ({
+vi.mock('@pages/AI/ExampleEmbeddings/ExampleEmbeddings', () => ({
   ExampleEmbeddings: () => <div>Example Embeddings</div>
 }))
 
-vi.mock('../../src/pages/AI/ScriptFormatter/ScriptFormatter', () => ({
+vi.mock('@pages/AI/ScriptFormatter/ScriptFormatter', () => ({
   default: () => <div>Script Formatter</div>
 }))
 
-vi.mock('../../src/pages/auth/Login', () => ({
+vi.mock('@pages/auth/Login', () => ({
   default: () => <div data-testid="login-page">Login Page</div>
 }))
 
-vi.mock('../../src/pages/auth/Register', () => ({
+vi.mock('@pages/auth/Register', () => ({
   default: () => <div data-testid="register-page">Register Page</div>
 }))
 
-vi.mock('../../src/pages/Baker/Baker', () => ({
+vi.mock('@pages/Baker/Baker', () => ({
   default: () => <div>Baker</div>
 }))
 
-vi.mock('../../src/pages/BuildProject/BuildProject', () => ({
+vi.mock('@pages/BuildProject/BuildProject', () => ({
   default: () => <div data-testid="build-project">Build Project</div>
 }))
 
-vi.mock('../../src/pages/ConnectedApps', () => ({
+vi.mock('@pages/ConnectedApps', () => ({
   default: () => <div>Connected Apps</div>
 }))
 
-vi.mock('../../src/pages/IngestHistory', () => ({
+vi.mock('@pages/IngestHistory', () => ({
   default: () => <div>Ingest History</div>
 }))
 
-vi.mock('../../src/pages/Posterframe', () => ({
+vi.mock('@pages/Posterframe', () => ({
   default: () => <div>Posterframe</div>
 }))
 
-vi.mock('../../src/pages/Settings', () => ({
+vi.mock('@pages/Settings', () => ({
   default: () => <div>Settings</div>
 }))
 
-vi.mock('../../src/pages/UploadOtter', () => ({
+vi.mock('@pages/UploadOtter', () => ({
   default: () => <div>Upload Otter</div>
 }))
 
-vi.mock('../../src/pages/UploadSprout', () => ({
+vi.mock('@pages/UploadSprout', () => ({
   default: () => <div>Upload Sprout</div>
 }))
 
-vi.mock('../../src/pages/UploadTrello', () => ({
+vi.mock('@pages/UploadTrello', () => ({
   default: () => <div>Upload Trello</div>
 }))
 
@@ -141,7 +141,7 @@ describe('AppRouter', () => {
       const { check } = await import('@tauri-apps/plugin-updater')
       const { relaunch } = await import('@tauri-apps/plugin-process')
 
-      const mockDownloadAndInstall = vi.fn(async (callback) => {
+      const mockDownloadAndInstall = vi.fn(async callback => {
         // Simulate download events
         callback({ event: 'Started', data: { contentLength: 1000 } })
         callback({ event: 'Progress', data: { chunkLength: 500 } })
@@ -216,7 +216,7 @@ describe('AppRouter', () => {
 
       let progressCallback: any
 
-      const mockDownloadAndInstall = vi.fn(async (callback) => {
+      const mockDownloadAndInstall = vi.fn(async callback => {
         progressCallback = callback
         callback({ event: 'Started', data: { contentLength: 1000 } })
         callback({ event: 'Progress', data: { chunkLength: 250 } })

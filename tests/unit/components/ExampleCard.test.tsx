@@ -3,11 +3,11 @@
  * Feature: 007-frontend-script-example
  */
 
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { describe, it, expect, vi } from 'vitest'
 import { ExampleCard } from '@/pages/AI/ExampleEmbeddings/ExampleCard'
 import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { describe, expect, it, vi } from 'vitest'
 
 describe('ExampleCard - Contract Tests (T014)', () => {
   const bundledExample: ExampleWithMetadata = {
@@ -96,7 +96,9 @@ describe('ExampleCard - Contract Tests (T014)', () => {
     const user = userEvent.setup()
     const onDelete = vi.fn()
 
-    render(<ExampleCard example={uploadedExample} {...defaultProps} onDelete={onDelete} />)
+    render(
+      <ExampleCard example={uploadedExample} {...defaultProps} onDelete={onDelete} />
+    )
 
     const deleteButton = screen.getByTitle('Delete')
     await user.click(deleteButton)
@@ -109,7 +111,9 @@ describe('ExampleCard - Contract Tests (T014)', () => {
     const user = userEvent.setup()
     const onReplace = vi.fn()
 
-    render(<ExampleCard example={uploadedExample} {...defaultProps} onReplace={onReplace} />)
+    render(
+      <ExampleCard example={uploadedExample} {...defaultProps} onReplace={onReplace} />
+    )
 
     const replaceButton = screen.getByTitle('Replace')
     await user.click(replaceButton)

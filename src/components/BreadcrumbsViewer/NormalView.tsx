@@ -3,7 +3,9 @@
  * Extracted from BreadcrumbsViewerEnhanced.tsx (DEBT-002)
  */
 
+import type { BreadcrumbsFile } from '@/types/baker'
 import { open } from '@tauri-apps/plugin-shell'
+import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
 import {
   Calendar,
   Camera,
@@ -14,8 +16,6 @@ import {
   User
 } from 'lucide-react'
 import React from 'react'
-import type { BreadcrumbsFile } from '../../types/baker'
-import { formatBreadcrumbDateSimple } from '../../utils/breadcrumbsComparison'
 import { TrelloCardsManager } from '../Baker/TrelloCardsManager'
 import { VideoLinksManager } from '../Baker/VideoLinksManager'
 import { Button } from '../ui/button'
@@ -111,12 +111,12 @@ export const NormalView: React.FC<NormalViewProps> = ({
       <FilesList files={breadcrumbs.files} />
 
       {/* Video Links Section - Feature 004 */}
-      <div className="border-t pt-4 mt-4">
+      <div className="border-t border-border pt-4 mt-4">
         <VideoLinksManager projectPath={projectPath} />
       </div>
 
       {/* Trello Cards Section - Feature 004 */}
-      <div className="border-t pt-4 mt-4">
+      <div className="border-t border-border pt-4 mt-4">
         <TrelloCardsManager
           projectPath={projectPath}
           trelloApiKey={trelloApiKey}
@@ -206,7 +206,7 @@ const FilesList: React.FC<FilesListProps> = ({ files }) => {
         {files.map((file, index) => (
           <div
             key={index}
-            className="flex items-center justify-between bg-white rounded p-2"
+            className="flex items-center justify-between bg-background border border-border rounded p-2"
           >
             <div className="flex-1 min-w-0">
               <p className="text-xs font-medium truncate">{file.name}</p>

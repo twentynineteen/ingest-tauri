@@ -1,5 +1,31 @@
 import '@testing-library/jest-dom'
-import { beforeAll, afterEach, afterAll } from 'vitest'
+import { afterAll, afterEach, beforeAll, vi } from 'vitest'
+
+// Mock matchMedia IMMEDIATELY at module load time
+// This is required for both our code and Framer Motion's reduced motion detection
+const mockMatchMedia = (query: string) => ({
+  matches: false,
+  media: query,
+  onchange: null,
+  addListener: vi.fn(), // deprecated
+  removeListener: vi.fn(), // deprecated
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  dispatchEvent: vi.fn()
+})
+
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation(mockMatchMedia)
+})
+
+// Also ensure global.matchMedia exists for Node environment
+if (typeof global !== 'undefined') {
+  Object.defineProperty(global, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation(mockMatchMedia)
+  })
+}
 
 // Mock Tauri APIs
 const mockTauriApis = () => {
@@ -15,34 +41,34 @@ const mockTauriApis = () => {
 
   // Mock app functions
   vi.mock('@tauri-apps/api/app', () => ({
-    getVersion: vi.fn().mockResolvedValue('1.0.0'),
+    getVersion: vi.fn().mockResolvedValue('1.0.0')
   }))
 
   // Mock plugin-dialog
   vi.mock('@tauri-apps/plugin-dialog', () => ({
-    open: vi.fn(),
+    open: vi.fn()
   }))
 
   // Mock plugin-shell
   vi.mock('@tauri-apps/plugin-shell', () => ({
-    open: vi.fn(),
+    open: vi.fn()
   }))
 
   // Mock plugin-process
   vi.mock('@tauri-apps/plugin-process', () => ({
-    relaunch: vi.fn(),
+    relaunch: vi.fn()
   }))
 
   // Mock plugin-updater
   vi.mock('@tauri-apps/plugin-updater', () => ({
-    check: vi.fn(),
+    check: vi.fn()
   }))
 
   // Mock plugin-store
   vi.mock('@tauri-apps/plugin-store', () => ({
     get: vi.fn(),
     set: vi.fn(),
-    del: vi.fn(),
+    del: vi.fn()
   }))
 }
 
@@ -52,23 +78,8 @@ const mockBrowserApis = () => {
   global.ResizeObserver = vi.fn().mockImplementation(() => ({
     observe: vi.fn(),
     unobserve: vi.fn(),
-    disconnect: vi.fn(),
+    disconnect: vi.fn()
   }))
-
-  // Mock matchMedia
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    value: vi.fn().mockImplementation(query => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener: vi.fn(), // deprecated
-      removeListener: vi.fn(), // deprecated
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
-  })
 
   // Mock TextEncoder/TextDecoder for Node.js environment
   if (typeof global.TextEncoder === 'undefined') {
@@ -103,12 +114,12 @@ export const createMockQueryClient = async () => {
     defaultOptions: {
       queries: {
         retry: false,
-        gcTime: 0,
+        gcTime: 0
       },
       mutations: {
-        retry: false,
-      },
-    },
+        retry: false
+      }
+    }
   })
 }
 
@@ -116,13 +127,15 @@ export const createWrapper = (queryClient?: any) => {
   return ({ children }: { children: React.ReactNode }) => {
     const React = require('react')
     const { QueryClientProvider } = require('@tanstack/react-query')
-    const client = queryClient || new (require('@tanstack/react-query').QueryClient)({
-      defaultOptions: {
-        queries: { retry: false, gcTime: 0 },
-        mutations: { retry: false }
-      }
-    })
-    
+    const client =
+      queryClient ||
+      new (require('@tanstack/react-query').QueryClient)({
+        defaultOptions: {
+          queries: { retry: false, gcTime: 0 },
+          mutations: { retry: false }
+        }
+      })
+
     return React.createElement(QueryClientProvider, { client }, children)
   }
 }

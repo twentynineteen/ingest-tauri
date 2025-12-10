@@ -1,14 +1,14 @@
 /**
  * Unit Test: useBakerScan React Hook
- * 
+ *
  * This test verifies the useBakerScan custom hook behavior.
  * It MUST FAIL initially until the hook implementation is complete.
  */
 
-import { renderHook, act, waitFor } from '@testing-library/react'
-import { describe, test, expect, vi, beforeEach } from 'vitest'
-import { useBakerScan } from '../../src/hooks/useBakerScan'
-import type { ScanOptions, ScanResult } from '../../src/types/baker'
+import type { ScanOptions, ScanResult } from '@/types/baker'
+import { useBakerScan } from '@hooks/useBakerScan'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock Tauri invoke function
 vi.mock('@tauri-apps/api/core', () => ({
@@ -106,7 +106,9 @@ describe('useBakerScan Hook', () => {
 
     // Simulate scan completion event using the captured handler
     await act(async () => {
-      completeEventHandler!({ payload: { scanId: 'test-scan-id', result: mockScanResult } })
+      completeEventHandler!({
+        payload: { scanId: 'test-scan-id', result: mockScanResult }
+      })
     })
 
     // Wait for state updates to complete
@@ -170,7 +172,7 @@ describe('useBakerScan Hook', () => {
   test('should handle progress updates during scan', async () => {
     const { invoke } = await import('@tauri-apps/api/core')
     const { listen } = await import('@tauri-apps/api/event')
-    
+
     vi.mocked(invoke).mockResolvedValue('test-scan-id')
     vi.mocked(listen).mockResolvedValue(vi.fn())
 

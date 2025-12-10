@@ -4,10 +4,14 @@
  * Purpose: Test provider-agnostic model creation and validation
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { ModelFactory, createOllamaModel, createOpenAIModel } from '@/services/ai/modelFactory'
+import {
+  createOllamaModel,
+  createOpenAIModel,
+  ModelFactory
+} from '@/services/ai/modelFactory'
 import { providerRegistry } from '@/services/ai/providerConfig'
-import type { ProviderAdapter, ConnectionValidationResult } from '@/services/ai/types'
+import type { ConnectionValidationResult, ProviderAdapter } from '@/services/ai/types'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock the provider registry
 vi.mock('@/services/ai/providerConfig', () => ({
@@ -77,7 +81,10 @@ describe('ModelFactory', () => {
         ModelFactory.createModel({
           providerId: 'nonexistent',
           modelId: 'test-model',
-          configuration: { serviceUrl: 'http://localhost:11434', connectionStatus: 'configured' }
+          configuration: {
+            serviceUrl: 'http://localhost:11434',
+            connectionStatus: 'configured'
+          }
         })
       ).toThrow('Provider "nonexistent" not found. Available providers: ollama')
     })
@@ -104,9 +111,14 @@ describe('ModelFactory', () => {
         ModelFactory.createModel({
           providerId: 'ollama',
           modelId: 'llama3.1',
-          configuration: { serviceUrl: 'http://localhost:11434', connectionStatus: 'configured' }
+          configuration: {
+            serviceUrl: 'http://localhost:11434',
+            connectionStatus: 'configured'
+          }
         })
-      ).toThrow('Failed to create model "llama3.1" for provider "ollama": Network timeout')
+      ).toThrow(
+        'Failed to create model "llama3.1" for provider "ollama": Network timeout'
+      )
     })
 
     it('should handle non-Error exceptions from adapter', () => {
@@ -119,7 +131,10 @@ describe('ModelFactory', () => {
         ModelFactory.createModel({
           providerId: 'ollama',
           modelId: 'llama3.1',
-          configuration: { serviceUrl: 'http://localhost:11434', connectionStatus: 'configured' }
+          configuration: {
+            serviceUrl: 'http://localhost:11434',
+            connectionStatus: 'configured'
+          }
         })
       ).toThrow('Failed to create model "llama3.1" for provider "ollama": Unknown error')
     })
@@ -160,7 +175,9 @@ describe('ModelFactory', () => {
       }
 
       vi.mocked(providerRegistry.get).mockReturnValue(mockOllamaAdapter)
-      vi.mocked(mockOllamaAdapter.validateConnection).mockResolvedValue(mockValidationResult)
+      vi.mocked(mockOllamaAdapter.validateConnection).mockResolvedValue(
+        mockValidationResult
+      )
 
       const result = await ModelFactory.validateProvider('ollama', {
         serviceUrl: 'http://localhost:11434',
@@ -183,7 +200,9 @@ describe('ModelFactory', () => {
       }
 
       vi.mocked(providerRegistry.get).mockReturnValue(mockOllamaAdapter)
-      vi.mocked(mockOllamaAdapter.validateConnection).mockResolvedValue(mockValidationResult)
+      vi.mocked(mockOllamaAdapter.validateConnection).mockResolvedValue(
+        mockValidationResult
+      )
 
       const result = await ModelFactory.validateProvider('ollama', {
         serviceUrl: 'http://localhost:11434',

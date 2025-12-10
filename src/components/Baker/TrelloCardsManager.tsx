@@ -147,15 +147,35 @@ export function TrelloCardsManager({
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {trelloCards.map((card, index) => (
-            <TrelloCardItem
-              key={`${card.cardId}-${index}`}
-              trelloCard={card}
-              onRemove={() => handleRemove(index)}
-              onRefresh={hasApiCredentials ? () => handleRefresh(index) : undefined}
-            />
-          ))}
+        <div className="rounded-lg border border-border overflow-hidden">
+          <table className="w-full">
+            <thead className="bg-muted/50 border-b border-border">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                  Title
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                  Board
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">
+                  Last Updated
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {trelloCards.map((card, index) => (
+                <TrelloCardItem
+                  key={`${card.cardId}-${index}`}
+                  trelloCard={card}
+                  onRemove={() => handleRemove(index)}
+                  onRefresh={hasApiCredentials ? () => handleRefresh(index) : undefined}
+                />
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 

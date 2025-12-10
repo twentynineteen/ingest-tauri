@@ -14,9 +14,9 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
+import type { TrelloCard } from '@/types/baker'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import type { TrelloCard } from '../../types/baker'
 
 interface TrelloCardUpdateDialogProps {
   open: boolean

@@ -5,10 +5,10 @@
  * TDD Phase: RED - These tests expect the new grouped parameter interface
  */
 
+import { AddCardDialog } from '@/components/Baker/TrelloCards/AddCardDialog'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, test, vi } from 'vitest'
-import { AddCardDialog } from '@/components/Baker/TrelloCards/AddCardDialog'
 
 // Type definitions for grouped parameters
 export interface DialogState {
@@ -142,7 +142,9 @@ describe('AddCardDialog - Dialog State Group', () => {
 
     render(<AddCardDialog {...props} />)
 
-    expect(screen.getByText(/select a card from your board or enter a url/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/select a card from your board or enter a url/i)
+    ).toBeInTheDocument()
   })
 })
 
@@ -195,7 +197,9 @@ describe('AddCardDialog - URL Mode State Group', () => {
 
     render(<AddCardDialog {...props} />)
 
-    expect(screen.getByDisplayValue('https://trello.com/c/abc12345/test-card')).toBeInTheDocument()
+    expect(
+      screen.getByDisplayValue('https://trello.com/c/abc12345/test-card')
+    ).toBeInTheDocument()
   })
 
   test('calls onCardUrlChange when URL input changes', async () => {
@@ -243,7 +247,9 @@ describe('AddCardDialog - URL Mode State Group', () => {
 
     render(<AddCardDialog {...props} />)
 
-    expect(screen.getByText(/card details will be fetched automatically/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/card details will be fetched automatically/i)
+    ).toBeInTheDocument()
   })
 
   test('shows appropriate help text when hasApiCredentials is false', () => {
@@ -253,7 +259,9 @@ describe('AddCardDialog - URL Mode State Group', () => {
 
     render(<AddCardDialog {...props} />)
 
-    expect(screen.getByText(/enter the full url from your trello board/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/enter the full url from your trello board/i)
+    ).toBeInTheDocument()
   })
 })
 
@@ -300,7 +308,7 @@ describe('AddCardDialog - Select Mode State Group', () => {
         { id: '1', name: 'Card 1', desc: 'Description 1' },
         { id: '2', name: 'Card 2', desc: 'Description 2' }
       ],
-      'Done': [{ id: '3', name: 'Card 3' }]
+      Done: [{ id: '3', name: 'Card 3' }]
     }
 
     render(<AddCardDialog {...props} />)
@@ -391,7 +399,9 @@ describe('AddCardDialog - Error State Group', () => {
 
     render(<AddCardDialog {...props} />)
 
-    expect(screen.getByText('Failed to fetch card details from Trello API')).toBeInTheDocument()
+    expect(
+      screen.getByText('Failed to fetch card details from Trello API')
+    ).toBeInTheDocument()
   })
 
   test('does not display error alerts when no errors', () => {
@@ -417,7 +427,9 @@ describe('AddCardDialog - Integration Tests', () => {
     render(<AddCardDialog {...props} />)
 
     // Verify URL is populated
-    expect(screen.getByDisplayValue('https://trello.com/c/abc12345/test-card')).toBeInTheDocument()
+    expect(
+      screen.getByDisplayValue('https://trello.com/c/abc12345/test-card')
+    ).toBeInTheDocument()
 
     // Add card
     const addButton = screen.getByRole('button', { name: /add card/i })

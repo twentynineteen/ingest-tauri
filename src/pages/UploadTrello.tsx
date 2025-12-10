@@ -1,9 +1,9 @@
 import { Input } from '@components/ui/input'
-import { useBreadcrumb } from 'hooks'
-import { useUploadTrello } from 'hooks/useUploadTrello'
+import { useBreadcrumb } from '@hooks/useBreadcrumb'
+import { useUploadTrello } from '@hooks/useUploadTrello'
+import TrelloCardList from '@utils/trello/TrelloCardList'
 import { Search } from 'lucide-react'
 import React from 'react'
-import TrelloCardList from 'utils/trello/TrelloCardList'
 import { CardDetailsDialog } from './UploadTrello/components/CardDetailsDialog'
 
 // Trello icon SVG component
@@ -40,6 +40,7 @@ const UploadTrello = () => {
     selectedCardDetails,
     members,
     uploadedVideo,
+    boardName,
     mainDescription,
     breadcrumbsData,
     breadcrumbsBlock,
@@ -58,7 +59,7 @@ const UploadTrello = () => {
       <div className="w-full pb-4 border-b mb-4">
         <h2 className="px-4 text-2xl font-semibold flex items-center gap-4">
           <TrelloIcon />
-          Trello: Small Projects
+          Trello: {boardName}
         </h2>
         <div className="px-4 mx-4 mt-4 space-y-4">
           <div className="relative">

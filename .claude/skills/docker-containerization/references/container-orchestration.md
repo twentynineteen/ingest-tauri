@@ -7,6 +7,7 @@ This document covers deploying Dockerized Next.js applications to various orches
 ### Basic Setup
 
 Docker Compose is ideal for:
+
 - Local development environments
 - Small-scale deployments
 - Testing multi-container setups
@@ -22,11 +23,11 @@ services:
     container_name: nextjs-prod
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - NODE_ENV=production
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/health']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -34,10 +35,10 @@ services:
     networks:
       - app-network
     logging:
-      driver: "json-file"
+      driver: 'json-file'
       options:
-        max-size: "10m"
-        max-file: "3"
+        max-size: '10m'
+        max-file: '3'
 
 networks:
   app-network:
@@ -68,6 +69,7 @@ docker-compose up -d --build
 ### When to Use Kubernetes
 
 Use Kubernetes for:
+
 - Large-scale deployments (100+ containers)
 - High availability requirements
 - Complex microservices architectures
@@ -95,32 +97,32 @@ spec:
         app: nextjs-app
     spec:
       containers:
-      - name: nextjs
-        image: nextjs-app:latest
-        ports:
-        - containerPort: 3000
-        env:
-        - name: NODE_ENV
-          value: "production"
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /api/health
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /api/health
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: nextjs
+          image: nextjs-app:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: 'production'
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
 ```
 
 ### Service Configuration
@@ -150,24 +152,24 @@ kind: Ingress
 metadata:
   name: nextjs-ingress
   annotations:
-    kubernetes.io/ingress.class: "nginx"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    kubernetes.io/ingress.class: 'nginx'
+    cert-manager.io/cluster-issuer: 'letsencrypt-prod'
 spec:
   tls:
-  - hosts:
-    - app.example.com
-    secretName: nextjs-tls
+    - hosts:
+        - app.example.com
+      secretName: nextjs-tls
   rules:
-  - host: app.example.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: nextjs-service
-            port:
-              number: 80
+    - host: app.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nextjs-service
+                port:
+                  number: 80
 ```
 
 ### Kubernetes Commands
@@ -235,10 +237,7 @@ kubectl delete -f deployment.yaml
         }
       },
       "healthCheck": {
-        "command": [
-          "CMD-SHELL",
-          "curl -f http://localhost:3000/api/health || exit 1"
-        ],
+        "command": ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"],
         "interval": 30,
         "timeout": 5,
         "retries": 3,
@@ -313,16 +312,16 @@ spec:
         autoscaling.knative.dev/minScale: '1'
     spec:
       containers:
-      - image: gcr.io/PROJECT_ID/nextjs-app
-        ports:
-        - containerPort: 3000
-        env:
-        - name: NODE_ENV
-          value: production
-        resources:
-          limits:
-            memory: 512Mi
-            cpu: '1'
+        - image: gcr.io/PROJECT_ID/nextjs-app
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: production
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: '1'
 ```
 
 ## Azure Container Instances (ACI)
@@ -355,37 +354,37 @@ az container create \
 # .do/app.yaml
 name: nextjs-app
 services:
-- name: web
-  github:
-    repo: username/nextjs-app
-    branch: main
-    deploy_on_push: true
-  dockerfile_path: Dockerfile.production
-  http_port: 3000
-  instance_count: 3
-  instance_size_slug: basic-s
-  env_vars:
-  - key: NODE_ENV
-    value: "production"
-  health_check:
-    http_path: /api/health
-    initial_delay_seconds: 30
-    period_seconds: 10
-    timeout_seconds: 5
-    success_threshold: 1
-    failure_threshold: 3
+  - name: web
+    github:
+      repo: username/nextjs-app
+      branch: main
+      deploy_on_push: true
+    dockerfile_path: Dockerfile.production
+    http_port: 3000
+    instance_count: 3
+    instance_size_slug: basic-s
+    env_vars:
+      - key: NODE_ENV
+        value: 'production'
+    health_check:
+      http_path: /api/health
+      initial_delay_seconds: 30
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
 ```
 
 ## Comparison Matrix
 
-| Platform | Best For | Complexity | Cost | Auto-Scaling |
-|----------|----------|------------|------|--------------|
-| Docker Compose | Dev/Small deployments | Low | Very Low | No |
-| Kubernetes | Enterprise/Large scale | High | Medium | Yes |
-| ECS | AWS ecosystem | Medium | Medium | Yes |
-| Cloud Run | Serverless/Pay-per-use | Low | Low | Yes |
-| ACI | Simple Azure deployments | Low | Medium | Limited |
-| DO App Platform | Simple deployments | Low | Low | Yes |
+| Platform        | Best For                 | Complexity | Cost     | Auto-Scaling |
+| --------------- | ------------------------ | ---------- | -------- | ------------ |
+| Docker Compose  | Dev/Small deployments    | Low        | Very Low | No           |
+| Kubernetes      | Enterprise/Large scale   | High       | Medium   | Yes          |
+| ECS             | AWS ecosystem            | Medium     | Medium   | Yes          |
+| Cloud Run       | Serverless/Pay-per-use   | Low        | Low      | Yes          |
+| ACI             | Simple Azure deployments | Low        | Medium   | Limited      |
+| DO App Platform | Simple deployments       | Low        | Low      | Yes          |
 
 ## Auto-Scaling Configuration
 
@@ -404,18 +403,18 @@ spec:
   minReplicas: 2
   maxReplicas: 10
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
 ```
 
 ### ECS Auto Scaling
@@ -482,8 +481,8 @@ spec:
     matchLabels:
       app: nextjs-app
   endpoints:
-  - port: metrics
-    interval: 30s
+    - port: metrics
+      interval: 30s
 ```
 
 ### ELK Stack (Elasticsearch, Logstash, Kibana)
@@ -496,7 +495,7 @@ services:
     environment:
       - discovery.type=single-node
     ports:
-      - "9200:9200"
+      - '9200:9200'
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.5.0
@@ -506,7 +505,7 @@ services:
   kibana:
     image: docker.elastic.co/kibana/kibana:8.5.0
     ports:
-      - "5601:5601"
+      - '5601:5601'
 ```
 
 ## Disaster Recovery
@@ -525,13 +524,13 @@ services:
 affinity:
   podAntiAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
-    - labelSelector:
-        matchExpressions:
-        - key: app
-          operator: In
-          values:
-          - nextjs-app
-      topologyKey: kubernetes.io/hostname
+      - labelSelector:
+          matchExpressions:
+            - key: app
+              operator: In
+              values:
+                - nextjs-app
+        topologyKey: kubernetes.io/hostname
 ```
 
 ---

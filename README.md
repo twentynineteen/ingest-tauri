@@ -222,6 +222,22 @@ Then update the URL in Bucket Settings to `http://localhost:11435`
   - mammoth.js for Word document parsing
   - docx for document generation
 
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#documentation)
+
+## ➤ Documentation
+
+### Feature Guides
+
+- **[Premiere Plugin Management](docs/PREMIERE_PLUGINS.md)** - Install and manage CEP extensions
+- **[Architecture](docs/ARCHITECTURE.md)** - System design and technical architecture
+- **[API Commands](docs/API_COMMANDS.md)** - Complete Tauri commands reference
+
+### Developer Resources
+
+- **[Onboarding Guide](docs/ONBOARDING.md)** - Get started with development
+- **[React Query Patterns](docs/react-query-patterns.md)** - Modern data fetching patterns
+- **[Security Audit](docs/security-audit.md)** - Security best practices
+
 [![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/cloudy.png)](#license)
 
 ## ➤ License

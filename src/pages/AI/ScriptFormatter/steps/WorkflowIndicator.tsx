@@ -3,8 +3,8 @@
  * Displays the workflow progress steps
  */
 
+import type { WorkflowStep } from '@hooks/useScriptFormatterState'
 import React from 'react'
-import type { WorkflowStep } from '../../../../hooks/useScriptFormatterState'
 
 interface WorkflowIndicatorProps {
   currentStep: WorkflowStep

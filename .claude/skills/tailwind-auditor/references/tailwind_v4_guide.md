@@ -9,12 +9,13 @@ Tailwind CSS v4 represents a fundamental shift in how the framework is configure
 ### Configuration Location
 
 **v3**: JavaScript file (`tailwind.config.js`)
+
 ```javascript
 module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#3b82f6',
+        primary: '#3b82f6'
       }
     }
   }
@@ -22,6 +23,7 @@ module.exports = {
 ```
 
 **v4**: CSS file (typically `src/index.css`)
+
 ```css
 @theme {
   --color-primary: 59 130 246;
@@ -31,6 +33,7 @@ module.exports = {
 ### No JavaScript Config Required
 
 v4 projects typically have **no `tailwind.config.js` file** at all. Configuration is done entirely in CSS using:
+
 - `@theme` directive for theme customization
 - CSS custom properties (CSS variables)
 - `@custom-variant` for custom variants
@@ -244,6 +247,7 @@ Note: Must wrap in `hsl()` when using in CSS.
 ### Colors
 
 **v3**:
+
 ```javascript
 // tailwind.config.js
 theme: {
@@ -256,6 +260,7 @@ theme: {
 ```
 
 **v4**:
+
 ```css
 /* src/index.css */
 @theme {
@@ -289,14 +294,14 @@ theme: {
 ### Multi-theme Support
 
 ```css
-[data-theme="ocean"] {
+[data-theme='ocean'] {
   @theme {
     --color-primary: 200 80% 50%;
     --color-secondary: 180 60% 40%;
   }
 }
 
-[data-theme="forest"] {
+[data-theme='forest'] {
   @theme {
     --color-primary: 120 70% 45%;
     --color-secondary: 100 60% 35%;

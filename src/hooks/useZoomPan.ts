@@ -1,8 +1,8 @@
+import { CACHE } from '@constants/timing'
+import { queryKeys } from '@lib/query-keys'
+import { createQueryOptions } from '@lib/query-utils'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useMemo } from 'react'
-import { CACHE } from '../constants/timing'
-import { queryKeys } from '../lib/query-keys'
-import { createQueryOptions } from '../lib/query-utils'
 
 interface ZoomPanState {
   zoomLevel: number

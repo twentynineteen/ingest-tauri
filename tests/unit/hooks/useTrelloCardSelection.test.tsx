@@ -3,13 +3,14 @@
  * Handles card selection state, details fetching, and validation
  */
 
-import { renderHook, waitFor, act } from '@testing-library/react'
-import { describe, test, expect, vi, beforeEach } from 'vitest'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useTrelloCardDetails } from '@/hooks/useTrelloCardDetails'
 import { useTrelloCardSelection } from '@/hooks/useTrelloCardSelection'
-import type { ReactNode } from 'react'
 import type { SelectedCard } from '@/pages/UploadTrello/UploadTrelloTypes'
 import type { TrelloCard } from '@/utils/TrelloCards'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import type { ReactNode } from 'react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock dependencies
 vi.mock('@/hooks/useTrelloCardDetails', () => ({
@@ -20,8 +21,6 @@ vi.mock('@/pages/UploadTrello/UploadTrelloHooks', () => ({
   useCardDetailsSync: vi.fn(),
   useCardValidation: vi.fn()
 }))
-
-import { useTrelloCardDetails } from '@/hooks/useTrelloCardDetails'
 
 const mockCardDetails: TrelloCard = {
   id: 'card123',
@@ -77,7 +76,11 @@ describe('useTrelloCardSelection', () => {
         wrapper: createWrapper()
       })
 
-      expect(useTrelloCardDetails).toHaveBeenCalledWith(null, 'test-api-key', 'test-token')
+      expect(useTrelloCardDetails).toHaveBeenCalledWith(
+        null,
+        'test-api-key',
+        'test-token'
+      )
     })
   })
 

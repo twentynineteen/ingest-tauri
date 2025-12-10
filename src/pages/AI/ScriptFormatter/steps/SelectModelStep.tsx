@@ -9,15 +9,15 @@ import {
   AccordionItem,
   AccordionTrigger
 } from '@/components/ui/accordion'
-import { Database, Sparkles } from 'lucide-react'
-import React from 'react'
-import type { ExampleWithMetadata } from '../../../../types/exampleEmbeddings'
+import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
 import type {
   AIModel,
   AIProvider,
   ProviderConfiguration,
   ScriptDocument
-} from '../../../../types/scriptFormatter'
+} from '@/types/scriptFormatter'
+import { Database, Sparkles } from 'lucide-react'
+import React from 'react'
 import { ExampleToggleList } from '../ExampleToggleList'
 import { ModelSelector } from '../ModelSelector'
 import { ProviderSelector } from '../ProviderSelector'

@@ -1,21 +1,21 @@
-import { render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
-import React from 'react'
+import * as useMobileHook from '@components/hooks/use-mobile'
 import {
-  SidebarProvider,
   Sidebar,
   SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
   SidebarMenuAction,
   SidebarMenuBadge,
+  SidebarMenuButton,
+  SidebarMenuItem,
   SidebarMenuSkeleton,
   SidebarMenuSub,
+  SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarMenuSubButton
+  SidebarProvider
 } from '@components/ui/sidebar'
-import * as useMobileHook from '@components/hooks/use-mobile'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import React from 'react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock the use-mobile hook
 vi.mock('@components/hooks/use-mobile', () => ({
@@ -548,7 +548,9 @@ describe('SidebarMenu Components', () => {
         </SidebarProvider>
       )
 
-      expect(container.querySelector('[data-sidebar="menu-skeleton"]')).toBeInTheDocument()
+      expect(
+        container.querySelector('[data-sidebar="menu-skeleton"]')
+      ).toBeInTheDocument()
     })
 
     test('renders without icon by default', () => {

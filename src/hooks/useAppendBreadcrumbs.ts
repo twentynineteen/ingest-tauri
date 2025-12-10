@@ -1,10 +1,10 @@
 import { logger } from '@/utils/logger'
+import { appStore } from '@store/useAppStore'
 import { useQueryClient } from '@tanstack/react-query'
 import { ask, confirm, open } from '@tauri-apps/plugin-dialog'
 import { readTextFile } from '@tauri-apps/plugin-fs'
-import { appStore } from 'store/useAppStore'
-import { TrelloCard as LegacyTrelloCard } from 'utils/TrelloCards'
-import type { Breadcrumb } from 'utils/types'
+import { TrelloCard as LegacyTrelloCard } from '@utils/TrelloCards'
+import type { Breadcrumb } from '@utils/types'
 
 function formatBreadcrumbsForHumans(breadcrumbs: Breadcrumb): string {
   const lines = ['PROJECT DETAILS', '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━']

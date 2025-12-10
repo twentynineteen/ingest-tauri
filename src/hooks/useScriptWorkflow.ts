@@ -10,10 +10,10 @@
  * - Navigation warnings for unsaved work
  */
 
+import type { ProcessedOutput, WorkflowStep } from '@/types/scriptFormatter'
 import { logger } from '@/utils/logger'
+import { createNamespacedLogger } from '@utils/logger'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { ProcessedOutput, WorkflowStep } from '../types/scriptFormatter'
-import { createNamespacedLogger } from '../utils/logger'
 import { useAIProcessing } from './useAIProcessing'
 import { useScriptDownload } from './useScriptDownload'
 import { useScriptReview } from './useScriptReview'
@@ -63,6 +63,8 @@ export function useScriptWorkflow() {
   const uploadHook = useScriptUpload({
     onSuccess: document => {
       log.info('File uploaded successfully:', document.filename)
+      // Automatically advance to model selection step
+      setCurrentStep('select-model')
     },
     onError: error => {
       logger.error('File upload failed:', error.message)

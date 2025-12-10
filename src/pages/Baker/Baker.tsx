@@ -5,11 +5,13 @@
  * Refactored to separate concerns into focused components and hooks.
  */
 
+import { useTrelloBoard } from '@/hooks'
 import { logger } from '@/utils/logger'
 import { BakerPreferences } from '@components/Baker/BakerPreferences'
 import { BatchActions } from '@components/Baker/BatchActions'
 import { FolderSelector } from '@components/Baker/FolderSelector'
-import { ProjectList } from '@components/Baker/ProjectList'
+import { ProjectDetailPanel } from '@components/Baker/ProjectDetailPanel'
+import { ProjectListPanel } from '@components/Baker/ProjectListPanel'
 import { ScanResults } from '@components/Baker/ScanResults'
 import { BatchUpdateConfirmationDialog } from '@components/BatchUpdateConfirmationDialog'
 import ErrorBoundary from '@components/ErrorBoundary'
@@ -17,11 +19,10 @@ import { Button } from '@components/ui/button'
 import { useBakerPreferences } from '@hooks/useBakerPreferences'
 import { useBakerScan } from '@hooks/useBakerScan'
 import { useBakerTrelloIntegration } from '@hooks/useBakerTrelloIntegration'
+import { useBreadcrumb } from '@hooks/useBreadcrumb'
 import { useBreadcrumbsManager } from '@hooks/useBreadcrumbsManager'
 import { useBreadcrumbsPreview } from '@hooks/useBreadcrumbsPreview'
 import { useLiveBreadcrumbsReader } from '@hooks/useLiveBreadcrumbsReader'
-import { useTrelloBoard } from 'hooks'
-import { useBreadcrumb } from 'hooks/useBreadcrumb'
 import { AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react'
 import React, { useCallback, useState } from 'react'
 
@@ -33,7 +34,7 @@ const BakerPageContent: React.FC = () => {
   const [selectedFolder, setSelectedFolder] = useState<string>('')
   const [selectedProjects, setSelectedProjects] = useState<string[]>([])
   const [showPreferences, setShowPreferences] = useState(false)
-  const [expandedProject, setExpandedProject] = useState<string | null>(null)
+  const [selectedProject, setSelectedProject] = useState<string | null>(null)
   const [previewProject, setPreviewProject] = useState<string | null>(null)
   const [showBatchConfirmation, setShowBatchConfirmation] = useState(false)
 
@@ -85,7 +86,7 @@ const BakerPageContent: React.FC = () => {
     clearResults()
     clearUpdateResults()
     setSelectedProjects([])
-    setExpandedProject(null)
+    setSelectedProject(null)
     setPreviewProject(null)
     clearBreadcrumbs()
     clearPreviews()
@@ -160,18 +161,13 @@ const BakerPageContent: React.FC = () => {
     }
   }, [selectedProjects, preferences, updateBreadcrumbs, updateTrelloCards, clearPreviews])
 
-  const handleViewBreadcrumbs = useCallback(
+  const handleProjectClick = useCallback(
     async (projectPath: string) => {
-      if (expandedProject === projectPath) {
-        setExpandedProject(null)
-        setPreviewProject(null)
-        clearBreadcrumbs()
-      } else {
-        setExpandedProject(projectPath)
-        await readLiveBreadcrumbs(projectPath)
-      }
+      // Always select the project and load its breadcrumbs
+      setSelectedProject(projectPath)
+      await readLiveBreadcrumbs(projectPath)
     },
-    [expandedProject, readLiveBreadcrumbs, clearBreadcrumbs]
+    [readLiveBreadcrumbs]
   )
 
   const handleTogglePreview = useCallback(
@@ -190,88 +186,123 @@ const BakerPageContent: React.FC = () => {
   )
 
   return (
-    <div className="px-6 space-y-6">
-      {/* Header with Settings */}
-      <div className="flex items-center justify-between border-b pb-4">
-        <h2 className="text-2xl font-semibold">Baker</h2>
-        <BakerPreferences
-          preferences={preferences}
-          onUpdatePreferences={updatePreferences}
-          onResetToDefaults={resetToDefaults}
-          isOpen={showPreferences}
-          onOpenChange={setShowPreferences}
-        />
+    <div className="w-full h-full overflow-y-auto overflow-x-hidden">
+      <div className="w-full max-w-full pb-4">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-border bg-card/50">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Baker</h1>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Scan directories for BuildProject folders and manage breadcrumbs files
+              </p>
+            </div>
+            <BakerPreferences
+              preferences={preferences}
+              onUpdatePreferences={updatePreferences}
+              onResetToDefaults={resetToDefaults}
+              isOpen={showPreferences}
+              onOpenChange={setShowPreferences}
+            />
+          </div>
+        </div>
+
+        <div className="px-6 py-4 space-y-4 max-w-full">
+          {/* Folder Selection */}
+          <FolderSelector
+            selectedFolder={selectedFolder}
+            onFolderChange={setSelectedFolder}
+            onStartScan={handleStartScan}
+            onCancelScan={cancelScan}
+            onClearResults={handleClearResults}
+            isScanning={isScanning}
+            hasResults={!!scanResult}
+          />
+
+          {/* Error Display */}
+          {error && (
+            <div className="border border-red-200 bg-red-50 rounded-lg p-4">
+              <div className="flex items-center">
+                <AlertTriangle className="h-4 w-4 text-red-600 mr-2" />
+                <span className="text-red-800">{error}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Scan Results */}
+          <ScanResults scanResult={scanResult} isScanning={isScanning} />
+
+          {/* Project Results - Master-Detail Layout */}
+          {scanResult?.projects && (
+            <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden">
+              <div className="flex items-center gap-2 p-4 border-b border-border">
+                <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex-shrink-0">
+                  3
+                </div>
+                <h2 className="text-sm font-semibold text-foreground">
+                  Found Projects ({scanResult.projects.length})
+                </h2>
+              </div>
+              <div className="flex h-[600px]">
+                {/* Left Panel - Project List */}
+                <div className="w-2/5 border-r border-border">
+                  <ProjectListPanel
+                    projects={scanResult.projects}
+                    selectedProjects={selectedProjects}
+                    selectedProject={selectedProject}
+                    onProjectSelection={handleProjectSelection}
+                    onProjectClick={handleProjectClick}
+                  />
+                </div>
+
+                {/* Right Panel - Project Details */}
+                <div className="flex-1">
+                  <ProjectDetailPanel
+                    selectedProject={selectedProject}
+                    breadcrumbs={breadcrumbs}
+                    isLoadingBreadcrumbs={isLoadingBreadcrumbs}
+                    breadcrumbsError={breadcrumbsError}
+                    previewMode={previewProject === selectedProject}
+                    preview={selectedProject ? getPreview(selectedProject) : null}
+                    onTogglePreview={() =>
+                      selectedProject && handleTogglePreview(selectedProject)
+                    }
+                    trelloApiKey={apiKey}
+                    trelloApiToken={token}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Batch Actions */}
+          <BatchActions
+            selectedProjects={selectedProjects}
+            totalProjects={scanResult?.projects.length || 0}
+            isUpdating={isUpdating}
+            onSelectAll={handleSelectAll}
+            onClearSelection={handleClearSelection}
+            onApplyChanges={handleApplyChanges}
+          />
+
+          {/* Update Results */}
+          {lastUpdateResult && (
+            <div className="border border-green-200 bg-green-50 rounded-lg p-4">
+              <div className="flex items-center">
+                <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
+                <span className="text-green-800">
+                  Update complete: {lastUpdateResult.successful.length} successful,{' '}
+                  {lastUpdateResult.failed.length} failed
+                  {lastUpdateResult.created.length > 0 &&
+                    ` • ${lastUpdateResult.created.length} created`}
+                  {lastUpdateResult.updated.length > 0 &&
+                    ` • ${lastUpdateResult.updated.length} updated`}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-
-      {/* Folder Selection */}
-      <FolderSelector
-        selectedFolder={selectedFolder}
-        onFolderChange={setSelectedFolder}
-        onStartScan={handleStartScan}
-        onCancelScan={cancelScan}
-        onClearResults={handleClearResults}
-        isScanning={isScanning}
-        hasResults={!!scanResult}
-      />
-
-      {/* Error Display */}
-      {error && (
-        <div className="border border-red-200 bg-red-50 rounded-lg p-4">
-          <div className="flex items-center">
-            <AlertTriangle className="h-4 w-4 text-red-600 mr-2" />
-            <span className="text-red-800">{error}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Scan Results */}
-      <ScanResults scanResult={scanResult} isScanning={isScanning} />
-
-      {/* Project Results */}
-      {scanResult?.projects && (
-        <ProjectList
-          projects={scanResult.projects}
-          selectedProjects={selectedProjects}
-          onProjectSelection={handleProjectSelection}
-          onViewBreadcrumbs={handleViewBreadcrumbs}
-          onTogglePreview={handleTogglePreview}
-          expandedProject={expandedProject}
-          previewProject={previewProject}
-          breadcrumbs={breadcrumbs}
-          isLoadingBreadcrumbs={isLoadingBreadcrumbs}
-          breadcrumbsError={breadcrumbsError}
-          getPreview={getPreview}
-          trelloApiKey={apiKey}
-          trelloApiToken={token}
-        />
-      )}
-
-      {/* Batch Actions */}
-      <BatchActions
-        selectedProjects={selectedProjects}
-        totalProjects={scanResult?.projects.length || 0}
-        isUpdating={isUpdating}
-        onSelectAll={handleSelectAll}
-        onClearSelection={handleClearSelection}
-        onApplyChanges={handleApplyChanges}
-      />
-
-      {/* Update Results */}
-      {lastUpdateResult && (
-        <div className="border border-green-200 bg-green-50 rounded-lg p-4">
-          <div className="flex items-center">
-            <CheckCircle className="h-4 w-4 text-green-600 mr-2" />
-            <span className="text-green-800">
-              Update complete: {lastUpdateResult.successful.length} successful,{' '}
-              {lastUpdateResult.failed.length} failed
-              {lastUpdateResult.created.length > 0 &&
-                ` • ${lastUpdateResult.created.length} created`}
-              {lastUpdateResult.updated.length > 0 &&
-                ` • ${lastUpdateResult.updated.length} updated`}
-            </span>
-          </div>
-        </div>
-      )}
 
       {/* Batch Update Confirmation Dialog */}
       <BatchUpdateConfirmationDialog
@@ -304,13 +335,13 @@ const BakerPage: React.FC = () => {
                 <li>• Memory or performance constraints</li>
               </ul>
               {error && process.env.NODE_ENV === 'development' && (
-                <details className="mt-4 text-left bg-gray-50 p-4 rounded-md text-sm">
-                  <summary className="cursor-pointer font-medium">
+                <details className="mt-4 text-left bg-muted/50 p-4 rounded-md text-sm border border-border">
+                  <summary className="cursor-pointer font-medium text-foreground">
                     Technical Details
                   </summary>
-                  <div className="mt-2">
+                  <div className="mt-2 text-muted-foreground">
                     <p>
-                      <strong>Error:</strong> {error.message}
+                      <strong className="text-foreground">Error:</strong> {error.message}
                     </p>
                   </div>
                 </details>

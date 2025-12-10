@@ -5,8 +5,8 @@
  * Tests for the Baker folder scanning and breadcrumbs management workflow.
  */
 
-import { test, expect } from '../fixtures/app.fixture'
-import { BakerPage } from '../pages/baker.page'
+import { BakerPage } from '@pages/baker.page'
+import { expect, test } from '../fixtures/app.fixture'
 import { setupTauriMocks } from '../fixtures/mocks.fixture'
 
 test.describe('Baker Page - Basic Navigation', () => {

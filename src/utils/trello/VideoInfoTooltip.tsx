@@ -1,5 +1,5 @@
+import { SproutUploadResponse } from '@utils/types'
 import React from 'react'
-import { SproutUploadResponse } from 'utils/types'
 
 interface Props {
   video: SproutUploadResponse

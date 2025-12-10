@@ -5,12 +5,12 @@
  * TDD Phase: RED (Writing failing tests first)
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Settings from '@/pages/Settings'
-import * as storage from '@/utils/storage'
 import { appStore } from '@/store/useAppStore'
+import * as storage from '@/utils/storage'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock Tauri APIs
 vi.mock('@tauri-apps/plugin-dialog', () => ({
@@ -40,7 +40,7 @@ vi.mock('@/hooks/useAIProvider', () => ({
 
 // Mock app store
 vi.mock('@/store/useAppStore', () => ({
-  useAppStore: vi.fn((selector) => {
+  useAppStore: vi.fn(selector => {
     const mockState = {
       defaultBackgroundFolder: '',
       setDefaultBackgroundFolder: vi.fn(),
@@ -131,9 +131,7 @@ describe('Settings - Trello Board Configuration (DEBT-014)', () => {
       renderSettings()
 
       await waitFor(() => {
-        expect(
-          screen.getByText(/24-character alphanumeric ID/i)
-        ).toBeInTheDocument()
+        expect(screen.getByText(/24-character alphanumeric ID/i)).toBeInTheDocument()
       })
     })
 

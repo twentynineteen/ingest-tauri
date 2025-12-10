@@ -3,8 +3,8 @@
  * Extracted from BatchUpdateConfirmationDialog (DEBT-002)
  */
 
+import type { BatchUpdateSummary } from '@utils/batchUpdateSummary'
 import React from 'react'
-import type { BatchUpdateSummary } from '../../utils/batchUpdateSummary'
 
 interface SummaryStatsProps {
   summary: BatchUpdateSummary

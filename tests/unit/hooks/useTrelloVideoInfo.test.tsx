@@ -3,11 +3,14 @@
  * Handles video info operations for Trello cards
  */
 
-import { renderHook, act, waitFor } from '@testing-library/react'
-import { describe, test, expect, vi, beforeEach } from 'vitest'
+import { useAppendVideoInfo } from '@/hooks/useAppendVideoInfo'
 import { useTrelloVideoInfo } from '@/hooks/useTrelloVideoInfo'
+import { useVideoInfoBlock } from '@/hooks/useVideoInfoBlock'
+import { appStore } from '@/store/useAppStore'
 import type { TrelloCard } from '@/utils/TrelloCards'
 import type { SproutUploadResponse } from '@/utils/types'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock dependencies
 vi.mock('@/hooks/useAppendVideoInfo', () => ({
@@ -23,10 +26,6 @@ vi.mock('@/store/useAppStore', () => ({
     getState: vi.fn()
   }
 }))
-
-import { useAppendVideoInfo } from '@/hooks/useAppendVideoInfo'
-import { useVideoInfoBlock } from '@/hooks/useVideoInfoBlock'
-import { appStore } from '@/store/useAppStore'
 
 const mockCard: TrelloCard = {
   id: 'card123',
@@ -123,10 +122,7 @@ describe('useTrelloVideoInfo', () => {
         await result.current.handleAppendVideoInfo()
       })
 
-      expect(mockApplyVideoInfoToCard).toHaveBeenCalledWith(
-        mockCard,
-        mockUploadedVideo
-      )
+      expect(mockApplyVideoInfoToCard).toHaveBeenCalledWith(mockCard, mockUploadedVideo)
     })
 
     test('refreshes card after appending video info', async () => {
@@ -309,10 +305,7 @@ describe('useTrelloVideoInfo', () => {
         await result.current.handleAppendVideoInfo()
       })
 
-      expect(mockApplyVideoInfoToCard).toHaveBeenCalledWith(
-        mockCard,
-        mockUploadedVideo
-      )
+      expect(mockApplyVideoInfoToCard).toHaveBeenCalledWith(mockCard, mockUploadedVideo)
       expect(mockRefetchCard).toHaveBeenCalled()
     })
   })

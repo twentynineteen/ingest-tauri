@@ -3,11 +3,13 @@
  * Handles board data fetching, searching, and filtering
  */
 
-import { renderHook, waitFor } from '@testing-library/react'
-import { describe, test, expect, vi, beforeEach } from 'vitest'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useTrelloBoard } from '@/hooks/useTrelloBoard'
+import { loadApiKeys } from '@/utils/storage'
+import { fetchTrelloCards, fetchTrelloLists } from '@/utils/TrelloCards'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { renderHook, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock dependencies
 vi.mock('@/utils/TrelloCards', () => ({
@@ -53,9 +55,6 @@ vi.mock('@/lib/query-utils', () => ({
   })),
   shouldRetry: vi.fn(() => false)
 }))
-
-import { fetchTrelloCards, fetchTrelloLists } from '@/utils/TrelloCards'
-import { loadApiKeys } from '@/utils/storage'
 
 const mockCards = [
   { id: 'card1', name: 'Card One', desc: 'Description one', idList: 'list1' },
@@ -105,8 +104,16 @@ describe('useTrelloBoard', () => {
       })
 
       expect(loadApiKeys).toHaveBeenCalled()
-      expect(fetchTrelloCards).toHaveBeenCalledWith('test-api-key', 'test-token', 'board123')
-      expect(fetchTrelloLists).toHaveBeenCalledWith('test-api-key', 'test-token', 'board123')
+      expect(fetchTrelloCards).toHaveBeenCalledWith(
+        'test-api-key',
+        'test-token',
+        'board123'
+      )
+      expect(fetchTrelloLists).toHaveBeenCalledWith(
+        'test-api-key',
+        'test-token',
+        'board123'
+      )
     })
 
     test('returns loading state while fetching', () => {
@@ -273,14 +280,22 @@ describe('useTrelloBoard', () => {
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false)
       })
-      expect(fetchTrelloCards).toHaveBeenCalledWith('test-api-key', 'test-token', 'board1')
+      expect(fetchTrelloCards).toHaveBeenCalledWith(
+        'test-api-key',
+        'test-token',
+        'board1'
+      )
 
       // Change board ID
       vi.clearAllMocks()
       rerender({ boardId: 'board2' })
 
       await waitFor(() => {
-        expect(fetchTrelloCards).toHaveBeenCalledWith('test-api-key', 'test-token', 'board2')
+        expect(fetchTrelloCards).toHaveBeenCalledWith(
+          'test-api-key',
+          'test-token',
+          'board2'
+        )
       })
     })
   })

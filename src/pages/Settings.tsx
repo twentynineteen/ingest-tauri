@@ -1,18 +1,19 @@
 import { logger } from '@/utils/logger'
+import { TrelloBoardSelector } from '@components/Settings/TrelloBoardSelector'
 import { Button } from '@components/ui/button'
+import { CACHE } from '@constants/timing'
+import { useAIProvider } from '@hooks/useAIProvider'
+import { useBreadcrumb } from '@hooks/useBreadcrumb'
+import { queryKeys } from '@lib/query-keys'
+import { createQueryError, createQueryOptions, shouldRetry } from '@lib/query-utils'
+import { useAppStore } from '@store/useAppStore'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { open as openPath } from '@tauri-apps/plugin-dialog'
 import { open } from '@tauri-apps/plugin-shell'
-import { useBreadcrumb } from 'hooks/useBreadcrumb'
+import ApiKeyInput from '@utils/ApiKeyInput'
+import { ApiKeys, loadApiKeys, saveApiKeys } from '@utils/storage'
 import { CheckCircle, Loader2, XCircle } from 'lucide-react'
 import React, { useState } from 'react'
-import { useAppStore } from 'store/useAppStore'
-import ApiKeyInput from 'utils/ApiKeyInput'
-import { CACHE } from '../constants/timing'
-import { useAIProvider } from '../hooks/useAIProvider'
-import { queryKeys } from '../lib/query-keys'
-import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
-import { ApiKeys, loadApiKeys, saveApiKeys } from '../utils/storage'
 
 const Settings: React.FC = () => {
   const queryClient = useQueryClient()
@@ -161,16 +162,6 @@ const Settings: React.FC = () => {
     }
   }
 
-  const handleSaveTrelloBoardId = async () => {
-    try {
-      await saveApiKeysMutation.mutateAsync({ trelloBoardId: localApiKeys.trelloBoardId })
-      alert('Trello Board ID saved successfully!')
-    } catch (error) {
-      alert('Failed to save Trello Board ID')
-      logger.error('Save error:', error)
-    }
-  }
-
   const handleOllamaUrlChange = (newUrl: string) => {
     setOllamaUrl(newUrl)
     setLocalApiKeys({ ...localApiKeys, ollamaUrl: newUrl })
@@ -313,31 +304,20 @@ const Settings: React.FC = () => {
               onSave={handleSaveTrelloToken}
             />
           </div>
-          <div>
-            <label
-              htmlFor="trello-board-id-input"
-              className="block text-sm font-medium mb-2"
-            >
-              Trello Board ID
-              <span className="text-xs text-muted-foreground ml-2">
-                (24-character alphanumeric ID from board URL)
-              </span>
-            </label>
-            <ApiKeyInput
-              id="trello-board-id-input"
-              inputType="text"
-              placeholder="Board ID (e.g., 55a504d70bed2bd21008dc5a)"
-              apiKey={localApiKeys.trelloBoardId || ''}
-              setApiKey={(newKey: string) =>
-                setLocalApiKeys({ ...localApiKeys, trelloBoardId: newKey.trim() })
+          <TrelloBoardSelector
+            value={localApiKeys.trelloBoardId || ''}
+            onValueChange={async (boardId: string) => {
+              setLocalApiKeys({ ...localApiKeys, trelloBoardId: boardId })
+              // Auto-save when board is selected
+              try {
+                await saveApiKeysMutation.mutateAsync({ trelloBoardId: boardId })
+              } catch (error) {
+                logger.error('Failed to save board ID:', error)
               }
-              onSave={handleSaveTrelloBoardId}
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Leave empty to use default board. Find the board ID in your Trello board
-              URL.
-            </p>
-          </div>
+            }}
+            label="Trello Board"
+            placeholder="Select a board"
+          />
         </section>
 
         {/* SproutVideo Section */}

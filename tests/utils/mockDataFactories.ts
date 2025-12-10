@@ -8,7 +8,9 @@ import type { Breadcrumb } from '@/utils/types'
 /**
  * Create mock breadcrumbs data
  */
-export const createMockBreadcrumbs = (overrides: Partial<Breadcrumb> = {}): Breadcrumb => {
+export const createMockBreadcrumbs = (
+  overrides: Partial<Breadcrumb> = {}
+): Breadcrumb => {
   return {
     projectTitle: 'Test Project',
     numberOfCameras: 2,

@@ -3,10 +3,10 @@
  * Feature: 007-frontend-script-example
  */
 
+import { DeleteConfirm } from '@/pages/AI/ExampleEmbeddings/DeleteConfirm'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { describe, it, expect, vi } from 'vitest'
-import { DeleteConfirm } from '@/pages/AI/ExampleEmbeddings/DeleteConfirm'
+import { describe, expect, it, vi } from 'vitest'
 
 describe('DeleteConfirm - Contract Tests (T016)', () => {
   const defaultProps = {

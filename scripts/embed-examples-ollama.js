@@ -5,10 +5,10 @@
  * Run: npm run embed:examples:ollama
  */
 
-import Database from 'better-sqlite3'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import Database from 'better-sqlite3'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -38,7 +38,9 @@ async function checkOllamaAvailability() {
 
     const hasModel = models.some(m => m.name.includes(EMBEDDING_MODEL))
     if (!hasModel) {
-      throw new Error(`Model "${EMBEDDING_MODEL}" not found. Run: ollama pull ${EMBEDDING_MODEL}`)
+      throw new Error(
+        `Model "${EMBEDDING_MODEL}" not found. Run: ollama pull ${EMBEDDING_MODEL}`
+      )
     }
 
     return true
@@ -91,10 +93,7 @@ async function embedExamples() {
   }
 
   // Create/open database
-  const dbPath = path.join(
-    __dirname,
-    '../src-tauri/resources/embeddings/examples.db'
-  )
+  const dbPath = path.join(__dirname, '../src-tauri/resources/embeddings/examples.db')
   const db = new Database(dbPath)
 
   console.log(`📂 Database: ${dbPath}\n`)
@@ -159,7 +158,11 @@ async function embedExamples() {
       const afterPath = path.join(examplePath, 'after.txt')
       const metadataPath = path.join(examplePath, 'metadata.json')
 
-      if (!fs.existsSync(beforePath) || !fs.existsSync(afterPath) || !fs.existsSync(metadataPath)) {
+      if (
+        !fs.existsSync(beforePath) ||
+        !fs.existsSync(afterPath) ||
+        !fs.existsSync(metadataPath)
+      ) {
         console.log(`   ⚠️  Skipping (missing files)\n`)
         errorCount++
         continue
@@ -170,7 +173,9 @@ async function embedExamples() {
       const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf-8'))
 
       // Generate embedding using Ollama - use AFTER text for formatting pattern matching
-      console.log(`   🔄 Generating embedding with Ollama (from formatted 'after' text)...`)
+      console.log(
+        `   🔄 Generating embedding with Ollama (from formatted 'after' text)...`
+      )
       const embedding = await generateEmbedding(after)
       console.log(`   ✅ Embedding generated (${embedding.length} dimensions)`)
 

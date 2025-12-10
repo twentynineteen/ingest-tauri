@@ -49,60 +49,82 @@ export const FolderSelector: React.FC<FolderSelectorProps> = ({
   }, [onFolderChange])
 
   return (
-    <div className="border rounded-lg p-6 space-y-4">
-      <h3 className="text-lg font-medium">Select Folder to Scan</h3>
-      <p className="text-sm text-muted-foreground">
-        Choose a root directory to scan for BuildProject-compatible folders
-      </p>
-
-      <div className="flex space-x-2">
-        <Input
-          placeholder="No folder selected"
-          value={selectedFolder}
-          readOnly
-          className="flex-1"
-        />
-        <Button
-          onClick={handleSelectFolder}
-          variant="outline"
-          disabled={disabled || isScanning}
-        >
-          <FolderOpen className="h-4 w-4 mr-2" />
-          Browse
-        </Button>
+    <div className="bg-card border border-border rounded-xl shadow-sm p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex-shrink-0">
+          1
+        </div>
+        <div className="flex-1">
+          <h2 className="text-sm font-semibold text-foreground">Select Folder to Scan</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Choose a root directory to scan for BuildProject-compatible folders
+          </p>
+        </div>
       </div>
 
-      <div className="flex space-x-2">
-        <Button
-          onClick={onStartScan}
-          disabled={!selectedFolder || isScanning || disabled}
-          className="flex-1"
-        >
-          {isScanning ? (
-            <>
-              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-              Scanning...
-            </>
-          ) : (
-            <>
-              <Play className="h-4 w-4 mr-2" />
-              Start Scan
-            </>
+      <div className="space-y-3">
+        <div className="flex gap-2">
+          <Input
+            placeholder="No folder selected"
+            value={selectedFolder}
+            readOnly
+            className="flex-1"
+          />
+          <Button
+            onClick={handleSelectFolder}
+            variant="outline"
+            size="sm"
+            disabled={disabled || isScanning}
+            className="gap-1.5"
+          >
+            <FolderOpen className="w-3.5 h-3.5" />
+            Browse
+          </Button>
+        </div>
+
+        <div className="flex gap-2">
+          <Button
+            onClick={onStartScan}
+            disabled={!selectedFolder || isScanning || disabled}
+            size="sm"
+            className="flex-1 gap-1.5 shadow-sm hover:shadow"
+          >
+            {isScanning ? (
+              <>
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                Scanning...
+              </>
+            ) : (
+              <>
+                <Play className="w-3.5 h-3.5" />
+                Start Scan
+              </>
+            )}
+          </Button>
+
+          {isScanning && (
+            <Button
+              onClick={onCancelScan}
+              variant="outline"
+              size="sm"
+              className="gap-1.5 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+            >
+              <Square className="w-3.5 h-3.5" />
+              Cancel
+            </Button>
           )}
-        </Button>
 
-        {isScanning && (
-          <Button onClick={onCancelScan} variant="outline">
-            <Square className="h-4 w-4 mr-2" />
-            Cancel
-          </Button>
-        )}
-
-        {hasResults && (
-          <Button onClick={onClearResults} variant="outline">
-            Clear Results
-          </Button>
-        )}
+          {hasResults && (
+            <Button
+              onClick={onClearResults}
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+            >
+              Clear Results
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   )

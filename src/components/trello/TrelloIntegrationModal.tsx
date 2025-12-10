@@ -8,8 +8,11 @@ import {
   DialogTitle
 } from '@components/ui/dialog'
 import { Input } from '@components/ui/input'
+import { appStore } from '@store/useAppStore'
 import { writeTextFile } from '@tauri-apps/plugin-fs'
 import { open } from '@tauri-apps/plugin-shell'
+import TrelloCardList from '@utils/trello/TrelloCardList'
+import { TrelloCard } from '@utils/TrelloCards'
 import {
   useAppendBreadcrumbs,
   useFuzzySearch,
@@ -18,9 +21,6 @@ import {
 } from 'hooks'
 import { ExternalLink, Search } from 'lucide-react'
 import React, { useEffect, useMemo, useState } from 'react'
-import { appStore } from 'store/useAppStore'
-import TrelloCardList from '../../utils/trello/TrelloCardList'
-import { TrelloCard } from '../../utils/TrelloCards'
 
 interface TrelloIntegrationModalProps {
   isOpen: boolean

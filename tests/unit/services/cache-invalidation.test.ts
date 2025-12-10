@@ -3,13 +3,13 @@
  * Purpose: Test React Query cache invalidation utilities
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { QueryClient } from '@tanstack/react-query'
+import { queryKeys } from '@/lib/query-keys'
 import {
   CacheInvalidationService,
   createCacheInvalidationService
 } from '@/services/cache-invalidation'
-import { queryKeys } from '@/lib/query-keys'
+import { QueryClient } from '@tanstack/react-query'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 describe('CacheInvalidationService', () => {
   let queryClient: QueryClient
@@ -36,7 +36,9 @@ describe('CacheInvalidationService', () => {
       await service.invalidateUserData()
 
       expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.user.profile() })
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.user.authentication() })
+      expect(invalidateSpy).toHaveBeenCalledWith({
+        queryKey: queryKeys.user.authentication()
+      })
     })
   })
 
@@ -50,7 +52,9 @@ describe('CacheInvalidationService', () => {
 
       await service.invalidateSettings()
 
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.settings.apiKeys() })
+      expect(invalidateSpy).toHaveBeenCalledWith({
+        queryKey: queryKeys.settings.apiKeys()
+      })
     })
   })
 
@@ -64,7 +68,9 @@ describe('CacheInvalidationService', () => {
 
       await service.invalidateTrelloData('board123')
 
-      expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: queryKeys.trello.board('board123') })
+      expect(invalidateSpy).toHaveBeenCalledWith({
+        queryKey: queryKeys.trello.board('board123')
+      })
     })
 
     it('should invalidate all Trello data when no boardId is provided', async () => {
@@ -251,7 +257,9 @@ describe('CacheInvalidationService', () => {
 
       await service.onSuccessfulMutation('unknown' as any)
 
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Unknown mutation type'))
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Unknown mutation type')
+      )
 
       warnSpy.mockRestore()
     })
@@ -267,7 +275,11 @@ describe('CacheInvalidationService', () => {
       const removeSpy = vi.spyOn(queryCache, 'remove')
 
       // Add a query with old timestamp
-      queryClient.setQueryData(['old-query'], { data: 'test' }, { updatedAt: Date.now() - 60 * 60 * 1000 }) // 1 hour old
+      queryClient.setQueryData(
+        ['old-query'],
+        { data: 'test' },
+        { updatedAt: Date.now() - 60 * 60 * 1000 }
+      ) // 1 hour old
 
       await service.cleanupStaleCache(30 * 60 * 1000) // 30 min threshold
 
@@ -334,9 +346,8 @@ describe('CacheInvalidationService', () => {
     })
 
     it('should return initialized global service', async () => {
-      const { initializeCacheService, getCacheService, CacheInvalidationService } = await import(
-        '@/services/cache-invalidation'
-      )
+      const { initializeCacheService, getCacheService, CacheInvalidationService } =
+        await import('@/services/cache-invalidation')
       initializeCacheService(queryClient)
       const service = getCacheService()
 

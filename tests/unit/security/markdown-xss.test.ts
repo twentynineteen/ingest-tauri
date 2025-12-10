@@ -11,13 +11,13 @@
  * 4. Malicious script tags and attributes are neutralized
  */
 
-import { describe, test, expect } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
-import { useScriptDownload } from '../../../src/hooks/useScriptDownload'
-import type { ScriptDocument } from '../../../src/types/scriptFormatter'
+import type { ScriptDocument } from '@/types/scriptFormatter'
+import { useScriptDownload } from '@hooks/useScriptDownload'
+import { act, renderHook } from '@testing-library/react'
+import { describe, expect, test } from 'vitest'
 
 // Mock useDocxGenerator
-vi.mock('../../../src/hooks/useDocxGenerator', () => ({
+vi.mock('@hooks/useDocxGenerator', () => ({
   useDocxGenerator: () => ({
     generateFile: vi.fn().mockResolvedValue(undefined),
     isGenerating: false,
@@ -162,7 +162,8 @@ describe('Markdown XSS Prevention', () => {
     test('should sanitize data: protocol', async () => {
       const { result } = renderHook(() => useScriptDownload())
 
-      const maliciousMarkdown = '<a href="data:text/html,<script>alert(\'XSS\')</script>">Click</a>'
+      const maliciousMarkdown =
+        '<a href="data:text/html,<script>alert(\'XSS\')</script>">Click</a>'
 
       await act(async () => {
         await result.current.handleDownload(mockDocument, maliciousMarkdown)
@@ -213,7 +214,8 @@ describe('Markdown XSS Prevention', () => {
     test('should handle multiple suspicious class names', async () => {
       const { result } = renderHook(() => useScriptDownload())
 
-      const maliciousMarkdown = '<span class="constructor __proto__ prototype">Test</span>'
+      const maliciousMarkdown =
+        '<span class="constructor __proto__ prototype">Test</span>'
 
       await act(async () => {
         await result.current.handleDownload(mockDocument, maliciousMarkdown)

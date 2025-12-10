@@ -3,12 +3,12 @@
  * Feature: 007-frontend-script-example
  */
 
-import { renderHook, waitFor } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useExampleManagement } from '@/hooks/useExampleManagement'
 import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import * as tauriCore from '@tauri-apps/api/core'
+import { renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@tauri-apps/api/core', () => ({
   invoke: vi.fn()

@@ -9,16 +9,15 @@
  * - Handle UI state (loading, messages)
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
 import { usePremiereIntegration } from '@/hooks/usePremiereIntegration'
+import { invoke } from '@tauri-apps/api/core'
+import { renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock Tauri APIs
 vi.mock('@tauri-apps/api/core', () => ({
   invoke: vi.fn()
 }))
-
-import { invoke } from '@tauri-apps/api/core'
 
 describe('usePremiereIntegration', () => {
   const mockSetLoading = vi.fn()

@@ -14,11 +14,13 @@
  * Total: 12 tests
  */
 
-import { renderHook, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import React from 'react'
+import { useEmbedding } from '@/hooks/useEmbedding'
 import { useScriptRetrieval, type SimilarExample } from '@/hooks/useScriptRetrieval'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { invoke } from '@tauri-apps/api/core'
+import { renderHook, waitFor } from '@testing-library/react'
+import React from 'react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock dependencies
 vi.mock('@tauri-apps/api/core', () => ({
@@ -39,16 +41,14 @@ vi.mock('@/utils/logger', () => ({
   })
 }))
 
-import { invoke } from '@tauri-apps/api/core'
-import { useEmbedding } from '@/hooks/useEmbedding'
-
 describe('useScriptRetrieval Hook', () => {
   let queryClient: QueryClient
   let mockEmbed: ReturnType<typeof vi.fn>
   let mockInvoke: ReturnType<typeof vi.fn>
 
   // Mock data
-  const mockScriptText = 'This is a test script that needs formatting for autocue reading.'
+  const mockScriptText =
+    'This is a test script that needs formatting for autocue reading.'
   const mockEmbedding = new Array(384).fill(0.5) // Typical embedding dimension
 
   const mockExamples: SimilarExample[] = [
@@ -99,7 +99,6 @@ describe('useScriptRetrieval Hook', () => {
     // Setup default mocks
     mockEmbed = vi.fn().mockResolvedValue(mockEmbedding)
     mockInvoke = vi.fn().mockResolvedValue(mockExamples)
-
     ;(invoke as any).mockImplementation(mockInvoke)
     ;(useEmbedding as any).mockReturnValue({
       embed: mockEmbed,
@@ -324,10 +323,9 @@ describe('useScriptRetrieval Hook', () => {
   describe('Caching Behavior', () => {
     test('uses cached results for identical queries', async () => {
       // Arrange & Act - First render
-      const { result: result1 } = renderHook(
-        () => useScriptRetrieval(mockScriptText),
-        { wrapper }
-      )
+      const { result: result1 } = renderHook(() => useScriptRetrieval(mockScriptText), {
+        wrapper
+      })
 
       await waitFor(() => {
         expect(result1.current.isLoading).toBe(false)
@@ -337,10 +335,9 @@ describe('useScriptRetrieval Hook', () => {
       vi.clearAllMocks()
 
       // Second render with same script text
-      const { result: result2 } = renderHook(
-        () => useScriptRetrieval(mockScriptText),
-        { wrapper }
-      )
+      const { result: result2 } = renderHook(() => useScriptRetrieval(mockScriptText), {
+        wrapper
+      })
 
       await waitFor(() => {
         expect(result2.current.isLoading).toBe(false)
@@ -354,13 +351,10 @@ describe('useScriptRetrieval Hook', () => {
 
     test('generates new query when script text changes', async () => {
       // Arrange - First query
-      const { result, rerender } = renderHook(
-        ({ text }) => useScriptRetrieval(text),
-        {
-          wrapper,
-          initialProps: { text: mockScriptText }
-        }
-      )
+      const { result, rerender } = renderHook(({ text }) => useScriptRetrieval(text), {
+        wrapper,
+        initialProps: { text: mockScriptText }
+      })
 
       await waitFor(() => {
         expect(result.current.isLoading).toBe(false)

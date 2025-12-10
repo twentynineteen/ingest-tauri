@@ -1,21 +1,21 @@
-import { render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
-import React from 'react'
+import * as useMobileHook from '@components/hooks/use-mobile'
 import {
-  SidebarProvider,
   Sidebar,
-  SidebarHeader,
-  SidebarFooter,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarGroupAction,
   SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
   SidebarInput,
+  SidebarProvider,
   SidebarSeparator
 } from '@components/ui/sidebar'
-import * as useMobileHook from '@components/hooks/use-mobile'
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import React from 'react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock the use-mobile hook
 vi.mock('@components/hooks/use-mobile', () => ({
@@ -371,9 +371,7 @@ describe('Sidebar Layout Components', () => {
         </SidebarProvider>
       )
 
-      expect(
-        container.querySelector('[data-sidebar="group-label"]')
-      ).toBeInTheDocument()
+      expect(container.querySelector('[data-sidebar="group-label"]')).toBeInTheDocument()
     })
 
     test('renders children', () => {
@@ -478,9 +476,7 @@ describe('Sidebar Layout Components', () => {
         </SidebarProvider>
       )
 
-      expect(
-        container.querySelector('[data-sidebar="group-action"]')
-      ).toBeInTheDocument()
+      expect(container.querySelector('[data-sidebar="group-action"]')).toBeInTheDocument()
     })
 
     test('renders children', () => {
@@ -752,9 +748,7 @@ describe('Sidebar Layout Components', () => {
         </SidebarProvider>
       )
 
-      expect(
-        container.querySelector('[data-sidebar="separator"]')
-      ).toBeInTheDocument()
+      expect(container.querySelector('[data-sidebar="separator"]')).toBeInTheDocument()
     })
 
     test('has data-sidebar attribute', () => {

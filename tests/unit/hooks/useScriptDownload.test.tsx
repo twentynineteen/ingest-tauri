@@ -9,17 +9,18 @@
  * - Download state and errors
  */
 
+import type { ScriptDocument } from '@/types/scriptFormatter'
+import { useDocxGenerator } from '@hooks/useDocxGenerator'
+import { useScriptDownload } from '@hooks/useScriptDownload'
 import { act, renderHook, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useScriptDownload } from '../../../src/hooks/useScriptDownload'
-import type { ScriptDocument } from '../../../src/types/scriptFormatter'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock dependencies
-vi.mock('../../../src/hooks/useDocxGenerator', () => ({
+vi.mock('@hooks/useDocxGenerator', () => ({
   useDocxGenerator: vi.fn()
 }))
 
-vi.mock('../../../src/utils/logger', () => ({
+vi.mock('@utils/logger', () => ({
   createNamespacedLogger: () => ({
     debug: vi.fn(),
     info: vi.fn(),
@@ -27,8 +28,6 @@ vi.mock('../../../src/utils/logger', () => ({
     error: vi.fn()
   })
 }))
-
-import { useDocxGenerator } from '../../../src/hooks/useDocxGenerator'
 
 describe('useScriptDownload', () => {
   const mockGenerateFile = vi.fn()
@@ -115,7 +114,10 @@ Normal text paragraph`
       const { result } = renderHook(() => useScriptDownload())
 
       await act(async () => {
-        await result.current.handleDownload(mockDocument, 'Line 1\n\n\nLine 2\n  \nLine 3')
+        await result.current.handleDownload(
+          mockDocument,
+          'Line 1\n\n\nLine 2\n  \nLine 3'
+        )
       })
 
       const htmlArg = mockGenerateFile.mock.calls[0][0]
@@ -414,9 +416,11 @@ Normal text paragraph`
     it('should accept custom filename pattern', async () => {
       mockGenerateFile.mockResolvedValue(undefined)
 
-      const { result } = renderHook(() => useScriptDownload({
-        filenameFormatter: (original) => original.replace('.docx', '_FINAL.docx')
-      }))
+      const { result } = renderHook(() =>
+        useScriptDownload({
+          filenameFormatter: original => original.replace('.docx', '_FINAL.docx')
+        })
+      )
 
       await act(async () => {
         await result.current.handleDownload(mockDocument, mockMarkdownText)

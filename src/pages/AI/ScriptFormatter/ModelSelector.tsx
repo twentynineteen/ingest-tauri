@@ -4,9 +4,9 @@
  * Purpose: Select AI model with capabilities display
  */
 
+import type { AIModel } from '@/types/scriptFormatter'
 import { Brain, Loader2, Wrench, Zap } from 'lucide-react'
 import React from 'react'
-import type { AIModel } from '../../../types/scriptFormatter'
 
 interface ModelSelectorProps {
   models: AIModel[]

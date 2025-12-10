@@ -10,29 +10,33 @@
  * - Navigation warnings for unsaved work
  */
 
+import type { WorkflowStep } from '@/types/scriptFormatter'
+import { useAIProcessing } from '@hooks/useAIProcessing'
+import { useScriptDownload } from '@hooks/useScriptDownload'
+import { useScriptReview } from '@hooks/useScriptReview'
+import { useScriptUpload } from '@hooks/useScriptUpload'
+import { useScriptWorkflow } from '@hooks/useScriptWorkflow'
 import { act, renderHook, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { useScriptWorkflow } from '../../../src/hooks/useScriptWorkflow'
-import type { WorkflowStep } from '../../../src/types/scriptFormatter'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock all sub-hooks
-vi.mock('../../../src/hooks/useScriptUpload', () => ({
+vi.mock('@hooks/useScriptUpload', () => ({
   useScriptUpload: vi.fn()
 }))
 
-vi.mock('../../../src/hooks/useAIProcessing', () => ({
+vi.mock('@hooks/useAIProcessing', () => ({
   useAIProcessing: vi.fn()
 }))
 
-vi.mock('../../../src/hooks/useScriptReview', () => ({
+vi.mock('@hooks/useScriptReview', () => ({
   useScriptReview: vi.fn()
 }))
 
-vi.mock('../../../src/hooks/useScriptDownload', () => ({
+vi.mock('@hooks/useScriptDownload', () => ({
   useScriptDownload: vi.fn()
 }))
 
-vi.mock('../../../src/utils/logger', () => ({
+vi.mock('@utils/logger', () => ({
   logger: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -48,11 +52,6 @@ vi.mock('../../../src/utils/logger', () => ({
     log: vi.fn()
   })
 }))
-
-import { useScriptUpload } from '../../../src/hooks/useScriptUpload'
-import { useAIProcessing } from '../../../src/hooks/useAIProcessing'
-import { useScriptReview } from '../../../src/hooks/useScriptReview'
-import { useScriptDownload } from '../../../src/hooks/useScriptDownload'
 
 describe('useScriptWorkflow', () => {
   const mockUploadHook = {
@@ -98,7 +97,6 @@ describe('useScriptWorkflow', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     localStorage.clear()
-
     ;(useScriptUpload as any).mockReturnValue(mockUploadHook)
     ;(useAIProcessing as any).mockReturnValue(mockProcessingHook)
     ;(useScriptReview as any).mockReturnValue(mockReviewHook)
@@ -149,7 +147,13 @@ describe('useScriptWorkflow', () => {
     it('should navigate through all steps in order', () => {
       const { result } = renderHook(() => useScriptWorkflow())
 
-      const steps: WorkflowStep[] = ['upload', 'select-model', 'processing', 'review', 'download']
+      const steps: WorkflowStep[] = [
+        'upload',
+        'select-model',
+        'processing',
+        'review',
+        'download'
+      ]
 
       steps.forEach(step => {
         act(() => {
@@ -267,7 +271,6 @@ describe('useScriptWorkflow', () => {
       })
 
       expect(result.current.hasChanges).toBe(false)
-
       ;(useScriptReview as any).mockReturnValue({
         ...mockReviewHook,
         modifiedText: 'Modified text',
@@ -361,7 +364,6 @@ describe('useScriptWorkflow', () => {
       }
 
       localStorage.setItem('PROCESSED_OUTPUT', JSON.stringify(cachedOutput))
-
       ;(useScriptReview as any).mockReturnValue({
         ...mockReviewHook,
         modifiedText: cachedOutput.formattedText
@@ -392,13 +394,16 @@ describe('useScriptWorkflow', () => {
     })
 
     it('should clear cache after successful download', async () => {
-      localStorage.setItem('PROCESSED_OUTPUT', JSON.stringify({
-        formattedText: 'Test',
-        generationTimestamp: new Date(),
-        examplesCount: 1,
-        editHistory: [],
-        isEdited: false
-      }))
+      localStorage.setItem(
+        'PROCESSED_OUTPUT',
+        JSON.stringify({
+          formattedText: 'Test',
+          generationTimestamp: new Date(),
+          examplesCount: 1,
+          editHistory: [],
+          isEdited: false
+        })
+      )
 
       const { result } = renderHook(() => useScriptWorkflow())
 
@@ -521,7 +526,6 @@ describe('useScriptWorkflow', () => {
 
       // Can't go to select-model without document
       expect(result.current.canAdvanceToSelectModel).toBe(false)
-
       ;(useScriptUpload as any).mockReturnValue({
         ...mockUploadHook,
         document: { filename: 'test.docx', textContent: 'content', metadata: {} }
@@ -536,7 +540,6 @@ describe('useScriptWorkflow', () => {
       const { result } = renderHook(() => useScriptWorkflow())
 
       expect(result.current.canStartProcessing).toBe(false)
-
       ;(useScriptUpload as any).mockReturnValue({
         ...mockUploadHook,
         document: { filename: 'test.docx', textContent: 'content', metadata: {} }
@@ -556,7 +559,6 @@ describe('useScriptWorkflow', () => {
       const { result } = renderHook(() => useScriptWorkflow())
 
       expect(result.current.canAdvanceToReview).toBe(false)
-
       ;(useAIProcessing as any).mockReturnValue({
         ...mockProcessingHook,
         processedOutput: {

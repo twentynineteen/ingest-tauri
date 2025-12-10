@@ -1,5 +1,4 @@
-import { Locator, Page, expect } from '@playwright/test'
-
+import { expect, Locator, Page } from '@playwright/test'
 import { CommonPage } from './common.page'
 
 /**
@@ -47,9 +46,7 @@ export class ExampleEmbeddingsPage extends CommonPage {
     )
 
     // Actions
-    this.uploadButton = page.locator(
-      'button:has-text("Upload"), button:has-text("Add")'
-    )
+    this.uploadButton = page.locator('button:has-text("Upload"), button:has-text("Add")')
     this.deleteButton = page.locator(
       'button:has-text("Delete"), button[aria-label="Delete"]'
     )
@@ -66,17 +63,11 @@ export class ExampleEmbeddingsPage extends CommonPage {
     this.uploadSubmit = page.locator(
       '[role="dialog"] button:has-text("Upload"), [role="dialog"] button[type="submit"]'
     )
-    this.uploadCancel = page.locator(
-      '[role="dialog"] button:has-text("Cancel")'
-    )
+    this.uploadCancel = page.locator('[role="dialog"] button:has-text("Cancel")')
 
     // Filters
-    this.filterSelect = page.locator(
-      'select, [role="combobox"], button:has-text("All")'
-    )
-    this.searchInput = page.locator(
-      'input[placeholder*="Search"], input[type="search"]'
-    )
+    this.filterSelect = page.locator('select, [role="combobox"], button:has-text("All")')
+    this.searchInput = page.locator('input[placeholder*="Search"], input[type="search"]')
 
     // Details
     this.examplePreview = page.locator(
@@ -162,9 +153,7 @@ export class ExampleEmbeddingsPage extends CommonPage {
   /**
    * Filter examples by source
    */
-  async filterBySource(
-    source: 'All' | 'Bundled' | 'Uploaded'
-  ): Promise<void> {
+  async filterBySource(source: 'All' | 'Bundled' | 'Uploaded'): Promise<void> {
     await this.filterSelect.click()
     await this.page.locator(`text="${source}"`).click()
   }

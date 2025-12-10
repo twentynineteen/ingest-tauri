@@ -3,8 +3,8 @@ import {
   AccordionItem,
   AccordionTrigger
 } from '@components/ui/accordion'
+import { Breadcrumb } from '@utils/types'
 import React from 'react'
-import { Breadcrumb } from 'utils/types'
 import { formatBreadcrumbDate } from '../breadcrumbsComparison'
 import FileList from './FileList'
 import KeyValueRow from './KeyValueRow'

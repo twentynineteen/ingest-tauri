@@ -44,8 +44,7 @@ export function useUploadTrello() {
     selectedCardDetails,
     members,
     isCardLoading,
-    refetchCard,
-    refetchMembers
+    refetchCard
   } = useTrelloCardSelection(apiKey, token)
 
   // 4. Video info operations

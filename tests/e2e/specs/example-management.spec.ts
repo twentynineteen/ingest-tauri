@@ -6,8 +6,8 @@
  * for the AI Script Example Embedding Management feature.
  */
 
-import { test, expect } from '../fixtures/app.fixture'
-import { ExampleEmbeddingsPage } from '../pages/example.page'
+import { ExampleEmbeddingsPage } from '@pages/example.page'
+import { expect, test } from '../fixtures/app.fixture'
 import { setupTauriMocks } from '../fixtures/mocks.fixture'
 
 test.describe('Example Management - Upload Workflow', () => {
@@ -25,9 +25,7 @@ test.describe('Example Management - Upload Workflow', () => {
     await examplePage.waitForLoadingComplete()
   })
 
-  test('should open upload dialog when upload button clicked', async ({
-    page,
-  }) => {
+  test('should open upload dialog when upload button clicked', async ({ page }) => {
     // Wait for page to fully load
     await examplePage.waitForLoadingComplete()
 
@@ -117,9 +115,7 @@ test.describe('Example Management - Delete Workflow', () => {
     await examplePage.navigate()
   })
 
-  test('should show delete button for user-uploaded examples', async ({
-    page,
-  }) => {
+  test('should show delete button for user-uploaded examples', async ({ page }) => {
     await examplePage.waitForLoadingComplete()
 
     // Look for delete buttons in the UI
@@ -132,15 +128,13 @@ test.describe('Example Management - Delete Workflow', () => {
     expect(count).toBeGreaterThanOrEqual(0) // May be 0 if mocks don't render user examples
   })
 
-  test('should open confirmation dialog when delete clicked', async ({
-    page,
-  }) => {
+  test('should open confirmation dialog when delete clicked', async ({ page }) => {
     await examplePage.waitForLoadingComplete()
 
     // Find and click a delete button if available
-    const deleteButton = page.locator(
-      'button:has-text("Delete"), button[aria-label="Delete"]'
-    ).first()
+    const deleteButton = page
+      .locator('button:has-text("Delete"), button[aria-label="Delete"]')
+      .first()
 
     if (await deleteButton.isVisible()) {
       await deleteButton.click()
@@ -177,9 +171,9 @@ test.describe('Example Management - Tab Filtering', () => {
     await examplePage.waitForLoadingComplete()
 
     // Try clicking filter options if available
-    const bundledTab = page.locator(
-      'button:has-text("Bundled"), [role="tab"]:has-text("Bundled")'
-    ).first()
+    const bundledTab = page
+      .locator('button:has-text("Bundled"), [role="tab"]:has-text("Bundled")')
+      .first()
 
     if (await bundledTab.isVisible()) {
       await bundledTab.click()

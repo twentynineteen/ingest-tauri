@@ -4,10 +4,10 @@
  */
 
 import { logger } from '@/utils/logger'
+import { appStore } from '@store/useAppStore'
 import { writeTextFile } from '@tauri-apps/plugin-fs'
+import type { TrelloCard } from '@utils/TrelloCards'
 import { useCallback } from 'react'
-import { appStore } from '../store/useAppStore'
-import type { TrelloCard } from '../utils/TrelloCards'
 import { useAppendBreadcrumbs } from './useAppendBreadcrumbs'
 import { useParsedTrelloDescription } from './useParsedTrelloDescription'
 

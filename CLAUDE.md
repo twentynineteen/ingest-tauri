@@ -9,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Essential Commands
 
 ### Development
+
 ```bash
 npm run dev:tauri          # Start Tauri dev mode with devtools (primary dev command)
 npm run dev                # Start Vite dev server only
@@ -16,19 +17,22 @@ npm run preview            # Preview production build
 ```
 
 ### Building
+
 ```bash
 npm run build:tauri        # Build complete desktop app (creates DMG in /target/build/dmg)
 npm run build              # Build frontend only
 ```
 
 ### Code Quality (Run Before Committing)
+
 ```bash
 npm run eslint:fix         # Fix linting issues automatically
-npm run prettier:fix       # Format code automatically  
+npm run prettier:fix       # Format code automatically
 npm run test               # Run Vitest test suite (migrating from Jest)
 ```
 
 ### Dependency Management
+
 ```bash
 bun install                # Primary package manager for development
 bun update                 # Update dependencies to latest versions
@@ -37,6 +41,7 @@ bunx depcheck              # Detect unused dependencies
 ```
 
 ### Package Updates
+
 ```bash
 # Basic package update commands
 npx npm-check-updates                 # Check for available updates
@@ -46,6 +51,7 @@ npx npm-check-updates -u             # Update all dependencies to latest
 ## Architecture
 
 ### Tech Stack
+
 - **Frontend**: React 18.3 + TypeScript 5.7 + Vite 6.1
 - **Backend**: Tauri 2.0 (Rust) with extensive plugin ecosystem
 - **UI**: TailwindCSS + Radix UI components + Lucide icons
@@ -53,10 +59,11 @@ npx npm-check-updates -u             # Update all dependencies to latest
 - **Testing**: Vitest + Testing Library (migrating from Jest)
 
 ### Project Structure
+
 ```
 src/
 ├── pages/BuildProject/    # Main workflow: file selection, camera assignment, project creation
-├── pages/auth/            # Login/registration system  
+├── pages/auth/            # Login/registration system
 ├── pages/                 # Other features: UploadSprout, UploadTrello, Posterframe, Settings
 ├── components/            # Reusable UI components
 ├── hooks/                 # Custom hooks (useBreadcrumb, useCameraAutoRemap, etc.)
@@ -72,19 +79,23 @@ src-tauri/
 ## Code Conventions
 
 ### TypeScript/React
+
 - **Components**: Functional with React.FC typing, PascalCase files
-- **Hooks**: Prefix with `use`, custom hooks in `/hooks`  
+- **Hooks**: Prefix with `use`, custom hooks in `/hooks`
 - **State**: Zustand stores (suffix with `Store`) over Context API
 - **Data Fetching**: TanStack React Query over useEffect (see migration guide in specs/002-update-legacy-code/)
 - **Path Aliases**: `@components/*` → `src/components/*`
 
 ### Formatting (Auto-configured)
+
 - **Prettier**: 90 char width, single quotes, no semicolons, no trailing commas
 - **Import Sorting**: Automatic with @ianvs/prettier-plugin-sort-imports
 - **Tailwind Classes**: Auto-sorted with prettier-plugin-tailwindcss
 
 ### File Operations
+
 All file operations go through Tauri backend with progress tracking. Key patterns:
+
 - Progress bars for long-running operations
 - Camera assignment validation (1 to numCameras range)
 - Secure storage using Tauri's stronghold plugin
@@ -92,18 +103,21 @@ All file operations go through Tauri backend with progress tracking. Key pattern
 ## Key Business Logic
 
 ### BuildProject Workflow
+
 1. **File Selection**: Multi-select files via Tauri dialog
 2. **Camera Assignment**: Validate and assign camera numbers to footage
 3. **Project Creation**: Generate folder structure + Adobe Premiere integration
 4. **Progress Tracking**: Real-time progress during file operations
 
 ### Baker Workflow (NEW - Branch: 003-a-new-feature)
+
 1. **Drive Selection**: Choose root directory for scanning
 2. **Structure Validation**: Identify BuildProject-compatible folders (Footage/, Graphics/, Renders/, Projects/, Scripts/)
 3. **Breadcrumbs Management**: Update existing or create missing breadcrumbs.json files
 4. **Batch Operations**: Apply changes to multiple project folders with progress tracking
 
 ### External Integrations
+
 - **Adobe Premiere**: Project template generation
 - **Trello**: Project management card updates via REST API (GET /1/cards/{id})
 - **Sprout Video**: Video hosting + posterframe generation, thumbnails cached in breadcrumbs
@@ -111,6 +125,7 @@ All file operations go through Tauri backend with progress tracking. Key pattern
 ### Recent Features
 
 #### Phase 007: AI Script Example Embedding Management (Branch: 007-frontend-script-example)
+
 - **Status**: Implementation Complete
 - **Summary**: Frontend interface for managing script examples used in RAG-powered autocue script formatting
 - **Key Features**:
@@ -131,6 +146,7 @@ All file operations go through Tauri backend with progress tracking. Key pattern
   - See [database-persistence.md](specs/007-frontend-script-example/database-persistence.md)
 
 #### Phase 004: Multiple Video Links and Trello Cards (Branch: 004-embed-multiple-video)
+
 - **Status**: Phase 1 Design Complete (data models, contracts, tests planned)
 - **Summary**: Enhanced breadcrumbs.json to support arrays of video links and Trello cards instead of single values
 - **Key Changes**:
@@ -144,16 +160,19 @@ All file operations go through Tauri backend with progress tracking. Key pattern
 - **User Workflows**: See `specs/004-embed-multiple-video/quickstart.md`
 
 #### Phase 003: Baker Workflow (Branch: 003-a-new-feature - MERGED)
+
 - Folder scanning and breadcrumbs batch management
 - Stale breadcrumbs detection and validation
 - Detailed change previews before applying updates
 
 #### Phase 002: Legacy Code Modernization (MERGED)
+
 - Migrated from useEffect to TanStack React Query for data fetching
 - Refactored large components into focused, reusable pieces
 - Improved error handling and loading states
 
 #### Phase 005: Premiere Template Corruption Fix (MERGED)
+
 - Fixed file corruption when copying Premiere Pro templates during project creation
 - Root cause: Missing `sync_all()` call after `write_all()` in Rust file I/O
 - Solution: Added `file.sync_all()` to guarantee OS buffer flush to disk
@@ -167,3 +186,42 @@ All file operations go through Tauri backend with progress tracking. Key pattern
 - **Package Manager**: Bun (primary) + npm (audit compatibility, maintains dual lock files)
 - **Platform**: Cross-platform desktop app, primary development on macOS
 - **Security**: Uses argon2 for password hashing, JWT for auth, Tauri stronghold for secure storage
+
+## Development Skills
+
+Custom Claude Code skills available in `.claude/skills/` for specialized tasks:
+
+### new-frontend-feature
+
+**Purpose**: Scaffold new frontend pages/features with TDD approach
+
+**When to use**: Creating new pages or tools in the Bucket app
+
+**What it does**:
+
+1. Interactively gathers feature requirements (name, section, icon, description)
+2. Generates comprehensive test suite FIRST (90%+ coverage) using test-specialist
+3. Creates production-ready page component following BuildProject/Baker patterns
+4. Automatically updates routing in app-sidebar.tsx
+5. Verifies all tests pass before completion
+
+**Features**:
+
+- TDD workflow (tests before implementation)
+- Follows established UI patterns (header, numbered steps, error boundaries)
+- Automatic breadcrumb integration
+- Smart icon suggestions based on feature name
+- Master-detail or multi-step layouts
+- Full TypeScript and accessibility support
+
+**Usage**:
+
+```
+Use the new-frontend-feature skill to create a [feature name]
+```
+
+**Related Skills**:
+
+- `test-specialist`: Comprehensive testing and bug fixing
+- `ui-analyzer`: UI consistency audits across pages
+- `ux-animation-guru`: Polish animations and micro-interactions

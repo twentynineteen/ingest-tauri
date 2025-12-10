@@ -5,6 +5,9 @@
  * and breadcrumbs management functionality.
  */
 
+// Import after mocks
+import { useBakerScan } from '@hooks/useBakerScan'
+import BakerPage from '@pages/Baker/Baker'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
@@ -86,10 +89,6 @@ vi.mock('hooks/useBreadcrumb', () => ({
 vi.mock('@tauri-apps/plugin-dialog', () => ({
   open: vi.fn()
 }))
-
-// Import after mocks
-import { useBakerScan } from '@hooks/useBakerScan'
-import BakerPage from '../../src/pages/Baker/Baker'
 
 // Helper to render with providers
 function renderWithProviders(ui: React.ReactElement) {

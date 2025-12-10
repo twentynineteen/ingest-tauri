@@ -9,7 +9,9 @@
 import { CACHE } from '@/constants/timing'
 import { queryKeys } from '@/lib/query-keys'
 import { useAppStore } from '@/store/useAppStore'
+import { TrelloBoard } from '@/types/media'
 import { loadApiKeys, saveApiKeys } from '@/utils/storage'
+import { validateBoardAccess } from '@/utils/trelloBoardValidation'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 // Default board ID (original hardcoded value)
@@ -19,6 +21,8 @@ interface UseTrelloBoardIdReturn {
   boardId: string
   setBoardId: (newBoardId: string) => Promise<void>
   isLoading: boolean
+  /** Validates if the stored board ID is accessible */
+  validateStoredBoardId: (availableBoards: TrelloBoard[]) => boolean
 }
 
 /**
@@ -82,9 +86,15 @@ export function useTrelloBoardId(): UseTrelloBoardIdReturn {
     await saveBoardIdMutation.mutateAsync(valueToSave)
   }
 
+  // Validation function
+  const validateStoredBoardId = (availableBoards: TrelloBoard[]): boolean => {
+    return validateBoardAccess(effectiveBoardId, availableBoards)
+  }
+
   return {
     boardId: effectiveBoardId,
     setBoardId,
-    isLoading
+    isLoading,
+    validateStoredBoardId
   }
 }

@@ -9,16 +9,15 @@
  * - Handle folder creation errors gracefully
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
 import { useProjectFolders } from '@/hooks/useProjectFolders'
+import { mkdir } from '@tauri-apps/plugin-fs'
+import { renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock Tauri APIs
 vi.mock('@tauri-apps/plugin-fs', () => ({
   mkdir: vi.fn()
 }))
-
-import { mkdir } from '@tauri-apps/plugin-fs'
 
 describe('useProjectFolders', () => {
   beforeEach(() => {
@@ -81,9 +80,12 @@ describe('useProjectFolders', () => {
       })
 
       // Should not create Camera 2
-      expect(mkdir).not.toHaveBeenCalledWith('/destination/Test Project/Footage/Camera 2', {
-        recursive: true
-      })
+      expect(mkdir).not.toHaveBeenCalledWith(
+        '/destination/Test Project/Footage/Camera 2',
+        {
+          recursive: true
+        }
+      )
     })
 
     it('should create all required support folders', async () => {
@@ -154,9 +156,9 @@ describe('useProjectFolders', () => {
 
       vi.mocked(mkdir).mockRejectedValueOnce(new Error('Permission denied'))
 
-      await expect(result.current.createMainFolder('/destination/Test Project')).rejects.toThrow(
-        'Permission denied'
-      )
+      await expect(
+        result.current.createMainFolder('/destination/Test Project')
+      ).rejects.toThrow('Permission denied')
     })
   })
 

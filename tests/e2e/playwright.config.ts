@@ -10,10 +10,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: [
-    ['html', { outputFolder: '../../playwright-report' }],
-    ['list']
-  ],
+  reporter: [['html', { outputFolder: '../../playwright-report' }], ['list']],
 
   use: {
     // Base URL for the Vite dev server
@@ -26,22 +23,24 @@ export default defineConfig({
     screenshot: 'only-on-failure',
 
     // Video recording on failure
-    video: 'on-first-retry',
+    video: 'on-first-retry'
   },
 
   // Configure projects for different browsers
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'] }
     },
     // WebKit for macOS testing (skip in CI unless explicitly requested)
-    ...(process.env.CI && !process.env.PLAYWRIGHT_PROJECT?.includes('webkit') ? [] : [
-      {
-        name: 'webkit',
-        use: { ...devices['Desktop Safari'] },
-      }
-    ]),
+    ...(process.env.CI && !process.env.PLAYWRIGHT_PROJECT?.includes('webkit')
+      ? []
+      : [
+          {
+            name: 'webkit',
+            use: { ...devices['Desktop Safari'] }
+          }
+        ])
   ],
 
   // Run local dev server before starting tests
@@ -53,10 +52,10 @@ export default defineConfig({
     // Suppress npm warnings by clearing npm-related environment variables
     env: {
       ...process.env,
-      npm_config_project: undefined,
-    },
+      npm_config_project: undefined
+    }
   },
 
   // Output directory for test artifacts
-  outputDir: '../../test-results',
+  outputDir: '../../test-results'
 })

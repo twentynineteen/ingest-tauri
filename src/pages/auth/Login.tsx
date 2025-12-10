@@ -1,8 +1,8 @@
-import { useAuth } from 'hooks/useAuth'
+import { useAuth } from '@hooks/useAuth'
+import { createNamespacedLogger } from '@utils/logger'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { z } from 'zod'
-import { createNamespacedLogger } from '../../utils/logger'
 
 const logger = createNamespacedLogger('Login')
 

@@ -5,6 +5,7 @@
  * with categorization and before/after value comparison.
  */
 
+import type { DetailedFieldChange, ProjectChangeDetail } from '@/types/baker'
 import {
   AlertCircle,
   ArrowRight,
@@ -20,7 +21,6 @@ import {
   User
 } from 'lucide-react'
 import React, { useState } from 'react'
-import type { DetailedFieldChange, ProjectChangeDetail } from '../types/baker'
 
 interface ProjectChangeDetailViewProps {
   changeDetail: ProjectChangeDetail

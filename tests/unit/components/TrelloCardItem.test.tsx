@@ -13,12 +13,14 @@
  * Total: 8 tests
  */
 
+import type { TrelloCard } from '@/types/baker'
+import { logger } from '@/utils/logger'
+import { TrelloCardItem } from '@components/Baker/TrelloCardItem'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { TrelloCardItem } from '@components/Baker/TrelloCardItem'
-import type { TrelloCard } from '@/types/baker'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock Tauri opener
 vi.mock('@tauri-apps/plugin-opener', () => ({
@@ -34,9 +36,6 @@ vi.mock('@/utils/logger', () => ({
     debug: vi.fn()
   }
 }))
-
-import { openUrl } from '@tauri-apps/plugin-opener'
-import { logger } from '@/utils/logger'
 
 describe('TrelloCardItem Component', () => {
   // Mock functions for callbacks
@@ -118,7 +117,11 @@ describe('TrelloCardItem Component', () => {
 
       // Act
       render(
-        <TrelloCardItem trelloCard={todayCard} onRemove={mockOnRemove} onRefresh={mockOnRefresh} />
+        <TrelloCardItem
+          trelloCard={todayCard}
+          onRemove={mockOnRemove}
+          onRefresh={mockOnRefresh}
+        />
       )
 
       // Assert
@@ -137,7 +140,11 @@ describe('TrelloCardItem Component', () => {
 
       // Act
       render(
-        <TrelloCardItem trelloCard={recentCard} onRemove={mockOnRemove} onRefresh={mockOnRefresh} />
+        <TrelloCardItem
+          trelloCard={recentCard}
+          onRemove={mockOnRemove}
+          onRefresh={mockOnRefresh}
+        />
       )
 
       // Assert
@@ -224,7 +231,11 @@ describe('TrelloCardItem Component', () => {
 
       // Act
       const { container } = render(
-        <TrelloCardItem trelloCard={staleCard} onRemove={mockOnRemove} onRefresh={mockOnRefresh} />
+        <TrelloCardItem
+          trelloCard={staleCard}
+          onRemove={mockOnRemove}
+          onRefresh={mockOnRefresh}
+        />
       )
 
       // Assert

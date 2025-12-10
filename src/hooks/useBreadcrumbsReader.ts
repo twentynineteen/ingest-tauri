@@ -4,9 +4,9 @@
  * Custom React hook for reading and displaying breadcrumbs.json files.
  */
 
+import type { BreadcrumbsFile } from '@/types/baker'
 import { invoke } from '@tauri-apps/api/core'
 import { useCallback, useState } from 'react'
-import type { BreadcrumbsFile } from '../types/baker'
 
 interface UseBreadcrumbsReaderResult {
   breadcrumbs: BreadcrumbsFile | null

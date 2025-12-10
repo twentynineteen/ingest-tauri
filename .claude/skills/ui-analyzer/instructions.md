@@ -19,6 +19,7 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
 **Goal**: Identify all UI files in the codebase
 
 **Steps**:
+
 1. Use `Glob` tool to find all `.tsx` files
 2. Use `Read` or `mcp__serena__get_symbols_overview` to verify files return JSX
 3. Categorize files into:
@@ -36,6 +37,7 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
 **Goal**: Establish baseline patterns from reference page
 
 **Steps**:
+
 1. **Ask user** if they have a preferred reference file
    - If YES: Use their specified file
    - If NO: Default to root component (e.g., `src/App.tsx`) OR main workflow page (e.g., `src/pages/BuildProject/BuildProject.tsx`)
@@ -71,6 +73,7 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
 **Goal**: Compare all other UI files against reference patterns
 
 **Steps**:
+
 1. For each discovered UI file (excluding reference):
    - **Text Hierarchy Audit**:
      - Missing or improper semantic HTML (e.g., using `<div>` instead of `<h2>`)
@@ -102,6 +105,7 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
 **Goal**: Create actionable markdown report
 
 **Steps**:
+
 1. Use the report template (see `report-template.md`)
 2. Include sections:
    - **Executive Summary**: High-level overview of findings
@@ -121,6 +125,7 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
 **Goal**: Apply fixes automatically with user approval
 
 **Steps**:
+
 1. **Present report** to user and ask for approval to proceed
 2. **For each file with issues**:
    - Start with **Critical** priority issues
@@ -146,10 +151,12 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
 ### Text Hierarchy Checks
 
 #### Semantic HTML
+
 - ✅ **Good**: `<h1>Dashboard</h1>` → `<h2>Settings</h2>` → `<h3>Account</h3>`
 - ❌ **Bad**: `<div className="text-2xl font-bold">Dashboard</div>`
 
 #### Visual Hierarchy
+
 - ✅ **Good**: Consistent use of Tailwind classes for headings
   - h1: `text-4xl font-bold`
   - h2: `text-2xl font-semibold`
@@ -157,6 +164,7 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
 - ❌ **Bad**: Random font sizes (`text-3xl`, `text-lg`, `text-2xl` for similar elements)
 
 #### ARIA Labels
+
 - ✅ **Good**: `<button aria-label="Close dialog">×</button>`
 - ❌ **Bad**: `<button>×</button>` (no context for screen readers)
 
@@ -165,6 +173,7 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
 ### Visual Theme Checks
 
 #### Color Palette
+
 - Extract theme colors from Tailwind config or reference file
 - Common patterns:
   - Primary: `bg-blue-500`, `text-blue-600`
@@ -174,6 +183,7 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
 - Flag deviations (e.g., using `bg-blue-600` when `bg-blue-500` is standard)
 
 #### Spacing Patterns
+
 - Consistent use of Tailwind spacing scale (4px increments)
 - Common patterns:
   - Container padding: `p-4` or `p-6`
@@ -182,6 +192,7 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
 - Flag inconsistencies (e.g., using `p-3` when `p-4` is standard)
 
 #### Typography Scale
+
 - Consistent font sizes across similar elements
 - Common patterns:
   - Body text: `text-base` (16px)
@@ -190,6 +201,7 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
 - Flag inconsistencies (e.g., using `text-lg` for body text in one file, `text-base` in another)
 
 #### Component Patterns
+
 - Buttons should have consistent styles:
   - Primary: `bg-blue-500 text-white hover:bg-blue-600`
   - Secondary: `bg-gray-200 text-gray-700 hover:bg-gray-300`
@@ -203,6 +215,7 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
 ### Accessibility Checks (WCAG 2.1 Level AA)
 
 #### Color Contrast
+
 - **Normal text**: 4.5:1 minimum
 - **Large text** (18pt+ or 14pt+ bold): 3.1:1 minimum
 - Use contrast checker tools or manual calculation
@@ -211,6 +224,7 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
   - Low-contrast button states
 
 #### Keyboard Navigation
+
 - All interactive elements must be keyboard accessible
 - Check for:
   - Proper `tabIndex` attributes
@@ -221,6 +235,7 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
   - No visible focus outline
 
 #### Screen Reader Support
+
 - Use semantic HTML where possible
 - Add ARIA attributes when needed
 - Check for:
@@ -234,6 +249,7 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
   - Complex interactive widgets without ARIA
 
 #### Forms
+
 - All inputs must have associated labels
 - Error messages must be announced to screen readers
 - Check for:
@@ -250,11 +266,13 @@ You are a UI consistency and accessibility specialist. Your role is to ensure al
 
 Use the following structure for audit reports:
 
-```markdown
+````markdown
 # UI Audit Report
+
 Generated: {timestamp}
 
 ## Executive Summary
+
 - Total UI files: {count}
 - Reference file: {path}
 - Critical issues: {count}
@@ -263,33 +281,43 @@ Generated: {timestamp}
 - Low priority issues: {count}
 
 ## File Inventory
+
 ### Pages ({count})
+
 - [filename.tsx](path)
 
 ### Components ({count})
+
 - [filename.tsx](path)
 
 ### Root/Entry ({count})
+
 - [filename.tsx](path)
 
 ## Reference Analysis
+
 **File**: [filename.tsx](path)
 
 ### Design System Patterns
+
 **Colors**:
+
 - Primary: `bg-blue-500`, `text-blue-600`
 - Secondary: `bg-gray-200`, `text-gray-700`
 
 **Typography**:
+
 - h1: `text-4xl font-bold`
 - h2: `text-2xl font-semibold`
 - Body: `text-base`
 
 **Spacing**:
+
 - Container: `p-6`
 - Gaps: `gap-4`
 
 **Components**:
+
 - Primary Button: `bg-blue-500 text-white px-4 py-2 rounded-md`
 
 ## Issues by File
@@ -297,10 +325,12 @@ Generated: {timestamp}
 ### [filename.tsx](path)
 
 #### Critical Issues
+
 1. **Missing ARIA label on close button** (Line X)
    - **Issue**: Button with icon only, no accessible label
    - **Impact**: Screen reader users cannot identify button purpose
    - **Fix**:
+
      ```tsx
      // Before
      <button onClick={handleClose}>×</button>
@@ -310,54 +340,67 @@ Generated: {timestamp}
      ```
 
 #### High Priority Issues
+
 [...]
 
 #### Medium Priority Issues
+
 [...]
 
 #### Low Priority Issues
+
 [...]
 
 ## Implementation Plan
 
 ### Phase 1: Critical Fixes (Priority: Immediate)
+
 - [ ] Fix ARIA labels in [file1.tsx](path)
 - [ ] Fix keyboard navigation in [file2.tsx](path)
 
 ### Phase 2: High Priority Fixes (Priority: High)
+
 - [ ] Standardize heading hierarchy in [file3.tsx](path)
 - [ ] Fix color contrast in [file4.tsx](path)
 
 ### Phase 3: Medium Priority Fixes (Priority: Medium)
+
 - [ ] Align spacing patterns in [file5.tsx](path)
 
 ### Phase 4: Low Priority Optimizations (Priority: Low)
+
 - [ ] Optimize Tailwind classes in [file6.tsx](path)
 
 ## Next Steps
+
 1. Review report and approve fixes
 2. Run `test-specialist` skill for automated accessibility testing
 3. Apply fixes in priority order
 4. Re-audit to verify consistency
-```
+````
 
 ---
 
 ## Integration with Other Skills
 
 ### test-specialist
+
 After fixing accessibility issues, invoke `test-specialist` to:
+
 - Run automated accessibility tests (axe-core, jest-axe)
 - Validate WCAG compliance
 - Generate test coverage report
 
 **Example**:
+
 ```
 I've completed the UI fixes. Now invoking test-specialist to validate accessibility compliance.
 ```
 
 ### Custom Skills
+
 Coordinate with other skills as needed:
+
 - For Tailwind optimization: Reference tailwind-audit patterns
 - For component library: Ensure consistency with design system
 
@@ -366,30 +409,40 @@ Coordinate with other skills as needed:
 ## Best Practices
 
 ### 1. Always Ask for Reference
+
 Before starting analysis, ask the user:
+
 > "Would you like to specify a reference file for baseline patterns, or should I default to [App.tsx or main workflow page]?"
 
 ### 2. Start Small
+
 Don't overwhelm the user with fixes for 50 files at once. Suggest:
+
 - Fix 1-2 critical files first
 - Validate approach with user
 - Proceed to remaining files
 
 ### 3. Explain Changes
+
 For complex fixes, add comments explaining WHY the change was made:
+
 ```tsx
 // Changed to semantic heading for accessibility and SEO
 <h2 className="text-2xl font-semibold">Settings</h2>
 ```
 
 ### 4. Preserve Functionality
+
 Never break existing functionality while fixing UI issues:
+
 - Test interactive elements after fixes
 - Verify event handlers still work
 - Check conditional rendering logic
 
 ### 5. Be Conservative
+
 If unsure about a fix (e.g., color change might affect branding):
+
 - Document the issue
 - Ask user for approval before changing
 - Provide reasoning for suggestion
@@ -399,6 +452,7 @@ If unsure about a fix (e.g., color change might affect branding):
 ## Common Issues & Fixes
 
 ### Issue: Div Soup (Non-Semantic HTML)
+
 ```tsx
 // Before
 <div className="text-2xl font-bold">Page Title</div>
@@ -410,6 +464,7 @@ If unsure about a fix (e.g., color change might affect branding):
 ```
 
 ### Issue: Missing Focus States
+
 ```tsx
 // Before
 <button className="bg-blue-500 text-white">Click Me</button>
@@ -421,6 +476,7 @@ If unsure about a fix (e.g., color change might affect branding):
 ```
 
 ### Issue: Icon-Only Buttons
+
 ```tsx
 // Before
 <button onClick={handleDelete}>
@@ -434,6 +490,7 @@ If unsure about a fix (e.g., color change might affect branding):
 ```
 
 ### Issue: Low Contrast Text
+
 ```tsx
 // Before
 <p className="text-gray-400">This text is hard to read</p>
@@ -443,6 +500,7 @@ If unsure about a fix (e.g., color change might affect branding):
 ```
 
 ### Issue: Unlabeled Form Inputs
+
 ```tsx
 // Before
 <input type="text" placeholder="Enter name" />
@@ -453,6 +511,7 @@ If unsure about a fix (e.g., color change might affect branding):
 ```
 
 ### Issue: Inconsistent Spacing
+
 ```tsx
 // Before (one file)
 <div className="p-3 gap-3">...</div>
@@ -466,6 +525,7 @@ If unsure about a fix (e.g., color change might affect branding):
 ## Error Handling
 
 If errors occur during analysis or fixes:
+
 1. **Document the error** in the report
 2. **Skip problematic file** and continue with others
 3. **Ask user for guidance** if error is blocking
@@ -476,6 +536,7 @@ If errors occur during analysis or fixes:
 ## Success Criteria
 
 A successful UI audit and fix should result in:
+
 - ✅ All UI files cataloged
 - ✅ Reference patterns documented
 - ✅ All Critical and High priority issues fixed
@@ -492,6 +553,7 @@ A successful UI audit and fix should result in:
 **User**: "Analyze and fix UI consistency issues across the app"
 
 **Your Response**:
+
 1. "I'll analyze the UI for consistency and accessibility. Would you like to specify a reference file, or should I use [src/pages/BuildProject/BuildProject.tsx] as the baseline?"
 2. [User responds or approves default]
 3. Use Glob to find all `.tsx` files

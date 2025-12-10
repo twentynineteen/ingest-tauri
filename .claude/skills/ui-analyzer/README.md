@@ -5,6 +5,7 @@ A comprehensive UI consistency and accessibility analysis skill for React/TypeSc
 ## What It Does
 
 The UI Analyzer skill performs multi-phase audits of your UI components to ensure:
+
 - ✅ **Text Hierarchy**: Proper semantic HTML, visual hierarchy, and ARIA labels
 - ✅ **Visual Consistency**: Unified color palettes, spacing, typography, and component patterns
 - ✅ **Accessibility**: WCAG 2.1 Level AA compliance for all users
@@ -13,6 +14,7 @@ The UI Analyzer skill performs multi-phase audits of your UI components to ensur
 ## When to Use
 
 Invoke this skill when you need to:
+
 - Audit UI consistency across pages and components
 - Ensure accessibility compliance (WCAG 2.1 AA)
 - Standardize design system patterns
@@ -47,6 +49,7 @@ Skill:
 ## Output
 
 The skill generates a comprehensive markdown report including:
+
 - File inventory (pages, components, root files)
 - Reference pattern documentation
 - Issues grouped by priority (Critical → Low)
@@ -60,31 +63,38 @@ Reports are saved to `.claude/reports/ui-audit-{timestamp}.md`
 ## Integration with Other Skills
 
 ### test-specialist
+
 After applying fixes, the skill can invoke `test-specialist` to:
+
 - Run automated accessibility tests
 - Validate WCAG compliance
 - Generate test coverage reports
 
 ### Custom Skills
+
 Coordinates with other skills for comprehensive quality:
+
 - References tailwind-auditor patterns for CSS consistency
 - Ensures design system alignment
 
 ## What It Checks
 
 ### Text Hierarchy
+
 - Semantic HTML elements (`<h1>`, `<h2>`, `<h3>`, etc.)
 - Visual hierarchy (consistent Tailwind font classes)
 - ARIA labels and roles for accessibility
 - Proper heading level progression
 
 ### Visual Theme
+
 - Color palette consistency (Tailwind theme colors)
 - Spacing patterns (padding, margins, gaps)
 - Typography scale (font sizes, weights, line heights)
 - Component patterns (buttons, cards, forms)
 
 ### Accessibility (WCAG 2.1 Level AA)
+
 - Color contrast ratios (4.5:1 for normal text, 3:1 for large)
 - Keyboard navigation (tabIndex, focus states)
 - Screen reader support (ARIA, semantic HTML)
@@ -93,6 +103,7 @@ Coordinates with other skills for comprehensive quality:
 ## Priority Levels
 
 Issues are categorized by severity:
+
 - **Critical**: Blocks accessibility, WCAG failures
 - **High**: Major inconsistencies, wrong heading levels
 - **Medium**: Minor inconsistencies, spacing variations
@@ -114,6 +125,7 @@ Issues are categorized by severity:
 ## Example Fixes
 
 ### Before
+
 ```tsx
 // Non-semantic HTML
 <div className="text-2xl font-bold">Dashboard</div>
@@ -129,6 +141,7 @@ Issues are categorized by severity:
 ```
 
 ### After
+
 ```tsx
 // Semantic HTML
 <h1 className="text-2xl font-bold">Dashboard</h1>

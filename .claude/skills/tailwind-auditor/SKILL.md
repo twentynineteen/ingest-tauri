@@ -137,6 +137,7 @@ This is the main refactoring phase with checkpoint-based progress.
    - Highlight changed classes
    - Explain reasoning for each mapping
    - Example:
+
      ```diff
      - <button className="bg-blue-500 hover:bg-blue-600 text-white">
      + <button className="bg-primary hover:bg-primary/90 text-primary-foreground">
@@ -206,6 +207,7 @@ This is the main refactoring phase with checkpoint-based progress.
 Follow these semantic mappings for consistent theming:
 
 #### Interactive Elements (Buttons, Links, Focus States)
+
 - Primary action: `bg-blue-*` → `bg-primary`
 - Secondary action: `bg-gray-*` → `bg-secondary`
 - Destructive action: `bg-red-*` → `bg-destructive`
@@ -213,24 +215,28 @@ Follow these semantic mappings for consistent theming:
 - Focus states: Use `ring-ring` for focus rings
 
 #### Status/Feedback Colors
+
 - Success: `text-green-*`, `bg-green-*` → `text-success`, `bg-success`
 - Warning: `text-amber-*`, `text-orange-*`, `bg-yellow-*` → `text-warning`, `bg-warning`
 - Error: `text-red-*`, `bg-red-*` → `text-destructive`, `bg-destructive`
 - Info: `text-blue-*`, `bg-blue-*` → `text-info`, `bg-info`
 
 #### Text Colors
+
 - Primary text: `text-gray-900`, `text-black` → `text-foreground`
 - Secondary text: `text-gray-600`, `text-gray-500` → `text-muted-foreground`
 - Disabled text: `text-gray-400` → `text-muted-foreground/50`
 - Link text: `text-blue-600` → `text-primary`
 
 #### Background Colors
+
 - Page background: `bg-white`, `bg-gray-50` → `bg-background`
 - Card background: `bg-white`, `bg-gray-100` → `bg-card`
 - Muted background: `bg-gray-100`, `bg-gray-200` → `bg-muted`
 - Accent background: `bg-blue-50` → `bg-accent`
 
 #### Border Colors
+
 - Default border: `border-gray-300`, `border-gray-200` → `border-border`
 - Input border: `border-gray-300` → `border-input`
 - Focus border: `border-blue-500` → `border-ring`
@@ -238,13 +244,17 @@ Follow these semantic mappings for consistent theming:
 ### Spacing and Sizing
 
 #### Arbitrary Values
+
 Replace with standard Tailwind scale when possible:
+
 - `w-[460px]` → `w-[28.75rem]` or use closest standard: `w-96` (384px)
 - `p-[1.5rem]` → `p-6` (1.5rem standard)
 - `h-[48px]` → `h-12` (3rem = 48px)
 
 #### Custom Radius
+
 If project uses custom radius variables (`--radius-sm`, etc.):
+
 - `rounded-[8px]` → `rounded-lg` or use CSS variable directly
 
 ### Dark Mode Handling
@@ -309,6 +319,7 @@ The skill uses these detection strategies:
 ### Report Format
 
 Markdown reports include:
+
 - YAML frontmatter with metadata
 - Executive summary section
 - Detailed findings per file
@@ -459,6 +470,7 @@ This skill is tailored for the Bucket project's stack:
 ### Working with Existing UI Library
 
 The project uses shadcn/ui components in `src/components/ui/`:
+
 - These already use semantic tokens correctly
 - Focus audit on pages and custom components
 - Use UI components as reference for correct patterns
@@ -479,31 +491,37 @@ status: in_progress
 # Tailwind CSS Audit Report
 
 ## Executive Summary
+
 ...
 
 ## Files Requiring Refactoring
 
 ### High Priority (>15 violations)
+
 - [ ] src/components/ProjectChangeDetailView.tsx (24 violations)
 - [ ] src/pages/auth/Login.tsx (18 violations)
 - [ ] src/components/Baker/TrelloCardItem.tsx (12 violations)
 
 ### Medium Priority (5-15 violations)
+
 - [ ] src/pages/BuildProject/ProgressBar.tsx (8 violations)
 - [ ] src/components/Baker/VideoLinks/AddVideoDialog.tsx (7 violations)
-...
+      ...
 
 ### Low Priority (<5 violations)
+
 - [ ] src/components/Header.tsx (3 violations)
-...
+      ...
 
 ## Detailed Findings
+
 ...
 ```
 
 ### Checkpoint Updates
 
 After each file is refactored:
+
 ```markdown
 - [x] src/components/ProjectChangeDetailView.tsx (24 violations) - Completed 2025-12-08 14:35
 - [x] src/pages/auth/Login.tsx (18 violations) - Completed 2025-12-08 14:42
@@ -532,6 +550,7 @@ After each file is refactored:
 ## Future Enhancements
 
 Potential additions for future versions:
+
 - Auto-detect context from component purpose (button vs. status indicator)
 - Generate visual diff screenshots before/after
 - Integration with design tokens from Figma
@@ -542,6 +561,7 @@ Potential additions for future versions:
 ## Support
 
 If you encounter issues:
+
 1. Check the generated audit report for specific errors
 2. Review the error handling section above
 3. Ensure your theme file (src/index.css) is valid

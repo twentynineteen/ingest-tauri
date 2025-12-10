@@ -1,23 +1,23 @@
 // Modern Hero Section Layout
 // Copy and customize this layout for your Next.js landing pages
 
-import React from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/utils'
+import React from 'react'
 
 interface HeroSectionProps {
-  variant?: 'centered' | 'split' | 'minimal';
-  title: string;
-  subtitle: string;
+  variant?: 'centered' | 'split' | 'minimal'
+  title: string
+  subtitle: string
   ctaPrimary?: {
-    text: string;
-    onClick: () => void;
-  };
+    text: string
+    onClick: () => void
+  }
   ctaSecondary?: {
-    text: string;
-    onClick: () => void;
-  };
-  image?: string;
-  backgroundGradient?: boolean;
+    text: string
+    onClick: () => void
+  }
+  image?: string
+  backgroundGradient?: boolean
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
@@ -27,7 +27,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   ctaPrimary,
   ctaSecondary,
   image,
-  backgroundGradient = true,
+  backgroundGradient = true
 }) => {
   if (variant === 'centered') {
     return (
@@ -75,7 +75,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           </div>
         </div>
       </section>
-    );
+    )
   }
 
   if (variant === 'split') {
@@ -92,9 +92,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 mb-6">
                 {title}
               </h1>
-              <p className="text-xl text-slate-600 mb-8">
-                {subtitle}
-              </p>
+              <p className="text-xl text-slate-600 mb-8">{subtitle}</p>
               <div className="flex flex-col sm:flex-row gap-4">
                 {ctaPrimary && (
                   <button
@@ -116,17 +114,13 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             </div>
             {image && (
               <div className="animate-fade-in-up stagger-item-2">
-                <img
-                  src={image}
-                  alt="Hero"
-                  className="rounded-xl shadow-2xl"
-                />
+                <img src={image} alt="Hero" className="rounded-xl shadow-2xl" />
               </div>
             )}
           </div>
         </div>
       </section>
-    );
+    )
   }
 
   // Minimal variant
@@ -161,8 +155,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         )}
       </div>
     </section>
-  );
-};
+  )
+}
 
 // Example usage:
 // <HeroSection

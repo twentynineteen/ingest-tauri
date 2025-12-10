@@ -1,12 +1,12 @@
-import { describe, expect, it } from 'vitest'
+import type { BreadcrumbsFile, FileInfo } from '@/types/baker'
 import {
-  validateBreadcrumbs,
-  recoverBreadcrumbs,
-  hasSchemaIssues,
   getErrorMessage,
+  hasSchemaIssues,
+  recoverBreadcrumbs,
+  validateBreadcrumbs,
   type ValidationResult
-} from '../../../src/utils/breadcrumbsValidation'
-import type { BreadcrumbsFile, FileInfo } from '../../../src/types/baker'
+} from '@utils/breadcrumbsValidation'
+import { describe, expect, it } from 'vitest'
 
 describe('breadcrumbsValidation', () => {
   describe('validateBreadcrumbs', () => {
@@ -206,9 +206,7 @@ describe('breadcrumbsValidation', () => {
         const data = {
           projectTitle: 'Test',
           numberOfCameras: 2,
-          files: [
-            { camera: 0, name: 'file1.mp4', path: '/path/to/file1.mp4' }
-          ]
+          files: [{ camera: 0, name: 'file1.mp4', path: '/path/to/file1.mp4' }]
         }
 
         const result = validateBreadcrumbs(data)
@@ -222,9 +220,7 @@ describe('breadcrumbsValidation', () => {
         const data = {
           projectTitle: 'Test',
           numberOfCameras: 1,
-          files: [
-            { name: 'file1.mp4', path: '/path/to/file1.mp4' }
-          ]
+          files: [{ name: 'file1.mp4', path: '/path/to/file1.mp4' }]
         }
 
         const result = validateBreadcrumbs(data)
@@ -238,9 +234,7 @@ describe('breadcrumbsValidation', () => {
         const data = {
           projectTitle: 'Test',
           numberOfCameras: 1,
-          files: [
-            { camera: 1, name: '', path: '/path/to/file.mp4' }
-          ]
+          files: [{ camera: 1, name: '', path: '/path/to/file.mp4' }]
         }
 
         const result = validateBreadcrumbs(data)
@@ -254,9 +248,7 @@ describe('breadcrumbsValidation', () => {
         const data = {
           projectTitle: 'Test',
           numberOfCameras: 1,
-          files: [
-            { camera: 1, name: 'file1.mp4', path: '' }
-          ]
+          files: [{ camera: 1, name: 'file1.mp4', path: '' }]
         }
 
         const result = validateBreadcrumbs(data)
@@ -270,9 +262,7 @@ describe('breadcrumbsValidation', () => {
         const data = {
           projectTitle: 'Test',
           numberOfCameras: 1,
-          files: [
-            { camera: 1, name: '  file1.mp4  ', path: '  /path/to/file1.mp4  ' }
-          ]
+          files: [{ camera: 1, name: '  file1.mp4  ', path: '  /path/to/file1.mp4  ' }]
         }
 
         const result = validateBreadcrumbs(data)
@@ -424,9 +414,7 @@ describe('breadcrumbsValidation', () => {
       const data = {
         projectTitle: 'Test Project',
         numberOfCameras: 2,
-        files: [
-          { camera: 1, name: 'file1.mp4', path: '/path/to/file1.mp4' }
-        ]
+        files: [{ camera: 1, name: 'file1.mp4', path: '/path/to/file1.mp4' }]
       }
 
       const result = recoverBreadcrumbs(data, '/projects/Test Project')
@@ -496,9 +484,7 @@ describe('breadcrumbsValidation', () => {
 
     it('should return false for valid schema', () => {
       const data = {
-        files: [
-          { camera: 1, name: 'file1.mp4', path: '/path/to/file1.mp4' }
-        ]
+        files: [{ camera: 1, name: 'file1.mp4', path: '/path/to/file1.mp4' }]
       }
 
       expect(hasSchemaIssues(data)).toBe(false)
@@ -528,9 +514,7 @@ describe('breadcrumbsValidation', () => {
     it('should return single error message', () => {
       const result: ValidationResult = {
         isValid: false,
-        errors: [
-          { field: 'test', message: 'Test error', severity: 'error' }
-        ],
+        errors: [{ field: 'test', message: 'Test error', severity: 'error' }],
         warnings: [],
         canRecover: false
       }
