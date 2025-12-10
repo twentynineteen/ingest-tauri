@@ -8,7 +8,26 @@
 import { AddVideoDialog } from '@/components/Baker/VideoLinks/AddVideoDialog'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import React from 'react'
 import { describe, expect, test, vi } from 'vitest'
+
+// Mock framer-motion to avoid animation issues in tests
+vi.mock('framer-motion', () => ({
+  motion: new Proxy(
+    {},
+    {
+      get: (_, prop) => {
+        const Component = React.forwardRef<any, any>((props, ref) => {
+          const { children, ...rest } = props
+          return React.createElement(prop as string, { ...rest, ref }, children)
+        })
+        Component.displayName = `motion.${String(prop)}`
+        return Component
+      }
+    }
+  ),
+  AnimatePresence: ({ children }: any) => children
+}))
 
 // Type definitions for grouped parameters
 export interface DialogState {

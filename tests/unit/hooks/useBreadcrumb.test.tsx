@@ -6,7 +6,7 @@
 import { useBreadcrumb } from '@/hooks/useBreadcrumb'
 import { useBreadcrumbStore } from '@/store/useBreadcrumbStore'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { renderHook, waitFor } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock the Zustand store
@@ -268,17 +268,20 @@ describe('useBreadcrumb', () => {
       })
 
       // Wait for any pending updates to settle
-      await new Promise(resolve => setTimeout(resolve, 50))
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 50))
+      })
 
       // Get the fetch status before focus
       const queryStateBefore = queryClient.getQueryState(['user', 'breadcrumb'])
       const fetchStatusBefore = queryStateBefore?.fetchStatus
 
       // Simulate window focus
-      window.dispatchEvent(new Event('focus'))
-
-      // Wait a bit to ensure no refetch happens
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await act(async () => {
+        window.dispatchEvent(new Event('focus'))
+        // Wait a bit to ensure no refetch happens
+        await new Promise(resolve => setTimeout(resolve, 100))
+      })
 
       // Query should not be fetching after focus (refetchOnWindowFocus: false)
       const queryStateAfter = queryClient.getQueryState(['user', 'breadcrumb'])
