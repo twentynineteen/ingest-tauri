@@ -8,10 +8,12 @@
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::PathBuf;
-use std::process::Command;
 
 use tauri::{AppHandle, Manager};
 use zip::ZipArchive;
+
+#[cfg(any(target_os = "macos", target_os = "windows"))]
+use std::process::Command;
 
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
@@ -73,6 +75,7 @@ fn get_cep_extensions_dir() -> Result<PathBuf, String> {
 
 /// Check if a plugin is installed by verifying the plugin directory
 /// and manifest.xml file exist in either system or user directory
+#[cfg_attr(not(any(target_os = "macos", target_os = "windows")), allow(unused_variables))]
 fn check_plugin_installed_internal(plugin_name: &str) -> Result<bool, String> {
     #[cfg(target_os = "macos")]
     {
