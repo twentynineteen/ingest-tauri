@@ -3,11 +3,11 @@
  * Feature: 007-frontend-script-example
  */
 
-import { renderHook, act } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useScriptFileUpload } from '@/hooks/useScriptFileUpload'
 import * as tauriDialog from '@tauri-apps/plugin-dialog'
 import * as tauriFs from '@tauri-apps/plugin-fs'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@tauri-apps/plugin-dialog')
 vi.mock('@tauri-apps/plugin-fs')

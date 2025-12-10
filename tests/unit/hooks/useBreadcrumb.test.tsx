@@ -3,11 +3,11 @@
  * Purpose: Test breadcrumb state management with React Query and Zustand
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useBreadcrumb } from '@/hooks/useBreadcrumb'
 import { useBreadcrumbStore } from '@/store/useBreadcrumbStore'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock the Zustand store
 vi.mock('@/store/useBreadcrumbStore', () => ({
@@ -32,7 +32,7 @@ describe('useBreadcrumb', () => {
       defaultOptions: {
         queries: {
           retry: false,
-          refetchOnWindowFocus: false  // Disable auto refetch on window focus
+          refetchOnWindowFocus: false // Disable auto refetch on window focus
         },
         mutations: { retry: false }
       }
@@ -173,10 +173,7 @@ describe('useBreadcrumb', () => {
     })
 
     it('should use "#" for items without href', async () => {
-      const items = [
-        { label: 'Home', href: '/' },
-        { label: 'Current' }
-      ]
+      const items = [{ label: 'Home', href: '/' }, { label: 'Current' }]
 
       const { result } = renderHookWithClient(items)
 
@@ -224,7 +221,9 @@ describe('useBreadcrumb', () => {
         <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
       )
 
-      rerender({ children: renderHook(() => useBreadcrumb(newItems), { wrapper }).result })
+      rerender({
+        children: renderHook(() => useBreadcrumb(newItems), { wrapper }).result
+      })
 
       await waitFor(() => {
         expect(mockSetBreadcrumbs).toHaveBeenCalled()
@@ -269,17 +268,20 @@ describe('useBreadcrumb', () => {
       })
 
       // Wait for any pending updates to settle
-      await new Promise(resolve => setTimeout(resolve, 50))
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 50))
+      })
 
       // Get the fetch status before focus
       const queryStateBefore = queryClient.getQueryState(['user', 'breadcrumb'])
       const fetchStatusBefore = queryStateBefore?.fetchStatus
 
       // Simulate window focus
-      window.dispatchEvent(new Event('focus'))
-
-      // Wait a bit to ensure no refetch happens
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await act(async () => {
+        window.dispatchEvent(new Event('focus'))
+        // Wait a bit to ensure no refetch happens
+        await new Promise(resolve => setTimeout(resolve, 100))
+      })
 
       // Query should not be fetching after focus (refetchOnWindowFocus: false)
       const queryStateAfter = queryClient.getQueryState(['user', 'breadcrumb'])

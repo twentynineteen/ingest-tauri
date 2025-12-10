@@ -1,18 +1,21 @@
+import { CACHE } from '@constants/timing'
+import { queryKeys } from '@lib/query-keys'
+import { createQueryError, createQueryOptions, shouldRetry } from '@lib/query-utils'
 import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
-import { loadApiKeys } from 'utils/storage'
+import { loadApiKeys } from '@utils/storage'
 import {
   fetchTrelloCards,
   fetchTrelloLists,
   groupCardsByList,
   TrelloCard
-} from 'utils/TrelloCards'
-import { CACHE } from '../constants/timing'
-import { queryKeys } from '../lib/query-keys'
-import { createQueryError, createQueryOptions, shouldRetry } from '../lib/query-utils'
+} from '@utils/TrelloCards'
+import { useMemo } from 'react'
+
+import { logger } from '@/utils/logger'
 
 interface TrelloBoardData {
   grouped: Record<string, TrelloCard[]>
+  allCards: TrelloCard[]
   isLoading: boolean
   apiKey: string | null
   token: string | null
@@ -80,15 +83,21 @@ export function useTrelloBoard(boardId: string): TrelloBoardData {
       try {
         return groupCardsByList(cards, lists)
       } catch (error) {
-        console.error('Error grouping Trello cards:', error)
+        logger.error('Error grouping Trello cards:', error)
         return {}
       }
     }
     return {}
   }, [cards, lists, isDataReady])
 
+  // Flatten all cards for search/filtering
+  const allCards = useMemo(() => {
+    return cards || []
+  }, [cards])
+
   return {
     grouped,
+    allCards,
     isLoading,
     apiKey,
     token

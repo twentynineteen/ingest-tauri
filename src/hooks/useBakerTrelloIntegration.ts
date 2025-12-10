@@ -7,6 +7,8 @@
 import { readTextFile } from '@tauri-apps/plugin-fs'
 import { useCallback } from 'react'
 
+import { logger } from '@/utils/logger'
+
 interface TrelloError {
   project: string
   error: string
@@ -46,7 +48,7 @@ async function updateSingleTrelloCard(
     idList: ''
   }
 
-  const { updateTrelloCardWithBreadcrumbs } = await import('hooks/useAppendBreadcrumbs')
+  const { updateTrelloCardWithBreadcrumbs } = await import('@hooks/useAppendBreadcrumbs')
 
   await updateTrelloCardWithBreadcrumbs(mockCard, breadcrumbsBlock, apiKey, token, {
     autoReplace: true,
@@ -63,7 +65,7 @@ async function updateProjectTrelloCards(
   apiKey: string,
   token: string
 ): Promise<void> {
-  const { generateBreadcrumbsBlock } = await import('hooks/useAppendBreadcrumbs')
+  const { generateBreadcrumbsBlock } = await import('@hooks/useAppendBreadcrumbs')
 
   const block = generateBreadcrumbsBlock(breadcrumbsData)
   if (!block) return
@@ -75,9 +77,9 @@ async function updateProjectTrelloCards(
 
   if (trelloCards && trelloCards.length > 0) {
     // Update all cards in the array asynchronously
-    const updatePromises = trelloCards.map(card =>
-      updateSingleTrelloCard(card.cardId, block, apiKey, token).catch(err => {
-        console.warn(`Failed to update Trello card ${card.cardId}:`, err)
+    const updatePromises = trelloCards.map((card) =>
+      updateSingleTrelloCard(card.cardId, block, apiKey, token).catch((err) => {
+        logger.warn(`Failed to update Trello card ${card.cardId}:`, err)
         throw err // Re-throw to be caught by Promise.allSettled
       })
     )
@@ -88,10 +90,7 @@ async function updateProjectTrelloCards(
     // Log any failures but don't throw
     results.forEach((result, index) => {
       if (result.status === 'rejected') {
-        console.error(
-          `Failed to update card ${trelloCards[index].cardId}:`,
-          result.reason
-        )
+        logger.error(`Failed to update card ${trelloCards[index].cardId}:`, result.reason)
       }
     })
 
@@ -136,7 +135,7 @@ export function useBakerTrelloIntegration({
             error:
               trelloError instanceof Error ? trelloError.message : String(trelloError)
           })
-          console.warn(`Failed to update Trello card for ${projectPath}:`, trelloError)
+          logger.warn(`Failed to update Trello card for ${projectPath}:`, trelloError)
         }
       }
 

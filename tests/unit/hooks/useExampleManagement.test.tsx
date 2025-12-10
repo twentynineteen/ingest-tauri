@@ -3,12 +3,12 @@
  * Feature: 007-frontend-script-example
  */
 
-import { renderHook, waitFor } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useExampleManagement } from '@/hooks/useExampleManagement'
 import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import * as tauriCore from '@tauri-apps/api/core'
+import { renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@tauri-apps/api/core', () => ({
   invoke: vi.fn()
@@ -35,11 +35,16 @@ describe('useExampleManagement Hook - Contract Tests (T017)', () => {
   beforeEach(() => {
     queryClient = new QueryClient({
       defaultOptions: {
-        queries: { retry: false },
+        queries: {
+          retry: false,
+          staleTime: Infinity // Prevent automatic refetches
+        },
         mutations: { retry: false }
       }
     })
     vi.clearAllMocks()
+    // Set up default mock before each test
+    vi.mocked(tauriCore.invoke).mockResolvedValue(mockExamples)
   })
 
   const wrapper = ({ children }: { children: React.ReactNode }) => {
@@ -49,8 +54,6 @@ describe('useExampleManagement Hook - Contract Tests (T017)', () => {
   it('should fetch examples using TanStack Query', async () => {
     // Contract: Must use useQuery with key ['examples', 'list']
     // Contract: Must call get_all_examples_with_metadata Tauri command
-    vi.mocked(tauriCore.invoke).mockResolvedValueOnce(mockExamples)
-
     const { result } = renderHook(() => useExampleManagement(), { wrapper })
 
     await waitFor(() => {
@@ -64,14 +67,14 @@ describe('useExampleManagement Hook - Contract Tests (T017)', () => {
   it('should provide upload mutation', async () => {
     // Contract: Must return useMutation for upload_example
     // Contract: Upload must invalidate examples query cache
-    vi.mocked(tauriCore.invoke).mockResolvedValueOnce(mockExamples)
-    vi.mocked(tauriCore.invoke).mockResolvedValueOnce('new-id')
-
     const { result } = renderHook(() => useExampleManagement(), { wrapper })
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
     })
+
+    // Mock the upload response after initial query loads
+    vi.mocked(tauriCore.invoke).mockResolvedValueOnce('new-id')
 
     const uploadRequest = {
       beforeContent: 'Before',
@@ -95,14 +98,14 @@ describe('useExampleManagement Hook - Contract Tests (T017)', () => {
   it('should provide replace mutation', async () => {
     // Contract: Must return useMutation for replace_example
     // Contract: Replace must invalidate examples query cache
-    vi.mocked(tauriCore.invoke).mockResolvedValueOnce(mockExamples)
-    vi.mocked(tauriCore.invoke).mockResolvedValueOnce(undefined)
-
     const { result } = renderHook(() => useExampleManagement(), { wrapper })
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
     })
+
+    // Mock the replace response after initial query loads
+    vi.mocked(tauriCore.invoke).mockResolvedValueOnce(undefined)
 
     const replaceData = {
       id: '1',
@@ -124,14 +127,14 @@ describe('useExampleManagement Hook - Contract Tests (T017)', () => {
   it('should provide delete mutation', async () => {
     // Contract: Must return useMutation for delete_example
     // Contract: Delete must invalidate examples query cache
-    vi.mocked(tauriCore.invoke).mockResolvedValueOnce(mockExamples)
-    vi.mocked(tauriCore.invoke).mockResolvedValueOnce(undefined)
-
     const { result } = renderHook(() => useExampleManagement(), { wrapper })
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
     })
+
+    // Mock the delete response after initial query loads
+    vi.mocked(tauriCore.invoke).mockResolvedValueOnce(undefined)
 
     await result.current.deleteExample.mutateAsync('1')
 
@@ -141,14 +144,14 @@ describe('useExampleManagement Hook - Contract Tests (T017)', () => {
   it('should handle errors correctly', async () => {
     // Contract: Mutations must expose error state
     // Contract: Errors should be typed as string from Tauri
-    vi.mocked(tauriCore.invoke).mockResolvedValueOnce(mockExamples)
-    vi.mocked(tauriCore.invoke).mockRejectedValueOnce(new Error('Delete failed'))
-
     const { result } = renderHook(() => useExampleManagement(), { wrapper })
 
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
     })
+
+    // Mock the error response after initial query loads
+    vi.mocked(tauriCore.invoke).mockRejectedValueOnce(new Error('Delete failed'))
 
     try {
       await result.current.deleteExample.mutateAsync('1')
@@ -163,9 +166,6 @@ describe('useExampleManagement Hook - Contract Tests (T017)', () => {
 
   it('should invalidate cache after successful mutations', async () => {
     // Contract: After upload/replace/delete, must call queryClient.invalidateQueries(['examples'])
-    vi.mocked(tauriCore.invoke).mockResolvedValueOnce(mockExamples)
-    vi.mocked(tauriCore.invoke).mockResolvedValueOnce(undefined)
-
     const invalidateSpy = vi.spyOn(queryClient, 'invalidateQueries')
 
     const { result } = renderHook(() => useExampleManagement(), { wrapper })
@@ -173,6 +173,9 @@ describe('useExampleManagement Hook - Contract Tests (T017)', () => {
     await waitFor(() => {
       expect(result.current.isLoading).toBe(false)
     })
+
+    // Mock the delete response after initial query loads
+    vi.mocked(tauriCore.invoke).mockResolvedValueOnce(undefined)
 
     await result.current.deleteExample.mutateAsync('1')
 

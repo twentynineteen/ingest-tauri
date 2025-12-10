@@ -1,5 +1,5 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query'
-import { TrelloCard, TrelloMember } from '../../src/utils/TrelloCards'
+import { TrelloCard, TrelloMember } from '@utils/TrelloCards'
 
 interface CardDetailsResult {
   card: TrelloCard | undefined

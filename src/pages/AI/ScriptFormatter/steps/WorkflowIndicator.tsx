@@ -3,8 +3,8 @@
  * Displays the workflow progress steps
  */
 
+import type { WorkflowStep } from '@hooks/useScriptFormatterState'
 import React from 'react'
-import type { WorkflowStep } from '../../../../hooks/useScriptFormatterState'
 
 interface WorkflowIndicatorProps {
   currentStep: WorkflowStep
@@ -20,23 +20,23 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
 
 export const WorkflowIndicator: React.FC<WorkflowIndicatorProps> = ({ currentStep }) => {
   return (
-    <div className="flex items-center justify-between max-w-4xl mx-auto">
+    <div className="mx-auto flex max-w-4xl items-center justify-between">
       {WORKFLOW_STEPS.map((step, idx) => (
         <div
           key={step}
           className={`flex items-center ${
-            currentStep === step ? 'text-black font-medium' : 'text-gray-400'
+            currentStep === step ? 'font-medium text-black' : 'text-muted-foreground/50'
           }`}
         >
           <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              currentStep === step ? 'bg-black text-white' : 'bg-gray-300'
+            className={`flex h-8 w-8 items-center justify-center rounded-full ${
+              currentStep === step ? 'bg-black text-white' : 'bg-muted'
             }`}
           >
             {idx + 1}
           </div>
           <span className="ml-2 text-sm capitalize">{step.replace('-', ' ')}</span>
-          {idx < 4 && <div className="w-12 h-0.5 bg-gray-300 mx-4" />}
+          {idx < 4 && <div className="bg-muted mx-4 h-0.5 w-12" />}
         </div>
       ))}
     </div>

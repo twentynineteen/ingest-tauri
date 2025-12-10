@@ -3,6 +3,7 @@
  * Extracted from BreadcrumbsViewerEnhanced.tsx (DEBT-002)
  */
 
+import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
 import {
   Calendar,
   Camera,
@@ -17,8 +18,9 @@ import {
   User
 } from 'lucide-react'
 import React from 'react'
-import type { BreadcrumbsPreview, FieldChange } from '../../types/baker'
-import { formatBreadcrumbDateSimple } from '../../utils/breadcrumbsComparison'
+
+import type { BreadcrumbsPreview, FieldChange } from '@/types/baker'
+
 import { Field, formatFileSize } from './fieldUtils'
 
 interface PreviewComparisonProps {
@@ -64,40 +66,40 @@ const ChangeSummary: React.FC<ChangeSummaryProps> = ({
   hasMeaningfulChanges
 }) => (
   <div
-    className={`border rounded-lg p-3 ${hasMeaningfulChanges ? 'bg-blue-50 border-blue-200' : 'bg-green-50 border-green-200'}`}
+    className={`rounded-lg border p-3 ${hasMeaningfulChanges ? 'bg-primary/10 border-primary/30' : 'bg-success/10 border-success/30'}`}
   >
     <h5
-      className={`font-medium mb-2 ${hasMeaningfulChanges ? 'text-blue-900' : 'text-green-900'}`}
+      className={`mb-2 font-medium ${hasMeaningfulChanges ? 'text-primary' : 'text-success'}`}
     >
       Change Summary
     </h5>
     <div
-      className={`text-sm space-y-1 ${hasMeaningfulChanges ? 'text-blue-800' : 'text-green-800'}`}
+      className={`space-y-1 text-sm ${hasMeaningfulChanges ? 'text-foreground' : 'text-success'}`}
     >
       {hasMeaningfulChanges ? (
         <>
           {summaryDiff.summary.added > 0 && (
             <div className="flex items-center">
-              <Plus className="h-3 w-3 text-green-600 mr-1" />
+              <Plus className="text-success mr-1 h-3 w-3" />
               {summaryDiff.summary.added} fields will be added
             </div>
           )}
           {summaryDiff.summary.modified > 0 && (
             <div className="flex items-center">
-              <Edit className="h-3 w-3 text-orange-600 mr-1" />
+              <Edit className="text-warning mr-1 h-3 w-3" />
               {summaryDiff.summary.modified} fields will be modified
             </div>
           )}
           {summaryDiff.summary.removed > 0 && (
             <div className="flex items-center">
-              <Minus className="h-3 w-3 text-red-600 mr-1" />
+              <Minus className="text-destructive mr-1 h-3 w-3" />
               {summaryDiff.summary.removed} fields will be removed
             </div>
           )}
         </>
       ) : (
-        <div className="flex items-center text-green-700">
-          <CheckCircle className="h-3 w-3 mr-1" />
+        <div className="text-success flex items-center">
+          <CheckCircle className="mr-1 h-3 w-3" />
           No meaningful changes required - only maintenance updates
         </div>
       )}
@@ -112,8 +114,8 @@ interface CurrentViewProps {
 
 const CurrentView: React.FC<CurrentViewProps> = ({ current, formatDate }) => (
   <div>
-    <h5 className="font-medium text-gray-700 mb-3 flex items-center">
-      <File className="h-4 w-4 mr-2" />
+    <h5 className="text-foreground mb-3 flex items-center font-medium">
+      <File className="mr-2 h-4 w-4" />
       Current
     </h5>
     <div className="space-y-3">
@@ -156,8 +158,8 @@ const CurrentView: React.FC<CurrentViewProps> = ({ current, formatDate }) => (
           {current.scannedBy && <Field label="Scanned By" value={current.scannedBy} />}
         </>
       ) : (
-        <div className="text-center py-8 text-gray-500">
-          <File className="h-8 w-8 mx-auto mb-2 opacity-50" />
+        <div className="text-muted-foreground py-8 text-center">
+          <File className="mx-auto mb-2 h-8 w-8 opacity-50" />
           <p className="text-sm">No existing breadcrumbs file</p>
         </div>
       )}
@@ -266,8 +268,8 @@ const AfterUpdateView: React.FC<AfterUpdateViewProps> = ({ changes, formatDate }
 
   return (
     <div>
-      <h5 className="font-medium text-gray-700 mb-3 flex items-center">
-        <Eye className="h-4 w-4 mr-2" />
+      <h5 className="text-foreground mb-3 flex items-center font-medium">
+        <Eye className="mr-2 h-4 w-4" />
         After Update
       </h5>
       <div className="space-y-3">{changes.map(renderChange).filter(Boolean)}</div>

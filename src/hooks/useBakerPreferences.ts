@@ -6,7 +6,9 @@
  */
 
 import { useCallback, useState } from 'react'
-import type { ScanPreferences, UseBakerPreferencesResult } from '../types/baker'
+
+import type { ScanPreferences, UseBakerPreferencesResult } from '@/types/baker'
+import { logger } from '@/utils/logger'
 
 const STORAGE_KEY = 'baker-preferences'
 
@@ -56,7 +58,7 @@ function loadPreferencesFromStorage(): ScanPreferences {
       return validatePreferences(parsed)
     }
   } catch (error) {
-    console.warn('Failed to load Baker preferences from localStorage:', error)
+    logger.warn('Failed to load Baker preferences from localStorage:', error)
   }
 
   return DEFAULT_PREFERENCES
@@ -66,7 +68,7 @@ function savePreferencesToStorage(preferences: ScanPreferences): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences))
   } catch (error) {
-    console.warn('Failed to save Baker preferences to localStorage:', error)
+    logger.warn('Failed to save Baker preferences to localStorage:', error)
   }
 }
 
@@ -76,7 +78,7 @@ export function useBakerPreferences(): UseBakerPreferencesResult {
   )
 
   const updatePreferences = useCallback((newPrefs: Partial<ScanPreferences>) => {
-    setPreferences(currentPrefs => {
+    setPreferences((currentPrefs) => {
       const validatedPrefs = validatePreferences({ ...currentPrefs, ...newPrefs })
       savePreferencesToStorage(validatedPrefs)
       return validatedPrefs

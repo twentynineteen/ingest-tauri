@@ -9,6 +9,7 @@ import { useBreadcrumb } from '@hooks/index'
 import { useScriptFormatterState } from '@hooks/useScriptFormatterState'
 import { FileText } from 'lucide-react'
 import React from 'react'
+
 import { FileUploader } from './FileUploader'
 import { SaveExampleDialog } from './SaveExampleDialog'
 import {
@@ -76,17 +77,17 @@ const ScriptFormatter: React.FC = () => {
   } = useScriptFormatterState()
 
   return (
-    <div className="px-6 space-y-6">
+    <div className="space-y-6 px-6">
       {/* Header */}
-      <div className="w-full pb-4 border-b mb-4 flex items-center justify-between">
-        <h2 className="px-4 text-2xl font-semibold flex flex-row gap-4 items-center">
+      <div className="mb-4 flex w-full items-center justify-between border-b pb-4">
+        <h2 className="flex flex-row items-center gap-4 px-4 text-2xl font-semibold">
           <FileText />
           Autocue Script Formatter
         </h2>
         {currentStep !== 'upload' && (
           <button
             onClick={handleStartOver}
-            className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded hover:bg-gray-50"
+            className="text-muted-foreground border-border hover:bg-secondary rounded border px-4 py-2 text-sm"
           >
             Start Over
           </button>
@@ -98,7 +99,7 @@ const ScriptFormatter: React.FC = () => {
 
       {/* Step 1: Upload File */}
       {currentStep === 'upload' && (
-        <div className="max-w-2xl mx-auto space-y-6">
+        <div className="mx-auto max-w-2xl space-y-6">
           <FileUploader
             onFileSelect={handleFileSelect}
             isLoading={isParsing}

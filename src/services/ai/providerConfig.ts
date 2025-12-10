@@ -6,11 +6,14 @@
  */
 
 // import { createOpenAI } from '@ai-sdk/openai' // Commented out for Phase 1
+import { SECONDS, TIMEOUTS } from '@constants/timing'
+import type { ProviderConfiguration } from '@types/scriptFormatter'
+import { createNamespacedLogger } from '@utils/logger'
 import type { LanguageModel } from 'ai'
 import { createOllama } from 'ollama-ai-provider-v2'
-import { SECONDS, TIMEOUTS } from '../../constants/timing'
-import type { ProviderConfiguration } from '../../types/scriptFormatter'
-import { createNamespacedLogger } from '../../utils/logger'
+
+import { logger } from '@/utils/logger'
+
 import type { ModelInfo, ProviderAdapter, ProviderRegistry } from './types'
 
 const logger = createNamespacedLogger('Ollama')
@@ -40,6 +43,18 @@ const ollamaAdapter: ProviderAdapter = {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), timeout)
 
+      // Merge signals: abort if either the timeout or the passed signal is aborted
+      const existingSignal = init?.signal
+      if (existingSignal) {
+        // If the existing signal is already aborted, abort immediately
+        if (existingSignal.aborted) {
+          controller.abort()
+        } else {
+          // Listen for abort from the existing signal
+          existingSignal.addEventListener('abort', () => controller.abort())
+        }
+      }
+
       try {
         const response = await fetch(url, {
           ...init,
@@ -59,6 +74,7 @@ const ollamaAdapter: ProviderAdapter = {
     })
 
     // Return the model instance
+    // Note: num_ctx and other Ollama options are set via providerOptions in streamText
     return ollama(modelId)
   },
 
@@ -79,7 +95,7 @@ const ollamaAdapter: ProviderAdapter = {
       })
 
       if (!response.ok) {
-        console.error('[Ollama] Validation failed:', response.status, response.statusText)
+        logger.error('[Ollama] Validation failed:', response.status, response.statusText)
         return {
           success: false,
           errorMessage: `HTTP ${response.status}: ${response.statusText}. Check if Ollama is running at ${baseUrl}`,
@@ -98,7 +114,7 @@ const ollamaAdapter: ProviderAdapter = {
         latencyMs: Date.now() - start
       }
     } catch (error) {
-      console.error('[Ollama] Validation error:', error)
+      logger.error('[Ollama] Validation error:', error)
       return {
         success: false,
         errorMessage: error instanceof Error ? error.message : 'Unknown error',
@@ -137,19 +153,19 @@ const ollamaAdapter: ProviderAdapter = {
 
       logger.log('Models fetched:', data.models?.length || 0)
 
-      return (data.models || []).map(model => ({
+      return (data.models || []).map((model) => ({
         id: model.name,
         name: model.name.replace(':latest', ''),
         size: String(model.size),
         contextLength: model.details?.parameter_size || 4096,
         // Tool calling support detection
-        supportsToolCalling: ['llama3', 'mistral', 'qwen'].some(name =>
+        supportsToolCalling: ['llama3', 'mistral', 'qwen'].some((name) =>
           model.name.toLowerCase().includes(name)
         ),
         supportsStreaming: true // All Ollama models support streaming
       }))
     } catch (error) {
-      console.error('[Ollama] Failed to list models:', error)
+      logger.error('[Ollama] Failed to list models:', error)
       throw new Error(
         `Failed to list Ollama models: ${error instanceof Error ? error.message : 'Unknown error'}`
       )

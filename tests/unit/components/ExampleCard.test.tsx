@@ -3,11 +3,30 @@
  * Feature: 007-frontend-script-example
  */
 
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { describe, it, expect, vi } from 'vitest'
 import { ExampleCard } from '@/pages/AI/ExampleEmbeddings/ExampleCard'
 import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import React from 'react'
+import { describe, expect, it, vi } from 'vitest'
+
+// Mock framer-motion to avoid animation issues in tests
+vi.mock('framer-motion', () => ({
+  motion: new Proxy(
+    {},
+    {
+      get: (_, prop) => {
+        const Component = React.forwardRef<any, any>((props, ref) => {
+          const { children, ...rest } = props
+          return React.createElement(prop as string, { ...rest, ref }, children)
+        })
+        Component.displayName = `motion.${String(prop)}`
+        return Component
+      }
+    }
+  ),
+  AnimatePresence: ({ children }: any) => children
+}))
 
 describe('ExampleCard - Contract Tests (T014)', () => {
   const bundledExample: ExampleWithMetadata = {
@@ -96,7 +115,9 @@ describe('ExampleCard - Contract Tests (T014)', () => {
     const user = userEvent.setup()
     const onDelete = vi.fn()
 
-    render(<ExampleCard example={uploadedExample} {...defaultProps} onDelete={onDelete} />)
+    render(
+      <ExampleCard example={uploadedExample} {...defaultProps} onDelete={onDelete} />
+    )
 
     const deleteButton = screen.getByTitle('Delete')
     await user.click(deleteButton)
@@ -109,7 +130,9 @@ describe('ExampleCard - Contract Tests (T014)', () => {
     const user = userEvent.setup()
     const onReplace = vi.fn()
 
-    render(<ExampleCard example={uploadedExample} {...defaultProps} onReplace={onReplace} />)
+    render(
+      <ExampleCard example={uploadedExample} {...defaultProps} onReplace={onReplace} />
+    )
 
     const replaceButton = screen.getByTitle('Replace')
     await user.click(replaceButton)

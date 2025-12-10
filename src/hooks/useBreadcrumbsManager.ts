@@ -7,7 +7,8 @@
 
 import { invoke } from '@tauri-apps/api/core'
 import { useCallback, useState } from 'react'
-import type { BatchUpdateResult, UseBreadcrumbsManagerResult } from '../types/baker'
+
+import type { BatchUpdateResult, UseBreadcrumbsManagerResult } from '@/types/baker'
 
 export function useBreadcrumbsManager(): UseBreadcrumbsManagerResult {
   const [isUpdating, setIsUpdating] = useState(false)

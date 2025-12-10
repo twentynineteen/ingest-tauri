@@ -1,6 +1,7 @@
 // components/BuildProject/ProjectFileList.tsx
 
-import { Trash2 } from 'lucide-react'
+import { FILE_LIST_ANIMATION } from '@constants/animations'
+import { Film, Trash2, Video } from 'lucide-react'
 import React from 'react'
 
 interface FootageFile {
@@ -24,40 +25,92 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
   onUpdateCamera,
   onDeleteFile
 }) => {
-  if (files.length === 0) return null
+  // Empty state
+  if (files.length === 0) {
+    return (
+      <div className="mx-auto max-w-md px-6 py-6">
+        <div className="border-border bg-muted/20 flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-6">
+          <div className="bg-muted mb-3 rounded-full p-3">
+            <Film className="text-muted-foreground h-6 w-6" />
+          </div>
+          <h3 className="text-foreground mb-1 text-sm font-semibold">
+            No files selected yet
+          </h3>
+          <p className="text-muted-foreground text-center text-xs">
+            Click &quot;Select Files&quot; to add footage to your project
+          </p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <ul className="mx-2 justify-center">
+    <div className="w-full max-w-full space-y-2">
       {files.map((item, idx) => (
-        <li
-          key={`${item.file.path}-${idx}`} // Ensures unique key
-          className="my-4 text-sm text-gray-700 flex justify-between items-center"
+        <div
+          key={`${item.file.path}-${idx}`}
+          className="group bg-card border-border relative w-full max-w-full rounded-lg border p-3 shadow-sm transition-shadow duration-200 hover:shadow-md"
+          style={{
+            animation: `${FILE_LIST_ANIMATION.name} ${FILE_LIST_ANIMATION.duration}ms ${FILE_LIST_ANIMATION.easing} ${idx * FILE_LIST_ANIMATION.staggerDelay}ms both`
+          }}
         >
-          <span className="px-4 truncate w-[200px] text-start">{item.file.name}</span>
-          <span className="nowrap truncate italic w-[300px]">({item.file.path})</span>
+          {/* File Icon and Info */}
+          <div className="flex w-full max-w-full min-w-0 items-start gap-3">
+            <div className="mt-1 flex-shrink-0">
+              <div className="bg-primary/10 rounded-md p-2">
+                <Video className="text-primary h-5 w-5" />
+              </div>
+            </div>
 
-          <div className="flex justify-center px-4 grid-cols-2 gap-4 flex-row items-center">
-            {/* Camera select dropdown */}
-            <select
-              className="ml-2 border p-1 rounded mb-2"
-              value={item.camera}
-              onChange={e => onUpdateCamera(idx, Number(e.target.value))}
+            <div
+              className="min-w-0 flex-1 overflow-hidden"
+              style={{ maxWidth: '100%', width: 0 }}
             >
-              {Array.from({ length: numCameras }, (_, i) => i + 1).map(cam => (
-                <option key={cam} value={cam}>
-                  Camera {cam}
-                </option>
-              ))}
-            </select>
+              {/* File Name */}
+              <h4
+                className="text-foreground mb-1 truncate text-sm font-semibold"
+                title={item.file.name}
+              >
+                {item.file.name}
+              </h4>
+              {/* File Path */}
+              <p
+                className="text-muted-foreground truncate text-xs italic"
+                title={item.file.path}
+              >
+                {item.file.path}
+              </p>
+            </div>
 
-            {/* Delete Button */}
-            <button onClick={() => onDeleteFile(idx)} className="ml-2">
-              <Trash2 />
-            </button>
+            {/* Camera Selector & Delete Button */}
+            <div className="flex flex-shrink-0 items-center gap-2">
+              {/* Camera Badge/Selector */}
+              <select
+                aria-label={`Select camera for ${item.file.name}`}
+                className="border-input bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-ring cursor-pointer rounded-md border px-3 py-1.5 text-xs transition-colors focus:ring-2 focus:outline-none"
+                value={item.camera}
+                onChange={(e) => onUpdateCamera(idx, Number(e.target.value))}
+              >
+                {Array.from({ length: numCameras }, (_, i) => i + 1).map((cam) => (
+                  <option key={cam} value={cam}>
+                    Camera {cam}
+                  </option>
+                ))}
+              </select>
+
+              {/* Delete Button */}
+              <button
+                onClick={() => onDeleteFile(idx)}
+                aria-label={`Delete ${item.file.name}`}
+                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md p-2 transition-colors"
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-        </li>
+        </div>
       ))}
-    </ul>
+    </div>
   )
 }
 

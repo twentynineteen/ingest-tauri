@@ -14,14 +14,14 @@
  * - useScriptFileUpload hook tests (9/9)
  */
 
+import { ExampleEmbeddings } from '@/pages/AI/ExampleEmbeddings/ExampleEmbeddings'
+import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import * as tauriCore from '@tauri-apps/api/core'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { ExampleEmbeddings } from '@/pages/AI/ExampleEmbeddings/ExampleEmbeddings'
 import { BrowserRouter } from 'react-router-dom'
-import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
-import * as tauriCore from '@tauri-apps/api/core'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock Tauri core
 vi.mock('@tauri-apps/api/core', () => ({
@@ -105,7 +105,10 @@ const createQueryClient = () =>
     }
   })
 
-const renderWithProviders = (component: React.ReactElement, queryClient?: QueryClient) => {
+const renderWithProviders = (
+  component: React.ReactElement,
+  queryClient?: QueryClient
+) => {
   const client = queryClient || createQueryClient()
 
   return {
@@ -122,7 +125,10 @@ describe('Example Management Integration - Upload Workflow (T019)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Default: return initial examples list
-    vi.mocked(tauriCore.invoke).mockResolvedValue([mockBundledExample, mockUploadedExample])
+    vi.mocked(tauriCore.invoke).mockResolvedValue([
+      mockBundledExample,
+      mockUploadedExample
+    ])
   })
 
   afterEach(() => {
@@ -195,7 +201,11 @@ describe('Example Management Integration - Upload Workflow (T019)', () => {
           return Promise.resolve([mockBundledExample, mockUploadedExample])
         }
         // After upload, return updated list
-        return Promise.resolve([mockBundledExample, mockUploadedExample, newUploadedExample])
+        return Promise.resolve([
+          mockBundledExample,
+          mockUploadedExample,
+          newUploadedExample
+        ])
       }
       return Promise.resolve(undefined)
     })
@@ -283,25 +293,30 @@ describe('Example Management Integration - Upload Workflow (T019)', () => {
   it('should disable form during submission', async () => {
     const user = userEvent.setup()
 
-    vi.mocked(tauriCore.invoke).mockResolvedValue([mockBundledExample, mockUploadedExample])
+    vi.mocked(tauriCore.invoke).mockResolvedValue([
+      mockBundledExample,
+      mockUploadedExample
+    ])
 
     renderWithProviders(<ExampleEmbeddings />)
 
-    // Wait for load
+    // Wait for initial load - ensure examples are loaded
     await waitFor(() => {
-      expect(screen.getByText('Example Embeddings')).toBeInTheDocument()
+      expect(screen.getByRole('tab', { name: /all \(2\)/i })).toBeInTheDocument()
     })
 
     // Open dialog
     const uploadButton = screen.getByRole('button', { name: /upload example/i })
     await user.click(uploadButton)
 
+    // Wait for dialog to open with explicit waitFor
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument()
     })
 
-    // Cancel button should be present and functional
     const dialog = screen.getByRole('dialog')
+
+    // Cancel button should be present and functional
     const cancelButton = within(dialog).getByRole('button', { name: /cancel/i })
     expect(cancelButton).toBeInTheDocument()
     expect(cancelButton).not.toBeDisabled()
@@ -359,7 +374,10 @@ describe('Example Management Integration - Delete Workflow (T020)', () => {
   })
 
   it('should cancel delete when user clicks cancel', async () => {
-    vi.mocked(tauriCore.invoke).mockResolvedValue([mockBundledExample, mockUploadedExample])
+    vi.mocked(tauriCore.invoke).mockResolvedValue([
+      mockBundledExample,
+      mockUploadedExample
+    ])
 
     renderWithProviders(<ExampleEmbeddings />)
 
@@ -436,7 +454,10 @@ describe('Example Management Integration - Delete Workflow (T020)', () => {
   })
 
   it('should disable dialog during deletion', async () => {
-    vi.mocked(tauriCore.invoke).mockResolvedValue([mockBundledExample, mockUploadedExample])
+    vi.mocked(tauriCore.invoke).mockResolvedValue([
+      mockBundledExample,
+      mockUploadedExample
+    ])
 
     renderWithProviders(<ExampleEmbeddings />)
 
@@ -450,7 +471,10 @@ describe('Example Management Integration - Delete Workflow (T020)', () => {
   })
 
   it('should handle rapid delete attempts gracefully', async () => {
-    vi.mocked(tauriCore.invoke).mockResolvedValue([mockBundledExample, mockUploadedExample])
+    vi.mocked(tauriCore.invoke).mockResolvedValue([
+      mockBundledExample,
+      mockUploadedExample
+    ])
 
     renderWithProviders(<ExampleEmbeddings />)
 
@@ -467,7 +491,10 @@ describe('Example Management Integration - Delete Workflow (T020)', () => {
 describe('Example Management Integration - Tab Filtering (Bonus)', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(tauriCore.invoke).mockResolvedValue([mockBundledExample, mockUploadedExample])
+    vi.mocked(tauriCore.invoke).mockResolvedValue([
+      mockBundledExample,
+      mockUploadedExample
+    ])
   })
 
   afterEach(() => {

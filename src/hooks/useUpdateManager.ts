@@ -7,7 +7,10 @@ import { ask, message } from '@tauri-apps/plugin-dialog'
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { relaunch } from '@tauri-apps/plugin-process'
 import { check } from '@tauri-apps/plugin-updater'
-import { createNamespacedLogger } from '../utils/logger'
+import { createNamespacedLogger } from '@utils/logger'
+
+import { logger } from '@/utils/logger'
+
 import { useVersionCheck } from './useVersionCheck'
 
 const log = createNamespacedLogger('UpdateManager')
@@ -79,7 +82,7 @@ export function useUpdateManager() {
         })
       }
     } catch (error) {
-      console.error('[UpdateManager] Update check error:', error)
+      logger.error('[UpdateManager] Update check error:', error)
       await message(
         error.message || 'An unexpected error occurred during update check.',
         {
@@ -121,7 +124,7 @@ async function performUpdate(): Promise<void> {
       })
 
       // Use Tauri's built-in downloadAndInstall
-      await update.downloadAndInstall(event => {
+      await update.downloadAndInstall((event) => {
         log.debug('Update progress:', event)
         // Could add progress UI here if needed
       })
@@ -144,7 +147,7 @@ async function performUpdate(): Promise<void> {
         try {
           await relaunch()
         } catch (restartError) {
-          console.error('[UpdateManager] Failed to restart automatically:', restartError)
+          logger.error('[UpdateManager] Failed to restart automatically:', restartError)
           await message(
             'Automatic restart failed. Please close and reopen the app to complete the update.',
             {
@@ -169,7 +172,7 @@ async function performUpdate(): Promise<void> {
       throw new Error('No update available from Tauri updater')
     }
   } catch (error) {
-    console.error('[UpdateManager] Tauri updater error:', error)
+    logger.error('[UpdateManager] Tauri updater error:', error)
 
     // Offer manual download as fallback
     const manualUpdate = await ask(

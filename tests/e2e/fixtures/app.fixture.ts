@@ -26,11 +26,11 @@ export const test = base.extend<AppFixtures>({
     // Adjust selector based on your app's structure
     await page.waitForSelector('[data-testid="app-root"], #root', {
       state: 'visible',
-      timeout: 30000,
+      timeout: 30000
     })
 
     await use(page)
-  },
+  }
 })
 
 export { expect } from '@playwright/test'
@@ -57,12 +57,17 @@ export async function mockTauriInvoke(
 ): Promise<void> {
   await page.evaluate(
     ({ cmd, res }) => {
-      const originalInvoke = (window as { __TAURI__?: { invoke?: (cmd: string, args?: unknown) => Promise<unknown> } }).__TAURI__?.invoke
+      const originalInvoke = (
+        window as {
+          __TAURI__?: { invoke?: (cmd: string, args?: unknown) => Promise<unknown> }
+        }
+      ).__TAURI__?.invoke
       if (originalInvoke) {
-        (window as { __TAURI__?: { invoke?: (cmd: string, args?: unknown) => Promise<unknown> } }).__TAURI__!.invoke = async (
-          invokeCmd: string,
-          args?: unknown
-        ) => {
+        ;(
+          window as {
+            __TAURI__?: { invoke?: (cmd: string, args?: unknown) => Promise<unknown> }
+          }
+        ).__TAURI__!.invoke = async (invokeCmd: string, args?: unknown) => {
           if (invokeCmd === cmd) {
             return res
           }
@@ -79,7 +84,7 @@ export async function mockTauriInvoke(
  */
 export function collectConsoleLogs(page: Page): string[] {
   const logs: string[] = []
-  page.on('console', (msg) => {
+  page.on('console', msg => {
     logs.push(`[${msg.type()}] ${msg.text()}`)
   })
   return logs

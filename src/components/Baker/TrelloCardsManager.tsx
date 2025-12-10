@@ -4,9 +4,11 @@
  * Refactored: 2025-11-18 - Extracted state to useTrelloCardsManager, dialog to AddCardDialog
  */
 
-import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useTrelloCardsManager } from '@hooks/useTrelloCardsManager'
 import { AlertCircle, Loader2 } from 'lucide-react'
+
+import { Alert, AlertDescription } from '@/components/ui/alert'
+
 import { TrelloCardItem } from './TrelloCardItem'
 import { AddCardDialog } from './TrelloCards/AddCardDialog'
 
@@ -70,7 +72,7 @@ export function TrelloCardsManager({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+        <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
       </div>
     )
   }
@@ -93,65 +95,97 @@ export function TrelloCardsManager({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Trello Cards</h3>
-          <p className="text-sm text-gray-500">
+          <h3 className="text-foreground text-lg font-semibold">Trello Cards</h3>
+          <p className="text-muted-foreground text-sm">
             {trelloCards.length} {trelloCards.length === 1 ? 'card' : 'cards'} • Project
             management
           </p>
         </div>
 
         <AddCardDialog
-          isOpen={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-          canAddCard={canAddCard}
-          hasApiCredentials={hasApiCredentials}
-          addMode={addMode}
-          onAddModeChange={setAddMode}
-          cardUrl={cardUrl}
-          onCardUrlChange={setCardUrl}
-          onFetchAndAdd={handleFetchAndAdd}
-          searchTerm={searchTerm}
-          onSearchTermChange={setSearchTerm}
-          filteredGrouped={filteredGrouped}
-          onSelectCard={handleSelectCard}
-          isBoardLoading={isBoardLoading}
-          isFetchingCard={isFetchingCard}
-          onClose={() => {
-            setIsDialogOpen(false)
-            setCardUrl('')
+          dialog={{
+            isOpen: isDialogOpen,
+            onOpenChange: setIsDialogOpen,
+            canAddCard: canAddCard,
+            hasApiCredentials: hasApiCredentials
           }}
-          validationErrors={validationErrors}
-          addError={addError}
-          fetchError={fetchError}
+          mode={{
+            addMode: addMode,
+            onAddModeChange: setAddMode
+          }}
+          urlMode={{
+            cardUrl: cardUrl,
+            onCardUrlChange: setCardUrl,
+            onFetchAndAdd: handleFetchAndAdd
+          }}
+          selectMode={{
+            searchTerm: searchTerm,
+            onSearchTermChange: setSearchTerm,
+            filteredGrouped: filteredGrouped,
+            onSelectCard: handleSelectCard,
+            isBoardLoading: isBoardLoading
+          }}
+          common={{
+            isFetchingCard: isFetchingCard,
+            onClose: () => {
+              setIsDialogOpen(false)
+              setCardUrl('')
+            }
+          }}
+          errors={{
+            validationErrors: validationErrors,
+            addError: addError,
+            fetchError: fetchError
+          }}
         />
       </div>
 
       {/* Card List */}
       {trelloCards.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-gray-300 bg-gray-50 p-12 text-center">
-          <p className="text-sm text-gray-500">No Trello cards added yet</p>
-          <p className="mt-1 text-xs text-gray-400">
+        <div className="border-border bg-muted rounded-lg border border-dashed p-12 text-center">
+          <p className="text-muted-foreground text-sm">No Trello cards added yet</p>
+          <p className="text-muted-foreground/50 mt-1 text-xs">
             Link Trello cards to track project management tasks
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {trelloCards.map((card, index) => (
-            <TrelloCardItem
-              key={`${card.cardId}-${index}`}
-              trelloCard={card}
-              onRemove={() => handleRemove(index)}
-              onRefresh={hasApiCredentials ? () => handleRefresh(index) : undefined}
-            />
-          ))}
+        <div className="border-border overflow-hidden rounded-lg border">
+          <table className="w-full">
+            <thead className="bg-muted/50 border-border border-b">
+              <tr>
+                <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium">
+                  Title
+                </th>
+                <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium">
+                  Board
+                </th>
+                <th className="text-muted-foreground px-4 py-3 text-left text-xs font-medium">
+                  Last Updated
+                </th>
+                <th className="text-muted-foreground px-4 py-3 text-right text-xs font-medium">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-border divide-y">
+              {trelloCards.map((card, index) => (
+                <TrelloCardItem
+                  key={`${card.cardId}-${index}`}
+                  trelloCard={card}
+                  onRemove={() => handleRemove(index)}
+                  onRefresh={hasApiCredentials ? () => handleRefresh(index) : undefined}
+                />
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
       {/* Loading indicator */}
       {(isUpdating || isFetchingDetails || isSyncingToTrello) && (
         <div className="flex items-center justify-center py-4">
-          <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-          <span className="ml-2 text-sm text-gray-500">
+          <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />
+          <span className="text-muted-foreground ml-2 text-sm">
             {isSyncingToTrello
               ? 'Syncing breadcrumbs to Trello...'
               : isFetchingDetails

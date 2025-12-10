@@ -1,7 +1,10 @@
 /**
  * AddVideoDialog - Dialog for adding new video links
- * Extracted from VideoLinksManager to reduce complexity (DEBT-002)
+ * DEBT-007: Refactored with grouped parameters (21 → 6 parameter groups)
+ * Reduced from 21 individual parameters to 6 logical parameter groups
  */
+
+import { AlertCircle, Loader2, Plus, Upload as UploadIcon } from 'lucide-react'
 
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -17,31 +20,40 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { AlertCircle, Loader2, Plus, Upload as UploadIcon } from 'lucide-react'
 
-interface FormData {
+// Type definitions for grouped parameters
+export interface DialogState {
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
+  canAddVideo: boolean
+}
+
+export interface ModeState {
+  addMode: 'url' | 'upload'
+  onTabChange: (value: string) => void
+}
+
+export interface FormData {
   url: string
   title: string
   thumbnailUrl: string
   sproutVideoId: string
 }
 
-interface AddVideoDialogProps {
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-  canAddVideo: boolean
-  addMode: 'url' | 'upload'
-  onTabChange: (value: string) => void
-  // Form data
+export interface FormState {
   formData: FormData
   onFormFieldChange: (field: keyof FormData, value: string) => void
-  // URL mode
+}
+
+export interface UrlModeState {
   onFetchDetails: () => void
   onAddVideo: () => void
   isFetchingVideo: boolean
   hasApiKey: boolean
   fetchError: string | null
-  // Upload mode
+}
+
+export interface UploadModeState {
   selectedFile: string | null
   uploading: boolean
   progress: number
@@ -49,38 +61,35 @@ interface AddVideoDialogProps {
   uploadSuccess: boolean
   onSelectFile: () => void
   onUploadAndAdd: () => void
-  // Errors
+}
+
+export interface ErrorState {
   validationErrors: string[]
   addError: Error | null
 }
 
+// Refactored props interface - 6 grouped parameters instead of 21 individual ones
+export interface AddVideoDialogProps {
+  dialog: DialogState
+  mode: ModeState
+  form: FormState
+  urlMode: UrlModeState
+  uploadMode: UploadModeState
+  errors: ErrorState
+}
+
 export function AddVideoDialog({
-  isOpen,
-  onOpenChange,
-  canAddVideo,
-  addMode,
-  onTabChange,
-  formData,
-  onFormFieldChange,
-  onFetchDetails,
-  onAddVideo,
-  isFetchingVideo,
-  hasApiKey,
-  fetchError,
-  selectedFile,
-  uploading,
-  progress,
-  message,
-  uploadSuccess,
-  onSelectFile,
-  onUploadAndAdd,
-  validationErrors,
-  addError
+  dialog,
+  mode,
+  form,
+  urlMode,
+  uploadMode,
+  errors
 }: AddVideoDialogProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={dialog.isOpen} onOpenChange={dialog.onOpenChange}>
       <DialogTrigger asChild>
-        <Button disabled={!canAddVideo}>
+        <Button disabled={!dialog.canAddVideo}>
           <Plus className="mr-2 h-4 w-4" />
           Add Video
         </Button>
@@ -93,7 +102,7 @@ export function AddVideoDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={addMode} onValueChange={onTabChange}>
+        <Tabs value={mode.addMode} onValueChange={mode.onTabChange}>
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="url">Enter URL</TabsTrigger>
             <TabsTrigger value="upload">Upload File</TabsTrigger>
@@ -101,56 +110,42 @@ export function AddVideoDialog({
 
           {/* URL Entry Tab */}
           <TabsContent value="url" className="space-y-4 py-4">
-            <UrlEntryContent
-              formData={formData}
-              onFormFieldChange={onFormFieldChange}
-              onFetchDetails={onFetchDetails}
-              isFetchingVideo={isFetchingVideo}
-              hasApiKey={hasApiKey}
-              fetchError={fetchError}
-              validationErrors={validationErrors}
-              addError={addError}
-            />
+            <UrlEntryContent form={form} urlMode={urlMode} errors={errors} />
           </TabsContent>
 
           {/* Upload File Tab */}
           <TabsContent value="upload" className="space-y-4 py-4">
-            <UploadContent
-              selectedFile={selectedFile}
-              uploading={uploading}
-              progress={progress}
-              message={message}
-              hasApiKey={hasApiKey}
-              onSelectFile={onSelectFile}
-            />
+            <UploadContent uploadMode={uploadMode} urlMode={urlMode} />
           </TabsContent>
         </Tabs>
 
         <DialogFooter>
-          {addMode === 'url' ? (
+          {mode.addMode === 'url' ? (
             <>
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
+              <Button variant="outline" onClick={() => dialog.onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button onClick={onAddVideo}>Add Video</Button>
+              <Button onClick={urlMode.onAddVideo}>Add Video</Button>
             </>
-          ) : uploadSuccess ? (
-            <Button onClick={() => onOpenChange(false)} className="w-full">
+          ) : uploadMode.uploadSuccess ? (
+            <Button onClick={() => dialog.onOpenChange(false)} className="w-full">
               Finish
             </Button>
           ) : (
             <>
-              <Button variant="outline" onClick={() => onOpenChange(false)}>
+              <Button variant="outline" onClick={() => dialog.onOpenChange(false)}>
                 Cancel
               </Button>
               <Button
-                onClick={onUploadAndAdd}
-                disabled={!selectedFile || !hasApiKey || uploading}
+                onClick={uploadMode.onUploadAndAdd}
+                disabled={
+                  !uploadMode.selectedFile || !urlMode.hasApiKey || uploadMode.uploading
+                }
               >
-                {uploading ? (
+                {uploadMode.uploading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Uploading... {progress}%
+                    Uploading... {uploadMode.progress}%
                   </>
                 ) : (
                   'Upload and Add'
@@ -166,23 +161,13 @@ export function AddVideoDialog({
 
 // Sub-component for URL entry content
 function UrlEntryContent({
-  formData,
-  onFormFieldChange,
-  onFetchDetails,
-  isFetchingVideo,
-  hasApiKey,
-  fetchError,
-  validationErrors,
-  addError
+  form,
+  urlMode,
+  errors
 }: {
-  formData: FormData
-  onFormFieldChange: (field: keyof FormData, value: string) => void
-  onFetchDetails: () => void
-  isFetchingVideo: boolean
-  hasApiKey: boolean
-  fetchError: string | null
-  validationErrors: string[]
-  addError: Error | null
+  form: FormState
+  urlMode: UrlModeState
+  errors: ErrorState
 }) {
   return (
     <>
@@ -192,34 +177,34 @@ function UrlEntryContent({
           <Input
             id="video-url"
             placeholder="https://sproutvideo.com/videos/..."
-            value={formData.url}
-            onChange={e => onFormFieldChange('url', e.target.value)}
+            value={form.formData.url}
+            onChange={(e) => form.onFormFieldChange('url', e.target.value)}
             className="flex-1"
           />
           <Button
             type="button"
             variant="secondary"
-            onClick={onFetchDetails}
-            disabled={!formData.url || !hasApiKey || isFetchingVideo}
+            onClick={urlMode.onFetchDetails}
+            disabled={!form.formData.url || !urlMode.hasApiKey || urlMode.isFetchingVideo}
           >
-            {isFetchingVideo ? (
+            {urlMode.isFetchingVideo ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               'Fetch Details'
             )}
           </Button>
         </div>
-        {!hasApiKey && formData.url && (
-          <p className="text-xs text-amber-600">
+        {!urlMode.hasApiKey && form.formData.url && (
+          <p className="text-warning text-xs">
             Sprout Video API key not configured. Go to Settings to add it.
           </p>
         )}
       </div>
 
-      {fetchError && (
+      {urlMode.fetchError && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{fetchError}</AlertDescription>
+          <AlertDescription>{urlMode.fetchError}</AlertDescription>
         </Alert>
       )}
 
@@ -228,8 +213,8 @@ function UrlEntryContent({
         <Input
           id="video-title"
           placeholder="Video title"
-          value={formData.title}
-          onChange={e => onFormFieldChange('title', e.target.value)}
+          value={form.formData.title}
+          onChange={(e) => form.onFormFieldChange('title', e.target.value)}
           maxLength={200}
         />
       </div>
@@ -239,8 +224,8 @@ function UrlEntryContent({
         <Input
           id="sprout-id"
           placeholder="abc123xyz"
-          value={formData.sproutVideoId}
-          onChange={e => onFormFieldChange('sproutVideoId', e.target.value)}
+          value={form.formData.sproutVideoId}
+          onChange={(e) => form.onFormFieldChange('sproutVideoId', e.target.value)}
         />
       </div>
 
@@ -249,17 +234,17 @@ function UrlEntryContent({
         <Input
           id="thumbnail-url"
           placeholder="https://..."
-          value={formData.thumbnailUrl}
-          onChange={e => onFormFieldChange('thumbnailUrl', e.target.value)}
+          value={form.formData.thumbnailUrl}
+          onChange={(e) => form.onFormFieldChange('thumbnailUrl', e.target.value)}
         />
       </div>
 
-      {validationErrors.length > 0 && (
+      {errors.validationErrors.length > 0 && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <ul className="list-disc pl-4 space-y-1">
-              {validationErrors.map((err, i) => (
+            <ul className="list-disc space-y-1 pl-4">
+              {errors.validationErrors.map((err, i) => (
                 <li key={i}>{err}</li>
               ))}
             </ul>
@@ -267,11 +252,13 @@ function UrlEntryContent({
         </Alert>
       )}
 
-      {addError && (
+      {errors.addError && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {addError instanceof Error ? addError.message : String(addError)}
+            {errors.addError instanceof Error
+              ? errors.addError.message
+              : String(errors.addError)}
           </AlertDescription>
         </Alert>
       )}
@@ -281,19 +268,11 @@ function UrlEntryContent({
 
 // Sub-component for upload content
 function UploadContent({
-  selectedFile,
-  uploading,
-  progress,
-  message,
-  hasApiKey,
-  onSelectFile
+  uploadMode,
+  urlMode
 }: {
-  selectedFile: string | null
-  uploading: boolean
-  progress: number
-  message: string | null
-  hasApiKey: boolean
-  onSelectFile: () => void
+  uploadMode: UploadModeState
+  urlMode: UrlModeState
 }) {
   return (
     <div className="space-y-4">
@@ -303,22 +282,25 @@ function UploadContent({
           <Button
             type="button"
             variant="outline"
-            onClick={onSelectFile}
-            disabled={uploading}
+            onClick={uploadMode.onSelectFile}
+            disabled={uploadMode.uploading}
             className="flex-1"
           >
             <UploadIcon className="mr-2 h-4 w-4" />
             Select Video File
           </Button>
         </div>
-        {selectedFile && (
-          <p className="text-sm text-gray-600">
-            Selected: <span className="font-medium">{selectedFile.split('/').pop()}</span>
+        {uploadMode.selectedFile && (
+          <p className="text-muted-foreground text-sm">
+            Selected:{' '}
+            <span className="font-medium">
+              {uploadMode.selectedFile.split('/').pop()}
+            </span>
           </p>
         )}
       </div>
 
-      {!hasApiKey && (
+      {!urlMode.hasApiKey && (
         <Alert>
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
@@ -327,17 +309,19 @@ function UploadContent({
         </Alert>
       )}
 
-      {uploading && (
+      {uploadMode.uploading && (
         <div className="space-y-2">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">Uploading: {progress}%</span>
+            <span className="text-muted-foreground">
+              Uploading: {uploadMode.progress}%
+            </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+          <div className="bg-secondary h-2 w-full overflow-hidden rounded-full">
             <div
-              className="h-full bg-blue-600 transition-all duration-300"
-              style={{ width: `${progress}%` }}
+              className="bg-primary h-full transition-all duration-300"
+              style={{ width: `${uploadMode.progress}%` }}
               role="progressbar"
-              aria-valuenow={progress}
+              aria-valuenow={uploadMode.progress}
               aria-valuemin={0}
               aria-valuemax={100}
             />
@@ -345,16 +329,17 @@ function UploadContent({
         </div>
       )}
 
-      {message && !uploading && (
+      {uploadMode.message && !uploadMode.uploading && (
         <Alert
           variant={
-            typeof message === 'string' && message.includes('failed')
+            typeof uploadMode.message === 'string' &&
+            uploadMode.message.includes('failed')
               ? 'destructive'
               : 'default'
           }
         >
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{String(message)}</AlertDescription>
+          <AlertDescription>{String(uploadMode.message)}</AlertDescription>
         </Alert>
       )}
     </div>

@@ -1,7 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { ThemeProvider } from 'next-themes'
 import React from 'react'
 import { BrowserRouter as Router } from 'react-router-dom'
+
 import AppRouter from './AppRouter'
 import { QueryErrorBoundary } from './components/ErrorBoundary'
 import { CACHE, getBackoffDelay, RETRY } from './constants/timing'
@@ -9,6 +11,7 @@ import { AuthProvider } from './context/AuthProvider'
 import { initializePerformanceMonitor } from './lib/performance-monitor'
 import { initializePrefetchManager } from './lib/prefetch-strategies'
 import { initializeCacheService } from './services/cache-invalidation'
+import { logger } from './utils/logger'
 
 // The app component acts as the main routing generator for the application.
 // AppRouter wraps the app routes to make use of the useLocation method within react-router-dom
@@ -30,7 +33,8 @@ const queryClient = new QueryClient({
         return failureCount < RETRY.DEFAULT_ATTEMPTS
       },
       // Retry delay with exponential backoff
-      retryDelay: attemptIndex => getBackoffDelay(attemptIndex, RETRY.MAX_DELAY_DEFAULT),
+      retryDelay: (attemptIndex) =>
+        getBackoffDelay(attemptIndex, RETRY.MAX_DELAY_DEFAULT),
       // Refetch on window focus for critical data
       refetchOnWindowFocus: false, // Disabled by default, hooks can override this
       // Background refetch interval for important data
@@ -46,7 +50,8 @@ const queryClient = new QueryClient({
         return failureCount < 2 // Fewer retries for mutations
       },
       // Retry delay for mutations
-      retryDelay: attemptIndex => getBackoffDelay(attemptIndex, RETRY.MAX_DELAY_MUTATION)
+      retryDelay: (attemptIndex) =>
+        getBackoffDelay(attemptIndex, RETRY.MAX_DELAY_MUTATION)
     }
   }
 })
@@ -57,24 +62,26 @@ const prefetchManager = initializePrefetchManager(queryClient)
 initializePerformanceMonitor(queryClient)
 
 // Prefetch essential app data on startup (non-blocking)
-prefetchManager.prefetchAppStartupData().catch(error => {
-  console.warn('Startup prefetching failed:', error)
+prefetchManager.prefetchAppStartupData().catch((error) => {
+  logger.warn('Startup prefetching failed:', error)
   // Non-critical - app continues to work normally
 })
 
 const App: React.FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <QueryErrorBoundary>
-        <AuthProvider>
-          <Router>
-            <AppRouter />
-          </Router>
-        </AuthProvider>
-      </QueryErrorBoundary>
-      {/* React Query DevTools - only shows in development */}
-      <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <QueryClientProvider client={queryClient}>
+        <QueryErrorBoundary>
+          <AuthProvider>
+            <Router>
+              <AppRouter />
+            </Router>
+          </AuthProvider>
+        </QueryErrorBoundary>
+        {/* React Query DevTools - only shows in development */}
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
+    </ThemeProvider>
   )
 }
 

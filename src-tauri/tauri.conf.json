@@ -16,8 +16,8 @@
     "windows": [
       {
         "title": "Bucket",
-        "width": 750,
-        "height": 525,
+        "width": 1200,
+        "height": 800,
         "resizable": true,
         "dragDropEnabled": true
       }
@@ -46,6 +46,7 @@
     "createUpdaterArtifacts": true,
     "resources": {
       "assets/*": "resources/",
+      "assets/plugins/*": "resources/plugins/",
       "resources/embeddings/*": "embeddings/"
     },
     "active": true,

@@ -3,10 +3,11 @@
  * Extracted from BreadcrumbsViewerEnhanced.tsx (DEBT-002)
  */
 
+import { formatFieldValue } from '@utils/breadcrumbsComparison'
 import { Edit, Minus, Plus } from 'lucide-react'
 import React from 'react'
-import type { FieldChange } from '../../types/baker'
-import { formatFieldValue } from '../../utils/breadcrumbsComparison'
+
+import type { FieldChange } from '@/types/baker'
 
 export const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 B'
@@ -19,11 +20,11 @@ export const formatFileSize = (bytes: number): string => {
 export const getChangeIcon = (type: string): React.ReactNode => {
   switch (type) {
     case 'added':
-      return <Plus className="h-3 w-3 text-green-600" />
+      return <Plus className="text-success h-3 w-3" />
     case 'modified':
-      return <Edit className="h-3 w-3 text-orange-600" />
+      return <Edit className="text-warning h-3 w-3" />
     case 'removed':
-      return <Minus className="h-3 w-3 text-red-600" />
+      return <Minus className="text-destructive h-3 w-3" />
     default:
       return null
   }
@@ -32,13 +33,13 @@ export const getChangeIcon = (type: string): React.ReactNode => {
 export const getChangeColor = (type: string): string => {
   switch (type) {
     case 'added':
-      return 'bg-green-50 border-green-200'
+      return 'bg-success/10 border-success/30'
     case 'modified':
-      return 'bg-orange-50 border-orange-200'
+      return 'bg-warning/10 border-warning/30'
     case 'removed':
-      return 'bg-red-50 border-red-200'
+      return 'bg-destructive/10 border-destructive/30'
     default:
-      return 'bg-white border-gray-200'
+      return 'bg-background border-border'
   }
 }
 
@@ -50,17 +51,19 @@ interface FieldProps {
 }
 
 export const Field: React.FC<FieldProps> = ({ label, value, icon, change }) => {
-  const changeColor = change ? getChangeColor(change.type) : 'bg-white border-gray-200'
+  const changeColor = change ? getChangeColor(change.type) : 'bg-background border-border'
   const changeIcon = change ? getChangeIcon(change.type) : null
 
   return (
-    <div className={`p-2 border rounded ${changeColor}`}>
-      <label className="flex items-center text-xs font-medium text-gray-600">
+    <div className={`rounded border p-2 ${changeColor}`}>
+      <label className="text-muted-foreground flex items-center text-xs font-medium">
         {changeIcon && <span className="mr-1">{changeIcon}</span>}
         {icon && <span className="mr-1">{icon}</span>}
         {label}
       </label>
-      <p className="text-gray-900 mt-1">{formatFieldValue(value, label.toLowerCase())}</p>
+      <p className="text-foreground mt-1">
+        {formatFieldValue(value, label.toLowerCase())}
+      </p>
     </div>
   )
 }

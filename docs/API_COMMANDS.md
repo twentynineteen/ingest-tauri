@@ -32,6 +32,7 @@ Commands for file system operations with progress tracking.
 **Purpose:** Copy files to camera-specific folders with real-time progress tracking.
 
 **Signature:**
+
 ```rust
 pub fn move_files(
     files: Vec<(String, u32)>,  // [(file_path, camera_number), ...]
@@ -42,29 +43,30 @@ pub fn move_files(
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `files` | `Vec<(String, u32)>` | Array of tuples: `(file_path, camera_number)` |
-| `base_dest` | `String` | Destination project folder path |
-| `app_handle` | `AppHandle` | Tauri app handle (automatically provided) |
+| Parameter    | Type                 | Description                                   |
+| ------------ | -------------------- | --------------------------------------------- |
+| `files`      | `Vec<(String, u32)>` | Array of tuples: `(file_path, camera_number)` |
+| `base_dest`  | `String`             | Destination project folder path               |
+| `app_handle` | `AppHandle`          | Tauri app handle (automatically provided)     |
 
 **Returns:** `Result<(), String>` - Immediate success (runs async in background)
 
 **Events Emitted:**
 
 - `copy_progress` - Emitted during file copy with progress data
+
   ```typescript
   interface CopyProgressEvent {
-    current: number;    // Current file index
-    total: number;      // Total files
-    filename: string;   // Current file name
-    progress: number;   // 0-100 percentage
+    current: number // Current file index
+    total: number // Total files
+    filename: string // Current file name
+    progress: number // 0-100 percentage
   }
   ```
 
 - `copy_complete` - Emitted when all files are copied
   ```typescript
-  type CopyCompleteEvent = string[]; // Array of destination file paths
+  type CopyCompleteEvent = string[] // Array of destination file paths
   ```
 
 **Example Usage:**
@@ -74,7 +76,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 
 // Listen to progress events
-const unlisten = await listen('copy_progress', (event) => {
+const unlisten = await listen('copy_progress', event => {
   const { current, total, filename, progress } = event.payload
   console.log(`Copying ${filename}: ${progress}% (${current}/${total})`)
 })
@@ -90,13 +92,14 @@ await invoke('move_files', {
 })
 
 // Listen for completion
-await listen('copy_complete', (event) => {
+await listen('copy_complete', event => {
   console.log('All files copied:', event.payload)
   unlisten() // Clean up listener
 })
 ```
 
 **Implementation Details:**
+
 - Runs in a separate thread to avoid blocking the UI
 - Creates camera folders if they don't exist (`Footage/Camera 1/`, etc.)
 - Uses buffered I/O for performance (~100 MB/s on SSD)
@@ -104,6 +107,7 @@ await listen('copy_complete', (event) => {
 - Continues on error (logs error, skips file)
 
 **Error Handling:**
+
 - Returns immediately with `Ok(())` (errors logged to stderr)
 - Failed files are skipped, not included in `copy_complete` event
 
@@ -118,6 +122,7 @@ Simple token-based authentication for user sessions.
 **Purpose:** Verify if a token is valid.
 
 **Signature:**
+
 ```rust
 pub fn check_auth(
     token: String,
@@ -127,9 +132,9 @@ pub fn check_auth(
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `token` | `String` | Authentication token to verify |
+| Parameter | Type     | Description                    |
+| --------- | -------- | ------------------------------ |
+| `token`   | `String` | Authentication token to verify |
 
 **Returns:** `String` - `"authenticated"` or `"unauthorized"`
 
@@ -150,6 +155,7 @@ if (result === 'authenticated') {
 **Purpose:** Add a token to the authenticated tokens list.
 
 **Signature:**
+
 ```rust
 pub fn add_token(
     token: String,
@@ -159,9 +165,9 @@ pub fn add_token(
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `token` | `String` | Token to add to valid tokens list |
+| Parameter | Type     | Description                       |
+| --------- | -------- | --------------------------------- |
+| `token`   | `String` | Token to add to valid tokens list |
 
 **Returns:** `void`
 
@@ -185,6 +191,7 @@ Commands for managing script examples and vector similarity search.
 **Purpose:** Find script examples most similar to a given embedding vector.
 
 **Signature:**
+
 ```rust
 pub fn find_similar_examples(
     app: tauri::AppHandle,
@@ -195,22 +202,23 @@ pub fn find_similar_examples(
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
+| Parameter         | Type       | Description                                 |
+| ----------------- | ---------- | ------------------------------------------- |
 | `query_embedding` | `Vec<f32>` | Vector embedding (typically 768 dimensions) |
-| `top_k` | `usize` | Number of results to return (e.g., 3) |
+| `top_k`           | `usize`    | Number of results to return (e.g., 3)       |
 
 **Returns:** `Result<Vec<SimilarExample>, String>`
 
 **SimilarExample Structure:**
+
 ```typescript
 interface SimilarExample {
-  id: string;           // Unique example ID
-  title: string;        // Example title (e.g., "Educational Lecture")
-  category: string;     // Category (e.g., "educational", "business")
-  beforeText: string;   // Raw script text
-  afterText: string;    // Formatted script text
-  similarity: number;   // Cosine similarity score (0-1)
+  id: string // Unique example ID
+  title: string // Example title (e.g., "Educational Lecture")
+  category: string // Category (e.g., "educational", "business")
+  beforeText: string // Raw script text
+  afterText: string // Formatted script text
+  similarity: number // Cosine similarity score (0-1)
 }
 ```
 
@@ -233,11 +241,15 @@ const examples = await invoke<SimilarExample[]>('find_similar_examples', {
 const prompt = `
 Format this script like these examples:
 
-${examples.map(ex => `
+${examples
+  .map(
+    ex => `
 Example: ${ex.title}
 Before: ${ex.beforeText}
 After: ${ex.afterText}
-`).join('\n')}
+`
+  )
+  .join('\n')}
 
 Now format this script:
 ${userScript}
@@ -245,6 +257,7 @@ ${userScript}
 ```
 
 **Implementation Details:**
+
 - Uses cosine similarity for vector comparison
 - SQLite performs linear scan (fast for <1000 examples)
 - Results sorted by similarity (descending)
@@ -255,6 +268,7 @@ ${userScript}
 **Purpose:** Retrieve all examples with full metadata for management UI.
 
 **Signature:**
+
 ```rust
 pub fn get_all_examples_with_metadata(
     app: tauri::AppHandle,
@@ -266,18 +280,19 @@ pub fn get_all_examples_with_metadata(
 **Returns:** `Result<Vec<ExampleWithMetadata>, String>`
 
 **ExampleWithMetadata Structure:**
+
 ```typescript
 interface ExampleWithMetadata {
-  id: string;
-  title: string;
-  category: string;
-  beforeText: string;
-  afterText: string;
-  tags: string[];
-  wordCount: number | null;
-  qualityScore: number | null;
-  source: 'bundled' | 'user-uploaded';
-  createdAt: string;  // ISO 8601 timestamp
+  id: string
+  title: string
+  category: string
+  beforeText: string
+  afterText: string
+  tags: string[]
+  wordCount: number | null
+  qualityScore: number | null
+  source: 'bundled' | 'user-uploaded'
+  createdAt: string // ISO 8601 timestamp
 }
 ```
 
@@ -296,6 +311,7 @@ const userUploaded = examples.filter(ex => ex.source === 'user-uploaded')
 **Purpose:** Upload a new user script example to the database.
 
 **Signature:**
+
 ```rust
 pub fn upload_example(
     app: tauri::AppHandle,
@@ -305,22 +321,23 @@ pub fn upload_example(
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
+| Parameter | Type                   | Description                              |
+| --------- | ---------------------- | ---------------------------------------- |
 | `request` | `UploadExampleRequest` | Upload payload with content and metadata |
 
 **UploadExampleRequest Structure:**
+
 ```typescript
 interface UploadExampleRequest {
-  beforeContent: string;      // Raw script
-  afterContent: string;       // Formatted script
+  beforeContent: string // Raw script
+  afterContent: string // Formatted script
   metadata: {
-    title: string;
-    category: string;
-    tags?: string[];
-    qualityScore?: number;    // 1-10
-  };
-  embedding: number[];        // 768-dimensional vector
+    title: string
+    category: string
+    tags?: string[]
+    qualityScore?: number // 1-10
+  }
+  embedding: number[] // 768-dimensional vector
 }
 ```
 
@@ -354,12 +371,14 @@ console.log('Uploaded example:', exampleId)
 ```
 
 **Validation Rules:**
+
 - `beforeContent` and `afterContent`: 10-100,000 characters
 - `title`: 1-200 characters
 - `category`: Must be valid category (educational, business, narrative, etc.)
 - `embedding`: Must be 768 dimensions
 
 **Error Responses:**
+
 - `"Invalid text content length"` - Text too short/long
 - `"Invalid category"` - Category not recognized
 - `"Invalid embedding dimensions"` - Embedding not 768-dimensional
@@ -370,6 +389,7 @@ console.log('Uploaded example:', exampleId)
 **Purpose:** Replace an existing user-uploaded example.
 
 **Signature:**
+
 ```rust
 pub fn replace_example(
     app: tauri::AppHandle,
@@ -380,17 +400,18 @@ pub fn replace_example(
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `id` | `String` | Example ID to replace |
+| Parameter | Type                    | Description               |
+| --------- | ----------------------- | ------------------------- |
+| `id`      | `String`                | Example ID to replace     |
 | `request` | `ReplaceExampleRequest` | New content and embedding |
 
 **ReplaceExampleRequest Structure:**
+
 ```typescript
 interface ReplaceExampleRequest {
-  beforeContent: string;
-  afterContent: string;
-  embedding: number[];
+  beforeContent: string
+  afterContent: string
+  embedding: number[]
 }
 ```
 
@@ -410,6 +431,7 @@ await invoke('replace_example', {
 ```
 
 **Security:**
+
 - Can only replace user-uploaded examples (not bundled)
 - Returns error if trying to replace bundled example
 
@@ -418,6 +440,7 @@ await invoke('replace_example', {
 **Purpose:** Delete a user-uploaded example.
 
 **Signature:**
+
 ```rust
 pub fn delete_example(
     app: tauri::AppHandle,
@@ -427,9 +450,9 @@ pub fn delete_example(
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `id` | `String` | Example ID to delete |
+| Parameter | Type     | Description          |
+| --------- | -------- | -------------------- |
+| `id`      | `String` | Example ID to delete |
 
 **Returns:** `Result<(), String>`
 
@@ -440,6 +463,7 @@ await invoke('delete_example', { id: exampleId })
 ```
 
 **Security:**
+
 - Can only delete user-uploaded examples (not bundled)
 - Returns error if trying to delete bundled example
 
@@ -452,6 +476,7 @@ await invoke('delete_example', { id: exampleId })
 **Purpose:** Copy Premiere Pro template to project folder with proper file sync.
 
 **Signature:**
+
 ```rust
 pub fn copy_premiere_template(
     destination_path: String,
@@ -460,8 +485,8 @@ pub fn copy_premiere_template(
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
+| Parameter          | Type     | Description                              |
+| ------------------ | -------- | ---------------------------------------- |
 | `destination_path` | `String` | Full path including filename (`.prproj`) |
 
 **Returns:** `Result<(), String>`
@@ -475,12 +500,14 @@ await invoke('copy_premiere_template', {
 ```
 
 **Implementation Details:**
+
 - Copies `Premiere 4K Template 2025.prproj` from bundled assets
 - Uses `file.sync_all()` to flush OS buffers (prevents corruption)
 - Template supports multi-camera projects
 - Fixed corruption bug in v0.9.1
 
 **Error Handling:**
+
 - Returns error if template file not found in assets
 - Returns error if destination folder doesn't exist
 - Returns error if file write fails
@@ -496,6 +523,7 @@ Commands for parsing and generating Word documents.
 **Purpose:** Extract plain text from a Word document (.docx).
 
 **Signature:**
+
 ```rust
 pub fn parse_docx(
     file_data: Vec<u8>,
@@ -504,8 +532,8 @@ pub fn parse_docx(
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
+| Parameter   | Type      | Description             |
+| ----------- | --------- | ----------------------- |
 | `file_data` | `Vec<u8>` | Raw bytes of .docx file |
 
 **Returns:** `Result<String, String>` - Plain text content
@@ -525,12 +553,14 @@ const text = await invoke<string>('parse_docx', { fileData })
 ```
 
 **Implementation Details:**
+
 - Uses `mammoth` crate for parsing
 - Strips all formatting, images, tables (plain text only)
 - Preserves paragraph breaks
 - Maximum file size: ~100 MB (practical limit)
 
 **Error Handling:**
+
 - Returns error if file is corrupted
 - Returns error if file is not valid .docx format
 
@@ -545,6 +575,7 @@ Commands for Sprout Video API integration.
 **Purpose:** Upload video file to Sprout Video.
 
 **Signature:**
+
 ```rust
 pub fn upload_to_sprout(
     file_path: String,
@@ -555,20 +586,21 @@ pub fn upload_to_sprout(
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
+| Parameter   | Type     | Description             |
+| ----------- | -------- | ----------------------- |
 | `file_path` | `String` | Full path to video file |
-| `api_key` | `String` | Sprout Video API key |
-| `title` | `String` | Video title |
+| `api_key`   | `String` | Sprout Video API key    |
+| `title`     | `String` | Video title             |
 
 **Returns:** `Result<SproutVideoResponse, String>`
 
 **SproutVideoResponse Structure:**
+
 ```typescript
 interface SproutVideoResponse {
-  videoId: string;
-  embedCode: string;
-  thumbnailUrl: string;
+  videoId: string
+  embedCode: string
+  thumbnailUrl: string
 }
 ```
 
@@ -600,6 +632,7 @@ breadcrumbs.videoLinks.push({
 **Purpose:** List available Ollama models.
 
 **Signature:**
+
 ```rust
 pub fn list_ollama_models(
     base_url: String,
@@ -608,18 +641,19 @@ pub fn list_ollama_models(
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
+| Parameter  | Type     | Description                                        |
+| ---------- | -------- | -------------------------------------------------- |
 | `base_url` | `String` | Ollama server URL (e.g., `http://localhost:11434`) |
 
 **Returns:** `Result<Vec<OllamaModel>, String>`
 
 **OllamaModel Structure:**
+
 ```typescript
 interface OllamaModel {
-  name: string;         // e.g., "llama3.1:latest"
-  modifiedAt: string;   // ISO timestamp
-  size: number;         // Bytes
+  name: string // e.g., "llama3.1:latest"
+  modifiedAt: string // ISO timestamp
+  size: number // Bytes
 }
 ```
 
@@ -630,7 +664,10 @@ const models = await invoke<OllamaModel[]>('list_ollama_models', {
   baseUrl: 'http://localhost:11434'
 })
 
-console.log('Available models:', models.map(m => m.name))
+console.log(
+  'Available models:',
+  models.map(m => m.name)
+)
 ```
 
 ### `embed_text_ollama`
@@ -638,6 +675,7 @@ console.log('Available models:', models.map(m => m.name))
 **Purpose:** Generate embedding vector for text using Ollama.
 
 **Signature:**
+
 ```rust
 pub fn embed_text_ollama(
     text: String,
@@ -648,11 +686,11 @@ pub fn embed_text_ollama(
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `text` | `String` | Text to embed |
-| `model` | `String` | Embedding model name (e.g., `nomic-embed-text`) |
-| `base_url` | `String` | Ollama server URL |
+| Parameter  | Type     | Description                                     |
+| ---------- | -------- | ----------------------------------------------- |
+| `text`     | `String` | Text to embed                                   |
+| `model`    | `String` | Embedding model name (e.g., `nomic-embed-text`) |
+| `base_url` | `String` | Ollama server URL                               |
 
 **Returns:** `Result<Vec<f32>, String>` - 768-dimensional vector
 
@@ -669,6 +707,7 @@ console.log('Embedding dimensions:', embedding.length) // 768
 ```
 
 **Recommended Models:**
+
 - `nomic-embed-text` - Fast, good quality (768 dimensions)
 - `all-minilm` - Smaller, faster (384 dimensions - requires code changes)
 
@@ -681,6 +720,7 @@ console.log('Embedding dimensions:', embedding.length) // 768
 **Purpose:** Get current app version.
 
 **Signature:**
+
 ```rust
 pub fn get_app_version() -> String
 ```
@@ -699,15 +739,16 @@ console.log('Bucket version:', version)
 **Purpose:** Open a folder in the system file explorer.
 
 **Signature:**
+
 ```rust
 pub fn open_folder(path: String) -> Result<(), String>
 ```
 
 **Parameters:**
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `path` | `String` | Folder path to open |
+| Parameter | Type     | Description         |
+| --------- | -------- | ------------------- |
+| `path`    | `String` | Folder path to open |
 
 **Returns:** `Result<(), String>`
 
@@ -721,6 +762,7 @@ await invoke('open_folder', {
 ```
 
 **Platform Behavior:**
+
 - **macOS:** Opens in Finder
 - **Windows:** Opens in File Explorer
 - **Linux:** Opens in default file manager
@@ -749,14 +791,14 @@ try {
 
 **Common Error Messages:**
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| `"Failed to get app data dir"` | Tauri can't access app data directory | Check file permissions |
-| `"Database not found"` | embeddings database missing | Run `npm run embed:examples:ollama` |
-| `"Invalid embedding dimensions"` | Wrong embedding size | Use 768-dimensional embeddings |
-| `"Failed to copy file"` | I/O error during file copy | Check disk space, permissions |
-| `"Template not found"` | Premiere template missing | Verify `src-tauri/assets/` folder |
-| `"Connection refused"` | Ollama not running | Start Ollama: `ollama serve` |
+| Error                            | Cause                                 | Solution                            |
+| -------------------------------- | ------------------------------------- | ----------------------------------- |
+| `"Failed to get app data dir"`   | Tauri can't access app data directory | Check file permissions              |
+| `"Database not found"`           | embeddings database missing           | Run `npm run embed:examples:ollama` |
+| `"Invalid embedding dimensions"` | Wrong embedding size                  | Use 768-dimensional embeddings      |
+| `"Failed to copy file"`          | I/O error during file copy            | Check disk space, permissions       |
+| `"Template not found"`           | Premiere template missing             | Verify `src-tauri/assets/` folder   |
+| `"Connection refused"`           | Ollama not running                    | Start Ollama: `ollama serve`        |
 
 ---
 
@@ -765,6 +807,9 @@ try {
 For type safety, define interfaces matching Rust structures:
 
 ```typescript
+// Type-safe invoke wrapper
+import { invoke as tauriInvoke } from '@tauri-apps/api/core'
+
 // src/types/tauri-commands.ts
 
 export interface SimilarExample {
@@ -796,9 +841,6 @@ export interface UploadExampleRequest {
   embedding: number[]
 }
 
-// Type-safe invoke wrapper
-import { invoke as tauriInvoke } from '@tauri-apps/api/core'
-
 export async function invoke<T>(
   command: string,
   args?: Record<string, unknown>
@@ -812,6 +854,7 @@ export async function invoke<T>(
 ## Performance Tips
 
 1. **Use React Query for caching:**
+
    ```typescript
    const { data } = useQuery({
      queryKey: ['examples'],
@@ -825,6 +868,7 @@ export async function invoke<T>(
    - Backend handles parallelization internally
 
 3. **Debounce search queries:**
+
    ```typescript
    const debouncedSearch = useDebouncedCallback(
      (query: string) => invoke('search_examples', { query }),
@@ -845,13 +889,11 @@ Use Vitest to test Tauri command integration:
 ```typescript
 // tests/tauri-commands.test.ts
 import { invoke } from '@tauri-apps/api/core'
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 describe('RAG Commands', () => {
   it('should fetch all examples', async () => {
-    const examples = await invoke<ExampleWithMetadata[]>(
-      'get_all_examples_with_metadata'
-    )
+    const examples = await invoke<ExampleWithMetadata[]>('get_all_examples_with_metadata')
 
     expect(examples).toBeInstanceOf(Array)
     expect(examples.length).toBeGreaterThan(0)

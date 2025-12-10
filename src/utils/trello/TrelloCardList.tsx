@@ -7,6 +7,8 @@ import {
   AccordionTrigger
 } from '@components/ui/accordion'
 import React, { useState } from 'react'
+
+import { logger } from '../logger'
 import { TrelloCard } from '../TrelloCards'
 
 interface TrelloCardListProps {
@@ -29,7 +31,7 @@ const TrelloCardList: React.FC<TrelloCardListProps> = ({ grouped, onSelect }) =>
         return JSON.parse(savedState)
       }
     } catch (error) {
-      console.error('Failed to load accordion state:', error)
+      logger.error('Failed to load accordion state:', error)
     }
     return []
   })
@@ -40,7 +42,7 @@ const TrelloCardList: React.FC<TrelloCardListProps> = ({ grouped, onSelect }) =>
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(value))
     } catch (error) {
-      console.error('Failed to save accordion state:', error)
+      logger.error('Failed to save accordion state:', error)
     }
   }
 
@@ -61,11 +63,11 @@ const TrelloCardList: React.FC<TrelloCardListProps> = ({ grouped, onSelect }) =>
             {listName} ({cards.length})
           </AccordionTrigger>
           <AccordionContent>
-            <ul className="list-disc ml-5 space-y-1">
-              {cards.map(card => (
+            <ul className="ml-5 list-disc space-y-1">
+              {cards.map((card) => (
                 <li
                   key={card.id}
-                  className="hover:bg-gray-200 px-3 py-1 rounded transition-colors cursor-pointer"
+                  className="hover:bg-accent cursor-pointer rounded px-3 py-1 transition-colors"
                   onClick={() => onSelect({ id: card.id, name: card.name })}
                 >
                   {card.name}

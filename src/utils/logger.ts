@@ -9,9 +9,11 @@
  *   logger.log('Debug info', data)
  *   logger.info('Info message')
  *   logger.debug('Detailed debug info')
+ *   logger.error('Error occurred', error)
+ *   logger.warn('Warning message', details)
  *
- * For errors and warnings, continue using console.error and console.warn
- * as these are legitimate for production error tracking.
+ * All logging methods (including error and warn) are disabled in production
+ * to prevent console pollution and information leakage.
  */
 
 const isDevelopment = import.meta.env.DEV
@@ -21,6 +23,8 @@ interface Logger {
   info: (...args: unknown[]) => void
   debug: (...args: unknown[]) => void
   trace: (...args: unknown[]) => void
+  error: (...args: unknown[]) => void
+  warn: (...args: unknown[]) => void
   group: (label: string) => void
   groupEnd: () => void
   table: (data: unknown) => void
@@ -37,6 +41,8 @@ function createLogger(): Logger {
       info: noop,
       debug: noop,
       trace: noop,
+      error: noop,
+      warn: noop,
       group: noop,
       groupEnd: noop,
       table: noop,
@@ -61,6 +67,14 @@ function createLogger(): Logger {
     trace: (...args: unknown[]) => {
       // eslint-disable-next-line no-console
       console.trace(...args)
+    },
+    error: (...args: unknown[]) => {
+      // eslint-disable-next-line no-console
+      console.error(...args)
+    },
+    warn: (...args: unknown[]) => {
+      // eslint-disable-next-line no-console
+      console.warn(...args)
     },
     group: (label: string) => {
       // eslint-disable-next-line no-console
@@ -108,6 +122,8 @@ export function createNamespacedLogger(namespace: string): Logger {
     info: (...args: unknown[]) => baseLogger.info(prefix, ...args),
     debug: (...args: unknown[]) => baseLogger.debug(prefix, ...args),
     trace: (...args: unknown[]) => baseLogger.trace(prefix, ...args),
+    error: (...args: unknown[]) => baseLogger.error(prefix, ...args),
+    warn: (...args: unknown[]) => baseLogger.warn(prefix, ...args),
     group: (label: string) => baseLogger.group(`${prefix} ${label}`),
     groupEnd: baseLogger.groupEnd,
     table: baseLogger.table,

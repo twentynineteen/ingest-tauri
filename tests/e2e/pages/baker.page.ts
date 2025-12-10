@@ -1,5 +1,4 @@
-import { Locator, Page, expect } from '@playwright/test'
-
+import { expect, Locator, Page } from '@playwright/test'
 import { CommonPage } from './common.page'
 
 /**
@@ -39,9 +38,7 @@ export class BakerPage extends CommonPage {
     )
 
     // Results
-    this.scanResults = page.locator(
-      '[data-testid="scan-results"], .scan-results'
-    )
+    this.scanResults = page.locator('[data-testid="scan-results"], .scan-results')
     this.projectList = page.locator(
       '[data-testid="project-list"], .project-list, ul, table'
     )

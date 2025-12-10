@@ -1,11 +1,6 @@
+import type { BreadcrumbsFile, ProjectFolder, ScanResult } from '@/types/baker'
+import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
 import { Page } from '@playwright/test'
-
-import type {
-  BreadcrumbsFile,
-  ProjectFolder,
-  ScanResult,
-} from '../../../src/types/baker'
-import type { ExampleWithMetadata } from '../../../src/types/exampleEmbeddings'
 
 /**
  * Mock data and helpers for Tauri API mocking
@@ -19,14 +14,14 @@ export const mockBreadcrumbs: BreadcrumbsFile = {
   numberOfCameras: 2,
   files: [
     { camera: 1, name: 'A001_001.mov', path: '/Footage/A001_001.mov' },
-    { camera: 2, name: 'B001_001.mov', path: '/Footage/B001_001.mov' },
+    { camera: 2, name: 'B001_001.mov', path: '/Footage/B001_001.mov' }
   ],
   parentFolder: '/test/project',
   createdBy: 'Test User',
   creationDateTime: '2024-01-15T10:00:00Z',
   folderSizeBytes: 1024000,
   videoLinks: [],
-  trelloCards: [],
+  trelloCards: []
 }
 
 /**
@@ -41,7 +36,7 @@ export const mockProjectFolder: ProjectFolder = {
   invalidBreadcrumbs: false,
   lastScanned: '2024-01-15T10:00:00Z',
   cameraCount: 2,
-  validationErrors: [],
+  validationErrors: []
 }
 
 /**
@@ -58,7 +53,7 @@ export const mockExamples: ExampleWithMetadata[] = [
     wordCount: 150,
     qualityScore: 4,
     source: 'bundled',
-    createdAt: '2024-01-01T00:00:00Z',
+    createdAt: '2024-01-01T00:00:00Z'
   },
   {
     id: '2',
@@ -70,7 +65,7 @@ export const mockExamples: ExampleWithMetadata[] = [
     wordCount: 200,
     qualityScore: 5,
     source: 'bundled',
-    createdAt: '2024-01-02T00:00:00Z',
+    createdAt: '2024-01-02T00:00:00Z'
   },
   {
     id: '3',
@@ -82,8 +77,8 @@ export const mockExamples: ExampleWithMetadata[] = [
     wordCount: 100,
     qualityScore: 3,
     source: 'user-uploaded',
-    createdAt: '2024-01-10T00:00:00Z',
-  },
+    createdAt: '2024-01-10T00:00:00Z'
+  }
 ]
 
 /**
@@ -99,7 +94,7 @@ export const mockScanResults: ProjectFolder[] = [
     invalidBreadcrumbs: false,
     lastScanned: '2024-01-15T10:00:00Z',
     cameraCount: 2,
-    validationErrors: [],
+    validationErrors: []
   },
   {
     path: '/test/project-2',
@@ -110,7 +105,7 @@ export const mockScanResults: ProjectFolder[] = [
     invalidBreadcrumbs: false,
     lastScanned: '2024-01-14T10:00:00Z',
     cameraCount: 3,
-    validationErrors: [],
+    validationErrors: []
   },
   {
     path: '/test/project-3',
@@ -121,8 +116,8 @@ export const mockScanResults: ProjectFolder[] = [
     invalidBreadcrumbs: false,
     lastScanned: '2024-01-13T10:00:00Z',
     cameraCount: 1,
-    validationErrors: [],
-  },
+    validationErrors: []
+  }
 ]
 
 /**
@@ -138,7 +133,7 @@ export const mockScanResult: ScanResult = {
   createdBreadcrumbs: 0,
   totalFolderSize: 5120000,
   errors: [],
-  projects: mockScanResults,
+  projects: mockScanResults
 }
 
 /**
@@ -165,7 +160,7 @@ export async function setupTauriMocks(page: Page): Promise<void> {
             case 'get_preferences':
               return {
                 defaultPath: '/Users/test',
-                theme: 'system',
+                theme: 'system'
               }
             default:
               // Log unhandled commands for debugging
@@ -173,7 +168,7 @@ export async function setupTauriMocks(page: Page): Promise<void> {
               console.warn(`[E2E Mock] Unhandled Tauri command: ${cmd}`, args)
               return null
           }
-        },
+        }
       }
     }
   })
@@ -186,7 +181,7 @@ export async function mockFileDialog(
   page: Page,
   response: string | string[] | null
 ): Promise<void> {
-  await page.evaluate((dialogResponse) => {
+  await page.evaluate(dialogResponse => {
     const tauriWindow = window as {
       __TAURI__?: {
         dialog?: {
@@ -197,7 +192,7 @@ export async function mockFileDialog(
 
     if (tauriWindow.__TAURI__) {
       tauriWindow.__TAURI__.dialog = {
-        open: async () => dialogResponse,
+        open: async () => dialogResponse
       }
     }
   }, response)
@@ -210,7 +205,7 @@ export async function mockFileSystem(
   page: Page,
   files: Record<string, string>
 ): Promise<void> {
-  await page.evaluate((mockFiles) => {
+  await page.evaluate(mockFiles => {
     const tauriWindow = window as {
       __TAURI__?: {
         fs?: {
@@ -234,7 +229,7 @@ export async function mockFileSystem(
         },
         exists: async (path: string) => {
           return path in mockFiles
-        },
+        }
       }
     }
   }, files)

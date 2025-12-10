@@ -3,8 +3,9 @@
  * Feature: 004-embed-multiple-video
  */
 
-import { LIMITS } from '../constants/timing'
-import type { TrelloCard, VideoLink } from '../types/media'
+import { LIMITS } from '@constants/timing'
+
+import type { TrelloCard, VideoLink } from '@/types/media'
 
 /**
  * Validates a VideoLink object

@@ -3,21 +3,23 @@
  * Step 2: AI Provider and Model Selection
  */
 
+import { Database, Sparkles } from 'lucide-react'
+import React from 'react'
+
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger
 } from '@/components/ui/accordion'
-import { Database, Sparkles } from 'lucide-react'
-import React from 'react'
-import type { ExampleWithMetadata } from '../../../../types/exampleEmbeddings'
+import type { ExampleWithMetadata } from '@/types/exampleEmbeddings'
 import type {
   AIModel,
   AIProvider,
   ProviderConfiguration,
   ScriptDocument
-} from '../../../../types/scriptFormatter'
+} from '@/types/scriptFormatter'
+
 import { ExampleToggleList } from '../ExampleToggleList'
 import { ModelSelector } from '../ModelSelector'
 import { ProviderSelector } from '../ProviderSelector'
@@ -64,10 +66,10 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
   onFormatScript
 }) => {
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="mx-auto max-w-6xl space-y-6">
       {/* File uploaded confirmation */}
-      <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-        <p className="text-sm text-green-800">
+      <div className="bg-success/10 border-success/20 rounded-lg border p-4">
+        <p className="text-success text-sm">
           ✓ File uploaded: <strong>{document?.filename}</strong> ({document?.fileSize}{' '}
           bytes)
         </p>
@@ -80,8 +82,8 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
         className="space-y-4"
       >
         {/* RAG/Embedding Status */}
-        <AccordionItem value="rag-status" className="border rounded-lg px-4">
-          <AccordionTrigger className="hover:no-underline py-4">
+        <AccordionItem value="rag-status" className="rounded-lg border px-4">
+          <AccordionTrigger className="py-4 hover:no-underline">
             <div className="flex items-center gap-2">
               <Database className="h-4 w-4" />
               <span className="text-sm font-medium">RAG Enhancement Status</span>
@@ -98,15 +100,15 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
 
         {/* Example Selection */}
         {isEmbeddingReady && allExamples.length > 0 && (
-          <AccordionItem value="example-selection" className="border rounded-lg px-4">
-            <AccordionTrigger className="hover:no-underline py-4">
+          <AccordionItem value="example-selection" className="rounded-lg border px-4">
+            <AccordionTrigger className="py-4 hover:no-underline">
               <div className="flex items-center gap-2">
                 <Database className="h-4 w-4" />
                 <span className="text-sm font-medium">Select Examples to Use</span>
               </div>
             </AccordionTrigger>
             <AccordionContent className="pb-4">
-              <p className="text-xs text-gray-600 mb-3">
+              <p className="text-muted-foreground mb-3 text-xs">
                 Choose which examples the AI should reference when formatting your script.
                 The system will automatically select the most relevant enabled examples.
               </p>
@@ -124,7 +126,7 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
       {/* Two-column grid for provider and model selection */}
       <div className="grid grid-cols-2 gap-6">
         {/* Left column: AI Provider */}
-        <div className="p-6 border border-gray-300 rounded-lg max-h-[200px] overflow-y-auto">
+        <div className="border-border max-h-[200px] overflow-y-auto rounded-lg border p-6">
           <ProviderSelector
             providers={availableProviders}
             activeProvider={activeProvider}
@@ -135,7 +137,7 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
         </div>
 
         {/* Right column: Model Selector */}
-        <div className="p-6 border border-gray-300 rounded-lg max-h-[200px] overflow-y-auto">
+        <div className="border-border max-h-[200px] overflow-y-auto rounded-lg border p-6">
           {activeProvider?.status === 'configured' ? (
             <ModelSelector
               models={models}
@@ -144,7 +146,7 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
               isLoading={isLoadingModels}
             />
           ) : (
-            <div className="flex items-center justify-center h-full text-gray-400">
+            <div className="text-muted-foreground flex h-full items-center justify-center">
               <p className="text-sm">Select and validate an AI provider to see models</p>
             </div>
           )}
@@ -155,11 +157,11 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
       {selectedModelId && activeProvider?.status === 'configured' && (
         <button
           type="button"
-          onClick={e => {
+          onClick={(e) => {
             e.preventDefault()
             onFormatScript()
           }}
-          className="w-full px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 flex items-center justify-center gap-2 mb-3"
+          className="bg-foreground text-background hover:bg-foreground/90 mb-3 flex w-full items-center justify-center gap-2 rounded-lg px-6 py-3"
         >
           <Sparkles className="h-5 w-5" />
           Format Script with AI
@@ -177,15 +179,13 @@ const RAGStatusContent: React.FC<{
 }> = ({ isLoading, isReady, error }) => {
   if (isLoading) {
     return (
-      <p className="text-sm text-blue-600">
-        Checking Ollama embedding model availability...
-      </p>
+      <p className="text-info text-sm">Checking Ollama embedding model availability...</p>
     )
   }
 
   if (isReady) {
     return (
-      <p className="text-sm text-green-600">
+      <p className="text-success text-sm">
         ✓ RAG system ready (Ollama) - will use similar examples to improve formatting
       </p>
     )
@@ -193,10 +193,10 @@ const RAGStatusContent: React.FC<{
 
   if (error) {
     return (
-      <div className="text-sm text-red-600">
+      <div className="text-destructive text-sm">
         <p className="font-medium">⚠ RAG system not available</p>
-        <p className="text-xs mt-1">{error.message}</p>
-        <p className="text-xs mt-1 text-gray-600">
+        <p className="mt-1 text-xs">{error.message}</p>
+        <p className="text-muted-foreground mt-1 text-xs">
           Will format without example guidance.
         </p>
       </div>
@@ -204,7 +204,7 @@ const RAGStatusContent: React.FC<{
   }
 
   return (
-    <p className="text-sm text-gray-600">
+    <p className="text-muted-foreground text-sm">
       RAG system not available - will format without example guidance
     </p>
   )

@@ -296,8 +296,8 @@ The script will:
 Run the coverage analysis script after generating coverage:
 
 ```bash
-# Generate coverage (using Jest example)
-npm test -- --coverage
+# Generate coverage
+bun test --coverage
 
 # Analyze coverage gaps
 python3 scripts/analyze_coverage.py coverage/coverage-final.json
@@ -433,19 +433,19 @@ Follow this decision tree to determine the testing approach:
 
 ```bash
 # Run all tests
-npm test
+bun test
 
 # Run with coverage
-npm test -- --coverage
+bun test --coverage
 
 # Run specific test file
-npm test -- ExpenseCalculator.test.ts
+bun test ExpenseCalculator.test.ts
 
 # Run in watch mode
-npm test -- --watch
+bun test --watch
 
 # Run E2E tests
-npm run test:e2e
+bun run test:e2e
 ```
 
 ## Reference Documentation

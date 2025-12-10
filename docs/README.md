@@ -146,12 +146,14 @@ bucket/
 **What it is:** A `breadcrumbs.json` file stored in each project folder that contains metadata about the project (title, date, camera count, video links, Trello cards, etc.).
 
 **Why this matters:** Breadcrumbs serve as the central source of truth for project metadata. They enable:
+
 - Quick project identification without opening Premiere
 - Integration with external tools (Trello, Sprout Video)
 - Batch operations across multiple projects (Baker workflow)
 - Persistent metadata that survives file system changes
 
 **Example breadcrumbs.json:**
+
 ```json
 {
   "version": "2.0.0",
@@ -181,11 +183,13 @@ bucket/
 **What it is:** A system for organizing video files by camera number (1 to N) during project creation.
 
 **Why this matters:** Professional multi-camera shoots generate hundreds of files from different cameras. Bucket automates the organization:
+
 - Files are validated to ensure they have camera assignments from 1 to `num_cameras`
 - Files are copied to the appropriate camera subfolder (`Camera 1/`, `Camera 2/`, etc.)
 - Adobe Premiere project template is configured for the camera count
 
 **Example:**
+
 ```javascript
 // Selected files
 [
@@ -212,12 +216,14 @@ Conference Keynote 2024/
 **What it is:** AI-powered autocue script formatting using Retrieval-Augmented Generation (RAG) with locally hosted LLM models.
 
 **Why this matters:** Professional autocue scripts require specific formatting (punctuation, paragraph breaks, speaker notes). Instead of manual formatting:
+
 - Upload a Word document with raw transcript
 - System retrieves similar example scripts from embedding database
 - LLM uses examples to format the script consistently
 - Review changes in a diff editor before exporting
 
 **How it works:**
+
 1. User uploads script → parsed with mammoth.js
 2. Script chunks are embedded using Ollama's embedding model
 3. Similar examples are retrieved from SQLite vector database
@@ -296,14 +302,15 @@ Not currently used. Configuration is stored in Tauri's app data directory and ma
 
 **Accessible via:** Settings page in the app
 
-| Setting | Description | Default | Required |
-|---------|-------------|---------|----------|
-| **Ollama URL** | Ollama server endpoint for AI features | `http://localhost:11434` | For AI features |
-| **Trello API Key** | Trello API key for card integration | None | For Trello features |
-| **Trello Token** | Trello OAuth token | None | For Trello features |
-| **Sprout Video API Key** | Sprout Video API key | None | For Sprout features |
+| Setting                  | Description                            | Default                  | Required            |
+| ------------------------ | -------------------------------------- | ------------------------ | ------------------- |
+| **Ollama URL**           | Ollama server endpoint for AI features | `http://localhost:11434` | For AI features     |
+| **Trello API Key**       | Trello API key for card integration    | None                     | For Trello features |
+| **Trello Token**         | Trello OAuth token                     | None                     | For Trello features |
+| **Sprout Video API Key** | Sprout Video API key                   | None                     | For Sprout features |
 
 **How to configure:**
+
 1. Open Bucket
 2. Navigate to Settings
 3. Enter your API keys
@@ -335,6 +342,7 @@ cargo test
 ### Code Style
 
 **Frontend (TypeScript/React):**
+
 - **Component Style:** Functional components with `React.FC` typing
 - **Naming:** PascalCase for components, camelCase for functions/variables
 - **Imports:** Auto-sorted with `@ianvs/prettier-plugin-sort-imports`
@@ -342,6 +350,7 @@ cargo test
 - **State Management:** Zustand stores for global state, React Query for server state
 
 **Auto-formatting:**
+
 ```bash
 # Check formatting
 npm run prettier
@@ -357,6 +366,7 @@ npm run eslint:fix
 ```
 
 **Backend (Rust):**
+
 - Follow standard Rust conventions (rustfmt)
 - Use `Result<T, E>` for error handling
 - Document public APIs with `///` doc comments
@@ -397,6 +407,7 @@ RUST_LOG=app_lib::commands=debug npm run dev:tauri
 ```
 
 **Common debugging commands:**
+
 ```bash
 # Check Ollama connection
 curl http://localhost:11434/api/tags
@@ -417,6 +428,7 @@ sqlite3 examples.db "SELECT COUNT(*) FROM examples;"
 **Problem:** AI Script Formatter shows "Failed to connect to Ollama" or "No models available"
 
 **Solution:**
+
 ```bash
 # 1. Check if Ollama is running
 curl http://localhost:11434/api/tags
@@ -441,6 +453,7 @@ ollama pull llama3.1:latest
 **Problem:** `npm run build:tauri` fails with missing dependency errors
 
 **Solution:**
+
 ```bash
 # 1. Clear node_modules and reinstall
 rm -rf node_modules bun.lock package-lock.json
@@ -466,6 +479,7 @@ rustup update
 **Problem:** "Failed to copy file" or "Permission denied" errors during BuildProject workflow
 
 **Solution:**
+
 1. **Check disk space:** Ensure destination folder has enough space
 2. **Check permissions:** Make sure you have write access to the destination folder
 3. **Check file locks:** Close any apps (Premiere, Finder) that might have files open
@@ -508,12 +522,14 @@ ProjectFolder/
 ```
 
 **Fix:**
+
 1. Ensure folders have at least `Footage/` and `Projects/` subdirectories
 2. Folder names are case-sensitive on Linux/macOS
 3. Try scanning a parent directory that contains multiple project folders
 
 ## Additional Documentation
 
+- **[PREMIERE_PLUGINS.md](./PREMIERE_PLUGINS.md)** - Install and manage Premiere Pro CEP extensions
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Detailed system architecture and design decisions
 - **[API_COMMANDS.md](./API_COMMANDS.md)** - Complete Tauri command reference
 - **[CLAUDE.md](../CLAUDE.md)** - Instructions for Claude Code when working with this codebase

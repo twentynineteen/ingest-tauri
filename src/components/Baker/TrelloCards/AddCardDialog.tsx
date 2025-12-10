@@ -1,7 +1,11 @@
 /**
  * AddCardDialog - Dialog for adding new Trello cards
- * Extracted from TrelloCardsManager to reduce complexity (DEBT-002)
+ * DEBT-007: Refactored with grouped parameters (19 → 6 parameter groups)
+ * Reduced from 19 individual parameters to 6 logical parameter groups
  */
+
+import TrelloCardList from '@utils/trello/TrelloCardList'
+import { AlertCircle, Loader2, Plus, Search } from 'lucide-react'
 
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
@@ -17,76 +21,86 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { AlertCircle, Loader2, Plus, Search } from 'lucide-react'
-import TrelloCardList from '../../../utils/trello/TrelloCardList'
 
-interface AddCardDialogProps {
+// Type definitions for grouped parameters
+export interface DialogState {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
   canAddCard: boolean
   hasApiCredentials: boolean
+}
+
+export interface ModeState {
   addMode: 'url' | 'select'
   onAddModeChange: (mode: 'url' | 'select') => void
-  // URL mode
+}
+
+export interface UrlModeState {
   cardUrl: string
   onCardUrlChange: (url: string) => void
   onFetchAndAdd: () => void
-  // Select mode
+}
+
+export interface SelectModeState {
   searchTerm: string
   onSearchTermChange: (term: string) => void
   filteredGrouped: Record<string, Array<{ id: string; name: string; desc?: string }>>
   onSelectCard: (card: { id: string; name: string }) => void
   isBoardLoading: boolean
-  // Common
+}
+
+export interface CommonState {
   isFetchingCard: boolean
   onClose: () => void
-  // Errors
+}
+
+export interface ErrorState {
   validationErrors: string[]
   addError: Error | null
   fetchError: Error | null
 }
 
+// Refactored props interface - 6 grouped parameters instead of 19 individual ones
+export interface AddCardDialogProps {
+  dialog: DialogState
+  mode: ModeState
+  urlMode: UrlModeState
+  selectMode: SelectModeState
+  common: CommonState
+  errors: ErrorState
+}
+
 export function AddCardDialog({
-  isOpen,
-  onOpenChange,
-  canAddCard,
-  hasApiCredentials,
-  addMode,
-  onAddModeChange,
-  cardUrl,
-  onCardUrlChange,
-  onFetchAndAdd,
-  searchTerm,
-  onSearchTermChange,
-  filteredGrouped,
-  onSelectCard,
-  isBoardLoading,
-  isFetchingCard,
-  onClose,
-  validationErrors,
-  addError,
-  fetchError
+  dialog,
+  mode,
+  urlMode,
+  selectMode,
+  common,
+  errors
 }: AddCardDialogProps) {
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={dialog.isOpen} onOpenChange={dialog.onOpenChange}>
       <DialogTrigger asChild>
-        <Button disabled={!canAddCard}>
+        <Button disabled={!dialog.canAddCard}>
           <Plus className="mr-2 h-4 w-4" />
           Add Card
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Trello Card</DialogTitle>
           <DialogDescription>
-            {hasApiCredentials
+            {dialog.hasApiCredentials
               ? 'Select a card from your board or enter a URL'
               : 'Enter the URL of a Trello card'}
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs value={addMode} onValueChange={v => onAddModeChange(v as 'url' | 'select')}>
-          {hasApiCredentials && (
+        <Tabs
+          value={mode.addMode}
+          onValueChange={(v) => mode.onAddModeChange(v as 'url' | 'select')}
+        >
+          {dialog.hasApiCredentials && (
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="select">Select from Board</TabsTrigger>
               <TabsTrigger value="url">Enter URL</TabsTrigger>
@@ -94,33 +108,19 @@ export function AddCardDialog({
           )}
 
           <TabsContent value="select" className="space-y-4">
-            <SelectFromBoardContent
-              searchTerm={searchTerm}
-              onSearchTermChange={onSearchTermChange}
-              filteredGrouped={filteredGrouped}
-              onSelectCard={onSelectCard}
-              isBoardLoading={isBoardLoading}
-              isFetchingCard={isFetchingCard}
-            />
+            <SelectFromBoardContent selectMode={selectMode} common={common} />
           </TabsContent>
 
           <TabsContent value="url" className="space-y-4">
             <UrlInputContent
-              cardUrl={cardUrl}
-              onCardUrlChange={onCardUrlChange}
-              onFetchAndAdd={onFetchAndAdd}
-              onClose={onClose}
-              isFetchingCard={isFetchingCard}
-              hasApiCredentials={hasApiCredentials}
+              urlMode={urlMode}
+              common={common}
+              hasApiCredentials={dialog.hasApiCredentials}
             />
           </TabsContent>
         </Tabs>
 
-        <ErrorDisplay
-          validationErrors={validationErrors}
-          addError={addError}
-          fetchError={fetchError}
-        />
+        <ErrorDisplay errors={errors} />
       </DialogContent>
     </Dialog>
   )
@@ -128,25 +128,17 @@ export function AddCardDialog({
 
 // Sub-components
 function SelectFromBoardContent({
-  searchTerm,
-  onSearchTermChange,
-  filteredGrouped,
-  onSelectCard,
-  isBoardLoading,
-  isFetchingCard
+  selectMode,
+  common
 }: {
-  searchTerm: string
-  onSearchTermChange: (term: string) => void
-  filteredGrouped: Record<string, Array<{ id: string; name: string; desc?: string }>>
-  onSelectCard: (card: { id: string; name: string }) => void
-  isBoardLoading: boolean
-  isFetchingCard: boolean
+  selectMode: SelectModeState
+  common: CommonState
 }) {
-  if (isBoardLoading) {
+  if (selectMode.isBoardLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-        <span className="ml-2 text-sm text-gray-500">Loading cards...</span>
+        <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+        <span className="text-muted-foreground ml-2 text-sm">Loading cards...</span>
       </div>
     )
   }
@@ -156,25 +148,28 @@ function SelectFromBoardContent({
       <div className="space-y-2">
         <Label htmlFor="search">Search Cards</Label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             id="search"
             placeholder="Search by name or description..."
-            value={searchTerm}
-            onChange={e => onSearchTermChange(e.target.value)}
+            value={selectMode.searchTerm}
+            onChange={(e) => selectMode.onSearchTermChange(e.target.value)}
             className="pl-10"
           />
         </div>
       </div>
 
-      <div className="max-h-[400px] overflow-y-auto border rounded-md p-4">
-        {isFetchingCard ? (
+      <div className="max-h-[400px] overflow-y-auto rounded-md border p-4">
+        {common.isFetchingCard ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-            <span className="ml-2 text-sm text-gray-500">Adding card...</span>
+            <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+            <span className="text-muted-foreground ml-2 text-sm">Adding card...</span>
           </div>
         ) : (
-          <TrelloCardList grouped={filteredGrouped} onSelect={onSelectCard} />
+          <TrelloCardList
+            grouped={selectMode.filteredGrouped}
+            onSelect={selectMode.onSelectCard}
+          />
         )}
       </div>
     </>
@@ -182,18 +177,12 @@ function SelectFromBoardContent({
 }
 
 function UrlInputContent({
-  cardUrl,
-  onCardUrlChange,
-  onFetchAndAdd,
-  onClose,
-  isFetchingCard,
+  urlMode,
+  common,
   hasApiCredentials
 }: {
-  cardUrl: string
-  onCardUrlChange: (url: string) => void
-  onFetchAndAdd: () => void
-  onClose: () => void
-  isFetchingCard: boolean
+  urlMode: UrlModeState
+  common: CommonState
   hasApiCredentials: boolean
 }) {
   return (
@@ -203,10 +192,10 @@ function UrlInputContent({
         <Input
           id="card-url"
           placeholder="https://trello.com/c/abc12345/card-name"
-          value={cardUrl}
-          onChange={e => onCardUrlChange(e.target.value)}
+          value={urlMode.cardUrl}
+          onChange={(e) => urlMode.onCardUrlChange(e.target.value)}
         />
-        <p className="text-xs text-gray-500">
+        <p className="text-muted-foreground text-xs">
           {hasApiCredentials
             ? 'Card details will be fetched automatically'
             : 'Enter the full URL from your Trello board'}
@@ -214,11 +203,14 @@ function UrlInputContent({
       </div>
 
       <DialogFooter>
-        <Button variant="outline" onClick={onClose}>
+        <Button variant="outline" onClick={common.onClose}>
           Cancel
         </Button>
-        <Button onClick={onFetchAndAdd} disabled={isFetchingCard || !cardUrl.trim()}>
-          {isFetchingCard ? (
+        <Button
+          onClick={urlMode.onFetchAndAdd}
+          disabled={common.isFetchingCard || !urlMode.cardUrl.trim()}
+        >
+          {common.isFetchingCard ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Fetching...
@@ -232,23 +224,15 @@ function UrlInputContent({
   )
 }
 
-function ErrorDisplay({
-  validationErrors,
-  addError,
-  fetchError
-}: {
-  validationErrors: string[]
-  addError: Error | null
-  fetchError: Error | null
-}) {
+function ErrorDisplay({ errors }: { errors: ErrorState }) {
   return (
     <>
-      {validationErrors.length > 0 && (
+      {errors.validationErrors.length > 0 && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <ul className="list-disc pl-4 space-y-1">
-              {validationErrors.map((err, i) => (
+            <ul className="list-disc space-y-1 pl-4">
+              {errors.validationErrors.map((err, i) => (
                 <li key={i}>{err}</li>
               ))}
             </ul>
@@ -256,20 +240,24 @@ function ErrorDisplay({
         </Alert>
       )}
 
-      {addError && (
+      {errors.addError && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {addError instanceof Error ? addError.message : String(addError)}
+            {errors.addError instanceof Error
+              ? errors.addError.message
+              : String(errors.addError)}
           </AlertDescription>
         </Alert>
       )}
 
-      {fetchError && (
+      {errors.fetchError && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            {fetchError instanceof Error ? fetchError.message : String(fetchError)}
+            {errors.fetchError instanceof Error
+              ? errors.fetchError.message
+              : String(errors.fetchError)}
           </AlertDescription>
         </Alert>
       )}

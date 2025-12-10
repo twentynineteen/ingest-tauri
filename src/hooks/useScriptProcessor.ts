@@ -5,13 +5,16 @@
  * Enhanced with RAG (Retrieval-Augmented Generation)
  */
 
+import { ModelFactory } from '@services/ai/modelFactory'
 import { invoke } from '@tauri-apps/api/core'
+import { buildRAGPrompt } from '@utils/aiPrompts'
+import { createNamespacedLogger } from '@utils/logger'
 import { streamText } from 'ai'
 import { useRef, useState } from 'react'
-import { ModelFactory } from '../services/ai/modelFactory'
-import type { ProcessedOutput, ProviderConfiguration } from '../types/scriptFormatter'
-import { buildRAGPrompt } from '../utils/aiPrompts'
-import { createNamespacedLogger } from '../utils/logger'
+
+import type { ProcessedOutput, ProviderConfiguration } from '@/types/scriptFormatter'
+import { logger } from '@/utils/logger'
+
 import { useOllamaEmbedding } from './useOllamaEmbedding'
 import type { SimilarExample } from './useScriptRetrieval'
 
@@ -85,7 +88,7 @@ async function retrieveSimilarExamples(
     if (examples.length > 0) {
       logger.log(
         'Example details:',
-        examples.map(ex => ({
+        examples.map((ex) => ({
           id: ex.id,
           title: ex.title,
           similarity: ex.similarity,
@@ -104,7 +107,7 @@ async function retrieveSimilarExamples(
 
     return examples
   } catch (ragError) {
-    console.error('[useScriptProcessor] RAG retrieval failed:', ragError)
+    logger.error('[useScriptProcessor] RAG retrieval failed:', ragError)
     options.onRAGUpdate?.(
       'RAG search failed: ' +
         (ragError instanceof Error ? ragError.message : String(ragError)),
@@ -125,7 +128,7 @@ function filterEnabledExamples(
     return allExamples.slice(0, 3)
   }
 
-  const filtered = allExamples.filter(ex => enabledIds.has(ex.id))
+  const filtered = allExamples.filter((ex) => enabledIds.has(ex.id))
   logger.log(`Filtered ${allExamples.length} examples to ${filtered.length} enabled`)
   return filtered
 }
@@ -148,7 +151,20 @@ async function streamAIResponse(
   systemPrompt: string,
   abortSignal: AbortSignal
 ): Promise<string> {
+  const totalPromptSize = systemPrompt.length + options.text.length
   logger.log('Processing with AI...')
+  logger.log('System prompt length:', systemPrompt.length, 'characters')
+  logger.log('User text length:', options.text.length, 'characters')
+  logger.log(
+    'Total prompt size:',
+    totalPromptSize,
+    'characters (~' + Math.ceil(totalPromptSize / 4) + ' tokens)'
+  )
+
+  // Warn if prompt is very large
+  if (totalPromptSize > 20000) {
+    logger.log('⚠️  Large prompt detected - first response may take 30-60 seconds')
+  }
 
   const model = ModelFactory.createModel({
     providerId: options.providerId,
@@ -169,7 +185,24 @@ ${options.text}`
       }
     ],
     temperature: 0.3,
-    abortSignal
+    abortSignal,
+    // Ollama-specific options via providerOptions
+    providerOptions: {
+      ollama: {
+        options: {
+          // Context window size - set to 8192 for better compatibility with longer prompts
+          // Reduced from previous larger values to prevent timeout issues
+          // 8192 tokens (~32K chars) provides good balance between capacity and performance
+          num_ctx: 8192,
+          // Unlimited output tokens for long scripts
+          num_predict: -1,
+          // Keep model loaded for 10 minutes to avoid cold start delays
+          keep_alive: '10m',
+          // Reduce temperature for more consistent output
+          temperature: 0.3
+        }
+      }
+    }
   })
 
   // Collect streamed text
@@ -206,8 +239,8 @@ function createProcessedOutput(
   // Convert line breaks to proper HTML paragraphs
   const htmlContent = formattedText
     .split('\n')
-    .filter(line => line.trim().length > 0)
-    .map(line => `<p>${line}</p>`)
+    .filter((line) => line.trim().length > 0)
+    .map((line) => `<p>${line}</p>`)
     .join('\n')
 
   return {
@@ -311,6 +344,21 @@ export function useScriptProcessor(): UseScriptProcessorResult {
       } catch (err) {
         attempt++
 
+        // Log detailed error information
+        logger.error(
+          '[useScriptProcessor] Processing error (attempt',
+          attempt,
+          'of',
+          maxRetries,
+          '):',
+          err
+        )
+        if (err instanceof Error) {
+          logger.error('[useScriptProcessor] Error name:', err.name)
+          logger.error('[useScriptProcessor] Error message:', err.message)
+          logger.error('[useScriptProcessor] Error stack:', err.stack)
+        }
+
         if (abortControllerRef.current?.signal.aborted) {
           // User cancelled
           const cancelError = new Error('Processing cancelled by user')
@@ -323,15 +371,22 @@ export function useScriptProcessor(): UseScriptProcessorResult {
           // Final failure after retries
           const finalError =
             err instanceof Error ? err : new Error('Failed to process script')
+          logger.error(
+            '[useScriptProcessor] Max retries exceeded. Final error:',
+            finalError
+          )
           setError(finalError)
           setIsProcessing(false)
           throw finalError
         }
 
         // Retry with exponential backoff
+        logger.log(
+          `Retrying in ${Math.pow(2, attempt)}s... (attempt ${attempt} of ${maxRetries})`
+        )
         options.onRetry?.(attempt)
         const backoffDelay = Math.pow(2, attempt) * 1000 // 1s, 2s, 4s
-        await new Promise(resolve => setTimeout(resolve, backoffDelay))
+        await new Promise((resolve) => setTimeout(resolve, backoffDelay))
       }
     }
 

@@ -1,433 +1,147 @@
 /**
  * useScriptFormatterState Hook
  * Purpose: Manages all state and handlers for the ScriptFormatter workflow
- * Extracted from ScriptFormatter.tsx to reduce complexity (DEBT-002)
+ *
+ * REFACTORED (DEBT-001): Now uses composition of focused hooks
+ * - useScriptWorkflow: Orchestrates the complete workflow
+ * - Additional UI-specific state (save dialog)
+ * - Additional feature: Save formatted text as example for RAG
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react'
-import {
-  ExampleCategory,
-  type ExampleMetadata,
-  type UploadRequest
-} from '../types/exampleEmbeddings'
-import {
-  STORAGE_KEYS,
-  type ProcessedOutput,
-  type ProviderConfiguration,
-  type ScriptDocument
-} from '../types/scriptFormatter'
-import { createNamespacedLogger } from '../utils/logger'
-import { useAIModels } from './useAIModels'
-import { useAIProvider } from './useAIProvider'
-import { useDocxGenerator } from './useDocxGenerator'
-import { useDocxParser } from './useDocxParser'
+import { createNamespacedLogger } from '@utils/logger'
+import { useCallback, useState } from 'react'
+
+import { ExampleCategory } from '@/types/exampleEmbeddings'
+
 import { useExampleManagement } from './useExampleManagement'
-import { useOllamaEmbedding } from './useOllamaEmbedding'
-import { useScriptProcessor } from './useScriptProcessor'
+import { useScriptWorkflow } from './useScriptWorkflow'
 
 const log = createNamespacedLogger('ScriptFormatterState')
 
-export type WorkflowStep =
-  | 'upload'
-  | 'select-model'
-  | 'processing'
-  | 'review'
-  | 'download'
-
-/**
- * Converts markdown formatting to HTML
- */
-function convertMarkdownToHtml(text: string): string {
-  let result = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-  result = result.replace(/__(.+?)__/g, '<strong>$1</strong>')
-  result = result.replace(/(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)/g, '<em>$1</em>')
-  result = result.replace(/(?<!_)_(?!_)(.+?)(?<!_)_(?!_)/g, '<em>$1</em>')
-  return result
-}
-
-/**
- * Restores cached output from localStorage
- */
-function restoreCachedOutput(): ProcessedOutput | null {
-  const savedOutput = localStorage.getItem(STORAGE_KEYS.PROCESSED_OUTPUT)
-  if (!savedOutput) {
-    log.debug('No cached result found')
-    return null
-  }
-
-  try {
-    const output = JSON.parse(savedOutput)
-    log.debug('Restored cached result:', {
-      formattedTextPreview: output.formattedText.substring(0, 100),
-      timestamp: output.generationTimestamp,
-      examplesCount: output.examplesCount
-    })
-    return output
-  } catch (err) {
-    console.warn('[ScriptFormatterState] Failed to restore cached result:', err)
-    localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
-    return null
-  }
-}
+// Re-export WorkflowStep type for backward compatibility
+export type { WorkflowStep } from '@/types/scriptFormatter'
 
 export function useScriptFormatterState() {
-  // Core workflow state
-  const [currentStep, setCurrentStep] = useState<WorkflowStep>('upload')
-  const [document, setDocument] = useState<ScriptDocument | null>(null)
-  const [selectedModelId, setSelectedModelId] = useState<string | null>(null)
-  const [processedOutput, setProcessedOutput] = useState<ProcessedOutput | null>(null)
-  const [modifiedText, setModifiedText] = useState<string>('')
-  const [markdownText, setMarkdownText] = useState<string>('')
-  const [examplesCount, setExamplesCount] = useState<number>(0)
-  const [ragStatus, setRagStatus] = useState<string>('')
+  // Use the new orchestration hook
+  const workflow = useScriptWorkflow()
+
+  // Additional UI state not managed by workflow
   const [showSaveDialog, setShowSaveDialog] = useState(false)
-  const [enabledExampleIds, setEnabledExampleIds] = useState<Set<string>>(new Set())
-  const [isValidatingProvider, setIsValidatingProvider] = useState(false)
-  const [localProgress, setLocalProgress] = useState<number>(0)
-  const validatedProviderRef = useRef<string | null>(null)
 
-  // Initialize hooks
-  const { parseFile, isLoading: isParsing, error: parseError } = useDocxParser()
-  const { generateFile, isGenerating, error: generateError } = useDocxGenerator()
-  const { activeProvider, availableProviders, switchProvider, validateProvider } =
-    useAIProvider()
+  // Example management for saving formatted text as RAG example
+  const { uploadMutation } = useExampleManagement()
 
-  const { models, isLoading: isLoadingModels } = useAIModels({
-    providerId: activeProvider?.id || '',
-    configuration: activeProvider?.configuration || {
-      serviceUrl: '',
-      connectionStatus: 'not-configured'
-    },
-    enabled: !!activeProvider && activeProvider.status === 'configured'
-  })
-
-  const {
-    processScript,
-    error: processingError,
-    cancel: cancelProcessing,
-    isEmbeddingReady,
-    isEmbeddingLoading,
-    embeddingError
-  } = useScriptProcessor()
-
-  const {
-    uploadExample,
-    examples: allExamples,
-    isLoading: isLoadingExamples
-  } = useExampleManagement()
-  const { embed: embedForSaving } = useOllamaEmbedding()
-
-  // Initialize enabled examples when examples are loaded
-  useEffect(() => {
-    if (allExamples.length > 0 && enabledExampleIds.size === 0) {
-      setEnabledExampleIds(new Set(allExamples.map(ex => ex.id)))
-    }
-  }, [allExamples, enabledExampleIds.size])
-
-  // Restore session data from localStorage on mount
-  const [initialLoadDone] = useState(() => {
-    const cachedOutput = restoreCachedOutput()
-    if (cachedOutput) {
-      setProcessedOutput(cachedOutput)
-      setMarkdownText(cachedOutput.formattedText)
-      setModifiedText(cachedOutput.formattedText)
-      if (cachedOutput.examplesCount !== undefined) {
-        setExamplesCount(cachedOutput.examplesCount)
-      }
-      setCurrentStep('review')
-    }
-    return true
-  })
-  void initialLoadDone
-
-  // Handlers
-  const handleFileSelect = useCallback(
-    async (file: File) => {
-      try {
-        const parsed = await parseFile(file)
-        setDocument(parsed)
-        setCurrentStep('select-model')
-      } catch (error) {
-        console.error('Failed to parse file:', error)
-      }
-    },
-    [parseFile]
-  )
-
-  const handleProviderValidate = useCallback(
-    async (providerId: string, config: ProviderConfiguration) => {
-      setIsValidatingProvider(true)
-      try {
-        await validateProvider(providerId, config)
-      } finally {
-        setIsValidatingProvider(false)
-      }
-    },
-    [validateProvider]
-  )
-
-  const handleFormatScript = useCallback(async () => {
-    log.debug('handleFormatScript called', {
-      document,
-      selectedModelId,
-      activeProvider
-    })
-
-    if (!document || !selectedModelId || !activeProvider) {
-      console.warn('[ScriptFormatterState] Missing required data:', {
-        document,
-        selectedModelId,
-        activeProvider
-      })
-      return
-    }
-
-    // Clear any cached results before processing
-    localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
-    setProcessedOutput(null)
-    setModifiedText('')
-    setMarkdownText('')
-    setRagStatus('')
-    setExamplesCount(0)
-    setLocalProgress(0)
-
-    log.debug('Setting step to processing...')
-    setCurrentStep('processing')
-
-    try {
-      log.debug(
-        'Processing script with user input:',
-        document.textContent.substring(0, 200) + '...'
-      )
-
-      const output = await processScript({
-        text: document.textContent,
-        modelId: selectedModelId,
-        providerId: activeProvider.id,
-        configuration: activeProvider.configuration,
-        enabledExampleIds: enabledExampleIds,
-        onProgress: prog => {
-          log.debug(`Progress: ${prog}%`)
-          setLocalProgress(prog)
-        },
-        onRAGUpdate: (status, count) => {
-          setRagStatus(status)
-          setExamplesCount(count)
-        }
-      })
-
-      log.debug('Processing completed successfully:', output)
-      log.info('Output preview:', output.formattedText.substring(0, 200) + '...')
-
-      // Set all state first
-      setMarkdownText(output.formattedText)
-      setModifiedText(output.formattedText)
-      setProcessedOutput(output)
-      setLocalProgress(100)
-
-      // Cache result
-      localStorage.setItem(STORAGE_KEYS.PROCESSED_OUTPUT, JSON.stringify(output))
-
-      // Longer delay to ensure all state updates complete and Monaco can initialize properly
-      // This prevents race conditions where Monaco receives data before it's fully mounted
-      await new Promise(resolve => setTimeout(resolve, 300))
-      setCurrentStep('review')
-    } catch (error) {
-      console.error('[ScriptFormatterState] Processing failed with error:', error)
-      setLocalProgress(0)
-    }
-  }, [document, selectedModelId, activeProvider, enabledExampleIds, processScript])
-
-  const handleModifiedChange = useCallback(
-    (value: string) => {
-      setModifiedText(value)
-      setMarkdownText(value)
-
-      if (processedOutput) {
-        setProcessedOutput({
-          ...processedOutput,
-          formattedText: value,
-          isEdited: true,
-          editHistory: [
-            ...processedOutput.editHistory,
-            {
-              timestamp: new Date(),
-              type: 'manual',
-              changeDescription: 'Manual edit',
-              previousValue: processedOutput.formattedText,
-              newValue: value
-            }
-          ]
-        })
-      }
-    },
-    [processedOutput]
-  )
-
-  const handleDownload = useCallback(async () => {
-    if (!document || !markdownText) return
-
-    try {
-      const filename = document.filename.replace('.docx', '_formatted.docx')
-      const htmlContent = markdownText
-        .split('\n')
-        .filter(line => line.trim())
-        .map(line => `<p>${convertMarkdownToHtml(line)}</p>`)
-        .join('')
-
-      await generateFile(htmlContent, filename)
-      setCurrentStep('download')
-      localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
-    } catch (error) {
-      console.error('Download failed:', error)
-    }
-  }, [document, markdownText, generateFile])
-
+  /**
+   * Saves the current formatted text as a new RAG example
+   */
   const handleSaveAsExample = useCallback(
     async (title: string, category: ExampleCategory, qualityScore: number) => {
-      if (!document || !modifiedText) {
+      if (!workflow.document || !workflow.modifiedText) {
         throw new Error('Missing document or formatted text')
       }
 
-      try {
-        log.info('Generating embedding from formatted text...')
-        const embedding = await embedForSaving(modifiedText)
-        log.info(`Embedding generated: ${embedding.length} dimensions`)
+      log.info('Saving formatted text as example:', title)
 
-        const metadata: ExampleMetadata = {
-          title,
-          category,
-          tags: [],
-          qualityScore
-        }
+      // Create a Blob from the modified text
+      const blob = new Blob([workflow.modifiedText], { type: 'text/plain' })
+      const file = new File([blob], `${title}.txt`, { type: 'text/plain' })
 
-        const request: UploadRequest = {
-          beforeContent: document.textContent,
-          afterContent: modifiedText,
-          metadata,
-          embedding
-        }
+      await uploadMutation.mutateAsync({
+        file,
+        title,
+        category,
+        qualityScore,
+        source: 'uploaded'
+      })
 
-        await uploadExample.mutateAsync(request)
-        log.info('Example saved successfully!')
-      } catch (error) {
-        console.error('[ScriptFormatterState] Failed to save example:', error)
-        throw error
-      }
+      log.info('Example saved successfully')
+      setShowSaveDialog(false)
     },
-    [document, modifiedText, embedForSaving, uploadExample]
+    [workflow.document, workflow.modifiedText, uploadMutation]
   )
 
-  const handleStartOver = useCallback(() => {
-    setCurrentStep('upload')
-    setDocument(null)
-    setProcessedOutput(null)
-    setModifiedText('')
-    setMarkdownText('')
-    setSelectedModelId(null)
-    setRagStatus('')
-    setExamplesCount(0)
-    validatedProviderRef.current = null
-    localStorage.removeItem(STORAGE_KEYS.PROCESSED_OUTPUT)
-  }, [])
+  /**
+   * Wrapper for handleChange that maintains backward compatibility
+   */
+  const handleModifiedChange = useCallback(
+    (text: string) => {
+      workflow.handleChange(text)
+    },
+    [workflow]
+  )
 
-  const handleExampleToggle = useCallback((exampleId: string) => {
-    setEnabledExampleIds(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(exampleId)) {
-        newSet.delete(exampleId)
-      } else {
-        newSet.add(exampleId)
-      }
-      return newSet
-    })
-  }, [])
-
-  const goToStep = useCallback((step: WorkflowStep) => {
-    setCurrentStep(step)
-  }, [])
-
-  // Auto-validate provider when step changes to select-model
-  useEffect(() => {
-    if (currentStep === 'select-model' && activeProvider) {
-      if (
-        activeProvider.status !== 'configured' &&
-        validatedProviderRef.current !== activeProvider.id
-      ) {
-        validatedProviderRef.current = activeProvider.id
-        handleProviderValidate(activeProvider.id, activeProvider.configuration)
-      }
-    }
-  }, [currentStep, activeProvider, handleProviderValidate])
-
-  // Auto-select first model when models become available
-  useEffect(() => {
-    if (models.length > 0 && !selectedModelId && currentStep === 'select-model') {
-      setSelectedModelId(models[0].id)
-    }
-  }, [models, selectedModelId, currentStep])
-
-  // Warn before navigation with unsaved work
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (processedOutput && !processedOutput.isEdited && currentStep === 'review') {
-        e.preventDefault()
-        e.returnValue = ''
-      }
-    }
-
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-  }, [processedOutput, currentStep])
-
+  // Return the complete interface
   return {
-    // State
-    currentStep,
-    document,
-    selectedModelId,
-    processedOutput,
-    modifiedText,
-    markdownText,
-    examplesCount,
-    ragStatus,
-    showSaveDialog,
-    enabledExampleIds,
-    isValidatingProvider,
+    // Workflow state
+    currentStep: workflow.currentStep,
+    document: workflow.document,
+    selectedModelId: workflow.selectedModelId,
+    isProcessing: workflow.isProcessing,
+    processedOutput: workflow.processedOutput,
+    modifiedText: workflow.modifiedText,
+    markdownText: workflow.markdownText,
+    progress: workflow.progress,
+    ragStatus: workflow.ragStatus,
+    examplesCount: workflow.examplesCount,
+    enabledExampleIds: workflow.enabledExampleIds,
+    hasChanges: workflow.hasChanges,
+    hasUnsavedChanges: workflow.hasUnsavedChanges,
+    editHistory: workflow.editHistory,
+    canUndo: workflow.canUndo,
+    canRedo: workflow.canRedo,
+
+    // Validation state
+    canAdvanceToSelectModel: workflow.canAdvanceToSelectModel,
+    canStartProcessing: workflow.canStartProcessing,
+    canAdvanceToReview: workflow.canAdvanceToReview,
 
     // Loading states
-    isParsing,
-    isGenerating,
-    isLoadingModels,
-    isLoadingExamples,
-    isEmbeddingLoading,
-    isEmbeddingReady,
+    isParsing: workflow.isParsing,
+    isValidatingProvider: workflow.isValidatingProvider,
+    isLoadingModels: workflow.isLoadingModels,
+    isLoadingExamples: workflow.isLoadingExamples,
+    isEmbeddingLoading: workflow.isEmbeddingLoading,
+    isEmbeddingReady: workflow.isEmbeddingReady,
+    isGenerating: workflow.isGenerating,
+    isBusy: workflow.isBusy,
 
-    // Errors
-    parseError,
-    generateError,
-    processingError,
-    embeddingError,
+    // Error states
+    parseError: workflow.parseError,
+    processingError: workflow.processingError,
+    embeddingError: workflow.embeddingError,
+    generateError: workflow.generateError,
 
     // Data
-    models,
-    allExamples,
-    activeProvider,
-    availableProviders,
-    progress: localProgress,
+    models: workflow.models,
+    allExamples: workflow.allExamples,
+    activeProvider: workflow.activeProvider,
+    availableProviders: workflow.availableProviders,
 
-    // Handlers
-    handleFileSelect,
-    handleProviderValidate,
-    handleFormatScript,
+    // UI-specific state
+    showSaveDialog,
+
+    // Actions - Workflow
+    goToStep: workflow.goToStep,
+    handleFileSelect: workflow.handleFileSelect,
+    setSelectedModelId: workflow.setSelectedModelId,
+    handleProviderValidate: workflow.handleProviderValidate,
+    handleFormatScript: workflow.handleFormatScript,
+    handleExampleToggle: workflow.handleExampleToggle,
+    switchProvider: workflow.switchProvider,
+    cancelProcessing: workflow.cancelProcessing,
+    handleStartOver: workflow.handleStartOver,
+
+    // Actions - Review
     handleModifiedChange,
-    handleDownload,
+    undo: workflow.undo,
+    redo: workflow.redo,
+    markAsSaved: workflow.markAsSaved,
+
+    // Actions - Download
+    handleDownload: workflow.handleDownload,
+
+    // Actions - UI-specific
     handleSaveAsExample,
-    handleStartOver,
-    handleExampleToggle,
-    goToStep,
-    setSelectedModelId,
-    setShowSaveDialog,
-    switchProvider,
-    cancelProcessing
+    setShowSaveDialog
   }
 }

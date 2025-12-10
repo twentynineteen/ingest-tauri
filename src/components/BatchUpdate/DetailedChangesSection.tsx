@@ -1,137 +1,168 @@
 /**
- * DetailedChangesSection - Expandable detailed changes view
+ * DetailedChangesSection - Simplified detailed changes view
  * Extracted from BatchUpdateConfirmationDialog (DEBT-002)
+ * Refactored: 2025-11-18 - Flattened nesting from 6 levels to 2 levels
  */
 
-import { ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react'
+import { cn } from '@components/lib/utils'
+import { ChevronRight, Edit, Info, Minus, Plus } from 'lucide-react'
 import React, { useState } from 'react'
-import type { BreadcrumbsPreview } from '../../types/baker'
-import { ProjectChangeDetailView } from '../ProjectChangeDetailView'
-import { Button } from '../ui/button'
+
+import type { BreadcrumbsPreview } from '@/types/baker'
 
 interface DetailedChangesSectionProps {
   previews: BreadcrumbsPreview[]
   selectedProjects: string[]
 }
 
+const getChangeIcon = (type: string) => {
+  switch (type) {
+    case 'added':
+      return <Plus className="text-success h-3 w-3" />
+    case 'modified':
+      return <Edit className="text-warning h-3 w-3" />
+    case 'removed':
+      return <Minus className="text-destructive h-3 w-3" />
+    default:
+      return <Info className="text-muted-foreground h-3 w-3" />
+  }
+}
+
 export const DetailedChangesSection: React.FC<DetailedChangesSectionProps> = ({
-  previews,
-  selectedProjects
+  previews
 }) => {
-  const [showDetailedChanges, setShowDetailedChanges] = useState(false)
-  const [showMaintenanceChanges, setShowMaintenanceChanges] = useState(false)
-  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set())
+  const [expandedProject, setExpandedProject] = useState<string | null>(null)
 
-  const toggleProjectExpanded = (projectPath: string) => {
-    const newExpanded = new Set(expandedProjects)
-    if (newExpanded.has(projectPath)) {
-      newExpanded.delete(projectPath)
-    } else {
-      newExpanded.add(projectPath)
-    }
-    setExpandedProjects(newExpanded)
-  }
-
-  const expandAllProjects = () => {
-    const allPaths = previews
-      .map(p =>
-        selectedProjects.find(sp => sp === (p.detailedChanges?.projectPath || ''))
-      )
-      .filter(Boolean) as string[]
-    setExpandedProjects(new Set(allPaths))
-  }
-
-  const collapseAllProjects = () => {
-    setExpandedProjects(new Set())
-  }
-
-  const projectsWithChangesCount = previews.filter(
-    p => p.detailedChanges?.hasChanges
-  ).length
+  const projectsWithChanges = previews.filter((p) => p.detailedChanges?.hasChanges)
 
   return (
-    <div className="border rounded-lg p-4">
-      <div className="flex items-center justify-between mb-3">
-        <h4 className="font-medium text-gray-900">Detailed Changes</h4>
-        <div className="flex items-center space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowDetailedChanges(!showDetailedChanges)}
-          >
-            {showDetailedChanges ? (
-              <>
-                <EyeOff className="h-4 w-4 mr-1" />
-                Hide Details
-              </>
-            ) : (
-              <>
-                <Eye className="h-4 w-4 mr-1" />
-                Show Details
-              </>
-            )}
-          </Button>
+    <div className="overflow-hidden rounded-lg border">
+      <div className="bg-muted border-border border-b px-4 py-3">
+        <div className="flex items-center justify-between">
+          <h4 className="text-foreground font-medium">Project-by-Project Changes</h4>
+          <span className="text-muted-foreground text-sm">
+            {projectsWithChanges.length} projects with changes
+          </span>
         </div>
       </div>
 
-      {showDetailedChanges && (
-        <>
-          {/* Controls */}
-          <div className="flex items-center justify-between mb-4 pb-3 border-b">
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={
-                  expandedProjects.size === 0 ? expandAllProjects : collapseAllProjects
-                }
+      {/* Simplified project list - no nesting */}
+      <div className="divide-border max-h-96 divide-y overflow-y-auto">
+        {projectsWithChanges.map((preview, index) => {
+          if (!preview.detailedChanges) return null
+
+          const detail = preview.detailedChanges
+          const isExpanded = expandedProject === detail.projectPath
+
+          // Collect all changes (content + metadata, skip maintenance)
+          const allChanges = [
+            ...detail.changeCategories.content,
+            ...detail.changeCategories.metadata
+          ]
+
+          return (
+            <div key={`${detail.projectPath}-${index}`} className="bg-card">
+              {/* Compact project header with inline summary */}
+              <button
+                onClick={() => setExpandedProject(isExpanded ? null : detail.projectPath)}
+                className="hover:bg-accent/50 flex w-full items-center justify-between px-4 py-3 transition-colors"
               >
-                {expandedProjects.size === 0 ? (
-                  <>
-                    <ChevronDown className="h-4 w-4 mr-1" />
-                    Expand All
-                  </>
-                ) : (
-                  <>
-                    <ChevronUp className="h-4 w-4 mr-1" />
-                    Collapse All
-                  </>
-                )}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowMaintenanceChanges(!showMaintenanceChanges)}
-              >
-                {showMaintenanceChanges ? 'Hide' : 'Show'} Maintenance
-              </Button>
+                <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <ChevronRight
+                    className={cn(
+                      'text-muted-foreground h-4 w-4 flex-shrink-0 transition-transform',
+                      isExpanded && 'rotate-90'
+                    )}
+                  />
+                  <div className="min-w-0 flex-1 text-left">
+                    <p className="text-foreground truncate text-sm font-medium">
+                      {detail.projectName}
+                    </p>
+                    <div className="mt-0.5 flex items-center gap-2">
+                      {detail.summary.contentChanges > 0 && (
+                        <span className="bg-destructive/20 text-destructive rounded px-1.5 py-0.5 text-xs">
+                          {detail.summary.contentChanges} content
+                        </span>
+                      )}
+                      {detail.summary.metadataChanges > 0 && (
+                        <span className="bg-warning/20 text-warning rounded px-1.5 py-0.5 text-xs">
+                          {detail.summary.metadataChanges} metadata
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <span className="text-muted-foreground ml-2 text-sm">
+                  {detail.summary.totalChanges} changes
+                </span>
+              </button>
+
+              {/* Inline field changes - no category grouping */}
+              {isExpanded && (
+                <div className="space-y-2 px-4 pb-4">
+                  {allChanges.map((change, changeIndex) => (
+                    <div
+                      key={`${change.field}-${changeIndex}`}
+                      className="bg-muted/50 flex items-start gap-2 rounded-lg p-2 text-sm"
+                    >
+                      {getChangeIcon(change.type)}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-foreground font-medium">
+                            {change.fieldDisplayName}
+                          </span>
+                          {change.impact !== 'low' && (
+                            <span
+                              className={cn(
+                                'rounded px-1.5 py-0.5 text-xs font-medium',
+                                change.impact === 'high'
+                                  ? 'bg-destructive/20 text-destructive'
+                                  : 'bg-warning/20 text-warning'
+                              )}
+                            >
+                              {change.impact}
+                            </span>
+                          )}
+                        </div>
+                        {change.type === 'modified' && (
+                          <div className="mt-1 space-y-0.5 text-xs">
+                            <div className="flex items-center gap-2">
+                              <span className="text-muted-foreground">From:</span>
+                              <span className="text-destructive font-mono line-through">
+                                {change.formattedOldValue}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-muted-foreground">To:</span>
+                              <span className="text-success font-mono">
+                                {change.formattedNewValue}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                        {change.type === 'added' && (
+                          <div className="mt-1 text-xs">
+                            <span className="text-success font-mono">
+                              {change.formattedNewValue}
+                            </span>
+                          </div>
+                        )}
+                        {change.type === 'removed' && (
+                          <div className="mt-1 text-xs">
+                            <span className="text-destructive font-mono line-through">
+                              {change.formattedOldValue}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-            <span className="text-sm text-gray-600">
-              {projectsWithChangesCount} projects with changes
-            </span>
-          </div>
-
-          {/* Project Details */}
-          <div className="space-y-3 max-h-96 overflow-y-auto">
-            {previews.map((preview, index) => {
-              if (!preview.detailedChanges) return null
-
-              const projectPath = preview.detailedChanges.projectPath
-              const isExpanded = expandedProjects.has(projectPath)
-
-              return (
-                <ProjectChangeDetailView
-                  key={`${projectPath}-${index}`}
-                  changeDetail={preview.detailedChanges}
-                  isExpanded={isExpanded}
-                  onToggleExpanded={() => toggleProjectExpanded(projectPath)}
-                  showMaintenanceChanges={showMaintenanceChanges}
-                />
-              )
-            })}
-          </div>
-        </>
-      )}
+          )
+        })}
+      </div>
     </div>
   )
 }
