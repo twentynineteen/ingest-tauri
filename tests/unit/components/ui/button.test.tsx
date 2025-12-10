@@ -6,7 +6,12 @@
  * Following TDD methodology - these should fail initially
  */
 
-import { vi } from 'vitest'
+import { Button } from '@/components/ui/button'
+import { BUTTON_ANIMATIONS, DURATION, EASING } from '@/constants/animations'
+import { render } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { mockReducedMotion } from '@tests/utils/animation-testing'
+import { describe, expect, it, vi } from 'vitest'
 
 // Mock matchMedia BEFORE imports using vi.hoisted (required for Framer Motion)
 vi.hoisted(() => {
@@ -27,13 +32,6 @@ vi.hoisted(() => {
     value: mockMatchMedia
   })
 })
-
-import { render } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { describe, expect, it } from 'vitest'
-import { Button } from '@/components/ui/button'
-import { BUTTON_ANIMATIONS, DURATION, EASING } from '@/constants/animations'
-import { mockReducedMotion } from '@tests/utils/animation-testing'
 
 describe('Button Animations', () => {
   describe('Animation Presence', () => {

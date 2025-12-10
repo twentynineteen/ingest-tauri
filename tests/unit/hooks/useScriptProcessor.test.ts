@@ -7,9 +7,9 @@
  * IMPORTANT: Use MockLanguageModelV2 from ai/test for deterministic, fast tests
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { MockLanguageModelV2, simulateReadableStream } from 'ai/test'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Import the hook (will fail during RED phase - not implemented yet)
 // import { useScriptProcessor } from '@hooks/useScriptProcessor'
@@ -26,12 +26,12 @@ const createMockModel = () => {
           {
             type: 'finish',
             finishReason: 'stop',
-            usage: { promptTokens: 10, completionTokens: 20 },
-          },
-        ],
+            usage: { promptTokens: 10, completionTokens: 20 }
+          }
+        ]
       }),
-      rawCall: { rawPrompt: null, rawSettings: {} },
-    }),
+      rawCall: { rawPrompt: null, rawSettings: {} }
+    })
   })
 }
 
@@ -123,7 +123,7 @@ describe('useScriptProcessor - Contract Tests (T021)', () => {
     const mockModelWithFailure = new MockLanguageModelV2({
       doStream: async () => {
         throw new Error('Connection timeout')
-      },
+      }
     })
 
     // const { result } = renderHook(() => useScriptProcessor())
@@ -183,14 +183,27 @@ describe('useScriptProcessor - Contract Tests (T021)', () => {
       doStream: async () => ({
         stream: simulateReadableStream({
           chunks: [
-            { type: 'tool-call', toolCallId: 'call-1', toolName: 'formatParagraph', args: { originalText: 'test' } },
-            { type: 'tool-result', toolCallId: 'call-1', result: { formattedText: 'TEST' } },
+            {
+              type: 'tool-call',
+              toolCallId: 'call-1',
+              toolName: 'formatParagraph',
+              args: { originalText: 'test' }
+            },
+            {
+              type: 'tool-result',
+              toolCallId: 'call-1',
+              result: { formattedText: 'TEST' }
+            },
             { type: 'text-delta', textDelta: 'Formatted with tools' },
-            { type: 'finish', finishReason: 'stop', usage: { promptTokens: 10, completionTokens: 20 } },
-          ],
+            {
+              type: 'finish',
+              finishReason: 'stop',
+              usage: { promptTokens: 10, completionTokens: 20 }
+            }
+          ]
         }),
-        rawCall: { rawPrompt: null, rawSettings: {} },
-      }),
+        rawCall: { rawPrompt: null, rawSettings: {} }
+      })
     })
 
     // const { result } = renderHook(() => useScriptProcessor())
@@ -217,7 +230,7 @@ describe('useScriptProcessor - Contract Tests (T021)', () => {
     const mockModelWithError = new MockLanguageModelV2({
       doStream: async () => {
         throw new Error('Provider not available')
-      },
+      }
     })
 
     // const { result } = renderHook(() => useScriptProcessor())

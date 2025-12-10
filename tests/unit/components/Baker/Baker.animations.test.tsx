@@ -7,7 +7,11 @@
  * Following TDD methodology - tests written before implementation.
  */
 
-import { vi } from 'vitest'
+import { BAKER_ANIMATIONS, DURATION, SPRING } from '@/constants/animations'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { mockReducedMotion } from '@tests/utils/animation-testing'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock matchMedia BEFORE imports (required for Framer Motion)
 vi.hoisted(() => {
@@ -28,12 +32,6 @@ vi.hoisted(() => {
     value: mockMatchMedia
   })
 })
-
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { describe, expect, it, beforeEach } from 'vitest'
-import { BAKER_ANIMATIONS, DURATION, SPRING } from '@/constants/animations'
-import { mockReducedMotion } from '@tests/utils/animation-testing'
 
 // Note: BakerPage is wrapped in ErrorBoundary, we'll test animation constants and contracts
 

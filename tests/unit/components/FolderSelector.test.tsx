@@ -13,11 +13,13 @@
  * Total: 10 tests
  */
 
+import { logger } from '@/utils/logger'
+import { FolderSelector } from '@components/Baker/FolderSelector'
+import { open } from '@tauri-apps/plugin-dialog'
 import { render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { FolderSelector } from '@components/Baker/FolderSelector'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock Tauri dialog
 vi.mock('@tauri-apps/plugin-dialog', () => ({
@@ -33,9 +35,6 @@ vi.mock('@/utils/logger', () => ({
     debug: vi.fn()
   }
 }))
-
-import { open } from '@tauri-apps/plugin-dialog'
-import { logger } from '@/utils/logger'
 
 describe('FolderSelector Component', () => {
   // Mock functions for callbacks
@@ -74,7 +73,9 @@ describe('FolderSelector Component', () => {
       // Assert
       expect(screen.getByText('Select Folder to Scan')).toBeInTheDocument()
       expect(
-        screen.getByText(/Choose a root directory to scan for BuildProject-compatible folders/i)
+        screen.getByText(
+          /Choose a root directory to scan for BuildProject-compatible folders/i
+        )
       ).toBeInTheDocument()
       expect(screen.getByPlaceholderText('No folder selected')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /browse/i })).toBeInTheDocument()

@@ -35,13 +35,13 @@ This document provides examples and patterns for writing effective inline docume
  */
 function calculateProratedCost(fullPrice, startDate, periodEnd) {
   if (startDate > periodEnd) {
-    throw new Error('Start date must be before period end');
+    throw new Error('Start date must be before period end')
   }
 
-  const daysInPeriod = (periodEnd - startDate) / (1000 * 60 * 60 * 24);
-  const daysInMonth = new Date(periodEnd.getYear(), periodEnd.getMonth() + 1, 0).getDate();
+  const daysInPeriod = (periodEnd - startDate) / (1000 * 60 * 60 * 24)
+  const daysInMonth = new Date(periodEnd.getYear(), periodEnd.getMonth() + 1, 0).getDate()
 
-  return (fullPrice / daysInMonth) * daysInPeriod;
+  return (fullPrice / daysInMonth) * daysInPeriod
 }
 ```
 
@@ -129,11 +129,11 @@ public double calculateProratedCost(double fullPrice, LocalDate startDate, Local
 // cancelled trial users.
 
 if (subscription.status === 'cancelled') {
-  return <CancelledMessage />;
+  return <CancelledMessage />
 } else if (subscription.status === 'trial') {
-  return <TrialMessage daysRemaining={subscription.trialDaysLeft} />;
+  return <TrialMessage daysRemaining={subscription.trialDaysLeft} />
 } else if (subscription.status === 'active') {
-  return <ActiveMessage />;
+  return <ActiveMessage />
 }
 ```
 
@@ -160,7 +160,7 @@ else:
 // Performance note: We use a Set here instead of an Array because
 // we frequently check if user IDs exist (O(1) lookup vs O(n)).
 // With 10,000+ users, this saves ~500ms per request.
-const activeUserIds = new Set(users.map(u => u.id));
+const activeUserIds = new Set(users.map(u => u.id))
 
 // Avoid: const activeUserIds = users.map(u => u.id); // O(n) lookups
 if (activeUserIds.has(currentUserId)) {
@@ -182,14 +182,17 @@ timestamp = datetime.fromtimestamp(api_response['created_at'] / 1000)
 // a more verbose approach here. Can simplify once we drop Safari 15 support.
 // TODO: Replace with lookbehind regex when Safari 15+ usage drops below 1%
 // Original regex: /(?<=@)\w+/g
-const mentions = text.split('@').slice(1).map(part => part.split(/\s/)[0]);
+const mentions = text
+  .split('@')
+  .slice(1)
+  .map(part => part.split(/\s/)[0])
 ```
 
 ## Class Documentation
 
 ### TypeScript Class
 
-```typescript
+````typescript
 /**
  * Manages user authentication state and provides methods for login/logout.
  *
@@ -213,8 +216,8 @@ const mentions = text.split('@').slice(1).map(part => part.split(/\s/)[0]);
  * ```
  */
 class AuthManager {
-  private token: string | null = null;
-  private user: User | null = null;
+  private token: string | null = null
+  private user: User | null = null
 
   /**
    * Authenticates a user with email and password.
@@ -235,7 +238,7 @@ class AuthManager {
    * Use refreshToken() if you need to verify token is still valid.
    */
   isAuthenticated(): boolean {
-    return this.token !== null && !this.isTokenExpired();
+    return this.token !== null && !this.isTokenExpired()
   }
 
   /**
@@ -248,7 +251,7 @@ class AuthManager {
     // Implementation
   }
 }
-```
+````
 
 ## Algorithm Documentation
 
@@ -343,29 +346,29 @@ def find_shortest_path(graph, start, end):
  */
 async function fetchUserFromLegacyAPI(userId) {
   try {
-    const response = await fetch(`https://legacy-api.example.com/users/${userId}`);
+    const response = await fetch(`https://legacy-api.example.com/users/${userId}`)
 
     // Check for pseudo-error responses (API returns 200 with error object)
     if (response.ok) {
-      const data = await response.json();
+      const data = await response.json()
 
       // Check for API's custom error format
       if (data.error) {
-        throw new APIError(data.error.message, data.error.code);
+        throw new APIError(data.error.message, data.error.code)
       }
 
       // Check for deleted user (API quirk #4)
       if (data.deleted === true) {
-        return null;
+        return null
       }
 
-      return data;
+      return data
     }
 
-    throw new APIError(`API returned ${response.status}`, response.status);
+    throw new APIError(`API returned ${response.status}`, response.status)
   } catch (error) {
     // Add context to help with debugging
-    throw new APIError(`Failed to fetch user ${userId}: ${error.message}`);
+    throw new APIError(`Failed to fetch user ${userId}: ${error.message}`)
   }
 }
 ```
@@ -389,17 +392,17 @@ const dbConfig = {
   database: process.env.DB_NAME,
 
   // Connection pooling
-  max: 20,  // Maximum number of connections in pool
-  min: 5,   // Minimum number of connections (always maintained)
+  max: 20, // Maximum number of connections in pool
+  min: 5, // Minimum number of connections (always maintained)
 
   // Timeout settings
   // - connectionTimeoutMillis: How long to wait for a connection from pool
   // - idleTimeoutMillis: How long a connection can sit idle before being closed
   // - query_timeout: PostgreSQL-specific timeout for long-running queries
-  connectionTimeoutMillis: 5000,   // Fail fast if pool is exhausted
-  idleTimeoutMillis: 30000,        // Close idle connections after 30s
-  query_timeout: 60000,            // Kill queries running longer than 60s
-};
+  connectionTimeoutMillis: 5000, // Fail fast if pool is exhausted
+  idleTimeoutMillis: 30000, // Close idle connections after 30s
+  query_timeout: 60000 // Kill queries running longer than 60s
+}
 ```
 
 ## TODO Comments
@@ -413,7 +416,7 @@ Use TODO comments effectively:
 // Complexity: Medium - need to handle cache invalidation
 // Ticket: PERF-123
 async function getUserList() {
-  return await api.get('/users');
+  return await api.get('/users')
 }
 
 // TODO(username): Refactor to use new auth system
@@ -427,7 +430,7 @@ function legacyAuthCheck(token) {
 // Bug report: BUG-789
 // Workaround: Validate date before passing to this function
 function calculateEndDate(startDay, daysToAdd) {
-  return startDay + daysToAdd; // Simplified example
+  return startDay + daysToAdd // Simplified example
 }
 
 // HACK(username): Temporary workaround for Safari bug
@@ -445,10 +448,10 @@ if (isSafari()) {
 ```javascript
 // ❌ BAD: Comment explains what code obviously does
 // Increment counter by 1
-counter++;
+counter++
 
 // ✅ GOOD: No comment needed, code is self-explanatory
-counter++;
+counter++
 ```
 
 ### Don't Describe Implementation That's Clear
@@ -456,10 +459,10 @@ counter++;
 ```javascript
 // ❌ BAD: Describes obvious loop logic
 // Loop through all users and find the one with matching ID
-const user = users.find(u => u.id === userId);
+const user = users.find(u => u.id === userId)
 
 // ✅ GOOD: No comment needed, code is clear
-const user = users.find(u => u.id === userId);
+const user = users.find(u => u.id === userId)
 ```
 
 ### Don't Leave Commented-Out Code
@@ -469,18 +472,19 @@ const user = users.find(u => u.id === userId);
 function calculateTotal(items) {
   // return items.reduce((sum, item) => sum + item.price, 0);
   // return items.map(i => i.price).reduce((a, b) => a + b);
-  return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  return items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 }
 
 // ✅ GOOD: Delete old code, use version control instead
 function calculateTotal(items) {
-  return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  return items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 }
 ```
 
 ## Summary
 
 **Good comments:**
+
 - Explain WHY, not WHAT
 - Provide context and business logic
 - Document edge cases and gotchas
@@ -489,6 +493,7 @@ function calculateTotal(items) {
 - Explain workarounds with links to issues
 
 **Avoid:**
+
 - Describing obvious code
 - Leaving commented-out code
 - Outdated information

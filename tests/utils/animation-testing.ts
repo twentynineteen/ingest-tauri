@@ -106,8 +106,7 @@ export const waitForAnimation = async (
   expectedDuration?: number
 ): Promise<void> => {
   const styles = window.getComputedStyle(element)
-  const duration =
-    expectedDuration || parseFloat(styles.transitionDuration) * 1000 || 300
+  const duration = expectedDuration || parseFloat(styles.transitionDuration) * 1000 || 300
 
   await new Promise(resolve => setTimeout(resolve, duration + 50)) // Add buffer
 }

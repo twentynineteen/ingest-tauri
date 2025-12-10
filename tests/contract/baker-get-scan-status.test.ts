@@ -5,10 +5,10 @@
  * Uses mocked Tauri backend for testing the contract interface.
  */
 
-import { invoke } from '@tauri-apps/api/core'
-import { describe, test, expect, beforeAll } from 'vitest'
-import { setupTauriMocks } from '../setup/tauri-mocks'
 import type { ScanResult } from '@/types/baker'
+import { invoke } from '@tauri-apps/api/core'
+import { beforeAll, describe, expect, test } from 'vitest'
+import { setupTauriMocks } from '../setup/tauri-mocks'
 
 describe('baker_get_scan_status Contract', () => {
   let mockScanId: string
@@ -36,7 +36,7 @@ describe('baker_get_scan_status Contract', () => {
 
     expect(result).toBeDefined()
     expect(typeof result).toBe('object')
-    
+
     // Verify ScanResult structure
     expect(result).toHaveProperty('startTime')
     expect(result).toHaveProperty('rootPath')
@@ -46,7 +46,7 @@ describe('baker_get_scan_status Contract', () => {
     expect(result).toHaveProperty('createdBreadcrumbs')
     expect(result).toHaveProperty('errors')
     expect(result).toHaveProperty('projects')
-    
+
     // Verify data types
     expect(typeof result.startTime).toBe('string')
     expect(typeof result.rootPath).toBe('string')
@@ -57,21 +57,25 @@ describe('baker_get_scan_status Contract', () => {
   })
 
   test('should reject when scan ID is invalid', async () => {
-    await expect(invoke('baker_get_scan_status', {
-      scanId: 'invalid-scan-id'
-    })).rejects.toThrow()
+    await expect(
+      invoke('baker_get_scan_status', {
+        scanId: 'invalid-scan-id'
+      })
+    ).rejects.toThrow()
   })
 
   test('should reject when scan ID is empty', async () => {
-    await expect(invoke('baker_get_scan_status', {
-      scanId: ''
-    })).rejects.toThrow()
+    await expect(
+      invoke('baker_get_scan_status', {
+        scanId: ''
+      })
+    ).rejects.toThrow()
   })
 
   test('should handle completed scan correctly', async () => {
     // Wait for scan to complete (in real implementation)
     await new Promise(resolve => setTimeout(resolve, 100))
-    
+
     const result: ScanResult = await invoke('baker_get_scan_status', {
       scanId: mockScanId
     })
@@ -79,7 +83,9 @@ describe('baker_get_scan_status Contract', () => {
     // If scan is complete, should have endTime
     if (result.endTime) {
       expect(typeof result.endTime).toBe('string')
-      expect(new Date(result.endTime).getTime()).toBeGreaterThan(new Date(result.startTime).getTime())
+      expect(new Date(result.endTime).getTime()).toBeGreaterThan(
+        new Date(result.startTime).getTime()
+      )
     }
   })
 
@@ -95,8 +101,10 @@ describe('baker_get_scan_status Contract', () => {
       expect(error).toHaveProperty('type')
       expect(error).toHaveProperty('message')
       expect(error).toHaveProperty('timestamp')
-      
-      expect(['permission', 'structure', 'filesystem', 'corruption']).toContain(error.type)
+
+      expect(['permission', 'structure', 'filesystem', 'corruption']).toContain(
+        error.type
+      )
     }
   })
 })

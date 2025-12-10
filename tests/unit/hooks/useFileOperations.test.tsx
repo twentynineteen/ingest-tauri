@@ -9,10 +9,12 @@
  * - Clean up event listeners
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
-import { useFileOperations } from '@/hooks/useFileOperations'
 import type { FootageFile } from '@/hooks/useCameraAutoRemap'
+import { useFileOperations } from '@/hooks/useFileOperations'
+import { invoke } from '@tauri-apps/api/core'
+import { listen } from '@tauri-apps/api/event'
+import { renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock Tauri APIs
 vi.mock('@tauri-apps/api/core', () => ({
@@ -22,9 +24,6 @@ vi.mock('@tauri-apps/api/core', () => ({
 vi.mock('@tauri-apps/api/event', () => ({
   listen: vi.fn()
 }))
-
-import { invoke } from '@tauri-apps/api/core'
-import { listen } from '@tauri-apps/api/event'
 
 describe('useFileOperations', () => {
   const mockUnlisten = vi.fn()
@@ -120,9 +119,9 @@ describe('useFileOperations', () => {
 
       vi.mocked(invoke).mockRejectedValueOnce(new Error('File not found'))
 
-      await expect(result.current.moveFiles(mockFiles, '/destination/Project')).rejects.toThrow(
-        'File not found'
-      )
+      await expect(
+        result.current.moveFiles(mockFiles, '/destination/Project')
+      ).rejects.toThrow('File not found')
     })
   })
 

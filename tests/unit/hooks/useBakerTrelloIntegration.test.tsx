@@ -4,9 +4,11 @@
  * Phase: RED (Write failing tests)
  */
 
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
-import { renderHook } from '@testing-library/react'
 import { useBakerTrelloIntegration } from '@/hooks/useBakerTrelloIntegration'
+import { logger } from '@/utils/logger'
+import { readTextFile } from '@tauri-apps/plugin-fs'
+import { renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock external dependencies
 vi.mock('@tauri-apps/plugin-fs', () => ({
@@ -27,18 +29,13 @@ vi.mock('hooks/useAppendBreadcrumbs', () => ({
   generateBreadcrumbsBlock: vi.fn()
 }))
 
-import { readTextFile } from '@tauri-apps/plugin-fs'
-import { logger } from '@/utils/logger'
-
 describe('useBakerTrelloIntegration', () => {
   const mockApiKey = 'test-api-key'
   const mockToken = 'test-token'
   const mockProjectPath = '/path/to/project'
   const mockBreadcrumbsData = {
     projectName: 'Test Project',
-    trelloCards: [
-      { cardId: 'card123', url: 'https://trello.com/c/card123' }
-    ]
+    trelloCards: [{ cardId: 'card123', url: 'https://trello.com/c/card123' }]
   }
 
   beforeEach(() => {
@@ -215,9 +212,7 @@ describe('useBakerTrelloIntegration', () => {
       // Arrange
       const breadcrumbsWithInvalidCard = {
         projectName: 'Test Project',
-        trelloCards: [
-          { cardId: 'invalid', url: 'https://trello.com/c/invalid' }
-        ]
+        trelloCards: [{ cardId: 'invalid', url: 'https://trello.com/c/invalid' }]
       }
 
       // Simulate a scenario where breadcrumbs parsing works but update fails
@@ -315,9 +310,7 @@ describe('useBakerTrelloIntegration', () => {
       const breadcrumbsWithInvalidUrl = {
         trelloCards: [{ cardId: '', url: 'invalid-url' }]
       }
-      vi.mocked(readTextFile).mockResolvedValue(
-        JSON.stringify(breadcrumbsWithInvalidUrl)
-      )
+      vi.mocked(readTextFile).mockResolvedValue(JSON.stringify(breadcrumbsWithInvalidUrl))
 
       const { result } = renderHook(() =>
         useBakerTrelloIntegration({ apiKey: mockApiKey, token: mockToken })

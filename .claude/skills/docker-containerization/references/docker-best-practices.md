@@ -7,6 +7,7 @@ This document outlines best practices for Docker containerization of Next.js app
 ### Why Use Multi-Stage Builds?
 
 Multi-stage builds create smaller, more secure images by:
+
 - Separating build dependencies from runtime dependencies
 - Reducing final image size (often 50-70% smaller)
 - Improving security by excluding build tools from production
@@ -15,16 +16,19 @@ Multi-stage builds create smaller, more secure images by:
 ### Stage Structure
 
 **Stage 1: Dependencies**
+
 - Install production dependencies only
 - Use `npm ci` for reproducible builds
 - Cache dependencies for faster rebuilds
 
 **Stage 2: Builder**
+
 - Copy dependencies from Stage 1
 - Build the application
 - Generate optimized production assets
 
 **Stage 3: Runner**
+
 - Copy only necessary files (public, .next)
 - Run as non-root user
 - Minimal runtime dependencies
@@ -45,6 +49,7 @@ FROM node:18
 ```
 
 **Comparison**:
+
 - Alpine: ~170MB
 - Slim: ~250MB
 - Full: ~900MB
@@ -73,6 +78,7 @@ RUN npm run build
 ### 3. .dockerignore
 
 Always include a `.dockerignore` file to exclude:
+
 - `node_modules/`
 - `.next/`
 - `.git/`
@@ -81,6 +87,7 @@ Always include a `.dockerignore` file to exclude:
 - Documentation
 
 **Benefits**:
+
 - Faster builds (less data to copy)
 - Smaller images
 - Better security (no secrets)
@@ -162,7 +169,7 @@ Enable compression in Next.js:
 ```javascript
 // next.config.js
 module.exports = {
-  compress: true,
+  compress: true
 }
 ```
 
@@ -171,12 +178,14 @@ module.exports = {
 ### Build-time vs Runtime
 
 **Build-time** (--build-arg):
+
 ```dockerfile
 ARG NODE_ENV=production
 ENV NODE_ENV=$NODE_ENV
 ```
 
 **Runtime** (docker run -e):
+
 ```bash
 docker run -e API_URL=https://api.example.com app:latest
 ```
@@ -208,7 +217,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 ```typescript
 // app/api/health/route.ts
 export async function GET() {
-  return Response.json({ status: 'healthy' }, { status: 200 });
+  return Response.json({ status: 'healthy' }, { status: 200 })
 }
 ```
 

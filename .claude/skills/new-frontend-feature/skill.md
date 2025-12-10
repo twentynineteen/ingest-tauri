@@ -230,6 +230,7 @@ describe('{FeatureName}', () => {
 ```
 
 **After test generation:**
+
 1. Run the tests (they should fail - this is expected in TDD)
 2. Display test output to user
 3. Confirm: "Tests created and currently failing (as expected). Ready to implement the component? (yes/no)"
@@ -377,6 +378,7 @@ export default {FeatureName}
 ```
 
 **After component generation:**
+
 - Confirm file created successfully
 - Show file path to user
 
@@ -429,12 +431,14 @@ Add new top-level section to `navMain` array:
 ```
 
 **Important:**
+
 - Maintain alphabetical or logical ordering of sections
 - Ensure icon is imported: `import { {IconName} } from 'lucide-react'`
 - Keep `isActive: false` for new items (user can change later)
 - Use consistent URL patterns
 
 **After routing update:**
+
 - Display the changes made
 - Show the navigation path: `{Section} > {Feature Name}`
 
@@ -443,6 +447,7 @@ Add new top-level section to `navMain` array:
 ### Phase 5: Run Tests & Verify
 
 1. **Run the test suite:**
+
    ```bash
    npm run test -- {FeatureName}.test.tsx
    ```
@@ -480,22 +485,23 @@ Display comprehensive summary to user:
 
 ✅ Files Created
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  📄 src/pages/{FeatureName}/{FeatureName}.tsx
-  🧪 tests/unit/pages/{FeatureName}.test.tsx
+📄 src/pages/{FeatureName}/{FeatureName}.tsx
+🧪 tests/unit/pages/{FeatureName}.test.tsx
 
 ✅ Files Modified
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  📝 src/components/app-sidebar.tsx
-     Added navigation: {Section} > {Feature Name}
+📝 src/components/app-sidebar.tsx
+Added navigation: {Section} > {Feature Name}
 
 ✅ Test Results
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  ✓ All tests passing ({X}/{X})
-  ✓ Coverage: {XX}% (target: 90%+)
-  ✓ TDD workflow completed successfully
+✓ All tests passing ({X}/{X})
+✓ Coverage: {XX}% (target: 90%+)
+✓ TDD workflow completed successfully
 
 📋 Next Steps
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 1. Review the generated component structure
 2. Implement your business logic:
    - Create custom hook: src/hooks/use{FeatureName}.ts
@@ -548,16 +554,19 @@ Display comprehensive summary to user:
 ## Integration with Other Skills
 
 ### test-specialist
+
 - **When**: Phase 2 (test generation)
 - **Purpose**: Generate comprehensive test suite with 90%+ coverage
 - **Invocation**: Automatic during scaffolding
 
 ### ui-analyzer (Optional)
+
 - **When**: After user implements their feature
 - **Purpose**: Validate UI consistency across all pages
 - **Invocation**: User can run manually
 
 ### ux-animation-guru (Optional)
+
 - **When**: After basic implementation
 - **Purpose**: Add polished animations to the new feature
 - **Invocation**: User can run manually
@@ -568,29 +577,30 @@ Display comprehensive summary to user:
 
 Use this AI reasoning to suggest appropriate icons:
 
-| Feature Keywords | Suggested Icons |
-|-----------------|-----------------|
-| video, media, play | Video, Film, PlayCircle |
-| upload, import | Upload, CloudUpload, FileUp |
-| download, export | Download, FileDown, ArrowDownToLine |
-| analyze, scan, search | ScanSearch, Search, ChartBar |
-| format, text, document | FileText, AlignLeft, Type |
-| batch, multiple, bulk | Layers, Package, FolderOpen |
-| settings, config | Settings, Sliders, Wrench |
-| AI, smart, auto | Sparkles, Zap, Brain |
-| calendar, schedule | Calendar, Clock |
-| database, storage | Database, HardDrive, Save |
-| security, lock | Lock, Shield, Key |
-| user, profile | User, UserCircle, Users |
-| chart, graph, data | BarChart, LineChart, PieChart |
-| link, connect | Link, Cable, Plug |
-| trash, delete | Trash2, X, XCircle |
+| Feature Keywords       | Suggested Icons                     |
+| ---------------------- | ----------------------------------- |
+| video, media, play     | Video, Film, PlayCircle             |
+| upload, import         | Upload, CloudUpload, FileUp         |
+| download, export       | Download, FileDown, ArrowDownToLine |
+| analyze, scan, search  | ScanSearch, Search, ChartBar        |
+| format, text, document | FileText, AlignLeft, Type           |
+| batch, multiple, bulk  | Layers, Package, FolderOpen         |
+| settings, config       | Settings, Sliders, Wrench           |
+| AI, smart, auto        | Sparkles, Zap, Brain                |
+| calendar, schedule     | Calendar, Clock                     |
+| database, storage      | Database, HardDrive, Save           |
+| security, lock         | Lock, Shield, Key                   |
+| user, profile          | User, UserCircle, Users             |
+| chart, graph, data     | BarChart, LineChart, PieChart       |
+| link, connect          | Link, Cable, Plug                   |
+| trash, delete          | Trash2, X, XCircle                  |
 
 ---
 
 ## Error Handling
 
 **If tests fail in Phase 5:**
+
 1. Display test output
 2. Ask test-specialist to analyze failures
 3. Update component code
@@ -598,15 +608,18 @@ Use this AI reasoning to suggest appropriate icons:
 5. Max 3 iterations - if still failing, alert user and ask for guidance
 
 **If icon doesn't exist:**
+
 1. Suggest alternative icon
 2. Fallback to generic icon: FileQuestion
 
 **If routing update fails:**
+
 1. Show error message
 2. Provide manual instructions for updating app-sidebar.tsx
 3. Continue with rest of workflow
 
 **If file already exists:**
+
 1. Alert user: "File already exists at {path}"
 2. Ask: "Overwrite, rename, or cancel?"
 3. Respect user's choice

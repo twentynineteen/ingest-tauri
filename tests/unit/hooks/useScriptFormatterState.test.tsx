@@ -7,11 +7,13 @@
  * It adds UI-specific state (showSaveDialog) and save-as-example functionality.
  */
 
-import { describe, test, expect, vi, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
+import { useExampleManagement } from '@/hooks/useExampleManagement'
 import { useScriptFormatterState } from '@/hooks/useScriptFormatterState'
+import { useScriptWorkflow } from '@/hooks/useScriptWorkflow'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { act, renderHook } from '@testing-library/react'
 import type { ReactNode } from 'react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock the composed hooks
 vi.mock('@/hooks/useScriptWorkflow', () => ({
@@ -29,9 +31,6 @@ vi.mock('@/utils/logger', () => ({
     error: vi.fn()
   }))
 }))
-
-import { useScriptWorkflow } from '@/hooks/useScriptWorkflow'
-import { useExampleManagement } from '@/hooks/useExampleManagement'
 
 describe('useScriptFormatterState', () => {
   let queryClient: QueryClient
@@ -416,7 +415,9 @@ describe('useScriptFormatterState', () => {
   describe('Integration with workflow', () => {
     test('T016: reflects workflow state changes', () => {
       // Arrange
-      const { result, rerender } = renderHook(() => useScriptFormatterState(), { wrapper })
+      const { result, rerender } = renderHook(() => useScriptFormatterState(), {
+        wrapper
+      })
 
       expect(result.current.currentStep).toBe('upload')
 

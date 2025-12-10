@@ -9,9 +9,11 @@
  * - Check folder existence and confirm overwrite
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
 import { useProjectValidation } from '@/hooks/useProjectValidation'
+import { confirm } from '@tauri-apps/plugin-dialog'
+import { exists, remove } from '@tauri-apps/plugin-fs'
+import { renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock Tauri APIs
 vi.mock('@tauri-apps/plugin-dialog', () => ({
@@ -22,9 +24,6 @@ vi.mock('@tauri-apps/plugin-fs', () => ({
   exists: vi.fn(),
   remove: vi.fn()
 }))
-
-import { confirm } from '@tauri-apps/plugin-dialog'
-import { exists, remove } from '@tauri-apps/plugin-fs'
 
 describe('useProjectValidation', () => {
   beforeEach(() => {
@@ -140,9 +139,7 @@ describe('useProjectValidation', () => {
     it('should return valid when files are provided', async () => {
       const { result } = renderHook(() => useProjectValidation())
 
-      const files = [
-        { file: { path: '/test.mp4', name: 'test.mp4' }, camera: 1 }
-      ]
+      const files = [{ file: { path: '/test.mp4', name: 'test.mp4' }, camera: 1 }]
 
       const validation = await result.current.validateFiles(files)
 
@@ -308,7 +305,9 @@ describe('useProjectValidation', () => {
 
       expect(validation.isValid).toBe(true)
       expect(validation.folderExists).toBe(true)
-      expect(remove).toHaveBeenCalledWith('/destination/Test Project', { recursive: true })
+      expect(remove).toHaveBeenCalledWith('/destination/Test Project', {
+        recursive: true
+      })
     })
   })
 
@@ -333,9 +332,9 @@ describe('useProjectValidation', () => {
 
       vi.mocked(remove).mockRejectedValueOnce(new Error('Permission denied'))
 
-      await expect(
-        result.current.removeExistingFolder('/test/path')
-      ).rejects.toThrow('Permission denied')
+      await expect(result.current.removeExistingFolder('/test/path')).rejects.toThrow(
+        'Permission denied'
+      )
     })
   })
 })

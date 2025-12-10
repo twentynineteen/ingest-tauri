@@ -5,10 +5,10 @@
  * TDD Phase: RED - These tests expect the new grouped parameter interface
  */
 
+import { AddVideoDialog } from '@/components/Baker/VideoLinks/AddVideoDialog'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, test, vi } from 'vitest'
-import { AddVideoDialog } from '@/components/Baker/VideoLinks/AddVideoDialog'
 
 // Type definitions for grouped parameters
 export interface DialogState {
@@ -187,7 +187,9 @@ describe('AddVideoDialog - Form State Group', () => {
 
     render(<AddVideoDialog {...props} />)
 
-    expect(screen.getByDisplayValue('https://sproutvideo.com/videos/test123')).toBeInTheDocument()
+    expect(
+      screen.getByDisplayValue('https://sproutvideo.com/videos/test123')
+    ).toBeInTheDocument()
     expect(screen.getByDisplayValue('Test Video')).toBeInTheDocument()
     expect(screen.getByDisplayValue('https://example.com/thumb.jpg')).toBeInTheDocument()
     expect(screen.getByDisplayValue('test123')).toBeInTheDocument()
@@ -241,7 +243,9 @@ describe('AddVideoDialog - URL Mode State Group', () => {
 
     // When fetching, button should be disabled and show no text (just spinner icon)
     const buttons = screen.getAllByRole('button')
-    const fetchButton = buttons.find(btn => btn.hasAttribute('disabled') && btn.closest('.flex'))
+    const fetchButton = buttons.find(
+      btn => btn.hasAttribute('disabled') && btn.closest('.flex')
+    )
     expect(fetchButton).toBeDisabled()
   })
 
@@ -405,7 +409,9 @@ describe('AddVideoDialog - Integration Tests', () => {
     render(<AddVideoDialog {...props} />)
 
     // Verify URL is populated
-    expect(screen.getByDisplayValue('https://sproutvideo.com/videos/test123')).toBeInTheDocument()
+    expect(
+      screen.getByDisplayValue('https://sproutvideo.com/videos/test123')
+    ).toBeInTheDocument()
 
     // Fetch details
     const fetchButton = screen.getByRole('button', { name: /fetch details/i })

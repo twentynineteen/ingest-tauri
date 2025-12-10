@@ -3,9 +3,9 @@
  * Feature: 007-frontend-script-example
  */
 
-import { render, screen } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { UploadDialog } from '@/pages/AI/ExampleEmbeddings/UploadDialog'
+import { render, screen } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock the hooks
 vi.mock('@/hooks/useDocxParser', () => ({

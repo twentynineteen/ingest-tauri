@@ -14,6 +14,7 @@
 - **Low Priority:** 1
 
 ### Key Metrics
+
 - **Files Analyzed:** 224
 - **Total Lines of Code:** 26,753
 - **Total Issues Found:** 451
@@ -21,6 +22,7 @@
 - **Security Vulnerabilities:** 0 (all resolved)
 
 ### Health Score: 8.5/10 ⬆️ (was 6.5/10)
+
 **Rationale:** Significant improvements achieved! Successfully resolved all HIGH priority debt items (DEBT-001, DEBT-002, DEBT-009, DEBT-010). Comprehensive test coverage now protects critical business logic (Baker workflow, AI script processing, Trello integration). Architecture remains sound with excellent separation of concerns. Remaining debt items are MEDIUM/LOW priority refactoring opportunities that don't impact functionality or maintainability.
 
 ---
@@ -39,6 +41,7 @@ The `useScriptFormatterState` hook had grown to 433 lines with cyclomatic comple
 
 **Resolution Summary:**
 Successfully refactored using Test-Driven Development (TDD) methodology:
+
 - **Lines of Code:** 433 → 145 (66% reduction)
 - **Complexity:** 33 → <5 per hook
 - **Test Coverage:** 0 tests → 133 new test cases
@@ -46,13 +49,15 @@ Successfully refactored using Test-Driven Development (TDD) methodology:
 
 **Implementation Details:**
 Split into 5 focused, testable hooks following Single Responsibility Principle:
-   - [useScriptUpload.ts](src/hooks/useScriptUpload.ts) - File upload and parsing (84 lines, 15 tests)
-   - [useAIProcessing.ts](src/hooks/useAIProcessing.ts) - AI model selection and processing (216 lines, 27 tests)
-   - [useScriptReview.ts](src/hooks/useScriptReview.ts) - Output review and editing with undo/redo (188 lines, 29 tests)
-   - [useScriptDownload.ts](src/hooks/useScriptDownload.ts) - DOCX generation and download (108 lines, 29 tests)
-   - [useScriptWorkflow.ts](src/hooks/useScriptWorkflow.ts) - Workflow orchestration (246 lines, 33 tests)
+
+- [useScriptUpload.ts](src/hooks/useScriptUpload.ts) - File upload and parsing (84 lines, 15 tests)
+- [useAIProcessing.ts](src/hooks/useAIProcessing.ts) - AI model selection and processing (216 lines, 27 tests)
+- [useScriptReview.ts](src/hooks/useScriptReview.ts) - Output review and editing with undo/redo (188 lines, 29 tests)
+- [useScriptDownload.ts](src/hooks/useScriptDownload.ts) - DOCX generation and download (108 lines, 29 tests)
+- [useScriptWorkflow.ts](src/hooks/useScriptWorkflow.ts) - Workflow orchestration (246 lines, 33 tests)
 
 **Benefits Achieved:**
+
 - ✅ Each hook has single, clear responsibility
 - ✅ Complexity reduced from 33 to <10 per hook
 - ✅ Comprehensive test coverage (133 tests)
@@ -61,6 +66,7 @@ Split into 5 focused, testable hooks following Single Responsibility Principle:
 - ✅ Improved developer experience
 
 **Documentation:**
+
 - Progress report: [docs/debt-001-progress.md](docs/debt-001-progress.md)
 - Test files: `tests/unit/hooks/useScript*.test.tsx`
 
@@ -82,6 +88,7 @@ The `useUploadTrello` hook had 201 lines with cyclomatic complexity of 25, manag
 
 **Resolution Summary:**
 Successfully refactored using Test-Driven Development (TDD) methodology:
+
 - **Lines of Code:** 201 → ~80 per hook (60% reduction in complexity)
 - **Complexity:** 25 → <10 per hook
 - **Test Coverage:** 0 tests → 103 new test cases
@@ -89,15 +96,17 @@ Successfully refactored using Test-Driven Development (TDD) methodology:
 
 **Implementation Details:**
 Split into 6 focused, testable hooks following Single Responsibility Principle:
-   - [useTrelloActions.ts](src/hooks/useTrelloActions.ts) - External actions (12 tests)
-   - [useTrelloBoard.ts](src/hooks/useTrelloBoard.ts) - Board data fetching (enhanced, 12 tests)
-   - [useTrelloBoardSearch.ts](src/hooks/useTrelloBoardSearch.ts) - Search/filter with fuzzy matching (21 tests)
-   - [useTrelloCardSelection.ts](src/hooks/useTrelloCardSelection.ts) - Card selection & validation (18 tests)
-   - [useTrelloVideoInfo.ts](src/hooks/useTrelloVideoInfo.ts) - Video info operations (18 tests)
-   - [useTrelloBreadcrumbs.ts](src/hooks/useTrelloBreadcrumbs.ts) - Breadcrumbs & file I/O (22 tests)
-   - [useUploadTrello.refactored.ts](src/hooks/useUploadTrello.refactored.ts) - Orchestrator composing all hooks
+
+- [useTrelloActions.ts](src/hooks/useTrelloActions.ts) - External actions (12 tests)
+- [useTrelloBoard.ts](src/hooks/useTrelloBoard.ts) - Board data fetching (enhanced, 12 tests)
+- [useTrelloBoardSearch.ts](src/hooks/useTrelloBoardSearch.ts) - Search/filter with fuzzy matching (21 tests)
+- [useTrelloCardSelection.ts](src/hooks/useTrelloCardSelection.ts) - Card selection & validation (18 tests)
+- [useTrelloVideoInfo.ts](src/hooks/useTrelloVideoInfo.ts) - Video info operations (18 tests)
+- [useTrelloBreadcrumbs.ts](src/hooks/useTrelloBreadcrumbs.ts) - Breadcrumbs & file I/O (22 tests)
+- [useUploadTrello.refactored.ts](src/hooks/useUploadTrello.refactored.ts) - Orchestrator composing all hooks
 
 **Benefits Achieved:**
+
 - ✅ Each hook has single, clear responsibility
 - ✅ Complexity reduced from 25 to <10 per hook
 - ✅ Comprehensive test coverage (103 tests)
@@ -107,6 +116,7 @@ Split into 6 focused, testable hooks following Single Responsibility Principle:
 - ✅ Fully mocked file system operations for testing
 
 **Test Files:**
+
 - `tests/unit/hooks/useTrelloActions.test.tsx`
 - `tests/unit/hooks/useTrelloBoard.test.tsx`
 - `tests/unit/hooks/useTrelloBoardSearch.test.tsx`
@@ -119,6 +129,7 @@ Split into 6 focused, testable hooks following Single Responsibility Principle:
 **Status:** ✅ RESOLVED
 
 **Next Steps:**
+
 - Replace original `useUploadTrello.ts` with `useUploadTrello.refactored.ts`
 - Address DEBT-014 (make Trello board ID configurable in Settings)
 
@@ -136,6 +147,7 @@ The `useCreateProject` hook had 177 lines with cyclomatic complexity of 28, hand
 
 **Resolution Summary:**
 Successfully refactored using Test-Driven Development (TDD) methodology:
+
 - **Lines of Code:** 177 → ~80-110 per hook (60% reduction in complexity)
 - **Complexity:** 28 → <5 per hook
 - **Test Coverage:** 27 tests → 92 new test cases (65 new tests for refactored hooks)
@@ -143,14 +155,16 @@ Successfully refactored using Test-Driven Development (TDD) methodology:
 
 **Implementation Details:**
 Split into 5 focused, testable hooks following Single Responsibility Principle:
-   - [useProjectValidation.ts](src/hooks/useProjectValidation.ts) - Input validation and folder checks (100 lines, 22 tests)
-   - [useProjectFolders.ts](src/hooks/useProjectFolders.ts) - Folder structure creation (85 lines, 23 tests)
-   - [useProjectBreadcrumbs.ts](src/hooks/useProjectBreadcrumbs.ts) - Breadcrumbs generation/storage (130 lines, 21 tests)
-   - [useFileOperations.ts](src/hooks/useFileOperations.ts) - File moving with progress (110 lines, 10 tests)
-   - [usePremiereIntegration.ts](src/hooks/usePremiereIntegration.ts) - Premiere template integration (85 lines, 9 tests)
-   - [useCreateProject.refactored.ts](src/hooks/useCreateProject.refactored.ts) - Orchestrator composing all hooks (120 lines)
+
+- [useProjectValidation.ts](src/hooks/useProjectValidation.ts) - Input validation and folder checks (100 lines, 22 tests)
+- [useProjectFolders.ts](src/hooks/useProjectFolders.ts) - Folder structure creation (85 lines, 23 tests)
+- [useProjectBreadcrumbs.ts](src/hooks/useProjectBreadcrumbs.ts) - Breadcrumbs generation/storage (130 lines, 21 tests)
+- [useFileOperations.ts](src/hooks/useFileOperations.ts) - File moving with progress (110 lines, 10 tests)
+- [usePremiereIntegration.ts](src/hooks/usePremiereIntegration.ts) - Premiere template integration (85 lines, 9 tests)
+- [useCreateProject.refactored.ts](src/hooks/useCreateProject.refactored.ts) - Orchestrator composing all hooks (120 lines)
 
 **Benefits Achieved:**
+
 - ✅ Each hook has single, clear responsibility
 - ✅ Complexity reduced from 28 to <5 per hook
 - ✅ Comprehensive test coverage (92 tests)
@@ -160,6 +174,7 @@ Split into 5 focused, testable hooks following Single Responsibility Principle:
 - ✅ Original hook preserved for backward compatibility
 
 **Test Files:**
+
 - `tests/unit/hooks/useProjectValidation.test.tsx`
 - `tests/unit/hooks/useProjectFolders.test.tsx`
 - `tests/unit/hooks/useProjectBreadcrumbs.test.tsx`
@@ -171,6 +186,7 @@ Split into 5 focused, testable hooks following Single Responsibility Principle:
 **Status:** ✅ RESOLVED
 
 **Next Steps:**
+
 - Replace original `useCreateProject.ts` with `useCreateProject.refactored.ts` after integration testing
 - Update BuildProject page to use refactored hook
 
@@ -188,6 +204,7 @@ UI component file had 721 lines exceeding the 500-line guideline by 44%. It cont
 
 **Resolution Summary:**
 Successfully refactored using Test-Driven Development (TDD) methodology:
+
 - **Lines of Code:** 721 → 32 (96% reduction in main file)
 - **New Files Created:** 4 focused component files
 - **Test Coverage:** 0 tests → 171 new test cases
@@ -195,13 +212,15 @@ Successfully refactored using Test-Driven Development (TDD) methodology:
 
 **Implementation Details:**
 Split into 4 focused, testable files following Single Responsibility Principle:
-   - [SidebarProvider.tsx](src/components/ui/sidebar/SidebarProvider.tsx) - Context provider and state management (117 lines, 29 tests)
-   - [Sidebar.tsx](src/components/ui/sidebar/Sidebar.tsx) - Core sidebar with mobile/desktop rendering (189 lines, 41 tests)
-   - [SidebarMenu.tsx](src/components/ui/sidebar/SidebarMenu.tsx) - All menu-related components (250 lines, 50 tests)
-   - [SidebarLayout.tsx](src/components/ui/sidebar/SidebarLayout.tsx) - Header, Footer, Content, Group components (153 lines, 51 tests)
-   - [sidebar.tsx](src/components/ui/sidebar.tsx) - Barrel export file (32 lines)
+
+- [SidebarProvider.tsx](src/components/ui/sidebar/SidebarProvider.tsx) - Context provider and state management (117 lines, 29 tests)
+- [Sidebar.tsx](src/components/ui/sidebar/Sidebar.tsx) - Core sidebar with mobile/desktop rendering (189 lines, 41 tests)
+- [SidebarMenu.tsx](src/components/ui/sidebar/SidebarMenu.tsx) - All menu-related components (250 lines, 50 tests)
+- [SidebarLayout.tsx](src/components/ui/sidebar/SidebarLayout.tsx) - Header, Footer, Content, Group components (153 lines, 51 tests)
+- [sidebar.tsx](src/components/ui/sidebar.tsx) - Barrel export file (32 lines)
 
 **Benefits Achieved:**
+
 - ✅ 96% reduction in main file size (721 → 32 lines)
 - ✅ Each file has single, clear responsibility
 - ✅ Comprehensive test coverage (171 tests)
@@ -212,6 +231,7 @@ Split into 4 focused, testable files following Single Responsibility Principle:
 - ✅ No regressions (980/980 tests passing)
 
 **Test Files:**
+
 - `tests/unit/components/SidebarProvider.test.tsx`
 - `tests/unit/components/Sidebar.test.tsx`
 - `tests/unit/components/SidebarMenu.test.tsx`
@@ -234,6 +254,7 @@ Split into 4 focused, testable files following Single Responsibility Principle:
 138 console statements found throughout codebase (128 excluding logger.ts). While some were intentional logging, many were debug statements left from development.
 
 **Breakdown:**
+
 - `console.error`: 85 instances (62%)
 - `console.warn`: 30 instances (22%)
 - `console.log`: 10 instances (7%)
@@ -241,12 +262,14 @@ Split into 4 focused, testable files following Single Responsibility Principle:
 - `console.info`: 1 instance (1%)
 
 **Impact:**
+
 - **Technical:** Console pollution makes debugging harder
 - **Performance:** Minor performance overhead in production
 - **Professional:** Unprofessional in production builds
 
 **Resolution Summary:**
 Successfully replaced all 125 console statements in production code using systematic approach with comprehensive testing:
+
 - **Console Statements Replaced:** 125 (10 in Phase 1, 115 in Phase 2)
 - **Files Modified:** 53 files (52 production + 1 test)
 - **Test Coverage:** 1038/1038 tests passing (zero regressions)
@@ -255,6 +278,7 @@ Successfully replaced all 125 console statements in production code using system
 ### ✅ Phase 1: Logger Enhancement (COMPLETED 2025-12-03)
 
 **What Was Done:**
+
 1. **Enhanced logger utility** with `error()` and `warn()` methods
    - Updated [src/utils/logger.ts](src/utils/logger.ts) with new methods
    - Maintains silent behavior in production (all methods are no-ops)
@@ -267,11 +291,13 @@ Successfully replaced all 125 console statements in production code using system
    - Proved TDD methodology for console replacement
 
 **Methodology:** Test-Driven Development (TDD)
+
 - RED phase: Wrote 47 failing tests + 11 failing tests for debug.ts
 - GREEN phase: Implemented error/warn methods + replaced console statements
 - REFACTOR phase: Clean implementation, no changes needed
 
 **Results:**
+
 - ✅ Logger utility fully functional with error/warn support
 - ✅ 58 comprehensive tests (100% passing)
 - ✅ Zero regressions
@@ -279,6 +305,7 @@ Successfully replaced all 125 console statements in production code using system
 ### ✅ Phase 2: Systematic Console Replacement (COMPLETED 2025-12-03)
 
 **What Was Done:**
+
 1. **Created automated replacement script** ([scripts/replace-console-with-logger.py](scripts/replace-console-with-logger.py))
    - Intelligent path resolution for logger imports
    - Skips test files and scripts (appropriate to keep console there)
@@ -291,6 +318,7 @@ Successfully replaced all 125 console statements in production code using system
 4. **Verified zero regressions** - All 1038 tests passing
 
 **Files Modified (52 total):**
+
 - Components: Baker components, ErrorBoundary, FolderTree, Trello components
 - Hooks: useAppendBreadcrumbs (5), useScriptWorkflow (8), useCreateProject (7), useEmbedding (4), and 25+ other hooks
 - Utils: breadcrumbs utilities, storage, TrelloCards, updateManifest (7)
@@ -298,6 +326,7 @@ Successfully replaced all 125 console statements in production code using system
 - Pages: Settings (6), Baker, BuildProject, auth pages
 
 **Results:**
+
 - ✅ 125 total console statements replaced
 - ✅ 1038/1038 tests passing (zero regressions)
 - ✅ All production code now uses logger utility
@@ -307,6 +336,7 @@ Successfully replaced all 125 console statements in production code using system
 ### ✅ Phase 3: ESLint Rule Enforcement (COMPLETED 2025-12-03)
 
 **What Was Done:**
+
 1. **Added ESLint rule** to [eslint.config.js](eslint.config.js):
    ```javascript
    'no-console': 'error'
@@ -315,6 +345,7 @@ Successfully replaced all 125 console statements in production code using system
 3. **Documentation added** inline in ESLint config
 
 **Results:**
+
 - ✅ ESLint now blocks console statements at build time
 - ✅ Zero console statements in src/ directory
 - ✅ Future-proof against regression
@@ -324,11 +355,13 @@ Successfully replaced all 125 console statements in production code using system
 ### ✅ Phase 4: Validation (COMPLETED 2025-12-03)
 
 **What Was Done:**
+
 1. **Full test suite validation** - All 1038 tests passing
 2. **ESLint validation** - No console statement errors
 3. **Manual code review** - Verified logger imports and usage
 
 **Results:**
+
 - ✅ All changes verified working correctly
 - ✅ Zero regressions
 - ✅ Production-safe (logger is silent in production builds)
@@ -336,6 +369,7 @@ Successfully replaced all 125 console statements in production code using system
 **Actual Effort:** 30 minutes
 
 **Benefits Achieved:**
+
 - ✅ All production console statements replaced with logger utility
 - ✅ Comprehensive test coverage (58 tests for logger and debug utilities)
 - ✅ Zero regressions (1038/1038 tests passing)
@@ -361,16 +395,19 @@ Successfully replaced all 125 console statements in production code using system
 
 **Original Problem:**
 74 instances of code nested >4 levels deep. Notable offenders:
+
 - [AppRouter.tsx:47](src/AppRouter.tsx#L47) - 7 levels (RESOLVED ✅)
 - [breadcrumbsValidation.ts:128](src/utils/breadcrumbsValidation.ts#L128) - 8 levels (RESOLVED ✅)
 - [useLiveBreadcrumbsReader.ts:102](src/hooks/useLiveBreadcrumbsReader.ts#L102) - 7 levels (Deferred)
 
 **Impact:**
+
 - **Technical:** Reduced readability, harder to follow logic flow
 - **Maintenance:** Difficult to modify without introducing bugs
 
 **Resolution Summary:**
 Successfully refactored using Test-Driven Development (TDD) methodology for the 2 worst offenders:
+
 - **Files Refactored:** 2 (AppRouter.tsx, breadcrumbsValidation.ts)
 - **Nesting Reduced:** From 7-8 levels to <3 levels per function
 - **Test Coverage:** 0 tests → 52 new test cases (8 for AppRouter, 44 for breadcrumbsValidation)
@@ -379,8 +416,10 @@ Successfully refactored using Test-Driven Development (TDD) methodology for the 
 **Implementation Details:**
 
 #### 1. AppRouter.tsx Refactoring (7 levels → <3 levels)
+
 **Original Issue:** Deeply nested update handler with switch statement inside async callback inside try-catch
 **Solution:** Extracted into focused functions with early returns
+
 - Created `createDownloadHandler()` - Download event handler with guard clauses
 - Created `installUpdateAndRelaunch()` - Update installation logic
 - Created `checkAndInstallUpdates()` - Top-level orchestrator with early returns
@@ -391,8 +430,10 @@ Successfully refactored using Test-Driven Development (TDD) methodology for the 
   - [tests/unit/AppRouter.test.tsx](tests/unit/AppRouter.test.tsx) - New test file (8 tests)
 
 #### 2. breadcrumbsValidation.ts Refactoring (8 levels → <3 levels)
+
 **Original Issue:** Deeply nested file validation loop with multiple conditional checks
 **Solution:** Extracted file validation into separate focused functions
+
 - Created `validateFileInfo()` - Single file validation orchestrator
 - Created `validateFileCamera()` - Camera number validation with early returns
 - Created `validateFileName()` - File name validation with early returns
@@ -404,6 +445,7 @@ Successfully refactored using Test-Driven Development (TDD) methodology for the 
   - [tests/unit/utils/breadcrumbsValidation.test.ts](tests/unit/utils/breadcrumbsValidation.test.ts) - New test file (44 tests)
 
 **Benefits Achieved:**
+
 - ✅ Reduced cognitive complexity significantly
 - ✅ Each function has single, clear responsibility
 - ✅ Comprehensive test coverage (52 tests for previously untested code)
@@ -413,11 +455,13 @@ Successfully refactored using Test-Driven Development (TDD) methodology for the 
 - ✅ Improved readability with guard clauses and early returns
 
 **Methodology:** Test-Driven Development (TDD)
+
 - **RED Phase:** Wrote comprehensive tests first (52 failing tests)
 - **GREEN Phase:** Tests passed with existing implementation
 - **REFACTOR Phase:** Extracted functions to reduce nesting while keeping tests green
 
 **Remaining Work:**
+
 - **useLiveBreadcrumbsReader.ts** (7 levels) - Deferred to future sprint
 - Remaining 72 instances of deep nesting - Low priority
 - Estimated effort for remaining work: 2 days
@@ -437,12 +481,14 @@ Successfully refactored using Test-Driven Development (TDD) methodology for the 
 
 **Original Problem:**
 Functions with excessive parameters (>5), making them hard to use and test. Worst offenders:
+
 - [AddVideoDialog.tsx:57](src/components/Baker/VideoLinks/AddVideoDialog.tsx#L57) - 21 parameters
 - [AddCardDialog.tsx:49](src/components/Baker/TrelloCards/AddCardDialog.tsx#L49) - 19 parameters
 - [button-variants.ts:3](src/components/ui/button-variants.ts#L3) - 13 parameters (not a real issue - cva CSS utility)
 
 **Resolution Summary:**
 Successfully refactored using Test-Driven Development (TDD) methodology:
+
 - **AddVideoDialog:** 21 parameters → 6 parameter groups (71% reduction)
 - **AddCardDialog:** 19 parameters → 6 parameter groups (68% reduction)
 - **Test Coverage:** 0 tests → 70 new test cases
@@ -452,22 +498,25 @@ Successfully refactored using Test-Driven Development (TDD) methodology:
 Grouped parameters into logical interfaces following Single Responsibility Principle:
 
 #### AddVideoDialog (21 → 6 groups):
-   - `dialog`: DialogState (3 params) - Dialog visibility and control
-   - `mode`: ModeState (2 params) - Tab switching between URL/Upload modes
-   - `form`: FormState (2 params) - Form data and field change handler
-   - `urlMode`: UrlModeState (5 params) - URL-specific functionality
-   - `uploadMode`: UploadModeState (7 params) - Upload-specific functionality
-   - `errors`: ErrorState (2 params) - Validation and operation errors
+
+- `dialog`: DialogState (3 params) - Dialog visibility and control
+- `mode`: ModeState (2 params) - Tab switching between URL/Upload modes
+- `form`: FormState (2 params) - Form data and field change handler
+- `urlMode`: UrlModeState (5 params) - URL-specific functionality
+- `uploadMode`: UploadModeState (7 params) - Upload-specific functionality
+- `errors`: ErrorState (2 params) - Validation and operation errors
 
 #### AddCardDialog (19 → 6 groups):
-   - `dialog`: DialogState (4 params) - Dialog visibility, control, and API credentials
-   - `mode`: ModeState (2 params) - Tab switching between URL/Select modes
-   - `urlMode`: UrlModeState (3 params) - URL entry functionality
-   - `selectMode`: SelectModeState (5 params) - Board selection and search
-   - `common`: CommonState (2 params) - Shared state across modes
-   - `errors`: ErrorState (3 params) - All error types centralized
+
+- `dialog`: DialogState (4 params) - Dialog visibility, control, and API credentials
+- `mode`: ModeState (2 params) - Tab switching between URL/Select modes
+- `urlMode`: UrlModeState (3 params) - URL entry functionality
+- `selectMode`: SelectModeState (5 params) - Board selection and search
+- `common`: CommonState (2 params) - Shared state across modes
+- `errors`: ErrorState (3 params) - All error types centralized
 
 **Benefits Achieved:**
+
 - ✅ Reduced cognitive load for developers
 - ✅ Improved code maintainability
 - ✅ Better parameter organization by responsibility
@@ -477,10 +526,12 @@ Grouped parameters into logical interfaces following Single Responsibility Princ
 - ✅ Zero regressions (1160/1160 tests passing)
 
 **Test Files:**
+
 - `tests/unit/components/AddVideoDialog.test.tsx` - 33 tests
 - `tests/unit/components/AddCardDialog.test.tsx` - 37 tests
 
 **Modified Files:**
+
 - [src/components/Baker/VideoLinks/AddVideoDialog.tsx](src/components/Baker/VideoLinks/AddVideoDialog.tsx) - Refactored with grouped parameters
 - [src/components/Baker/TrelloCards/AddCardDialog.tsx](src/components/Baker/TrelloCards/AddCardDialog.tsx) - Refactored with grouped parameters
 - [src/components/Baker/VideoLinksManager.tsx](src/components/Baker/VideoLinksManager.tsx) - Updated to use new interface
@@ -490,6 +541,7 @@ Grouped parameters into logical interfaces following Single Responsibility Princ
 The 13 "parameters" in button-variants.ts are CSS class strings passed to the `cva` (class-variance-authority) utility function. This is not a parameter list issue but rather a configuration object for styling variants. No action needed.
 
 **Methodology:** Test-Driven Development (TDD)
+
 - **RED Phase:** Wrote 70 failing tests expecting grouped parameter interfaces
 - **GREEN Phase:** Refactored components to make tests pass
 - **REFACTOR Phase:** Verified all 1160 tests pass with zero regressions
@@ -509,6 +561,7 @@ The 13 "parameters" in button-variants.ts are CSS class strings passed to the `c
 
 **Original Problem:**
 Technical debt register indicated 8 BUG comments existed in the codebase at the following locations:
+
 - [breadcrumbsComparison.ts:25](src/utils/breadcrumbsComparison.ts#L25)
 - [breadcrumbs/index.ts:26](src/utils/breadcrumbs/index.ts#L26)
 - [breadcrumbs/previewGeneration.ts:62](src/utils/breadcrumbs/previewGeneration.ts#L62)
@@ -518,6 +571,7 @@ Plus 4 TODO/DEPRECATED markers.
 
 **Resolution Summary:**
 After comprehensive codebase analysis using systematic grep searches and file inspection:
+
 - **BUG Comments Found:** 0 (zero)
 - **Actual Issue:** False positive - no BUG comments exist in current codebase
 - **Status:** Already resolved or never existed as described
@@ -543,17 +597,20 @@ After comprehensive codebase analysis using systematic grep searches and file in
 
 **Root Cause Analysis:**
 The technical debt entry appears to have been based on:
+
 1. Outdated codebase analysis where comments have since been removed/fixed
 2. Misidentification of debug/development comments as BUG markers
 3. Previous refactoring work (DEBT-001 through DEBT-007) that cleaned up these issues
 
 **Benefits Achieved:**
+
 - ✅ Verified codebase has no outstanding BUG comments
 - ✅ Confirmed previous refactoring work successfully cleaned up technical debt
 - ✅ Documented remaining TODO items (all low priority)
 - ✅ Zero technical debt from BUG markers
 
 **Methodology:** Test-Driven Development (TDD) Analysis Approach
+
 - **Analysis Phase:** Systematic codebase search with multiple grep patterns
 - **Verification Phase:** Manual inspection of all flagged locations
 - **Documentation Phase:** Comprehensive findings report
@@ -564,6 +621,7 @@ The technical debt entry appears to have been based on:
 
 **Note on Remaining TODOs:**
 Three low-priority TODO comments exist but do not represent bugs:
+
 1. Making Trello board ID configurable (tracked as DEBT-014)
 2. List nesting level calculation (enhancement, not critical)
 3. Trello card functionality placeholder (feature not implemented yet)
@@ -587,6 +645,7 @@ Codebase had only 79 test files with 1,185 tests. Most tests were contract tests
 Successfully implemented comprehensive test coverage across all priority levels using Test-Driven Development methodology:
 
 **Overall Metrics:**
+
 - **New Test Files:** 11 (8 components, 3 hooks)
 - **New Tests:** 157 total
 - **Final Test Count:** 1,341 passing ✅ (was 1,185, +13% increase)
@@ -598,7 +657,7 @@ Successfully implemented comprehensive test coverage across all priority levels 
 ---
 
 **Phase 1: HIGH Priority Hooks (6 hours, COMPLETED)**
-*Critical business logic for Baker and AI workflows*
+_Critical business logic for Baker and AI workflows_
 
 1. **useBakerTrelloIntegration.test.tsx** - 21 tests
    - Trello card batch updates, API error collection
@@ -618,7 +677,7 @@ Successfully implemented comprehensive test coverage across all priority levels 
 ---
 
 **Phase 2: HIGH Priority Components (1.5 hours, COMPLETED)**
-*Main UI components for Baker workflow*
+_Main UI components for Baker workflow_
 
 4. **BatchActions.test.tsx** - 12 tests
    - Rendering states (empty, partial selection, zero projects)
@@ -636,7 +695,7 @@ Successfully implemented comprehensive test coverage across all priority levels 
 ---
 
 **Phase 3: MEDIUM Priority Items (3.5 hours, COMPLETED)**
-*Supporting components and retrieval logic*
+_Supporting components and retrieval logic_
 
 6. **useScriptRetrieval.test.tsx** - 12 tests
    - RAG-powered script retrieval workflow
@@ -665,7 +724,7 @@ Successfully implemented comprehensive test coverage across all priority levels 
 ---
 
 **Phase 4: LOW Priority Display Components (1 hour, COMPLETED)**
-*Presentational components for Trello and video links*
+_Presentational components for Trello and video links_
 
 10. **TrelloCardItem.test.tsx** - 8 tests
     - Rendering (with/without optional fields)
@@ -682,6 +741,7 @@ Successfully implemented comprehensive test coverage across all priority levels 
 ---
 
 **Benefits Achieved:**
+
 - ✅ **100% Scenario Coverage** - All identified behaviors tested
 - ✅ **Zero Implementation Bugs** - All code passed tests without modification
 - ✅ **Comprehensive Mocking** - Tauri APIs, React Query, complex dialogs
@@ -692,6 +752,7 @@ Successfully implemented comprehensive test coverage across all priority levels 
 - ✅ **38% Time Savings** - Completed in 12h vs 19.5h estimate
 
 **Coverage by Feature:**
+
 - ✅ Baker workflow (Phase 003): Fully tested
 - ✅ Multiple video links (Phase 004): Fully tested
 - ✅ AI script formatting (Phases 006-007): Fully tested
@@ -699,6 +760,7 @@ Successfully implemented comprehensive test coverage across all priority levels 
 - ✅ Example embeddings management: Fully tested
 
 **Test Quality Standards Met:**
+
 - ✅ AAA Pattern (Arrange-Act-Assert)
 - ✅ TDD Methodology (RED → GREEN → REFACTOR)
 - ✅ Descriptive test names explaining scenarios
@@ -712,6 +774,7 @@ Successfully implemented comprehensive test coverage across all priority levels 
 **Completed By:** Claude Code + test-specialist skill
 **Resolution Date:** 2025-12-03
 **Documentation:**
+
 - Test plan: [docs/debt-009-test-plan.md](docs/debt-009-test-plan.md)
 - Phase 2 progress: [docs/debt-009-phase2-progress.md](docs/debt-009-phase2-progress.md)
 
@@ -733,6 +796,7 @@ Moderate severity vulnerability in mdast-util-to-hast (unsanitized class attribu
 
 **Resolution Summary:**
 Successfully resolved using Test-Driven Development (TDD) methodology:
+
 - **Current Version:** 13.2.1 (patched version, installed via react-markdown dependency)
 - **Security Tests Added:** 25 comprehensive XSS prevention tests
 - **Test Coverage:** Script injection, event handlers, HTML entities, protocol injection, malicious class attributes (CWE-915)
@@ -750,7 +814,7 @@ Successfully resolved using Test-Driven Development (TDD) methodology:
    - **Event Handler Injection:** 3 tests - onclick, onerror, onload handlers
    - **HTML Special Characters:** 3 tests - <, >, &, quotes
    - **JavaScript Protocol Injection:** 3 tests - javascript:, data:, vbscript: protocols
-   - **Malicious Class Attributes (CWE-915):** 3 tests - constructor, __proto__, prototype classes
+   - **Malicious Class Attributes (CWE-915):** 3 tests - constructor, **proto**, prototype classes
    - **Nested and Complex Attacks:** 3 tests - Nested tags, mixed injection, encoded scripts
    - **Legitimate Markdown Formatting:** 4 tests - Bold, italic, mixed formatting
    - **Edge Cases:** 3 tests - Empty input, whitespace, very long input
@@ -762,6 +826,7 @@ Successfully resolved using Test-Driven Development (TDD) methodology:
    - Validates HTML special character handling
 
 **Benefits Achieved:**
+
 - ✅ Security vulnerability eliminated (patched version confirmed)
 - ✅ Comprehensive security test suite (25 tests)
 - ✅ XSS prevention verified for all common attack vectors
@@ -770,12 +835,14 @@ Successfully resolved using Test-Driven Development (TDD) methodology:
 - ✅ Documentation of security testing methodology
 
 **Methodology:** Test-Driven Development (TDD)
+
 - **Analysis Phase:** Verified dependency versions and vulnerability status
 - **RED Phase:** Wrote 25 failing security tests for XSS scenarios
 - **GREEN Phase:** Tests passed with existing patched dependency
 - **Verification Phase:** Full test suite confirms no regressions
 
 **Test File:**
+
 - [tests/unit/security/markdown-xss.test.ts](tests/unit/security/markdown-xss.test.ts) - 25 comprehensive XSS prevention tests
 
 **Actual Effort:** 1 hour (analysis + security test creation + verification)
@@ -794,6 +861,7 @@ Successfully resolved using Test-Driven Development (TDD) methodology:
 
 **Description:**
 While CLAUDE.md provides good project overview, missing detailed architecture documentation:
+
 - Data flow diagrams for BuildProject workflow
 - State management patterns and when to use Zustand vs React Query
 - Backend command patterns in Rust
@@ -801,12 +869,14 @@ While CLAUDE.md provides good project overview, missing detailed architecture do
 - Integration architecture (Trello, Sprout, Premiere)
 
 **Impact:**
+
 - **Onboarding:** New developers take 2-3 weeks to understand architecture
 - **Maintenance:** Inconsistent patterns emerge without documented standards
 - **Technical Decisions:** Difficult to evaluate new approaches
 
 **Proposed Solution:**
 Create architectural documentation:
+
 1. `docs/architecture/README.md` - Overview and principles
 2. `docs/architecture/frontend.md` - React/TypeScript patterns
 3. `docs/architecture/backend.md` - Rust/Tauri patterns
@@ -829,6 +899,7 @@ Create architectural documentation:
 
 **Description:**
 Codebase uses multiple state management approaches:
+
 - Zustand stores (useBreadcrumbStore)
 - TanStack React Query (preferred per CLAUDE.md)
 - React Context (AuthProvider)
@@ -837,11 +908,13 @@ Codebase uses multiple state management approaches:
 No clear guidelines on when to use each pattern.
 
 **Impact:**
+
 - **Consistency:** Developers unsure which pattern to use
 - **Maintenance:** Different patterns for similar use cases
 - **Refactoring:** Difficult to migrate between patterns
 
 **Proposed Solution:**
+
 1. Document state management decision tree in CLAUDE.md:
    - Server state → React Query
    - Global client state → Zustand
@@ -866,16 +939,19 @@ No clear guidelines on when to use each pattern.
 
 **Description:**
 Rust backend has unit tests in `src-tauri/src/commands/tests/` but lacks integration testing infrastructure:
+
 - No test fixtures for file system operations
 - No mock external APIs (Trello, Sprout Video)
 - No end-to-end command testing with frontend
 
 **Impact:**
+
 - **Risk:** Backend changes require manual testing
 - **Regression:** No safety net for refactoring Rust code
 - **Quality:** Integration bugs only found in production
 
 **Proposed Solution:**
+
 1. Set up Rust integration test framework
 2. Create test fixtures for:
    - Breadcrumbs.json files
@@ -907,6 +983,7 @@ Trello board ID was hardcoded in `BOARD_ID` constant (`'55a504d70bed2bd21008dc5a
 
 **Resolution Summary:**
 Successfully implemented configurable Trello board ID using Test-Driven Development (TDD) methodology:
+
 - **Lines of Code Added:** ~150 (new hook + storage updates)
 - **Test Coverage:** 37 new tests (18 storage + 20 hook tests)
 - **All Tests:** 1401/1403 passing (99.9% pass rate, 2 skipped tests)
@@ -940,6 +1017,7 @@ Successfully implemented configurable Trello board ID using Test-Driven Developm
    - Backward compatible with default board ID
 
 **Benefits Achieved:**
+
 - ✅ Configurable board ID via Settings UI
 - ✅ Persistent storage across app restarts
 - ✅ Backward compatible (defaults to original board)
@@ -950,11 +1028,13 @@ Successfully implemented configurable Trello board ID using Test-Driven Developm
 - ✅ No code changes needed for different environments
 
 **Test Files Created:**
+
 - [tests/unit/utils/storage.test.ts](tests/unit/utils/storage.test.ts) - 18 tests (all passing)
 - [tests/unit/hooks/useTrelloBoardId.test.tsx](tests/unit/hooks/useTrelloBoardId.test.tsx) - 20 tests (all passing ✅)
 - [tests/unit/pages/Settings.test.tsx](tests/unit/pages/Settings.test.tsx) - 21/23 tests passing (2 skipped due to React state timing)
 
 **Accessibility Improvements:**
+
 - Enhanced [ApiKeyInput component](src/utils/ApiKeyInput.tsx) with proper label association
   - Added `id` prop for WCAG compliance (htmlFor/id attribute linking)
   - Added `inputType` prop (text/password) for non-sensitive data like board IDs
@@ -963,9 +1043,11 @@ Successfully implemented configurable Trello board ID using Test-Driven Developm
 - Fixed invalid `:has-text()` CSS selectors in tests (not valid in React Testing Library)
 
 **Performance Tuning:**
+
 - Adjusted [useTrelloBoardSearch performance test](tests/unit/hooks/useTrelloBoardSearch.test.tsx) threshold from 100ms → 250ms for environment stability
 
 **Methodology:** Test-Driven Development (TDD)
+
 - **RED Phase:** Wrote 37 failing tests first
 - **GREEN Phase:** Implemented functionality to pass tests
 - **REFACTOR Phase:** Cleaned up code, maintained test coverage
@@ -974,6 +1056,7 @@ Successfully implemented configurable Trello board ID using Test-Driven Developm
 
 **Test Failure Resolution (2025-12-05):**
 Successfully resolved all 21 failing tests from recent changes:
+
 1. **useTrelloBoardId.test.tsx** - Added missing `queryKeys` import (1 failure fixed)
 2. **Settings.test.tsx** - Fixed label/input accessibility issues (20 failures fixed)
    - Added proper `id`/`htmlFor` attributes
@@ -998,16 +1081,19 @@ Successfully resolved all 21 failing tests from recent changes:
 
 **Description:**
 186 magic numbers found. While many are in constants/ directory (good), others are hardcoded:
+
 - Timeout values
 - Buffer sizes
 - Retry counts
 - Polling intervals
 
 **Impact:**
+
 - **Maintenance:** Hard to understand meaning of numbers
 - **Configuration:** Can't adjust values without code changes
 
 **Proposed Solution:**
+
 1. Audit all magic numbers in non-constant files
 2. Extract meaningful numbers to named constants
 3. Move configuration values to constants/ directory
@@ -1028,17 +1114,20 @@ Successfully resolved all 21 failing tests from recent changes:
 
 **Description:**
 AI script processing (OpenAI/Ollama/Anthropic) can fail in various ways (API errors, timeouts, rate limits) but lacks comprehensive error handling and recovery:
+
 - No retry logic for transient failures
 - No fallback to cached results
 - No graceful degradation
 - Generic error messages to users
 
 **Impact:**
+
 - **User Experience:** Cryptic errors, lost work
 - **Reliability:** AI features feel unstable
 - **Support Cost:** Users can't self-recover from errors
 
 **Proposed Solution:**
+
 1. Implement retry logic with exponential backoff
 2. Cache intermediate results in localStorage
 3. Add recovery UI to resume from last successful step
@@ -1060,17 +1149,20 @@ AI script processing (OpenAI/Ollama/Anthropic) can fail in various ways (API err
 
 **Description:**
 Error logging is inconsistent across codebase:
+
 - Some code uses console.error directly (122 instances)
 - Some uses logger utility with namespaces
 - Some errors logged without context
 - No structured error metadata (user ID, operation, timestamp)
 
 **Impact:**
+
 - **Debugging:** Hard to trace errors across system
 - **Monitoring:** Can't aggregate or alert on error patterns
 - **Support:** Insufficient context to reproduce issues
 
 **Proposed Solution:**
+
 1. Standardize on structured logging:
    ```typescript
    logger.error('Operation failed', {
@@ -1099,17 +1191,20 @@ Error logging is inconsistent across codebase:
 
 **Description:**
 No performance monitoring or metrics collection:
+
 - No tracking of operation durations (file copying, AI processing)
 - No bundle size monitoring
 - No render performance tracking
 - No memory leak detection
 
 **Impact:**
+
 - **Performance:** Regressions go unnoticed
 - **User Experience:** Slow operations identified only by complaints
 - **Optimization:** No data to guide optimization efforts
 
 **Proposed Solution:**
+
 1. Add performance timing for key operations:
    - BuildProject workflow (target: <30s)
    - Baker scanning (target: <10s per 100 projects)
@@ -1137,16 +1232,19 @@ No performance monitoring or metrics collection:
 Baker workflow (Phase 003) is tightly coupled to breadcrumbs validation and comparison logic. Hard to reuse breadcrumbs utilities outside Baker context.
 
 **Files Affected:**
+
 - `src/utils/breadcrumbs/comparison.ts`
 - `src/utils/breadcrumbsValidation.ts`
 - `src/hooks/useBreadcrumbsPreview.ts`
 
 **Impact:**
+
 - **Reusability:** Can't use breadcrumbs logic in other features
 - **Testing:** Hard to test breadcrumbs logic in isolation
 - **Maintenance:** Changes to Baker affect breadcrumbs, vice versa
 
 **Proposed Solution:**
+
 1. Extract pure breadcrumbs logic to `src/services/breadcrumbs/`
 2. Create clear interfaces between layers:
    - Data layer (breadcrumbs CRUD)
@@ -1169,17 +1267,20 @@ Baker workflow (Phase 003) is tightly coupled to breadcrumbs validation and comp
 
 **Description:**
 Integrations with Trello, Sprout Video, and AI providers (OpenAI, Anthropic) don't handle rate limiting:
+
 - No detection of 429 responses
 - No automatic retry with backoff
 - No user feedback about rate limits
 - Risk of being blocked by providers
 
 **Impact:**
+
 - **Reliability:** Features fail unpredictably under heavy use
 - **User Experience:** Unexplained errors when rate limited
 - **Risk:** Could be temporarily blocked by API providers
 
 **Proposed Solution:**
+
 1. Implement rate limit detection:
    ```typescript
    if (response.status === 429) {
@@ -1212,6 +1313,7 @@ No recent audit for unused dependencies. Per dependency analysis recommendations
 
 **Resolution Summary:**
 Successfully completed dependency audit using systematic TDD-style verification:
+
 - **Depcheck Analysis:** 24 dependencies flagged (11 dependencies + 13 devDependencies)
 - **Manual Verification:** Researched each flagged dependency
 - **Confirmed Removals:** 3 dependencies removed (file-saver, react-dropzone, react-icons)
@@ -1224,9 +1326,11 @@ Successfully completed dependency audit using systematic TDD-style verification:
 **Implementation Details:**
 
 1. **Depcheck Execution:**
+
    ```bash
    bunx depcheck
    ```
+
    - Found 11 "unused dependencies"
    - Found 13 "unused devDependencies"
    - Found 28 "missing dependencies" (all false positives - TypeScript path aliases)
@@ -1269,6 +1373,7 @@ Successfully completed dependency audit using systematic TDD-style verification:
    - **react-markdown** - Not directly imported but may be needed for mdast-util-to-hast
 
 **Benefits Achieved:**
+
 - ✅ Removed 9 unnecessary packages (3 main + 6 transitive)
 - ✅ Reduced node_modules size by ~2-3 MB
 - ✅ Cleaner package.json
@@ -1279,6 +1384,7 @@ Successfully completed dependency audit using systematic TDD-style verification:
 - ✅ Documented 18 false positives to prevent future confusion
 
 **Why Depcheck Has False Positives:**
+
 1. **Dynamic Imports:** Static analysis misses `await import()`
 2. **Rust-Side Dependencies:** Tauri plugins in Cargo.toml not detected
 3. **Configuration Files:** Build tool plugins used only in config files
@@ -1288,6 +1394,7 @@ Successfully completed dependency audit using systematic TDD-style verification:
 7. **Plugin APIs:** Prettier/ESLint/Tailwind/PostCSS plugins
 
 **Methodology:** Test-Driven Development (TDD) Verification Approach
+
 - **Analysis Phase:** Ran depcheck, categorized all flagged dependencies
 - **Verification Phase:** Manual source code search for each dependency
 - **Test Phase (GREEN):** Verified tests pass after removal (1226/1231 passing)
@@ -1295,12 +1402,14 @@ Successfully completed dependency audit using systematic TDD-style verification:
 - **Documentation Phase:** Created comprehensive analysis document
 
 **Test Results:**
+
 - **Before Removal:** 1226/1231 tests passing (5 pre-existing failures in useScriptFileUpload)
 - **After Removal:** 1226/1231 tests passing (same 5 failures, unrelated to removed deps)
 - **Build:** ✅ Successful (dist/assets/index-BIOB3312.js 2,112.46 kB)
 - **Zero New Failures:** Confirmed removals did not break anything
 
 **Documentation:**
+
 - [docs/debt-021-analysis.md](docs/debt-021-analysis.md) - Comprehensive analysis with detailed findings, false positive explanations, and recommendations
 
 **Actual Effort:** 2 hours (under 4 hour estimate)
@@ -1308,6 +1417,7 @@ Successfully completed dependency audit using systematic TDD-style verification:
 **Status:** ✅ RESOLVED
 
 **Future Recommendations:**
+
 1. **Investigate 5 questionable dependencies** (see analysis document)
 2. **Add depcheck to CI** - With custom ignore list for known false positives
 3. **Quarterly dependency audits** - Regular reviews to catch accumulation
@@ -1324,17 +1434,20 @@ Successfully completed dependency audit using systematic TDD-style verification:
 
 **Description:**
 No evidence of CI/CD pipeline configuration:
+
 - No automated testing on PR
 - No automated builds
 - No automated security scanning
 - No automated code quality checks (ESLint, Prettier, type checking)
 
 **Impact:**
+
 - **Quality:** Broken code can be merged
 - **Security:** Vulnerabilities not caught early
 - **Efficiency:** Manual testing required for every change
 
 **Proposed Solution:**
+
 1. Set up GitHub Actions workflow:
    ```yaml
    - Run ESLint and Prettier checks
@@ -1363,17 +1476,20 @@ No evidence of CI/CD pipeline configuration:
 
 **Description:**
 Application stores user data (API keys, preferences, breadcrumbs, project metadata) locally but has no backup or recovery mechanism:
+
 - Loss of local data = complete loss
 - No export/import functionality
 - No sync between machines
 - No disaster recovery plan
 
 **Impact:**
+
 - **User Experience:** Data loss is catastrophic
 - **Trust:** Users fear investing time if data can be lost
 - **Support:** Can't help users recover from data corruption
 
 **Proposed Solution:**
+
 1. Implement data export functionality:
    - Export all settings and preferences
    - Export breadcrumbs database
@@ -1405,30 +1521,34 @@ _No items marked as "Won't Fix" yet._
 ## Debt Trends
 
 ### By Category
-| Category | Count | Trend |
-|----------|-------|-------|
-| Code Quality | 10 | 📈 Increasing |
-| Architectural | 6 | ➡️ Stable |
-| Test Debt | 2 | 📈 Increasing |
-| Security | 1 | ➡️ Stable |
-| Documentation | 1 | ➡️ Stable |
-| Infrastructure | 3 | 📈 Increasing |
+
+| Category       | Count | Trend         |
+| -------------- | ----- | ------------- |
+| Code Quality   | 10    | 📈 Increasing |
+| Architectural  | 6     | ➡️ Stable     |
+| Test Debt      | 2     | 📈 Increasing |
+| Security       | 1     | ➡️ Stable     |
+| Documentation  | 1     | ➡️ Stable     |
+| Infrastructure | 3     | 📈 Increasing |
 
 ### By Severity
+
 | Severity | Count | Percentage |
-|----------|-------|------------|
-| Critical | 0 | 0% |
-| High | 1 | 8% |
-| Medium | 11 | 85% |
-| Low | 1 | 7% |
+| -------- | ----- | ---------- |
+| Critical | 0     | 0%         |
+| High     | 1     | 8%         |
+| Medium   | 11    | 85%        |
+| Low      | 1     | 7%         |
 
 ### Age Analysis
+
 - **New (<1 month):** 0 items
 - **Recent (1-3 months):** 23 items (first analysis)
 - **Old (3-6 months):** 0 items
 - **Ancient (>6 months):** 0 items
 
 ### Velocity Metrics
+
 - **Items Added (this month):** 23 (initial analysis)
 - **Items Resolved (this month):** 10 (DEBT-001 through DEBT-010, DEBT-021)
 - **Items Won't Fix (this month):** 0
@@ -1441,17 +1561,20 @@ _No items marked as "Won't Fix" yet._
 ## Prioritization Matrix
 
 ### Do First (High Impact, Low Effort)
+
 1. ✅ **DEBT-010** - Fix mdast-util-to-hast vulnerability (RESOLVED)
 2. ✅ **DEBT-021** - Remove unused dependencies (RESOLVED)
 3. **DEBT-014** - Make Trello board ID configurable (2 days)
 
 ### Do Second (High Impact, Medium Effort)
+
 1. ✅ **DEBT-002** - Refactor useUploadTrello hook (RESOLVED)
 2. ✅ **DEBT-007** - Fix long parameter lists (RESOLVED)
 3. ✅ **DEBT-008** - Address technical debt markers (RESOLVED)
 4. **DEBT-020** - Add API rate limiting handling (2 days)
 
 ### Plan & Schedule (High Impact, High Effort)
+
 1. ✅ **DEBT-001** - Refactor useScriptFormatterState (RESOLVED)
 2. ✅ **DEBT-003** - Refactor useCreateProject (RESOLVED)
 3. **DEBT-009** - Improve test coverage (2 weeks)
@@ -1459,6 +1582,7 @@ _No items marked as "Won't Fix" yet._
 5. **DEBT-022** - Set up CI/CD pipeline (2 days)
 
 ### Consider Later (Medium/Low Impact)
+
 - All other items
 
 ---
@@ -1466,6 +1590,7 @@ _No items marked as "Won't Fix" yet._
 ## Review Schedule
 
 ### Weekly Reviews
+
 - **Who:** Lead Developer
 - **When:** Every Friday
 - **Focus:**
@@ -1474,6 +1599,7 @@ _No items marked as "Won't Fix" yet._
   - Triage new debt discovered
 
 ### Monthly Reviews
+
 - **Who:** Development Team
 - **When:** First Monday of each month
 - **Focus:**
@@ -1483,6 +1609,7 @@ _No items marked as "Won't Fix" yet._
   - Review trend metrics
 
 ### Quarterly Reviews
+
 - **Who:** Development Team + Stakeholders
 - **When:** First week of each quarter
 - **Focus:**
@@ -1497,11 +1624,12 @@ _No items marked as "Won't Fix" yet._
 ## Prevention Strategies
 
 ### Code Review Checklist
+
 Before approving any PR, verify:
 
 - [ ] No functions with complexity >10 (or document justification)
 - [ ] No files >500 lines (or split into modules)
-- [ ] No console.* statements (use logger instead)
+- [ ] No console.\* statements (use logger instead)
 - [ ] No BUG/FIXME comments without tickets
 - [ ] No functions with >5 parameters (use options objects)
 - [ ] Tests added/updated for changes
@@ -1513,6 +1641,7 @@ Before approving any PR, verify:
 ### Automated Prevention
 
 **ESLint Configuration:**
+
 ```json
 {
   "rules": {
@@ -1527,12 +1656,14 @@ Before approving any PR, verify:
 ```
 
 **Pre-commit Hooks:**
+
 - Run ESLint and Prettier
 - Run type checking
 - Run affected tests
 - Block commit if high-severity issues found
 
 **CI Checks:**
+
 - All linting and formatting checks
 - Full test suite
 - Security audit (npm audit)
@@ -1566,6 +1697,7 @@ Before approving any PR, verify:
 ## Recommendations
 
 ### Immediate Actions (This Sprint)
+
 1. ✅ **Fix security vulnerability** (DEBT-010) - RESOLVED
 2. ✅ **Remove unused dependencies** (DEBT-021) - RESOLVED
 3. ✅ **Address all 8 BUG comments** (DEBT-008) - RESOLVED (no BUG comments found)
@@ -1573,6 +1705,7 @@ Before approving any PR, verify:
 5. 🔧 Set up basic CI pipeline (DEBT-022)
 
 ### Short-term Goals (Q1 2026)
+
 1. Refactor top 3 complex hooks (DEBT-001, DEBT-002, DEBT-003)
 2. Improve test coverage to 60% (DEBT-009)
 3. Add API rate limiting (DEBT-020)
@@ -1580,6 +1713,7 @@ Before approving any PR, verify:
 5. Add error handling for AI processing (DEBT-016)
 
 ### Long-term Goals (2026)
+
 1. Achieve 80% test coverage
 2. Establish CI/CD pipeline with full automation
 3. Create comprehensive architecture documentation
@@ -1588,6 +1722,7 @@ Before approving any PR, verify:
 6. Add data backup/recovery features
 
 ### Cultural Changes
+
 1. Make technical debt visible in sprint planning
 2. Celebrate debt reduction as much as new features
 3. Include "technical health" in definition of done
@@ -1599,7 +1734,9 @@ Before approving any PR, verify:
 ## Appendix
 
 ### Methodology
+
 This technical debt analysis was conducted using:
+
 1. **Automated Analysis:**
    - Code smell detection script (detect_code_smells.py)
    - Dependency analysis script (analyze_dependencies.py)
@@ -1617,6 +1754,7 @@ This technical debt analysis was conducted using:
    - Effort estimated based on code complexity
 
 ### Tools Used
+
 - Python scripts for automated detection
 - npm audit for security scanning
 - Manual code review
@@ -1624,6 +1762,7 @@ This technical debt analysis was conducted using:
 - Codebase metrics (lines, files, complexity)
 
 ### References
+
 - [CLAUDE.md](CLAUDE.md) - Project guidelines and conventions
 - [tech-debt-analyzer skill](/.claude/skills/tech-debt-analyzer/) - Analysis methodology
 - [Phase specifications](/specs/) - Feature implementation details

@@ -338,8 +338,8 @@ export const mockReducedMotion = (shouldReduce: boolean) => {
 
 ```typescript
 export const mockIntersectionObserver = () => {
-  global.IntersectionObserver = vi.fn().mockImplementation((callback) => ({
-    observe: vi.fn((element) => {
+  global.IntersectionObserver = vi.fn().mockImplementation(callback => ({
+    observe: vi.fn(element => {
       // Simulate element coming into view
       callback([{ isIntersecting: true, target: element }])
     }),
@@ -352,7 +352,9 @@ export const mockIntersectionObserver = () => {
 ## Best Practices
 
 ### 1. Test Behavior, Not Implementation
+
 ❌ **Avoid:**
+
 ```typescript
 it('should call animate function', () => {
   const spy = vi.spyOn(component, 'animate')
@@ -361,6 +363,7 @@ it('should call animate function', () => {
 ```
 
 ✅ **Prefer:**
+
 ```typescript
 it('should scale button on hover', async () => {
   // Test observable behavior
@@ -370,6 +373,7 @@ it('should scale button on hover', async () => {
 ```
 
 ### 2. Use Custom Matchers
+
 Create reusable assertion helpers:
 
 ```typescript
@@ -387,6 +391,7 @@ expect.extend({
 ```
 
 ### 3. Wait for Animations
+
 Always wait for animations to complete before asserting final state:
 
 ```typescript
@@ -402,6 +407,7 @@ await waitFor(() => {
 ```
 
 ### 4. Test Edge Cases
+
 - Very fast interactions
 - Interrupted animations
 - Multiple rapid state changes
@@ -410,6 +416,7 @@ await waitFor(() => {
 ## Common Pitfalls
 
 ### 1. Timing Issues
+
 ```typescript
 // ❌ Hardcoded delays
 await new Promise(resolve => setTimeout(resolve, 300))
@@ -419,6 +426,7 @@ await waitFor(() => expect(element).toHaveClass('animated'))
 ```
 
 ### 2. Not Cleaning Up
+
 ```typescript
 afterEach(() => {
   // Reset mocks
@@ -430,7 +438,9 @@ afterEach(() => {
 ```
 
 ### 3. Flaky Tests
+
 Avoid flakiness by:
+
 - Using `waitFor` instead of fixed delays
 - Mocking time with `vi.useFakeTimers()`
 - Testing final state, not intermediate states

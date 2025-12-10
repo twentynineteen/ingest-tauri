@@ -5,8 +5,8 @@
  * for development-only debugging output.
  */
 
-import { describe, test, expect, beforeEach, vi, afterEach } from 'vitest'
 import type { BreadcrumbsFile } from '@/types/baker'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Create mock functions that will be used
 const mockLog = vi.fn()
@@ -23,12 +23,12 @@ const mockCreateNamespacedLogger = vi.fn(() => ({
   groupEnd: mockGroupEnd,
   table: vi.fn(),
   time: vi.fn(),
-  timeEnd: vi.fn(),
+  timeEnd: vi.fn()
 }))
 
 // Mock the logger BEFORE the module is imported
 vi.mock('@/utils/logger', () => ({
-  createNamespacedLogger: mockCreateNamespacedLogger,
+  createNamespacedLogger: mockCreateNamespacedLogger
 }))
 
 // Mock the comparison functions
@@ -40,15 +40,15 @@ vi.mock('@/utils/breadcrumbs/comparison', () => ({
         field: 'projectTitle',
         type: 'modified',
         oldValue: 'Old Project',
-        newValue: 'New Project',
-      },
+        newValue: 'New Project'
+      }
     ],
     summary: {
       added: 0,
       modified: 1,
       removed: 0,
-      unchanged: 0,
-    },
+      unchanged: 0
+    }
   })),
   compareBreadcrumbsMeaningful: vi.fn(() => ({
     hasChanges: true,
@@ -57,16 +57,16 @@ vi.mock('@/utils/breadcrumbs/comparison', () => ({
         field: 'projectTitle',
         type: 'modified',
         oldValue: 'Old Project',
-        newValue: 'New Project',
-      },
+        newValue: 'New Project'
+      }
     ],
     summary: {
       added: 0,
       modified: 1,
       removed: 0,
-      unchanged: 0,
-    },
-  })),
+      unchanged: 0
+    }
+  }))
 }))
 
 // Import after mocks are set up
@@ -89,7 +89,7 @@ describe('breadcrumbs/debug', () => {
       parentFolder: '/path/to',
       createdBy: 'test-user',
       creationDateTime: '2024-01-01T00:00:00Z',
-      lastModified: '2024-01-01T00:00:00Z',
+      lastModified: '2024-01-01T00:00:00Z'
     }
 
     const updatedBreadcrumbs: BreadcrumbsFile = {
@@ -99,7 +99,7 @@ describe('breadcrumbs/debug', () => {
       parentFolder: '/path/to',
       createdBy: 'test-user',
       creationDateTime: '2024-01-01T00:00:00Z',
-      lastModified: '2024-01-02T00:00:00Z',
+      lastModified: '2024-01-02T00:00:00Z'
     }
 
     test('should use logger methods instead of console', () => {
@@ -193,15 +193,15 @@ describe('breadcrumbs/debug', () => {
             field: 'lastModified',
             type: 'modified',
             oldValue: '2024-01-01T00:00:00Z',
-            newValue: '2024-01-01T00:00:00Z', // Same value
-          },
+            newValue: '2024-01-01T00:00:00Z' // Same value
+          }
         ],
         summary: {
           added: 0,
           modified: 1,
           removed: 0,
-          unchanged: 0,
-        },
+          unchanged: 0
+        }
       })
 
       debugComparison(currentBreadcrumbs, updatedBreadcrumbs)
@@ -224,21 +224,21 @@ describe('breadcrumbs/debug', () => {
             field: 'projectTitle',
             type: 'modified',
             oldValue: 'Old',
-            newValue: 'New',
+            newValue: 'New'
           },
           {
             field: 'lastModified',
             type: 'modified',
             oldValue: '2024-01-01',
-            newValue: '2024-01-02',
-          },
+            newValue: '2024-01-02'
+          }
         ],
         summary: {
           added: 0,
           modified: 2,
           removed: 0,
-          unchanged: 0,
-        },
+          unchanged: 0
+        }
       })
       vi.mocked(compareBreadcrumbsMeaningful).mockReturnValueOnce({
         hasChanges: true,
@@ -247,15 +247,15 @@ describe('breadcrumbs/debug', () => {
             field: 'projectTitle',
             type: 'modified',
             oldValue: 'Old',
-            newValue: 'New',
-          },
+            newValue: 'New'
+          }
         ],
         summary: {
           added: 0,
           modified: 1,
           removed: 0,
-          unchanged: 0,
-        },
+          unchanged: 0
+        }
       })
 
       debugComparison(currentBreadcrumbs, updatedBreadcrumbs)

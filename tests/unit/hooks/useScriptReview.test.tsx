@@ -10,10 +10,10 @@
  * - Change detection
  */
 
-import { act, renderHook, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useScriptReview } from '@hooks/useScriptReview'
 import type { ProcessedOutput } from '@/types/scriptFormatter'
+import { useScriptReview } from '@hooks/useScriptReview'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@utils/logger', () => ({
   createNamespacedLogger: () => ({
@@ -43,9 +43,11 @@ describe('useScriptReview', () => {
     })
 
     it('should initialize with processed output text', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       expect(result.current.markdownText).toBe('Initial formatted text')
       expect(result.current.modifiedText).toBe('Initial formatted text')
@@ -53,9 +55,11 @@ describe('useScriptReview', () => {
     })
 
     it('should initialize with empty edit history', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       expect(result.current.editHistory).toEqual([])
     })
@@ -63,9 +67,11 @@ describe('useScriptReview', () => {
 
   describe('Text Modification', () => {
     it('should update modified text when handleChange is called', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         result.current.handleChange('Updated text content')
@@ -76,9 +82,11 @@ describe('useScriptReview', () => {
     })
 
     it('should detect changes from original', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       expect(result.current.hasChanges).toBe(false)
 
@@ -90,9 +98,11 @@ describe('useScriptReview', () => {
     })
 
     it('should not detect changes when text is reverted to original', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         result.current.handleChange('Modified content')
@@ -109,10 +119,12 @@ describe('useScriptReview', () => {
 
     it('should call onChange callback when text changes', () => {
       const onChange = vi.fn()
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput,
-        onChange
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput,
+          onChange
+        })
+      )
 
       act(() => {
         result.current.handleChange('New content')
@@ -123,10 +135,12 @@ describe('useScriptReview', () => {
 
     it('should not call onChange if text is same', () => {
       const onChange = vi.fn()
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput,
-        onChange
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput,
+          onChange
+        })
+      )
 
       act(() => {
         result.current.handleChange('Initial formatted text')
@@ -138,9 +152,11 @@ describe('useScriptReview', () => {
 
   describe('Edit History', () => {
     it('should add entry to edit history on change', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         result.current.handleChange('Modified content')
@@ -156,9 +172,11 @@ describe('useScriptReview', () => {
     })
 
     it('should track multiple edits in history', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         result.current.handleChange('First edit')
@@ -179,9 +197,11 @@ describe('useScriptReview', () => {
     })
 
     it('should include timestamp in edit history', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       const beforeEdit = new Date()
 
@@ -192,8 +212,12 @@ describe('useScriptReview', () => {
       const afterEdit = new Date()
 
       expect(result.current.editHistory[0].timestamp).toBeDefined()
-      expect(result.current.editHistory[0].timestamp.getTime()).toBeGreaterThanOrEqual(beforeEdit.getTime())
-      expect(result.current.editHistory[0].timestamp.getTime()).toBeLessThanOrEqual(afterEdit.getTime())
+      expect(result.current.editHistory[0].timestamp.getTime()).toBeGreaterThanOrEqual(
+        beforeEdit.getTime()
+      )
+      expect(result.current.editHistory[0].timestamp.getTime()).toBeLessThanOrEqual(
+        afterEdit.getTime()
+      )
     })
 
     it('should preserve existing edit history from initial output', () => {
@@ -210,9 +234,11 @@ describe('useScriptReview', () => {
         ]
       }
 
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: outputWithHistory
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: outputWithHistory
+        })
+      )
 
       expect(result.current.editHistory).toHaveLength(1)
 
@@ -228,9 +254,11 @@ describe('useScriptReview', () => {
 
   describe('Undo/Redo Functionality', () => {
     it('should support undo to previous state', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         result.current.handleChange('First edit')
@@ -251,9 +279,11 @@ describe('useScriptReview', () => {
     })
 
     it('should support redo after undo', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         result.current.handleChange('First edit')
@@ -277,9 +307,11 @@ describe('useScriptReview', () => {
     })
 
     it('should not undo beyond initial state', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         result.current.handleChange('Single edit')
@@ -300,9 +332,11 @@ describe('useScriptReview', () => {
     })
 
     it('should clear redo stack when new edit is made after undo', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         result.current.handleChange('First edit')
@@ -328,9 +362,11 @@ describe('useScriptReview', () => {
 
   describe('Updated Output', () => {
     it('should provide updated output with current state', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         result.current.handleChange('Modified content')
@@ -344,9 +380,11 @@ describe('useScriptReview', () => {
     })
 
     it('should preserve original metadata in updated output', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         result.current.handleChange('Modified content')
@@ -354,14 +392,18 @@ describe('useScriptReview', () => {
 
       const updatedOutput = result.current.getUpdatedOutput()
 
-      expect(updatedOutput.generationTimestamp).toEqual(initialProcessedOutput.generationTimestamp)
+      expect(updatedOutput.generationTimestamp).toEqual(
+        initialProcessedOutput.generationTimestamp
+      )
       expect(updatedOutput.examplesCount).toBe(initialProcessedOutput.examplesCount)
     })
 
     it('should mark output as edited when text changes', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       let updatedOutput = result.current.getUpdatedOutput()
       expect(updatedOutput.isEdited).toBe(false)
@@ -377,9 +419,11 @@ describe('useScriptReview', () => {
 
   describe('Reset Functionality', () => {
     it('should reset to initial state', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         result.current.handleChange('Modified content 1')
@@ -401,9 +445,11 @@ describe('useScriptReview', () => {
     })
 
     it('should clear undo/redo stacks on reset', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         result.current.handleChange('First edit')
@@ -432,9 +478,11 @@ describe('useScriptReview', () => {
 
   describe('Load New Output', () => {
     it('should load new processed output', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       const newOutput: ProcessedOutput = {
         formattedText: 'New formatted text',
@@ -453,9 +501,11 @@ describe('useScriptReview', () => {
     })
 
     it('should clear previous changes when loading new output', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         result.current.handleChange('User modifications')
@@ -487,9 +537,11 @@ describe('useScriptReview', () => {
         formattedText: ''
       }
 
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: emptyOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: emptyOutput
+        })
+      )
 
       expect(result.current.modifiedText).toBe('')
 
@@ -503,12 +555,14 @@ describe('useScriptReview', () => {
     it('should handle very large text efficiently', () => {
       const largeText = 'A'.repeat(100000) // 100KB of text
 
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: {
-          ...initialProcessedOutput,
-          formattedText: largeText
-        }
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: {
+            ...initialProcessedOutput,
+            formattedText: largeText
+          }
+        })
+      )
 
       expect(result.current.modifiedText).toBe(largeText)
 
@@ -522,9 +576,11 @@ describe('useScriptReview', () => {
     })
 
     it('should handle rapid consecutive changes', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         for (let i = 0; i < 50; i++) {
@@ -537,11 +593,14 @@ describe('useScriptReview', () => {
     })
 
     it('should handle special characters in text', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
-      const specialText = '**Bold** _italic_ <script>alert("xss")</script> \n\n Line breaks'
+      const specialText =
+        '**Bold** _italic_ <script>alert("xss")</script> \n\n Line breaks'
 
       act(() => {
         result.current.handleChange(specialText)
@@ -553,9 +612,11 @@ describe('useScriptReview', () => {
 
   describe('Warning Before Unload', () => {
     it('should indicate unsaved changes exist', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       expect(result.current.hasUnsavedChanges).toBe(false)
 
@@ -567,9 +628,11 @@ describe('useScriptReview', () => {
     })
 
     it('should clear unsaved changes flag after explicit save', () => {
-      const { result } = renderHook(() => useScriptReview({
-        initialOutput: initialProcessedOutput
-      }))
+      const { result } = renderHook(() =>
+        useScriptReview({
+          initialOutput: initialProcessedOutput
+        })
+      )
 
       act(() => {
         result.current.handleChange('Modified content')

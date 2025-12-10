@@ -9,10 +9,13 @@
  * - Update app store with breadcrumbs data
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
-import { useProjectBreadcrumbs } from '@/hooks/useProjectBreadcrumbs'
 import type { FootageFile } from '@/hooks/useCameraAutoRemap'
+import { useProjectBreadcrumbs } from '@/hooks/useProjectBreadcrumbs'
+import { appStore } from '@store/useAppStore'
+import { invoke } from '@tauri-apps/api/core'
+import { writeTextFile } from '@tauri-apps/plugin-fs'
+import { renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock Tauri APIs
 vi.mock('@tauri-apps/api/core', () => ({
@@ -30,10 +33,6 @@ vi.mock('@store/useAppStore', () => ({
     }))
   }
 }))
-
-import { invoke } from '@tauri-apps/api/core'
-import { writeTextFile } from '@tauri-apps/plugin-fs'
-import { appStore } from '@store/useAppStore'
 
 describe('useProjectBreadcrumbs', () => {
   const mockFiles: FootageFile[] = [

@@ -3,11 +3,11 @@
  * Handles external actions: opening card in Trello, closing dialog
  */
 
-import { renderHook, act } from '@testing-library/react'
-import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { useTrelloActions } from '@/hooks/useTrelloActions'
-import { open } from '@tauri-apps/plugin-shell'
 import { SelectedCard } from '@/pages/UploadTrello/UploadTrelloTypes'
+import { open } from '@tauri-apps/plugin-shell'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock Tauri shell plugin
 vi.mock('@tauri-apps/plugin-shell', () => ({
@@ -65,7 +65,10 @@ describe('useTrelloActions', () => {
     test('generates correct URL for different card IDs', async () => {
       const testCases = [
         { id: 'short', expected: 'https://trello.com/c/short' },
-        { id: 'veryLongCardId123456', expected: 'https://trello.com/c/veryLongCardId123456' },
+        {
+          id: 'veryLongCardId123456',
+          expected: 'https://trello.com/c/veryLongCardId123456'
+        },
         { id: '12345', expected: 'https://trello.com/c/12345' }
       ]
 
@@ -147,10 +150,9 @@ describe('useTrelloActions', () => {
       const card1: SelectedCard = { id: 'card1', name: 'Card 1' }
       const card2: SelectedCard = { id: 'card2', name: 'Card 2' }
 
-      const { result, rerender } = renderHook(
-        ({ card }) => useTrelloActions(card),
-        { initialProps: { card: card1 } }
-      )
+      const { result, rerender } = renderHook(({ card }) => useTrelloActions(card), {
+        initialProps: { card: card1 }
+      })
 
       await act(async () => {
         await result.current.handleOpenInTrello()

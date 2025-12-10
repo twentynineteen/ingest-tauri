@@ -3,13 +3,13 @@
  * Feature: 007-frontend-script-example
  */
 
+import * as useExampleManagementModule from '@/hooks/useExampleManagement'
+import { ExampleEmbeddings } from '@/pages/AI/ExampleEmbeddings/ExampleEmbeddings'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { ExampleEmbeddings } from '@/pages/AI/ExampleEmbeddings/ExampleEmbeddings'
 import { BrowserRouter } from 'react-router-dom'
-import * as useExampleManagementModule from '@/hooks/useExampleManagement'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock the hooks
 vi.mock('@/hooks/useBreadcrumb', () => ({

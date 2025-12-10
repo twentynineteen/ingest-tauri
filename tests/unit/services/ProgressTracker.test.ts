@@ -3,9 +3,12 @@
  * Purpose: Test real-time progress tracking and user feedback
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { ProgressTracker } from '@/services/ProgressTracker'
-import type { ProgressUpdate, ProgressFilter } from '@/services/ProgressTracker'
+import {
+  ProgressTracker,
+  type ProgressFilter,
+  type ProgressUpdate
+} from '@/services/ProgressTracker'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 describe('ProgressTracker', () => {
   let tracker: ProgressTracker

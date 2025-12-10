@@ -3,10 +3,14 @@
  * Purpose: Test user notification and feedback mechanisms
  */
 
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
-import { UserFeedbackService } from '@/services/UserFeedbackService'
 import { ProgressTracker } from '@/services/ProgressTracker'
-import type { FeedbackOptions, UserPrompt, NotificationConfig } from '@/services/UserFeedbackService'
+import {
+  UserFeedbackService,
+  type FeedbackOptions,
+  type NotificationConfig,
+  type UserPrompt
+} from '@/services/UserFeedbackService'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 describe('UserFeedbackService', () => {
   let progressTracker: ProgressTracker
@@ -418,7 +422,9 @@ describe('UserFeedbackService', () => {
 
       service.showProgressSummary()
 
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('PROGRESS SUMMARY'))
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        expect.stringContaining('PROGRESS SUMMARY')
+      )
 
       consoleLogSpy.mockRestore()
     })
@@ -538,7 +544,9 @@ describe('UserFeedbackService', () => {
 
       service.showCompletionSummary(workflowResult)
 
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('✅ Status: SUCCESS'))
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        expect.stringContaining('✅ Status: SUCCESS')
+      )
 
       consoleLogSpy.mockRestore()
     })
@@ -559,13 +567,18 @@ describe('UserFeedbackService', () => {
         },
         rollbackId: 'rollback-123',
         errors: [
-          { phase: 'security-audit', error: { message: 'Critical vulnerability detected' } }
+          {
+            phase: 'security-audit',
+            error: { message: 'Critical vulnerability detected' }
+          }
         ]
       }
 
       service.showCompletionSummary(workflowResult)
 
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('❌ Status: FAILED'))
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        expect.stringContaining('❌ Status: FAILED')
+      )
       expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('Errors (1)'))
 
       consoleLogSpy.mockRestore()
@@ -591,7 +604,9 @@ describe('UserFeedbackService', () => {
 
       service.showCompletionSummary(workflowResult)
 
-      expect(consoleLogSpy).toHaveBeenCalledWith(expect.stringContaining('🔄 Rollback Available'))
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        expect.stringContaining('🔄 Rollback Available')
+      )
 
       consoleLogSpy.mockRestore()
     })

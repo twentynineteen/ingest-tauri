@@ -2,11 +2,11 @@
 // This is commonly used with shadcn/ui and other component libraries
 // Copy this to your project's lib/utils.ts file
 
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs))
 }
 
 // If you don't have clsx and tailwind-merge installed, run:

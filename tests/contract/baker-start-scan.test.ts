@@ -5,10 +5,10 @@
  * Uses mocked Tauri backend for testing the contract interface.
  */
 
-import { invoke } from '@tauri-apps/api/core'
-import { describe, test, expect, beforeAll } from 'vitest'
-import { setupTauriMocks } from '../setup/tauri-mocks'
 import type { ScanOptions } from '@/types/baker'
+import { invoke } from '@tauri-apps/api/core'
+import { beforeAll, describe, expect, test } from 'vitest'
+import { setupTauriMocks } from '../setup/tauri-mocks'
 
 describe('baker_start_scan Contract', () => {
   beforeAll(() => {
@@ -41,17 +41,21 @@ describe('baker_start_scan Contract', () => {
   })
 
   test('should reject when root path is empty', async () => {
-    await expect(invoke('baker_start_scan', {
-      rootPath: '',
-      options: mockScanOptions
-    })).rejects.toThrow()
+    await expect(
+      invoke('baker_start_scan', {
+        rootPath: '',
+        options: mockScanOptions
+      })
+    ).rejects.toThrow()
   })
 
   test('should reject when root path does not exist', async () => {
-    await expect(invoke('baker_start_scan', {
-      rootPath: '/non/existent/path',
-      options: mockScanOptions
-    })).rejects.toThrow()
+    await expect(
+      invoke('baker_start_scan', {
+        rootPath: '/non/existent/path',
+        options: mockScanOptions
+      })
+    ).rejects.toThrow()
   })
 
   test('should reject when options are invalid', async () => {
@@ -62,16 +66,18 @@ describe('baker_start_scan Contract', () => {
       backupOriginals: true
     }
 
-    await expect(invoke('baker_start_scan', {
-      rootPath: mockRootPath,
-      options: invalidOptions
-    })).rejects.toThrow()
+    await expect(
+      invoke('baker_start_scan', {
+        rootPath: mockRootPath,
+        options: invalidOptions
+      })
+    ).rejects.toThrow()
   })
 
   test('should handle permission denied gracefully', async () => {
     // Test with a system directory that requires elevated permissions
     const restrictedPath = '/System'
-    
+
     const result = await invoke('baker_start_scan', {
       rootPath: restrictedPath,
       options: mockScanOptions

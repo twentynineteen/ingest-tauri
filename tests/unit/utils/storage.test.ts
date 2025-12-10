@@ -5,11 +5,11 @@
  * TDD Phase: RED (Writing failing tests first)
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { saveApiKeys, loadApiKeys, ApiKeys } from '@/utils/storage'
+import { appStore } from '@/store/useAppStore'
+import { ApiKeys, loadApiKeys, saveApiKeys } from '@/utils/storage'
 import * as tauriPath from '@tauri-apps/api/path'
 import * as tauriFs from '@tauri-apps/plugin-fs'
-import { appStore } from '@/store/useAppStore'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock Tauri APIs
 vi.mock('@tauri-apps/api/path', () => ({

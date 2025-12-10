@@ -38,6 +38,7 @@ This plan outlines a **7-phase approach** to implementing animations across the 
 ### Timeline Approach
 
 **No time estimates**. Each phase is marked complete when:
+
 - ✅ All tests pass
 - ✅ Visual QA verified in browser
 - ✅ Accessibility requirements met (prefers-reduced-motion)
@@ -49,31 +50,37 @@ This plan outlines a **7-phase approach** to implementing animations across the 
 ## Guiding Principles
 
 ### 1. Purposeful Motion
+
 Every animation must have a clear reason:
+
 - Guide user attention to important changes
 - Provide feedback for user actions
 - Create smooth transitions between states
 - Establish spatial relationships
 
 ### 2. Apple-Like Quality
+
 - Natural, physics-based motion (spring animations)
 - Subtle, refined (not flashy)
 - Fast micro-interactions (150ms)
 - Smooth state changes (300-500ms)
 
 ### 3. Performance First
+
 - GPU-accelerated properties only: `transform`, `opacity`
 - 60fps target on all devices
 - Lazy-load Framer Motion where appropriate
 - Respect `prefers-reduced-motion`
 
 ### 4. Accessibility Non-Negotiable
+
 - All animations respect `prefers-reduced-motion`
 - Focus remains visible during animations
 - No animation longer than 600ms without user control
 - WCAG 2.1 Level AAA compliance
 
 ### 5. Test-Driven Development
+
 - **Red**: Write failing tests first
 - **Green**: Implement minimal code to pass
 - **Refactor**: Clean up, extract constants
@@ -116,6 +123,7 @@ Each phase follows this workflow:
 **Goal**: Establish foundation and add subtle micro-interactions to BuildProject page components.
 
 ### Components in Scope
+
 1. ✅ `src/hooks/useReducedMotion.ts` (CREATED)
 2. ✅ `tests/utils/animation-testing.ts` (CREATED)
 3. ✅ `src/constants/animations.ts` (EXPANDED)
@@ -127,15 +135,18 @@ Each phase follows this workflow:
 ### Tasks
 
 #### 1.1: Foundation (COMPLETED ✅)
+
 - [x] Install framer-motion
 - [x] Create `useReducedMotion` hook
 - [x] Create animation testing utilities
 - [x] Expand animation constants
 
 #### 1.2: Button Micro-interactions
+
 **File**: `src/components/ui/button.tsx`
 
 **Tests to Write**:
+
 ```typescript
 // tests/unit/components/ui/button.test.tsx
 describe('Button Animations', () => {
@@ -158,19 +169,23 @@ describe('Button Animations', () => {
 ```
 
 **Animation Opportunities**:
+
 - Hover: subtle scale (1.02) with shadow lift
 - Press: scale down (0.98) for tactile feedback
 - Disabled: opacity fade
 
 **Implementation Approach**:
+
 - Wrap button with `motion.button` from Framer Motion
 - Use `useReducedMotion` hook
 - Apply `BUTTON_ANIMATIONS` constants
 
 #### 1.3: Input Focus States
+
 **File**: `src/components/ui/input.tsx`
 
 **Tests to Write**:
+
 ```typescript
 // tests/unit/components/ui/input.test.tsx
 describe('Input Animations', () => {
@@ -193,14 +208,17 @@ describe('Input Animations', () => {
 ```
 
 **Animation Opportunities**:
+
 - Focus: border color change + subtle shadow
 - Error: shake animation + red border
 - Success: green border fade-in
 
 #### 1.4: FolderSelector Button
+
 **File**: `src/pages/BuildProject/FolderSelector.tsx`
 
 **Tests to Write**:
+
 ```typescript
 // tests/unit/pages/BuildProject/FolderSelector.test.tsx
 describe('FolderSelector Animations', () => {
@@ -215,10 +233,12 @@ describe('FolderSelector Animations', () => {
 ```
 
 **Animation Opportunities**:
+
 - Button hover (inherited from Button component)
 - Loading spinner during folder dialog
 
 ### Deliverables
+
 - [ ] All tests passing
 - [ ] Button component with hover/press animations
 - [ ] Input component with focus/error/success animations
@@ -227,6 +247,7 @@ describe('FolderSelector Animations', () => {
 - [ ] Accessibility verified
 
 ### Success Criteria
+
 - ✅ Buttons feel responsive and tactile
 - ✅ Inputs provide clear focus feedback
 - ✅ All animations < 200ms (micro-interactions)
@@ -240,6 +261,7 @@ describe('FolderSelector Animations', () => {
 **Goal**: Smooth transitions between BuildProject workflow states (idle → creating → success).
 
 ### Components in Scope
+
 1. `src/pages/BuildProject/ProjectConfigurationStep.tsx`
 2. `src/pages/BuildProject/AddFootageStep.tsx`
 3. `src/pages/BuildProject/CreateProjectStep.tsx`
@@ -249,9 +271,11 @@ describe('FolderSelector Animations', () => {
 ### Tasks
 
 #### 2.1: Step Card Collapse Animation
+
 **Files**: All step components
 
 **Tests to Write**:
+
 ```typescript
 // tests/unit/pages/BuildProject/ProjectConfigurationStep.test.tsx
 describe('ProjectConfigurationStep Animations', () => {
@@ -276,19 +300,23 @@ describe('ProjectConfigurationStep Animations', () => {
 **Current Implementation**: Uses inline styles (CSS transitions)
 
 **Enhancement Opportunities**:
+
 - Add spring physics for more natural collapse/expand
 - Stagger collapse of multiple steps
 - Add opacity fade for content inside cards
 
 **Implementation Approach**:
+
 - Convert to Framer Motion `AnimatePresence` for content
 - Use `motion.div` with `animate` prop for height
 - Apply `STEP_CARD_ANIMATION` constants
 
 #### 2.2: Progress Bar Animation
+
 **File**: `src/pages/BuildProject/ProgressBar.tsx`
 
 **Tests to Write**:
+
 ```typescript
 // tests/unit/pages/BuildProject/ProgressBar.test.tsx
 describe('ProgressBar Animations', () => {
@@ -311,14 +339,17 @@ describe('ProgressBar Animations', () => {
 ```
 
 **Animation Opportunities**:
+
 - Smooth progress bar fill (ease-out curve)
 - Pulse effect during active copying
 - Success checkmark with bounce
 
 #### 2.3: Success Section Entrance
+
 **File**: `src/pages/BuildProject/SuccessSection.tsx`
 
 **Tests to Write**:
+
 ```typescript
 // tests/unit/pages/BuildProject/SuccessSection.test.tsx
 describe('SuccessSection Animations', () => {
@@ -341,11 +372,13 @@ describe('SuccessSection Animations', () => {
 ```
 
 **Animation Opportunities**:
+
 - Fade + slide up entrance
 - Staggered button appearance
 - Success icon with spring animation
 
 ### Deliverables
+
 - [ ] All tests passing
 - [ ] Smooth step card collapse/expand
 - [ ] Animated progress bar
@@ -354,6 +387,7 @@ describe('SuccessSection Animations', () => {
 - [ ] Accessibility verified
 
 ### Success Criteria
+
 - ✅ State transitions feel smooth and intentional
 - ✅ Progress bar updates don't feel jarring
 - ✅ Success section feels celebratory but not over-the-top
@@ -367,14 +401,17 @@ describe('SuccessSection Animations', () => {
 **Goal**: Staggered entrance animations for file lists.
 
 ### Components in Scope
+
 1. `src/pages/BuildProject/ProjectFileList.tsx`
 
 ### Tasks
 
 #### 3.1: File List Stagger Animation
+
 **File**: `src/pages/BuildProject/ProjectFileList.tsx`
 
 **Tests to Write**:
+
 ```typescript
 // tests/unit/pages/BuildProject/ProjectFileList.test.tsx
 describe('ProjectFileList Animations', () => {
@@ -409,6 +446,7 @@ describe('ProjectFileList Animations', () => {
 ```
 
 **Animation Opportunities**:
+
 - Initial list render: staggered fade-up
 - New file added: individual fade-up
 - File deleted: fade-out + slide-out
@@ -416,12 +454,14 @@ describe('ProjectFileList Animations', () => {
 - Camera selector hover: border highlight
 
 **Implementation Approach**:
+
 - Use Framer Motion `variants` for container + items
 - Use `AnimatePresence` for exit animations
 - Apply `FILE_LIST_ANIMATION` constants
 - Add `layoutId` for smooth reordering (if drag-drop added later)
 
 ### Deliverables
+
 - [ ] All tests passing
 - [ ] Staggered list item entrance
 - [ ] Smooth file addition/deletion
@@ -430,6 +470,7 @@ describe('ProjectFileList Animations', () => {
 - [ ] Accessibility verified
 
 ### Success Criteria
+
 - ✅ List feels dynamic and alive
 - ✅ Stagger timing feels natural (50ms between items)
 - ✅ Exit animations don't feel abrupt
@@ -443,6 +484,7 @@ describe('ProjectFileList Animations', () => {
 **Goal**: Apply animations to shared UI components (cards, dialogs, tooltips).
 
 ### Components in Scope
+
 1. `src/components/ui/card.tsx`
 2. `src/components/ui/dialog.tsx`
 3. `src/components/ui/alert-dialog.tsx`
@@ -453,9 +495,11 @@ describe('ProjectFileList Animations', () => {
 ### Tasks
 
 #### 4.1: Card Component
+
 **File**: `src/components/ui/card.tsx`
 
 **Tests to Write**:
+
 ```typescript
 // tests/unit/components/ui/card.test.tsx
 describe('Card Animations', () => {
@@ -474,14 +518,17 @@ describe('Card Animations', () => {
 ```
 
 **Animation Opportunities**:
+
 - Hover: subtle scale + shadow elevation
 - Entrance: fade + slide up
 - Exit: fade + scale down (when removed)
 
 #### 4.2: Dialog/Modal Components
+
 **Files**: `dialog.tsx`, `alert-dialog.tsx`
 
 **Tests to Write**:
+
 ```typescript
 // tests/unit/components/ui/dialog.test.tsx
 describe('Dialog Animations', () => {
@@ -504,26 +551,32 @@ describe('Dialog Animations', () => {
 ```
 
 **Animation Opportunities**:
+
 - Backdrop: fade-in/out
 - Content: scale + slide with spring physics
 - Exit: reverse entrance animation
 
 #### 4.3: Tooltip Component
+
 **File**: `src/components/ui/tooltip.tsx`
 
 **Animation Opportunities**:
+
 - Fade + scale entrance (quick, 150ms)
 - Directional slide based on position
 
 #### 4.4: Tabs & Accordion
+
 **Files**: `tabs.tsx`, `accordion.tsx`
 
 **Animation Opportunities**:
+
 - Tab switch: slide/fade content
 - Accordion: smooth height animation
 - Active indicator: smooth position change
 
 ### Deliverables
+
 - [ ] All tests passing
 - [ ] Animated card components
 - [ ] Polished dialog/modal animations
@@ -533,6 +586,7 @@ describe('Dialog Animations', () => {
 - [ ] Accessibility verified
 
 ### Success Criteria
+
 - ✅ Components feel cohesive across the app
 - ✅ Modal entrances feel polished (spring physics)
 - ✅ Tooltips appear instantly (150ms max)
@@ -546,6 +600,7 @@ describe('Dialog Animations', () => {
 **Goal**: Polish animations for modals throughout the app (Trello integration, Sprout Video, etc.).
 
 ### Components in Scope
+
 1. `src/pages/BuildProject/SuccessSection.tsx` - Trello modal
 2. `src/pages/UploadTrello/*` components
 3. `src/pages/UploadSprout/*` components
@@ -554,19 +609,24 @@ describe('Dialog Animations', () => {
 ### Tasks
 
 #### 5.1: Trello Card Update Dialog
+
 **Animation Opportunities**:
+
 - Dialog entrance with spring
 - Loading spinner during API call
 - Success/error toast animations
 - Form input focus states
 
 #### 5.2: Video Upload Modals
+
 **Animation Opportunities**:
+
 - Upload progress animation
 - File preview entrance
 - Success confirmation
 
 ### Deliverables
+
 - [ ] All tests passing
 - [ ] Polished modal experiences
 - [ ] Consistent with Phase 4 patterns
@@ -580,6 +640,7 @@ describe('Dialog Animations', () => {
 **Goal**: Add advanced animations (scroll-based, drag-and-drop feedback).
 
 ### Components in Scope
+
 1. Scroll-triggered animations
 2. Drag-and-drop feedback (if applicable)
 3. Skeleton loaders
@@ -587,21 +648,26 @@ describe('Dialog Animations', () => {
 ### Tasks
 
 #### 6.1: Scroll-Based Animations
+
 **Components**: Any long-scrolling pages
 
 **Animation Opportunities**:
+
 - Fade in on scroll for sections
 - Parallax effects (use sparingly)
 - Sticky header animations
 
 #### 6.2: Skeleton Loaders
+
 **Files**: Any loading states
 
 **Animation Opportunities**:
+
 - Pulse effect for placeholders
 - Smooth transition from skeleton → real content
 
 ### Deliverables
+
 - [ ] All tests passing
 - [ ] Scroll animations feel natural
 - [ ] Loading states are polished
@@ -617,36 +683,42 @@ describe('Dialog Animations', () => {
 ### Tasks
 
 #### 7.1: Performance Audit
+
 - [ ] Profile all animations with Chrome DevTools
 - [ ] Verify 60fps on lower-end devices
 - [ ] Check bundle size impact of Framer Motion
 - [ ] Optimize heavy animations
 
 #### 7.2: Accessibility Audit
+
 - [ ] Test all animations with `prefers-reduced-motion`
 - [ ] Verify focus management during animations
 - [ ] Check WCAG 2.1 Level AAA compliance
 - [ ] Test with screen readers
 
 #### 7.3: Cross-Platform Testing
+
 - [ ] Test on macOS (WebKit)
 - [ ] Test on Windows (Chromium)
 - [ ] Test on Linux (Chromium)
 - [ ] Verify Tauri-specific behavior
 
 #### 7.4: Documentation
+
 - [ ] Document all animation patterns
 - [ ] Create video demos of key animations
 - [ ] Update CLAUDE.md with animation guidelines
 - [ ] Create animation style guide
 
 ### Deliverables
+
 - [ ] Performance report
 - [ ] Accessibility compliance report
 - [ ] Cross-platform test results
 - [ ] Comprehensive documentation
 
 ### Success Criteria
+
 - ✅ All animations 60fps on target devices
 - ✅ Bundle size increase < 100kb
 - ✅ 100% WCAG 2.1 Level AAA compliance
@@ -659,6 +731,7 @@ describe('Dialog Animations', () => {
 ### Test Types
 
 #### 1. Unit Tests (Per Component)
+
 - Animation presence (element has animation)
 - Animation constants (correct values used)
 - Animation lifecycle (enter → animate → exit)
@@ -667,6 +740,7 @@ describe('Dialog Animations', () => {
 **Location**: `tests/unit/components/**/*.test.tsx`
 
 #### 2. Integration Tests
+
 - User interactions trigger animations
 - State changes animate correctly
 - Multiple animations coordinate properly
@@ -674,17 +748,20 @@ describe('Dialog Animations', () => {
 **Location**: `tests/integration/**/*.test.tsx`
 
 #### 3. Visual Regression Tests (Optional)
+
 - Screenshots before/after animations
 - Ensure visual consistency
 
 **Tool**: Playwright (already installed)
 
 ### Test Coverage Target
+
 - **90%** for animation utilities
 - **80%** for animated components
 - **100%** for accessibility features
 
 ### Running Tests
+
 ```bash
 # Run all tests
 npm run test
@@ -704,18 +781,21 @@ npm run test -- --watch
 ## Success Metrics
 
 ### Quantitative Metrics
+
 - [ ] **Performance**: All animations maintain 60fps
 - [ ] **Bundle Size**: Framer Motion adds < 100kb to bundle
 - [ ] **Test Coverage**: > 80% for animated components
 - [ ] **Accessibility**: 100% compliance with prefers-reduced-motion
 
 ### Qualitative Metrics
+
 - [ ] **Feel**: Interactions feel smooth and natural
 - [ ] **Consistency**: All animations use shared constants
 - [ ] **Purpose**: Every animation serves a clear purpose
 - [ ] **Polish**: App feels professional and refined
 
 ### User Feedback
+
 - [ ] Internal testing with team members
 - [ ] User feedback on "feel" and responsiveness
 - [ ] Accessibility testing with users who prefer reduced motion
@@ -729,11 +809,13 @@ npm run test -- --watch
 This serves as a template for all future tasks.
 
 #### Step 1: Invoke the Skill
+
 ```
 User: Use the ux-animation-guru skill on src/components/ui/button.tsx
 ```
 
 #### Step 2: Skill Analysis Output
+
 ```
 Animation Opportunities Found:
 1. Hover state - subtle scale + shadow (LOW complexity)
@@ -746,6 +828,7 @@ Estimated Implementation: 15 minutes
 ```
 
 #### Step 3: Red Phase (Tests Written)
+
 ```typescript
 // tests/unit/components/ui/button.test.tsx
 import { render } from '@testing-library/react'
@@ -795,6 +878,7 @@ describe('Button Animations', () => {
 **Run Tests**: `npm run test button.test.tsx` → ❌ FAIL (expected)
 
 #### Step 4: Green Phase (Implementation)
+
 ```typescript
 // src/components/ui/button.tsx
 import { motion } from 'framer-motion'
@@ -833,6 +917,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 **Run Tests**: `npm run test button.test.tsx` → ✅ PASS
 
 #### Step 5: Visual QA
+
 - Open app in browser
 - Test hover states
 - Test press feedback
@@ -840,7 +925,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 - Verify no animation when enabled
 
 #### Step 6: Documentation
+
 Add note to implementation plan:
+
 ```
 ✅ Phase 1.2 Complete: Button Animations
 - Hover/press animations working
@@ -864,8 +951,9 @@ Add note to implementation plan:
 ## Quick Reference
 
 ### Animation Constant Usage
+
 ```typescript
-import { DURATION, EASING, BUTTON_ANIMATIONS } from '@/constants/animations'
+import { BUTTON_ANIMATIONS, DURATION, EASING } from '@/constants/animations'
 
 // Use predefined values
 duration: DURATION.fast // 150ms
@@ -876,6 +964,7 @@ scale: BUTTON_ANIMATIONS.hover.scale // 1.02
 ```
 
 ### Testing Patterns
+
 ```typescript
 import { expectMotionComponent, mockReducedMotion } from '@/tests/utils/animation-testing'
 
@@ -887,6 +976,7 @@ mockReducedMotion(true)
 ```
 
 ### Framer Motion Patterns
+
 ```typescript
 import { motion, AnimatePresence } from 'framer-motion'
 import { useReducedMotion } from '@/hooks/useReducedMotion'

@@ -13,12 +13,12 @@
  * - Installation interactions
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
-import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
-import { BrowserRouter } from 'react-router-dom'
-import userEvent from '@testing-library/user-event'
 import PremierePluginManager from '@/pages/PremierePluginManager/PremierePluginManager'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { BrowserRouter } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock hooks and Tauri APIs
 vi.mock('@/hooks/useBreadcrumb', () => ({
@@ -327,9 +327,7 @@ describe('PremierePluginManager', () => {
       renderWithProviders(<PremierePluginManager />)
 
       await waitFor(() => {
-        expect(
-          screen.getByRole('button', { name: /open.*folder/i })
-        ).toBeInTheDocument()
+        expect(screen.getByRole('button', { name: /open.*folder/i })).toBeInTheDocument()
       })
     })
 

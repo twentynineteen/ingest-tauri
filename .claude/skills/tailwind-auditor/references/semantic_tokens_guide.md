@@ -9,19 +9,23 @@ Semantic design tokens are named CSS variables that represent the **purpose** of
 ### Semantic vs. Literal Naming
 
 **Literal** (❌ Avoid):
+
 ```css
 --blue-500: 59 130 246;
 --red-600: 220 38 38;
 --gray-100: 244 244 245;
 ```
+
 Usage: `bg-blue-500`, `text-red-600`
 
 **Semantic** (✅ Prefer):
+
 ```css
 --color-primary: 59 130 246;
 --color-destructive: 220 38 38;
 --color-muted: 244 244 245;
 ```
+
 Usage: `bg-primary`, `text-destructive`, `bg-muted`
 
 ### Benefits
@@ -43,16 +47,18 @@ The shadcn/ui design system provides a comprehensive semantic token structure us
 ```css
 @theme {
   /* Page background and primary text */
-  --color-background: 0 0% 100%;      /* White in light mode */
-  --color-foreground: 222 47% 11%;    /* Near-black text */
+  --color-background: 0 0% 100%; /* White in light mode */
+  --color-foreground: 222 47% 11%; /* Near-black text */
 }
 ```
 
 **Usage**:
+
 - `bg-background`: Page/container backgrounds
 - `text-foreground`: Primary text content
 
 **When to use**:
+
 - Root-level backgrounds
 - Main content text
 - Default text color
@@ -76,6 +82,7 @@ The shadcn/ui design system provides a comprehensive semantic token structure us
 ```
 
 **Usage**:
+
 ```tsx
 // Primary button
 <button className="bg-primary text-primary-foreground hover:bg-primary/90">
@@ -94,6 +101,7 @@ The shadcn/ui design system provides a comprehensive semantic token structure us
 ```
 
 **When to use**:
+
 - **Primary**: Main actions, important CTAs, active links
 - **Secondary**: Supporting actions, less critical buttons, alternative paths
 - **Destructive**: Delete, remove, irreversible actions, critical warnings
@@ -117,12 +125,14 @@ The shadcn/ui design system provides a comprehensive semantic token structure us
 ```
 
 **Usage**:
+
 - `bg-muted`: Subtle backgrounds, disabled states, secondary info
 - `text-muted-foreground`: Secondary text, metadata, timestamps
 - `bg-accent`: Hover states, selected items, subtle highlights
 - `bg-card`: Card components, elevated surfaces
 
 **When to use**:
+
 - **Muted**: Less important information, secondary UI elements, placeholders
 - **Accent**: Hover effects, selection states, subtle emphasis
 - **Card**: Content cards, panels, modal backgrounds
@@ -143,12 +153,14 @@ The shadcn/ui design system provides a comprehensive semantic token structure us
 ```
 
 **Usage**:
+
 ```tsx
 <input className="border-input focus:ring-ring" />
 <div className="border border-border rounded-lg" />
 ```
 
 **When to use**:
+
 - **border**: Dividers, card outlines, section separators
 - **input**: Form field borders, text inputs, selects
 - **ring**: Focus indicators (accessibility)
@@ -180,6 +192,7 @@ Not included in base shadcn/ui but commonly added:
 ```
 
 **Usage**:
+
 ```tsx
 // Success message
 <div className="bg-success/10 text-success border-success/20">
@@ -203,6 +216,7 @@ Not included in base shadcn/ui but commonly added:
 ```
 
 **When to use**:
+
 - **Success**: Confirmation messages, completed actions, positive feedback
 - **Warning**: Cautionary messages, reversible issues, attention needed
 - **Info**: Neutral information, tips, announcements
@@ -240,10 +254,10 @@ Each token requires a dark mode equivalent:
 
 .dark {
   @theme {
-    --color-background: 222 47% 11%;      /* Dark gray */
-    --color-foreground: 210 40% 98%;      /* Off-white */
+    --color-background: 222 47% 11%; /* Dark gray */
+    --color-foreground: 210 40% 98%; /* Off-white */
 
-    --color-primary: 217 91% 60%;         /* Lighter shade */
+    --color-primary: 217 91% 60%; /* Lighter shade */
     --color-primary-foreground: 222 47% 11%; /* Dark text */
 
     --color-muted: 217 33% 17%;
@@ -253,7 +267,7 @@ Each token requires a dark mode equivalent:
     --color-input: 217 33% 17%;
 
     /* Status colors adjusted for dark backgrounds */
-    --color-success: 142 71% 55%;         /* Slightly lighter */
+    --color-success: 142 71% 55%; /* Slightly lighter */
     --color-warning: 38 92% 60%;
     --color-info: 217 91% 70%;
     --color-error: 0 84% 70%;
@@ -262,6 +276,7 @@ Each token requires a dark mode equivalent:
 ```
 
 **Dark mode principles**:
+
 1. **Increase lightness** for colors on dark backgrounds
 2. **Maintain contrast ratios** for accessibility (4.5:1 minimum)
 3. **Reduce saturation** slightly to prevent eye strain
@@ -295,6 +310,7 @@ Every background token should have a foreground pair:
 ```
 
 Examples:
+
 - `--color-primary`
 - `--color-primary-foreground`
 - `--color-sidebar-primary`
@@ -303,24 +319,28 @@ Examples:
 ### Avoid These Naming Patterns
 
 ❌ **Color + Shade**:
+
 ```css
 --color-blue-500
 --color-gray-200
 ```
 
 ❌ **Visual Description**:
+
 ```css
 --color-light-gray
 --color-dark-blue
 ```
 
 ❌ **Ambiguous Purpose**:
+
 ```css
 --color-button
 --color-text
 ```
 
 ✅ **Clear Semantic Intent**:
+
 ```css
 --color-primary
 --color-muted-foreground
@@ -429,17 +449,17 @@ Use `/value` syntax for transparency:
 
 ```tsx
 // Subtle backgrounds
-bg-primary/10     /* 10% opacity */
-bg-success/20     /* 20% opacity */
-bg-muted/50       /* 50% opacity */
+bg - primary / 10 /* 10% opacity */
+bg - success / 20 /* 20% opacity */
+bg - muted / 50 /* 50% opacity */
 
 // Subdued text
-text-foreground/60
-text-muted-foreground/70
+text - foreground / 60
+text - muted - foreground / 70
 
 // Hover states
-hover:bg-primary/90
-hover:bg-accent/80
+hover: bg - primary / 90
+hover: bg - accent / 80
 ```
 
 ## Context-Dependent Mapping
@@ -517,6 +537,7 @@ Questions to ask:
 ### Too Many Specific Tokens
 
 ❌ **Over-specific**:
+
 ```css
 --color-login-button
 --color-signup-button
@@ -525,6 +546,7 @@ Questions to ask:
 ```
 
 ✅ **Semantic categories**:
+
 ```css
 --color-primary
 --color-secondary
@@ -534,12 +556,14 @@ Questions to ask:
 ### Using Both Systems
 
 ❌ **Mixing approaches**:
+
 ```tsx
 <button className="bg-primary">Submit</button>
 <button className="bg-blue-500">Cancel</button>
 ```
 
 ✅ **Consistent tokens**:
+
 ```tsx
 <button className="bg-primary">Submit</button>
 <button className="bg-secondary">Cancel</button>
@@ -550,6 +574,7 @@ Questions to ask:
 Limit to ~15-20 core tokens. More than that suggests over-engineering.
 
 **Core set**:
+
 - background, foreground
 - primary, secondary, destructive
 - muted, accent, card
@@ -557,6 +582,7 @@ Limit to ~15-20 core tokens. More than that suggests over-engineering.
 - success, warning, info, error
 
 **Extended** (if needed):
+
 - Component-specific tokens (sidebar, chart, etc.)
 - Brand-specific tokens (for multi-brand apps)
 

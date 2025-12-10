@@ -5,14 +5,14 @@
  * TDD Phase: RED (Writing failing tests first)
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { renderHook, waitFor } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ReactNode } from 'react'
 import { useTrelloBoardId } from '@/hooks/useTrelloBoardId'
-import * as storage from '@/utils/storage'
-import { appStore } from '@/store/useAppStore'
 import { queryKeys } from '@/lib/query-keys'
+import { appStore } from '@/store/useAppStore'
+import * as storage from '@/utils/storage'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { renderHook, waitFor } from '@testing-library/react'
+import { ReactNode } from 'react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock storage
 vi.mock('@/utils/storage', () => ({
@@ -28,7 +28,7 @@ vi.mock('@/store/useAppStore', () => ({
       setTrelloBoardId: vi.fn()
     }))
   },
-  useAppStore: vi.fn((selector) => {
+  useAppStore: vi.fn(selector => {
     const mockState = {
       trelloBoardId: '',
       setTrelloBoardId: vi.fn()
@@ -144,7 +144,7 @@ describe('useTrelloBoardId hook (DEBT-014)', () => {
 
     it('should show loading state while fetching', () => {
       vi.mocked(storage.loadApiKeys).mockImplementation(
-        () => new Promise((resolve) => setTimeout(() => resolve({}), 100))
+        () => new Promise(resolve => setTimeout(() => resolve({}), 100))
       )
 
       const { result } = renderHook(() => useTrelloBoardId(), { wrapper })
@@ -292,7 +292,9 @@ describe('useTrelloBoardId hook (DEBT-014)', () => {
       })
 
       // Should throw when save fails (mutations propagate errors)
-      await expect(result.current.setBoardId('error-board')).rejects.toThrow('Save failed')
+      await expect(result.current.setBoardId('error-board')).rejects.toThrow(
+        'Save failed'
+      )
     })
   })
 

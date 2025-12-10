@@ -9,10 +9,11 @@
  * - Transition to next workflow step
  */
 
-import { act, renderHook, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useScriptUpload } from '@hooks/useScriptUpload'
 import type { ScriptDocument } from '@/types/scriptFormatter'
+import { useDocxParser } from '@hooks/useDocxParser'
+import { useScriptUpload } from '@hooks/useScriptUpload'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock dependencies
 vi.mock('@hooks/useDocxParser', () => ({
@@ -27,8 +28,6 @@ vi.mock('@utils/logger', () => ({
     error: vi.fn()
   })
 }))
-
-import { useDocxParser } from '@hooks/useDocxParser'
 
 describe('useScriptUpload', () => {
   const mockParseFile = vi.fn()
@@ -222,12 +221,10 @@ describe('useScriptUpload', () => {
     })
 
     it('should handle multiple consecutive file selections', async () => {
-      mockParseFile
-        .mockResolvedValueOnce(mockParsedDocument)
-        .mockResolvedValueOnce({
-          ...mockParsedDocument,
-          filename: 'second-script.docx'
-        })
+      mockParseFile.mockResolvedValueOnce(mockParsedDocument).mockResolvedValueOnce({
+        ...mockParsedDocument,
+        filename: 'second-script.docx'
+      })
 
       const { result } = renderHook(() => useScriptUpload())
 

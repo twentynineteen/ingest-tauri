@@ -13,6 +13,7 @@ This document describes the systematic approach for auditing Tailwind CSS usage 
 **Objective**: Understand the existing theme structure
 
 **Actions**:
+
 1. Read `src/index.css` (or primary CSS file)
 2. Extract all `@theme` definitions
 3. Identify existing semantic tokens
@@ -20,6 +21,7 @@ This document describes the systematic approach for auditing Tailwind CSS usage 
 5. Note custom animations and utilities
 
 **Look for**:
+
 - Color tokens (HSL format)
 - Spacing/sizing variables
 - Radius definitions
@@ -27,6 +29,7 @@ This document describes the systematic approach for auditing Tailwind CSS usage 
 - Custom CSS properties
 
 **Output**:
+
 ```
 Theme Analysis:
 - Semantic tokens defined: primary, secondary, destructive, muted, accent, card, border, input, ring
@@ -41,6 +44,7 @@ Theme Analysis:
 **Objective**: Identify all Tailwind class usage
 
 **Search Patterns** (regex):
+
 ```regex
 # Hardcoded utility colors
 (bg|text|border|ring)-(red|blue|green|yellow|amber|orange|purple|pink|indigo|gray|slate)-(50|100|200|300|400|500|600|700|800|900)
@@ -56,11 +60,13 @@ Theme Analysis:
 ```
 
 **File Types to Scan**:
+
 - `.tsx`, `.jsx` (React components)
 - `.ts`, `.js` (utility files with class generation)
 - `.html`, `.vue`, `.svelte` (if applicable)
 
 **Exclude**:
+
 - `node_modules/`
 - `.next/`, `dist/`, `build/` (build artifacts)
 - `*.test.*`, `*.spec.*` (test files - optional)
@@ -99,6 +105,7 @@ Theme Analysis:
    - `text-[rgb(59,130,246)]` → Use existing or create token
 
 **Frequency Analysis**:
+
 ```
 Color Usage Frequency:
 - bg-blue-500: 23 instances
@@ -111,6 +118,7 @@ Color Usage Frequency:
 ```
 
 **Pattern Insights**:
+
 - High blue usage suggests need for `info` token (non-primary context)
 - Green usage indicates missing `success` token
 - Amber usage shows missing `warning` token
@@ -136,6 +144,7 @@ For each file with violations, analyze:
    - Do other files use different colors for same intent?
 
 **Example Analysis**:
+
 ```
 File: src/pages/auth/Login.tsx
 - bg-blue-500 on submit button → PRIMARY action (map to bg-primary)
@@ -155,6 +164,7 @@ File: src/components/Baker/TrelloCardItem.tsx
 Based on pattern analysis, determine which semantic tokens are missing:
 
 **Common Gaps**:
+
 1. **Status Colors**
    - `--color-warning` (for amber/orange usage)
    - `--color-info` (for blue usage in non-primary context)
@@ -179,15 +189,17 @@ For each missing token:
    - Create foreground pair
 
 2. **Light Mode Values**
+
    ```css
-   --color-warning: 38 92% 50%;           /* Amber-ish */
+   --color-warning: 38 92% 50%; /* Amber-ish */
    --color-warning-foreground: 48 96% 89%; /* Light yellow */
    ```
 
 3. **Dark Mode Values**
+
    ```css
    /* In .dark theme */
-   --color-warning: 38 92% 60%;           /* Lighter for dark bg */
+   --color-warning: 38 92% 60%; /* Lighter for dark bg */
    --color-warning-foreground: 48 96% 12%; /* Dark for contrast */
    ```
 
@@ -204,11 +216,13 @@ For each missing token:
 #### Prioritization
 
 **Sort files by**:
+
 1. **Violation count** (highest first) - maximize impact
 2. **File type** (pages before components) - user-facing first
 3. **Dependency order** (leaf components before parents) - safer updates
 
 **Priority Tiers**:
+
 - **High**: >15 violations per file
 - **Medium**: 5-15 violations per file
 - **Low**: <5 violations per file
@@ -218,6 +232,7 @@ For each missing token:
 Create explicit mapping rules for consistency:
 
 **Interactive Elements**:
+
 ```
 bg-blue-500, bg-blue-600 (on buttons) → bg-primary
 bg-red-500, bg-red-600 (on delete buttons) → bg-destructive
@@ -225,6 +240,7 @@ bg-gray-200, bg-gray-300 (on secondary buttons) → bg-secondary
 ```
 
 **Status Indicators**:
+
 ```
 text-green-600, bg-green-100 → text-success, bg-success/10
 text-red-600, bg-red-100 → text-error, bg-error/10
@@ -233,6 +249,7 @@ text-blue-600, bg-blue-100 → text-info, bg-info/10
 ```
 
 **Text Colors**:
+
 ```
 text-gray-900, text-black → text-foreground
 text-gray-600, text-gray-700 → text-muted-foreground
@@ -241,6 +258,7 @@ text-gray-400 → text-muted-foreground/50
 ```
 
 **Backgrounds**:
+
 ```
 bg-white, bg-gray-50 → bg-background or bg-card
 bg-gray-100 → bg-muted or bg-secondary
@@ -248,12 +266,14 @@ bg-gray-200 → bg-muted/80
 ```
 
 **Borders**:
+
 ```
 border-gray-300, border-gray-200 → border-border
 border-gray-300 (on inputs) → border-input
 ```
 
 **Hover States**:
+
 ```
 hover:bg-blue-600 → hover:bg-primary/90
 hover:bg-gray-200 → hover:bg-secondary/80
@@ -265,6 +285,7 @@ hover:text-blue-700 → hover:text-primary/90
 **Context-Dependent Colors**:
 
 Problem: Same color used for different purposes
+
 ```tsx
 // Both use bg-blue-500, but different contexts
 <button className="bg-blue-500">Submit</button>  {/* Primary action */}
@@ -272,6 +293,7 @@ Problem: Same color used for different purposes
 ```
 
 Solution: Map based on context
+
 ```tsx
 <button className="bg-primary">Submit</button>
 <div className="bg-info">Info badge</div>
@@ -280,39 +302,45 @@ Solution: Map based on context
 **Multi-Shade Patterns**:
 
 Problem: Component uses multiple shades of same color
+
 ```tsx
-<div className="bg-blue-100 border border-blue-300 text-blue-700">
-  Info message
-</div>
+<div className="bg-blue-100 border border-blue-300 text-blue-700">Info message</div>
 ```
 
 Solution: Use opacity modifiers
+
 ```tsx
-<div className="bg-info/10 border border-info/30 text-info">
-  Info message
-</div>
+<div className="bg-info/10 border border-info/30 text-info">Info message</div>
 ```
 
 **Dynamic Classes**:
 
 Problem: Classes generated programmatically
+
 ```tsx
-const getStatusColor = (status) => {
-  switch(status) {
-    case 'active': return 'text-green-600'
-    case 'pending': return 'text-yellow-600'
-    case 'failed': return 'text-red-600'
+const getStatusColor = status => {
+  switch (status) {
+    case 'active':
+      return 'text-green-600'
+    case 'pending':
+      return 'text-yellow-600'
+    case 'failed':
+      return 'text-red-600'
   }
 }
 ```
 
 Solution: Map to semantic tokens
+
 ```tsx
-const getStatusColor = (status) => {
-  switch(status) {
-    case 'active': return 'text-success'
-    case 'pending': return 'text-warning'
-    case 'failed': return 'text-error'
+const getStatusColor = status => {
+  switch (status) {
+    case 'active':
+      return 'text-success'
+    case 'pending':
+      return 'text-warning'
+    case 'failed':
+      return 'text-error'
   }
 }
 ```
@@ -320,11 +348,13 @@ const getStatusColor = (status) => {
 **Conditional Classes**:
 
 Problem: Template literal classes
+
 ```tsx
 <div className={`${isError ? 'text-red-600' : 'text-gray-600'}`}>
 ```
 
 Solution: Use semantic tokens
+
 ```tsx
 <div className={`${isError ? 'text-error' : 'text-muted-foreground'}`}>
 ```
@@ -334,6 +364,7 @@ Solution: Use semantic tokens
 #### Pre-Refactoring Checks
 
 Before applying changes:
+
 1. **Git status clean**: Ensure no uncommitted changes
 2. **Theme tokens defined**: Verify all target tokens exist
 3. **Dark mode tested**: Check theme has dark variants
@@ -342,6 +373,7 @@ Before applying changes:
 #### Post-Refactoring Validation
 
 After each file:
+
 1. **Syntax check**: Ensure valid className attributes
 2. **Visual inspection**: Check in dev mode (light + dark)
 3. **Hover states**: Verify interactive elements
@@ -351,6 +383,7 @@ After each file:
 #### Batch Validation
 
 After completing all files:
+
 1. **Build check**: Ensure project builds without errors
 2. **Prettier format**: Run `npm run prettier:fix`
 3. **Lint check**: Run `npm run eslint:fix`
@@ -369,12 +402,14 @@ After completing all files:
 **Duration**: ~30 minutes scan
 
 **Findings**:
+
 - Files with issues: 47 (45.6%)
 - Total violations: 346
 - Hardcoded colors: 312 instances
 - Arbitrary values: 34 instances
 
 **Top Issues**:
+
 1. Hardcoded blue utilities (87 instances)
 2. Gray text colors (134 instances)
 3. Red error colors (31 instances)
@@ -382,6 +417,7 @@ After completing all files:
 5. Arbitrary sizing (34 instances)
 
 **Recommendations**:
+
 - Add 3 semantic tokens: warning, info, success
 - Refactor 47 files in 3 priority tiers
 - Estimated effort: 2-4 hours for complete refactoring
@@ -395,6 +431,7 @@ After completing all files:
 ### High Priority Files (>15 violations)
 
 #### src/components/ProjectChangeDetailView.tsx
+
 **Violations**: 24
 
 1. Line 45: `text-green-600` → `text-success`
@@ -417,15 +454,17 @@ After completing all files:
 
 ### Recommended Token Additions
 
-```markdown
+````markdown
 ## Theme Enhancement Recommendations
 
 ### Missing Tokens
 
 #### 1. Warning Token
+
 **Rationale**: 23 instances of amber/orange/yellow utilities for cautionary states
 
 **Proposed Definition**:
+
 ```css
 @theme {
   --color-warning: 38 92% 50%;
@@ -439,18 +478,23 @@ After completing all files:
   }
 }
 ```
+````
 
 **Usage Examples**:
+
 - Alert messages: "Your session will expire soon"
 - Warning icons
 - Caution badges
 
 #### 2. Info Token
+
 [Similar structure...]
 
 #### 3. Success Token
+
 [Similar structure...]
-```
+
+````
 
 ### Progress Tracking
 
@@ -472,7 +516,7 @@ After completing all files:
 - [ ] src/components/Badge.tsx (2 violations)
 
 **Progress**: 0/47 files completed (0%)
-```
+````
 
 ## Quality Metrics
 
@@ -491,12 +535,14 @@ After completing all files:
 ## Audit Metrics
 
 **Before Refactoring**:
+
 - Hardcoded utility colors: 312
 - Arbitrary values: 34
 - Files with violations: 47
 - Token coverage: 60%
 
 **After Refactoring**:
+
 - Hardcoded utility colors: 0
 - Arbitrary values: 12 (intentional)
 - Files with violations: 0
@@ -563,10 +609,12 @@ grep -r "(bg|text|border)-\[#[0-9a-fA-F]{3,6}\]" src/
 ### Color Contrast Requirements
 
 **WCAG AA Standard** (minimum):
+
 - Normal text: 4.5:1 contrast ratio
 - Large text (18pt+): 3:1 contrast ratio
 
 **WCAG AAA Standard** (enhanced):
+
 - Normal text: 7:1 contrast ratio
 - Large text: 4.5:1 contrast ratio
 

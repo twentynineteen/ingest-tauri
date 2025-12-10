@@ -10,10 +10,14 @@
  * - Processing error handling
  */
 
-import { act, renderHook, waitFor } from '@testing-library/react'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { useAIProcessing } from '@hooks/useAIProcessing'
 import type { ProcessedOutput, ProviderConfiguration } from '@/types/scriptFormatter'
+import { useAIModels } from '@hooks/useAIModels'
+import { useAIProcessing } from '@hooks/useAIProcessing'
+import { useAIProvider } from '@hooks/useAIProvider'
+import { useExampleManagement } from '@hooks/useExampleManagement'
+import { useScriptProcessor } from '@hooks/useScriptProcessor'
+import { act, renderHook, waitFor } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock dependencies
 vi.mock('@hooks/useAIProvider', () => ({
@@ -40,11 +44,6 @@ vi.mock('@utils/logger', () => ({
     error: vi.fn()
   })
 }))
-
-import { useAIProvider } from '@hooks/useAIProvider'
-import { useAIModels } from '@hooks/useAIModels'
-import { useScriptProcessor } from '@hooks/useScriptProcessor'
-import { useExampleManagement } from '@hooks/useExampleManagement'
 
 describe('useAIProcessing', () => {
   const mockProvider = {
@@ -82,7 +81,6 @@ describe('useAIProcessing', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-
     ;(useAIProvider as any).mockReturnValue({
       activeProvider: mockProvider,
       availableProviders: [mockProvider],
@@ -95,7 +93,6 @@ describe('useAIProcessing', () => {
       models: [],
       isLoading: false
     })
-
     ;(useScriptProcessor as any).mockReturnValue({
       processScript: mockProcessScript,
       cancel: mockCancelProcessing,
@@ -104,7 +101,6 @@ describe('useAIProcessing', () => {
       isEmbeddingLoading: false,
       embeddingError: null
     })
-
     ;(useExampleManagement as any).mockReturnValue({
       examples: mockExamples,
       isLoading: false
@@ -186,7 +182,6 @@ describe('useAIProcessing', () => {
       act(() => {
         result.current.setSelectedModelId('gpt-3.5-turbo')
       })
-
       ;(useAIModels as any).mockReturnValue({
         models: [...mockModels, { id: 'gpt-4-turbo', name: 'GPT-4 Turbo' }],
         isLoading: false

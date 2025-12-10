@@ -1,7 +1,7 @@
-import { render, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { BrowserRouter } from 'react-router-dom'
 import { AppRouter } from '@/AppRouter'
+import { render, screen, waitFor } from '@testing-library/react'
+import { BrowserRouter } from 'react-router-dom'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock Tauri plugins
 vi.mock('@tauri-apps/plugin-process', () => ({
@@ -141,7 +141,7 @@ describe('AppRouter', () => {
       const { check } = await import('@tauri-apps/plugin-updater')
       const { relaunch } = await import('@tauri-apps/plugin-process')
 
-      const mockDownloadAndInstall = vi.fn(async (callback) => {
+      const mockDownloadAndInstall = vi.fn(async callback => {
         // Simulate download events
         callback({ event: 'Started', data: { contentLength: 1000 } })
         callback({ event: 'Progress', data: { chunkLength: 500 } })
@@ -216,7 +216,7 @@ describe('AppRouter', () => {
 
       let progressCallback: any
 
-      const mockDownloadAndInstall = vi.fn(async (callback) => {
+      const mockDownloadAndInstall = vi.fn(async callback => {
         progressCallback = callback
         callback({ event: 'Started', data: { contentLength: 1000 } })
         callback({ event: 'Progress', data: { chunkLength: 250 } })

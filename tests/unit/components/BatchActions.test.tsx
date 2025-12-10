@@ -13,11 +13,11 @@
  * Total: 12 tests
  */
 
+import { BatchActions } from '@components/Baker/BatchActions'
 import { render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { BatchActions } from '@components/Baker/BatchActions'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 describe('BatchActions Component', () => {
   // Mock functions for callbacks
@@ -61,7 +61,11 @@ describe('BatchActions Component', () => {
       // Arrange & Act
       render(
         <BatchActions
-          selectedProjects={['/path/to/project1', '/path/to/project2', '/path/to/project3']}
+          selectedProjects={[
+            '/path/to/project1',
+            '/path/to/project2',
+            '/path/to/project3'
+          ]}
           totalProjects={10}
           isUpdating={false}
           onSelectAll={mockOnSelectAll}

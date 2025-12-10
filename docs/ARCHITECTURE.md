@@ -59,17 +59,17 @@ This document explains the high-level architecture of Bucket, including how diff
 
 ### Technology Stack
 
-| Layer | Technology | Why We Chose It |
-|-------|-----------|-----------------|
-| **Frontend Framework** | React 19 + TypeScript 5.9 | Type safety, large ecosystem, excellent tooling, team expertise |
-| **Build Tool** | Vite 7.1 | Fast HMR, modern ESM support, optimized production builds |
-| **Desktop Runtime** | Tauri 2.0 | Smaller app size than Electron, better security, Rust performance, native OS integration |
-| **UI Components** | Radix UI + TailwindCSS | Accessible primitives, utility-first styling, consistent design system |
-| **State Management** | Zustand + TanStack React Query | Simple API, minimal boilerplate, excellent async state handling |
-| **Backend Language** | Rust 2021 | Memory safety, performance, excellent async support (tokio), cargo ecosystem |
-| **Database** | SQLite (rusqlite) | Embedded, zero-config, perfect for desktop apps, supports vector embeddings |
-| **AI/LLM** | Ollama + Vercel AI SDK | Local-first, privacy-preserving, unified provider interface |
-| **Testing** | Vitest + Testing Library | Fast, ESM-native, compatible with Vite, excellent DX |
+| Layer                  | Technology                     | Why We Chose It                                                                          |
+| ---------------------- | ------------------------------ | ---------------------------------------------------------------------------------------- |
+| **Frontend Framework** | React 19 + TypeScript 5.9      | Type safety, large ecosystem, excellent tooling, team expertise                          |
+| **Build Tool**         | Vite 7.1                       | Fast HMR, modern ESM support, optimized production builds                                |
+| **Desktop Runtime**    | Tauri 2.0                      | Smaller app size than Electron, better security, Rust performance, native OS integration |
+| **UI Components**      | Radix UI + TailwindCSS         | Accessible primitives, utility-first styling, consistent design system                   |
+| **State Management**   | Zustand + TanStack React Query | Simple API, minimal boilerplate, excellent async state handling                          |
+| **Backend Language**   | Rust 2021                      | Memory safety, performance, excellent async support (tokio), cargo ecosystem             |
+| **Database**           | SQLite (rusqlite)              | Embedded, zero-config, perfect for desktop apps, supports vector embeddings              |
+| **AI/LLM**             | Ollama + Vercel AI SDK         | Local-first, privacy-preserving, unified provider interface                              |
+| **Testing**            | Vitest + Testing Library       | Fast, ESM-native, compatible with Vite, excellent DX                                     |
 
 ## Directory Structure
 
@@ -248,14 +248,17 @@ bucket/
 ### Directory Purpose and Rules
 
 #### src/pages/
+
 **Purpose:** Page-level components that represent routes in the application.
 
 **What goes here:**
+
 - Top-level feature pages (BuildProject, Baker, Settings, etc.)
 - Route-specific orchestrator components
 - Sub-components specific to one page (in subdirectories)
 
 **What doesn't go here:**
+
 - Reusable components (put in `components/`)
 - Business logic (put in `hooks/` or `services/`)
 - Utilities (put in `utils/`)
@@ -263,15 +266,18 @@ bucket/
 **When to add a file:** When creating a new route/page in the application.
 
 #### src/hooks/
+
 **Purpose:** Custom React hooks that encapsulate reusable logic.
 
 **What goes here:**
+
 - Tauri command wrappers (e.g., `useBreadcrumb`)
 - TanStack React Query hooks for data fetching
 - Complex state management logic
 - Reusable UI behavior (e.g., `useZoomPan`)
 
 **What doesn't go here:**
+
 - Pure utility functions (put in `utils/`)
 - UI components (put in `components/`)
 - Global state stores (put in `store/`)
@@ -279,15 +285,18 @@ bucket/
 **When to add a file:** When logic is reused across 2+ components or when abstracting Tauri commands.
 
 #### src-tauri/src/commands/
+
 **Purpose:** Rust functions exposed to the frontend via Tauri's IPC.
 
 **What goes here:**
+
 - File system operations
 - API integrations (Trello, Sprout Video, Ollama)
 - Database operations (SQLite)
 - CPU-intensive operations (embeddings, file hashing)
 
 **What doesn't go here:**
+
 - UI logic (stays in React)
 - Simple data transformations (do in TypeScript unless performance-critical)
 
@@ -452,6 +461,7 @@ Application State
    - Transient search/filter state
 
 **Why this architecture:**
+
 - Zustand: Minimal boilerplate, easy to use, no provider nesting
 - React Query: Best-in-class async state management, caching, deduplication
 - useState: Simple, fast, no overhead for local state
@@ -463,23 +473,27 @@ Application State
 **What we decided:** Build the desktop app with Tauri instead of Electron.
 
 **Context:**
+
 - Need cross-platform desktop app (macOS, Windows, Linux)
 - File system access for large video files (100+ GB projects)
 - Security concerns with executing untrusted code
 - App distribution size matters (DMG downloads)
 
 **Why we decided this:**
+
 - **Smaller app size:** Tauri apps are ~10MB vs. Electron's ~100MB (bundles OS webview instead of Chromium)
 - **Better security:** Rust's memory safety, restricted IPC, no Node.js in renderer
 - **Performance:** Rust backend handles file operations faster than Node.js
 - **Native OS integration:** Better system dialogs, notifications, and permissions
 
 **Trade-offs:**
+
 - ✅ **Pros:** Smaller downloads, better security, native performance, modern Rust ecosystem
 - ❌ **Cons:** Smaller community than Electron, fewer plugins/libraries, Rust learning curve
 - 🤔 **When to reconsider:** If we need plugins that only exist for Electron (rare now with Tauri 2.0)
 
 **Alternatives considered:**
+
 - **Electron:** Rejected due to app size and security concerns
 - **Progressive Web App:** Rejected because we need full file system access and OS integration
 
@@ -488,17 +502,20 @@ Application State
 **What we decided:** Use React Query for all data fetching instead of manual `useEffect` + `useState`.
 
 **Context:**
+
 - Application makes many Tauri IPC calls for file operations, API calls
 - Need to handle loading states, errors, retries, caching
 - Previous implementation used `useEffect` with manual state management (Phase 002 refactor)
 
 **Why we decided this:**
+
 - **Automatic caching:** Queries are cached by key, preventing redundant Tauri calls
 - **Deduplication:** Multiple components requesting same data share a single request
 - **Simpler code:** Eliminates 90% of `useEffect` boilerplate
 - **Built-in features:** Loading states, error handling, retries, stale-while-revalidate
 
 **Trade-offs:**
+
 - ✅ **Pros:** Less code, fewer bugs, better UX, excellent DevTools
 - ❌ **Cons:** Learning curve for developers new to React Query
 - 🤔 **When to reconsider:** If React Server Components become viable for desktop apps (unlikely)
@@ -524,7 +541,11 @@ useEffect(() => {
 }, [filePath])
 
 // NEW: React Query (current)
-const { data: breadcrumbs, isLoading, error } = useQuery({
+const {
+  data: breadcrumbs,
+  isLoading,
+  error
+} = useQuery({
   queryKey: ['breadcrumbs', filePath],
   queryFn: () => invoke('read_breadcrumbs', { filePath })
 })
@@ -535,18 +556,21 @@ const { data: breadcrumbs, isLoading, error } = useQuery({
 **What we decided:** Use SQLite with cosine similarity for vector search instead of dedicated vector database.
 
 **Context:**
+
 - AI Script Formatter needs to retrieve similar examples from ~50 bundled examples
 - Need vector embeddings storage (768-dimensional vectors)
 - Desktop app, not server application
 - Examples database must be bundled with app
 
 **Why we decided this:**
+
 - **Zero configuration:** SQLite is embedded, no separate database server
 - **Good enough performance:** 50 examples is tiny, linear search is <1ms
 - **Bundled with app:** Database file ships in `resources/embeddings/examples.db`
 - **Simple queries:** Standard SQL with custom cosine similarity function
 
 **Trade-offs:**
+
 - ✅ **Pros:** Simple, fast enough, no dependencies, works offline
 - ❌ **Cons:** Won't scale to millions of vectors (but we only have 50)
 - 🤔 **When to reconsider:** If we add user-uploaded examples reaching 10,000+ (then consider pgvector or Qdrant)
@@ -573,18 +597,21 @@ LIMIT 3;
 **What we decided:** Use `breadcrumbs.json` files as the canonical metadata source instead of a centralized database.
 
 **Context:**
+
 - Need to store project metadata (title, date, cameras, video links, Trello cards)
 - Projects are folder-based on user's file system
 - Users may move/rename project folders
 - Need metadata to survive file system changes
 
 **Why we decided this:**
+
 - **Portable:** Metadata travels with the project folder
 - **Resilient:** Works even if Bucket app is uninstalled/reinstalled
 - **Simple:** No database migrations, no schema versioning complexity
 - **Inspectable:** Users can open breadcrumbs.json in any text editor
 
 **Trade-offs:**
+
 - ✅ **Pros:** Portable, simple, inspectable, no database
 - ❌ **Cons:** Can't query across all projects efficiently (Baker workflow scans files)
 - 🤔 **When to reconsider:** If we add "global search across all projects" feature (then add optional database index)
@@ -652,22 +679,23 @@ hooks/
 
 ### External Dependencies (Key Packages)
 
-| Package | Version | Used For | Notes |
-|---------|---------|----------|-------|
-| **@tauri-apps/api** | 2.9.0 | Tauri IPC bridge | Invoke Rust commands from React |
-| **@tanstack/react-query** | 5.90.3 | Async state management | Replaces useEffect for data fetching |
-| **zustand** | 5.0.8 | Global state | Lightweight alternative to Redux |
-| **@radix-ui/react-*** | 1.x | Accessible UI primitives | Headless components for dialogs, dropdowns, etc. |
-| **ai** (Vercel AI SDK) | 5.0.72 | AI provider abstraction | Unified interface for Ollama, OpenAI, etc. |
-| **@monaco-editor/react** | 4.7.0 | Code/diff editor | Script formatting diff view |
-| **docx** | 9.5.1 | Word document generation | Export formatted scripts |
-| **mammoth** | 1.11.0 | Word document parsing | Import .docx scripts |
-| **fuse.js** | 7.1.0 | Fuzzy search | Search projects in Baker |
-| **vite** | 7.1.10 | Build tool | Fast dev server, production builds |
+| Package                   | Version | Used For                 | Notes                                            |
+| ------------------------- | ------- | ------------------------ | ------------------------------------------------ |
+| **@tauri-apps/api**       | 2.9.0   | Tauri IPC bridge         | Invoke Rust commands from React                  |
+| **@tanstack/react-query** | 5.90.3  | Async state management   | Replaces useEffect for data fetching             |
+| **zustand**               | 5.0.8   | Global state             | Lightweight alternative to Redux                 |
+| **@radix-ui/react-\***    | 1.x     | Accessible UI primitives | Headless components for dialogs, dropdowns, etc. |
+| **ai** (Vercel AI SDK)    | 5.0.72  | AI provider abstraction  | Unified interface for Ollama, OpenAI, etc.       |
+| **@monaco-editor/react**  | 4.7.0   | Code/diff editor         | Script formatting diff view                      |
+| **docx**                  | 9.5.1   | Word document generation | Export formatted scripts                         |
+| **mammoth**               | 1.11.0  | Word document parsing    | Import .docx scripts                             |
+| **fuse.js**               | 7.1.0   | Fuzzy search             | Search projects in Baker                         |
+| **vite**                  | 7.1.10  | Build tool               | Fast dev server, production builds               |
 
 **Rust dependencies:** See `src-tauri/Cargo.toml` for full list.
 
 Key Rust crates:
+
 - `tauri`: Desktop app framework
 - `tokio`: Async runtime
 - `reqwest`: HTTP client (Trello, Sprout Video APIs)
@@ -683,6 +711,7 @@ Key Rust crates:
 To add a new feature page (e.g., "Timeline" page):
 
 1. **Create page component:**
+
    ```
    src/pages/Timeline/
    ├── Timeline.tsx           # Main page component
@@ -778,6 +807,7 @@ export function useMyFeature() {
 To add a new bundled script example for RAG:
 
 1. **Create example directory:**
+
    ```
    src-tauri/resources/examples/new-example-1/
    ├── before.txt           # Raw script
@@ -786,6 +816,7 @@ To add a new bundled script example for RAG:
    ```
 
 2. **Generate embeddings:**
+
    ```bash
    npm run embed:examples:ollama
    ```
@@ -876,10 +907,12 @@ Examples are bundled with the app in the resources directory.
 ### Threat Model
 
 **Trusted:**
+
 - User's file system
 - Locally running Ollama instance
 
 **Untrusted:**
+
 - External APIs (Trello, Sprout Video) - use HTTPS, validate responses
 - User-uploaded files - validate file types, sanitize filenames
 - AI model outputs - sanitize before rendering (XSS protection)
@@ -888,10 +921,10 @@ Examples are bundled with the app in the resources directory.
 
 ### Environments
 
-| Environment | Purpose | How to Run |
-|------------|---------|------------|
-| **Development** | Local development with hot reload | `npm run dev:tauri` |
-| **Production Build** | Release builds for distribution | `npm run build:tauri` |
+| Environment          | Purpose                           | How to Run            |
+| -------------------- | --------------------------------- | --------------------- |
+| **Development**      | Local development with hot reload | `npm run dev:tauri`   |
+| **Production Build** | Release builds for distribution   | `npm run build:tauri` |
 
 No staging/preview environments (desktop app, not web app).
 
@@ -937,16 +970,19 @@ Bucket supports automatic updates via Tauri's updater plugin:
 ### Logging
 
 **Log levels (Rust):**
+
 - `ERROR`: Critical failures (file not found, API errors, database errors)
 - `WARN`: Recoverable issues (missing optional fields, deprecated features)
 - `INFO`: Normal operations (project created, file copied)
 - `DEBUG`: Detailed execution flow (only in dev builds)
 
 **Log destinations:**
+
 - **Development:** Terminal output (`RUST_LOG=debug npm run dev:tauri`)
 - **Production:** Tauri logs to app data directory (macOS: `~/Library/Logs/com.bucket.app/`)
 
 **TypeScript logging:**
+
 - `console.log` in development (Tauri devtools)
 - Errors logged to Sentry (TODO: not yet implemented)
 
@@ -955,6 +991,7 @@ Bucket supports automatic updates via Tauri's updater plugin:
 Currently no telemetry/metrics collection (privacy-focused desktop app).
 
 **Future considerations:**
+
 - Opt-in anonymous usage analytics (feature usage, crash reports)
 - Performance monitoring (file copy speeds, LLM inference times)
 
@@ -963,6 +1000,7 @@ Currently no telemetry/metrics collection (privacy-focused desktop app).
 ### Common Architecture Issues
 
 **Issue: Tauri command not found**
+
 - **Symptoms:** `Error: Command 'my_command' not found` in browser console
 - **Cause:** Command not registered in `main.rs` or wrong function name
 - **Solution:**
@@ -971,9 +1009,11 @@ Currently no telemetry/metrics collection (privacy-focused desktop app).
   3. Rebuild Rust: `cd src-tauri && cargo build`
 
 **Issue: React Query not refetching**
+
 - **Symptoms:** Stale data displayed, changes not reflected
 - **Cause:** Query not invalidated after mutation
 - **Solution:**
+
   ```typescript
   const queryClient = useQueryClient()
 
@@ -986,6 +1026,7 @@ Currently no telemetry/metrics collection (privacy-focused desktop app).
   ```
 
 **Issue: File copy fails silently**
+
 - **Symptoms:** Files not copied, no error message
 - **Cause:** Tauri command threw error but wasn't caught
 - **Solution:** Wrap Tauri calls in try-catch:
@@ -999,6 +1040,7 @@ Currently no telemetry/metrics collection (privacy-focused desktop app).
   ```
 
 **Issue: Premiere project corrupted**
+
 - **Symptoms:** Premiere won't open project, shows corruption error
 - **Cause:** File not flushed to disk (fixed in v0.9.1)
 - **Solution:** Update to v0.9.1+ (includes `file.sync_all()` fix)

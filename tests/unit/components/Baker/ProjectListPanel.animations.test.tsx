@@ -7,7 +7,13 @@
  * Following TDD methodology - tests written before implementation.
  */
 
-import { vi } from 'vitest'
+import { ProjectListPanel } from '@/components/Baker/ProjectListPanel'
+import { BAKER_ANIMATIONS, DURATION } from '@/constants/animations'
+import type { ProjectFolder } from '@/types/baker'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { expectMotionComponent, mockReducedMotion } from '@tests/utils/animation-testing'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock matchMedia BEFORE imports (required for Framer Motion)
 vi.hoisted(() => {
@@ -28,14 +34,6 @@ vi.hoisted(() => {
     value: mockMatchMedia
   })
 })
-
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { describe, expect, it, beforeEach } from 'vitest'
-import { ProjectListPanel } from '@/components/Baker/ProjectListPanel'
-import { BAKER_ANIMATIONS, DURATION } from '@/constants/animations'
-import { expectMotionComponent, mockReducedMotion } from '@tests/utils/animation-testing'
-import type { ProjectFolder } from '@/types/baker'
 
 describe('ProjectListPanel Animations', () => {
   // Mock project data
@@ -84,7 +82,8 @@ describe('ProjectListPanel Animations', () => {
   describe('List Container Animation', () => {
     it('should be a Framer Motion component', () => {
       const { container } = render(<ProjectListPanel {...defaultProps} />)
-      const listContainer = container.querySelector('[role="list"]') || container.firstChild
+      const listContainer =
+        container.querySelector('[role="list"]') || container.firstChild
 
       expect(listContainer).toBeInTheDocument()
       // The container or its children should have motion attributes
@@ -96,7 +95,9 @@ describe('ProjectListPanel Animations', () => {
     })
 
     it('should stagger children with correct delay', () => {
-      expect(BAKER_ANIMATIONS.projectList.container.show.transition.staggerChildren).toBe(0.05)
+      expect(BAKER_ANIMATIONS.projectList.container.show.transition.staggerChildren).toBe(
+        0.05
+      )
     })
   })
 
@@ -134,7 +135,9 @@ describe('ProjectListPanel Animations', () => {
       const user = userEvent.setup()
       render(<ProjectListPanel {...defaultProps} />)
 
-      const firstProject = screen.getByText('Project A').closest('div[role="button"], div')
+      const firstProject = screen
+        .getByText('Project A')
+        .closest('div[role="button"], div')
       expect(firstProject).toBeInTheDocument()
     })
 
@@ -322,7 +325,8 @@ describe('ProjectListPanel Animations', () => {
     })
 
     it('should use stagger delay under 100ms', () => {
-      const stagger = BAKER_ANIMATIONS.projectList.container.show.transition.staggerChildren
+      const stagger =
+        BAKER_ANIMATIONS.projectList.container.show.transition.staggerChildren
       expect(stagger).toBeLessThan(0.1) // Less than 100ms
     })
   })

@@ -4,9 +4,11 @@
  * Phase: RED (Write failing tests)
  */
 
-import { describe, test, expect, vi, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
 import { useScriptFileUpload } from '@/hooks/useScriptFileUpload'
+import { open } from '@tauri-apps/plugin-dialog'
+import { readTextFile } from '@tauri-apps/plugin-fs'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock external dependencies
 vi.mock('@tauri-apps/plugin-dialog', () => ({
@@ -17,12 +19,10 @@ vi.mock('@tauri-apps/plugin-fs', () => ({
   readTextFile: vi.fn()
 }))
 
-import { open } from '@tauri-apps/plugin-dialog'
-import { readTextFile } from '@tauri-apps/plugin-fs'
-
 describe('useScriptFileUpload', () => {
   const mockFilePath = '/path/to/file.txt'
-  const mockFileContent = 'This is valid script content with sufficient length to pass validation.'
+  const mockFileContent =
+    'This is valid script content with sufficient length to pass validation.'
   const MIN_CONTENT_LENGTH = 50
   const MAX_CONTENT_LENGTH = 100_000
 
@@ -357,7 +357,8 @@ describe('useScriptFileUpload', () => {
     test('T019: detects invalid UTF-8 encoding (\\uFFFD)', () => {
       // Arrange
       // Create content long enough to pass length check but with invalid UTF-8
-      const invalidContent = 'Valid content with sufficient length for validation to proceed but contains \uFFFD replacement character'
+      const invalidContent =
+        'Valid content with sufficient length for validation to proceed but contains \uFFFD replacement character'
       const { result } = renderHook(() => useScriptFileUpload())
 
       // Act
@@ -417,7 +418,10 @@ describe('useScriptFileUpload', () => {
 
       // Act & Assert - Invalid encoding (must be long enough first)
       act(() => {
-        result.current.validateFile(mockFilePath, 'Long enough content to pass length validation but has \uFFFD replacement char')
+        result.current.validateFile(
+          mockFilePath,
+          'Long enough content to pass length validation but has \uFFFD replacement char'
+        )
       })
       expect(result.current.error?.type).toBe('invalid_encoding')
     })

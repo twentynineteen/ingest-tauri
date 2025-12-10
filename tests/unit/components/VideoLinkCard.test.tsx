@@ -13,12 +13,14 @@
  * Total: 8 tests
  */
 
+import type { VideoLink } from '@/types/baker'
+import { logger } from '@/utils/logger'
+import { VideoLinkCard } from '@components/Baker/VideoLinkCard'
+import { openUrl } from '@tauri-apps/plugin-opener'
 import { render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { VideoLinkCard } from '@components/Baker/VideoLinkCard'
-import type { VideoLink } from '@/types/baker'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock Tauri opener
 vi.mock('@tauri-apps/plugin-opener', () => ({
@@ -34,9 +36,6 @@ vi.mock('@/utils/logger', () => ({
     debug: vi.fn()
   }
 }))
-
-import { openUrl } from '@tauri-apps/plugin-opener'
-import { logger } from '@/utils/logger'
 
 describe('VideoLinkCard Component', () => {
   // Mock functions for callbacks
@@ -84,7 +83,9 @@ describe('VideoLinkCard Component', () => {
       expect(screen.getByText(/ID: abc123/i)).toBeInTheDocument()
       expect(screen.getByText(/Uploaded:/i)).toBeInTheDocument()
       expect(screen.getByText(/Source: project_alpha_final.mp4/i)).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /open in sprout video/i })).toBeInTheDocument()
+      expect(
+        screen.getByRole('button', { name: /open in sprout video/i })
+      ).toBeInTheDocument()
     })
 
     test('renders without optional fields', () => {
@@ -139,7 +140,10 @@ describe('VideoLinkCard Component', () => {
       // Assert
       const thumbnail = screen.getByAltText('Project Alpha - Final Edit')
       expect(thumbnail).toBeInTheDocument()
-      expect(thumbnail).toHaveAttribute('src', 'https://sproutvideo.com/thumbnails/abc123.jpg')
+      expect(thumbnail).toHaveAttribute(
+        'src',
+        'https://sproutvideo.com/thumbnails/abc123.jpg'
+      )
     })
 
     test('displays placeholder icon when no thumbnail URL', () => {

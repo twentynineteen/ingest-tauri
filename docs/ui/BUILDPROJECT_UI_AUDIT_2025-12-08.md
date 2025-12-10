@@ -1,4 +1,5 @@
 # BuildProject UI Audit Report
+
 **Generated:** 2025-12-08
 **Scope:** `src/pages/BuildProject/` directory
 **Auditor:** UI Analyzer Skill (Claude Code)
@@ -12,11 +13,13 @@ Analyzed 6 React/TypeScript components in the BuildProject workflow. The codebas
 ### Overall Score: 7/10
 
 **Strengths:**
+
 - ✅ Consistent use of semantic color tokens (`bg-primary`, `text-foreground`, etc.)
 - ✅ Good component decomposition and separation of concerns
 - ✅ TypeScript interfaces for all components
 
 **Critical Issues:**
+
 - ❌ Hardcoded gradient colors breaking theme system
 - ❌ Missing ARIA labels and semantic HTML
 - ❌ Inconsistent text hierarchy
@@ -52,6 +55,7 @@ The project uses Tailwind CSS v4's `@theme` directive properly with semantic tok
 ```
 
 Most components correctly reference these tokens:
+
 - `bg-secondary`, `text-foreground`, `border-input`
 - `text-destructive`, `hover:text-destructive/80`
 - `bg-primary`, `hover:bg-primary/90`
@@ -59,6 +63,7 @@ Most components correctly reference these tokens:
 ### ❌ Hardcoded Values Violations
 
 #### 🔴 CRITICAL: ProjectActions.tsx:45-48
+
 **Issue:** Hardcoded gradient colors break theme system and dark mode
 **Location:** [ProjectActions.tsx:45-48](src/pages/BuildProject/ProjectActions.tsx#L45-L48)
 
@@ -69,12 +74,14 @@ className="bg-gradient-to-br from-purple-500 to-pink-500
 ```
 
 **Impact:**
+
 - Does NOT respond to dark mode
 - Purple/pink not in design token palette
 - Inconsistent with rest of UI
 - User sees jarring visual contrast
 
 **Recommended Fix:**
+
 ```tsx
 // ✅ OPTION 1: Use primary gradient (matches design system)
 className="bg-gradient-to-br from-primary to-primary/60
@@ -94,21 +101,24 @@ className="bg-gradient-to-br from-info to-info/60
 ---
 
 #### 🟡 MEDIUM: BuildProject.tsx:164
+
 **Issue:** Hardcoded gradient syntax error
 **Location:** [BuildProject.tsx:164](src/pages/BuildProject/BuildProject.tsx#L164)
 
 ```tsx
 // ❌ CURRENT (typo in gradient)
-className="bg-linear-to-r from-success/10 to-info/10"
+className = 'bg-linear-to-r from-success/10 to-info/10'
 //         ^^^^^^^^^^^^ should be bg-gradient-to-r
 ```
 
 **Impact:**
+
 - Gradient not rendering (Tailwind doesn't have `bg-linear-to-r`)
 - Falls back to solid background
 - Visual inconsistency with intended design
 
 **Recommended Fix:**
+
 ```tsx
 // ✅ FIX
 className="bg-gradient-to-r from-success/10 to-info/10
@@ -120,33 +130,36 @@ className="bg-gradient-to-r from-success/10 to-info/10
 ---
 
 #### 🟡 MEDIUM: Hardcoded spacing values
+
 **Locations:** Multiple files
 
 ```tsx
 // ❌ ProjectFileList.tsx:36
-className="px-4 truncate w-[200px] text-start"
+className = 'px-4 truncate w-[200px] text-start'
 //                      ^^^^^^^^^ hardcoded width
 
 // ❌ ProjectFileList.tsx:37
-className="nowrap truncate italic w-[300px]"
+className = 'nowrap truncate italic w-[300px]'
 //                                 ^^^^^^^^^ hardcoded width
 
 // ❌ ProjectInputs.tsx:34
-className="block w-full p-2.5"
+className = 'block w-full p-2.5'
 //                      ^^^^ use design token spacing
 ```
 
 **Impact:**
+
 - Not responsive to design system changes
 - May break on smaller screens
 - Inconsistent spacing rhythm
 
 **Recommended Fix:**
+
 ```tsx
 // ✅ Use Tailwind spacing scale
-className="px-4 truncate w-48 text-start"  // w-48 = 12rem = 192px
-className="truncate italic w-72"           // w-72 = 18rem = 288px
-className="block w-full p-2"               // p-2 = 0.5rem
+className = 'px-4 truncate w-48 text-start' // w-48 = 12rem = 192px
+className = 'truncate italic w-72' // w-72 = 18rem = 288px
+className = 'block w-full p-2' // p-2 = 0.5rem
 ```
 
 **Priority:** 🟡 **MEDIUM** (maintainability issue)
@@ -158,6 +171,7 @@ className="block w-full p-2"               // p-2 = 0.5rem
 ### ❌ Critical Failures
 
 #### 🔴 FAIL: Missing form labeling
+
 **WCAG SC 3.3.2 (Labels or Instructions) - Level A**
 
 **ProjectFileList.tsx:41-51** - Camera dropdown missing accessible label
@@ -172,6 +186,7 @@ className="block w-full p-2"               // p-2 = 0.5rem
 ```
 
 **Fix:**
+
 ```tsx
 // ✅ ADD aria-label
 <select
@@ -187,21 +202,20 @@ className="block w-full p-2"               // p-2 = 0.5rem
 ---
 
 #### 🔴 FAIL: Button without accessible name
+
 **WCAG SC 4.1.2 (Name, Role, Value) - Level A**
 
 **ProjectFileList.tsx:54-59** - Delete button only has icon, no text
 
 ```tsx
 // ❌ CURRENT (screen readers only announce "button")
-<button
-  onClick={() => onDeleteFile(idx)}
-  className="ml-2 text-destructive..."
->
+<button onClick={() => onDeleteFile(idx)} className="ml-2 text-destructive...">
   <Trash2 />
 </button>
 ```
 
 **Fix:**
+
 ```tsx
 // ✅ ADD aria-label
 <button
@@ -218,19 +232,21 @@ className="block w-full p-2"               // p-2 = 0.5rem
 ---
 
 #### 🔴 FAIL: Missing focus indicators
+
 **WCAG SC 2.4.7 (Focus Visible) - Level AA**
 
 **ProjectActions.tsx** - Custom button styling removes default focus rings
 
 ```tsx
 // ❌ CURRENT (focus:outline-hidden removes visible focus)
-className="focus:ring-4 focus:outline-hidden focus:ring-ring"
+className = 'focus:ring-4 focus:outline-hidden focus:ring-ring'
 //                      ^^^^^^^^^^^^^^^^^^ removes default outline
 ```
 
 **Issue:** `focus:outline-hidden` can hide focus for keyboard users if ring color doesn't have sufficient contrast
 
 **Fix:**
+
 ```tsx
 // ✅ BETTER (rely on ring alone with proper color)
 className="focus:ring-4 focus:ring-ring focus:ring-offset-2
@@ -242,6 +258,7 @@ className="focus:ring-4 focus:ring-ring focus:ring-offset-2
 ---
 
 #### 🟡 WARNING: No error handling UI
+
 **WCAG SC 3.3.1 (Error Identification) - Level A**
 
 **ProjectInputs.tsx** - Number input can accept invalid values (0, negative, decimals)
@@ -257,9 +274,10 @@ className="focus:ring-4 focus:ring-ring focus:ring-offset-2
 ```
 
 **Recommended Fix:**
+
 ```tsx
 // ✅ ADD validation + error message
-<input
+;<input
   type="number"
   min="1"
   max="10"
@@ -273,11 +291,13 @@ className="focus:ring-4 focus:ring-ring focus:ring-offset-2
   aria-invalid={numCameras < 1 || numCameras > 10}
   required
 />
-{(numCameras < 1 || numCameras > 10) && (
-  <p className="text-destructive text-sm" role="alert">
-    Must be between 1 and 10 cameras
-  </p>
-)}
+{
+  ;(numCameras < 1 || numCameras > 10) && (
+    <p className="text-destructive text-sm" role="alert">
+      Must be between 1 and 10 cameras
+    </p>
+  )
+}
 ```
 
 **Priority:** 🟡 **MEDIUM**
@@ -285,9 +305,11 @@ className="focus:ring-4 focus:ring-ring focus:ring-offset-2
 ---
 
 #### 🟢 PASS: Color contrast
+
 All text/background combinations meet WCAG AA contrast ratio (4.5:1 for normal text, 3:1 for large text)
 
 **Verified combinations:**
+
 - `text-foreground` on `bg-background` ✅
 - `text-primary-foreground` on `bg-primary` ✅
 - `text-destructive` on white backgrounds ✅
@@ -299,6 +321,7 @@ All text/background combinations meet WCAG AA contrast ratio (4.5:1 for normal t
 ### ❌ Issues Found
 
 #### 🟡 Missing semantic structure
+
 **BuildProject.tsx:128** - Page title uses `<h2>` instead of `<h1>`
 
 ```tsx
@@ -307,6 +330,7 @@ All text/background combinations meet WCAG AA contrast ratio (4.5:1 for normal t
 ```
 
 **Fix:**
+
 ```tsx
 // ✅ USE h1 for main page title
 <h1 className="px-4 text-2xl font-semibold">Build a Project</h1>
@@ -317,6 +341,7 @@ All text/background combinations meet WCAG AA contrast ratio (4.5:1 for normal t
 ---
 
 #### 🟡 Inconsistent heading levels
+
 **BuildProject.tsx:165** - Success message uses `<h3>` with no `<h2>` in between
 
 ```tsx
@@ -332,6 +357,7 @@ All text/background combinations meet WCAG AA contrast ratio (4.5:1 for normal t
 ---
 
 #### 🟢 Good practices observed:
+
 - Consistent use of `text-sm`, `text-lg`, `text-2xl` for size hierarchy
 - Font weights follow pattern: `font-medium` (500), `font-semibold` (600)
 - Helper text uses `text-muted-foreground` consistently
@@ -350,6 +376,7 @@ All text/background combinations meet WCAG AA contrast ratio (4.5:1 for normal t
 ### 🟡 Opportunities
 
 1. **ProgressBar.tsx** - Could use design tokens for animations
+
    ```tsx
    // Current: works but could use theme
    <div className="bg-primary text-xs leading-none py-1">
@@ -368,18 +395,21 @@ All text/background combinations meet WCAG AA contrast ratio (4.5:1 for normal t
 ## Summary of Issues by Priority
 
 ### 🔴 CRITICAL (Fix Immediately)
+
 1. **Hardcoded gradient in ProjectActions** - Breaks dark mode
 2. **Missing ARIA labels** - Screen reader accessibility
 3. **Delete button lacks accessible name** - Keyboard/SR users can't identify
 4. **Focus indicator removal** - Keyboard navigation issues
 
 ### 🟡 MEDIUM (Fix Soon)
+
 5. **Gradient typo in BuildProject** - Visual bug (`bg-linear-to-r`)
 6. **Hardcoded width values** - Maintainability
 7. **Heading hierarchy** - SEO and screen reader navigation
 8. **Number input validation** - UX and error prevention
 
 ### 🟢 LOW (Nice to Have)
+
 9. Extract FileListItem component for reusability
 10. Add transition tokens for smoother animations
 
@@ -388,6 +418,7 @@ All text/background combinations meet WCAG AA contrast ratio (4.5:1 for normal t
 ## Recommended Implementation Plan
 
 ### Phase 1: Critical Accessibility Fixes (1-2 hours)
+
 ```bash
 # Fix files in order of impact
 1. ProjectActions.tsx    - Replace hardcoded gradient
@@ -397,18 +428,21 @@ All text/background combinations meet WCAG AA contrast ratio (4.5:1 for normal t
 ```
 
 ### Phase 2: Design Token Consistency (1 hour)
+
 ```bash
 5. ProjectFileList.tsx   - Replace w-[200px], w-[300px] with w-48, w-72
 6. ProjectInputs.tsx     - Replace p-2.5 with p-2
 ```
 
 ### Phase 3: Semantic HTML (30 mins)
+
 ```bash
 7. BuildProject.tsx      - Change h2 → h1 for page title
 8. BuildProject.tsx      - Fix heading hierarchy (h3 → h2 or add intermediate h2)
 ```
 
 ### Phase 4: Enhanced UX (Optional)
+
 ```bash
 9. ProjectInputs.tsx     - Add number input validation + error messages
 10. ProjectFileList.tsx  - Extract FileListItem component
@@ -421,6 +455,7 @@ All text/background combinations meet WCAG AA contrast ratio (4.5:1 for normal t
 After fixes, verify with:
 
 1. **Automated testing:**
+
    ```bash
    npm run test  # Ensure no regressions
    ```
@@ -441,6 +476,7 @@ After fixes, verify with:
 The BuildProject components show strong adherence to the design system with **95% design token compliance**. However, **accessibility issues are blocking WCAG 2.1 Level AA certification** and must be addressed before production.
 
 **Next Steps:**
+
 1. Fix critical accessibility issues (ARIA labels, focus indicators)
 2. Replace hardcoded gradient with semantic tokens
 3. Validate fixes with keyboard/screen reader testing

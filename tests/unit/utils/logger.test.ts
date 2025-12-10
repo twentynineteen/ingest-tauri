@@ -1,4 +1,4 @@
-import { describe, test, expect, vi, beforeEach, afterEach } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 /**
  * Test suite for logger utility
@@ -37,7 +37,7 @@ describe('logger utility', () => {
 
   afterEach(() => {
     // Restore all spies
-    Object.values(consoleSpies).forEach((spy) => spy.mockRestore())
+    Object.values(consoleSpies).forEach(spy => spy.mockRestore())
 
     // Restore environment
     if (originalEnv !== undefined) {
@@ -102,7 +102,9 @@ describe('logger utility', () => {
         const { logger } = await import('../../../src/utils/logger')
         logger.warn('Warning message', { detail: 'info' })
 
-        expect(consoleSpies.warn).toHaveBeenCalledWith('Warning message', { detail: 'info' })
+        expect(consoleSpies.warn).toHaveBeenCalledWith('Warning message', {
+          detail: 'info'
+        })
         expect(consoleSpies.warn).toHaveBeenCalledTimes(1)
       })
 
@@ -110,14 +112,23 @@ describe('logger utility', () => {
         const { logger } = await import('../../../src/utils/logger')
         logger.error('Multiple', 'error', 'arguments', 123)
 
-        expect(consoleSpies.error).toHaveBeenCalledWith('Multiple', 'error', 'arguments', 123)
+        expect(consoleSpies.error).toHaveBeenCalledWith(
+          'Multiple',
+          'error',
+          'arguments',
+          123
+        )
       })
 
       test('warn() should handle objects and primitives', async () => {
         const { logger } = await import('../../../src/utils/logger')
         logger.warn('Warning:', { code: 404 }, 'Not found')
 
-        expect(consoleSpies.warn).toHaveBeenCalledWith('Warning:', { code: 404 }, 'Not found')
+        expect(consoleSpies.warn).toHaveBeenCalledWith(
+          'Warning:',
+          { code: 404 },
+          'Not found'
+        )
       })
     })
 
@@ -182,7 +193,7 @@ describe('logger utility', () => {
         const { logger } = await import('../../../src/utils/logger')
         logger.time('test-timer')
         // Simulate some work
-        await new Promise((resolve) => setTimeout(resolve, 10))
+        await new Promise(resolve => setTimeout(resolve, 10))
         logger.timeEnd('test-timer')
 
         expect(consoleSpies.time).toHaveBeenCalledWith('test-timer')
@@ -345,7 +356,9 @@ describe('logger utility', () => {
 
       log.info('info message', { data: 123 })
 
-      expect(consoleSpies.info).toHaveBeenCalledWith('[Service]', 'info message', { data: 123 })
+      expect(consoleSpies.info).toHaveBeenCalledWith('[Service]', 'info message', {
+        data: 123
+      })
     })
 
     test('should prefix debug messages with namespace', async () => {

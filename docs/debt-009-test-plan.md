@@ -10,6 +10,7 @@
 DEBT-009 addresses the lack of comprehensive test coverage for features added in Phase 003-007. This test plan identifies critical untested code and provides a structured approach to achieving 80% coverage for hooks and utils.
 
 ### Current State
+
 - **Total Test Files:** 78
 - **Total Tests:** 1,160 passing
 - **Test Coverage:** Unknown (coverage tool not installed)
@@ -20,12 +21,15 @@ DEBT-009 addresses the lack of comprehensive test coverage for features added in
 Based on automated analysis, the following critical features lack test coverage:
 
 #### Phase 003: Baker Workflow (MERGED)
+
 **Untested Hooks (3):**
+
 - ✅ `useBakerPreferences.ts` - HAS TESTS
 - ✅ `useBakerScan.ts` - HAS TESTS
 - ❌ `useBakerTrelloIntegration.ts` - **NO TESTS** (HIGH PRIORITY)
 
 **Untested Components (7):**
+
 - ❌ `BatchActions.tsx` - **NO TESTS** (HIGH PRIORITY)
 - ❌ `FolderSelector.tsx` - **NO TESTS** (MEDIUM PRIORITY)
 - ❌ `ProjectList.tsx` - **NO TESTS** (HIGH PRIORITY)
@@ -35,18 +39,22 @@ Based on automated analysis, the following critical features lack test coverage:
 - ❌ `VideoLinkCard.tsx` - **NO TESTS** (LOW PRIORITY)
 
 #### Phase 004: Multiple Video Links and Trello Cards
+
 **Status:** Design complete, implementation has tests
 ✅ Contract tests exist: `video_link_validation.test.ts`, `trello_card_validation.test.ts`
 ✅ Component tests exist: `AddVideoDialog.test.tsx`, `AddCardDialog.test.tsx`
 ✅ Manager tests exist: `VideoLinksManager.test.tsx` (33 tests)
 
 #### Phase 006-007: AI Script Formatting
+
 **Untested Hooks (3):**
+
 - ❌ `useScriptFileUpload.ts` - **NO TESTS** (HIGH PRIORITY)
 - ❌ `useScriptFormatterState.ts` - **NO TESTS** (HIGH PRIORITY)
 - ❌ `useScriptRetrieval.ts` - **NO TESTS** (MEDIUM PRIORITY)
 
 **Tested Hooks (7):**
+
 - ✅ `useAIModels.ts` - 7 tests
 - ✅ `useAIProcessing.tsx` - Tests exist
 - ✅ `useScriptDownload.tsx` - Tests exist
@@ -56,6 +64,7 @@ Based on automated analysis, the following critical features lack test coverage:
 - ✅ `useScriptWorkflow.tsx` - Tests exist
 
 **Example Embeddings Management:**
+
 - ✅ `useExampleManagement.tsx` - HAS TESTS
 - ✅ `ExampleEmbeddings.test.tsx` - HAS TESTS (page component)
 - ✅ `example-management.test.tsx` - HAS INTEGRATION TESTS (20 tests)
@@ -63,6 +72,7 @@ Based on automated analysis, the following critical features lack test coverage:
 ## Prioritization Matrix
 
 ### HIGH PRIORITY (Do First)
+
 These are critical business logic components with significant complexity:
 
 1. **useBakerTrelloIntegration.ts** (111-151 lines)
@@ -101,6 +111,7 @@ These are critical business logic components with significant complexity:
    - Effort: 2.5 hours
 
 ### MEDIUM PRIORITY (Do Second)
+
 Supporting components and features:
 
 6. **useScriptRetrieval.ts**
@@ -128,6 +139,7 @@ Supporting components and features:
    - Effort: 2 hours
 
 ### LOW PRIORITY (Consider Later)
+
 Simple presentational components:
 
 10. **TrelloCardItem.tsx**
@@ -147,9 +159,11 @@ Simple presentational components:
 ### Phase 1: High-Priority Hooks (6 hours)
 
 #### Test 1: useBakerTrelloIntegration.ts
+
 **File:** `tests/unit/hooks/useBakerTrelloIntegration.test.tsx`
 
 **Test Categories:**
+
 1. **Initialization** (3 tests)
    - Returns correct interface
    - Handles missing API credentials
@@ -176,6 +190,7 @@ Simple presentational components:
    - Handles partial success (some projects fail)
 
 **Mocks Required:**
+
 - `@tauri-apps/plugin-fs`: `readTextFile`
 - `src/hooks/useBakerTrelloIntegration`: `updateProjectTrelloCards`
 - `src/utils/logger`: `logger.warn`
@@ -185,9 +200,11 @@ Simple presentational components:
 ---
 
 #### Test 2: useScriptFileUpload.ts
+
 **File:** `tests/unit/hooks/useScriptFileUpload.test.tsx`
 
 **Test Categories:**
+
 1. **Initialization** (2 tests)
    - Returns correct interface
    - Initializes with isReading=false and error=null
@@ -220,6 +237,7 @@ Simple presentational components:
    - Handles edge case: exactly MIN_CONTENT_LENGTH
 
 **Mocks Required:**
+
 - `@tauri-apps/plugin-dialog`: `open`
 - `@tauri-apps/plugin-fs`: `readTextFile`
 
@@ -228,11 +246,13 @@ Simple presentational components:
 ---
 
 #### Test 3: useScriptFormatterState.ts
+
 **File:** `tests/unit/hooks/useScriptFormatterState.test.tsx`
 
 **Note:** This hook may be deprecated (DEBT-001 refactored it). Need to check if still in use.
 
 **Action Plan:**
+
 1. Check if hook is still imported/used in codebase
 2. If deprecated, document and remove from test plan
 3. If still used, create comprehensive test suite (20-30 tests)
@@ -244,9 +264,11 @@ Simple presentational components:
 ### Phase 2: High-Priority Components (4.5 hours)
 
 #### Test 4: BatchActions.tsx
+
 **File:** `tests/unit/components/BatchActions.test.tsx`
 
 **Test Categories:**
+
 1. **Rendering** (3 tests)
    - Renders with no selected projects
    - Renders with selected projects
@@ -272,9 +294,11 @@ Simple presentational components:
 ---
 
 #### Test 5: ProjectList.tsx
+
 **File:** `tests/unit/components/ProjectList.test.tsx`
 
 **Test Categories:**
+
 1. **Rendering** (4 tests)
    - Renders empty state
    - Renders list of projects
@@ -308,6 +332,7 @@ Simple presentational components:
 ### Phase 3: Medium-Priority Items (7 hours)
 
 #### Test 6-9: Remaining Components and Hooks
+
 - **useScriptRetrieval.ts**: 12 tests (1.5 hours)
 - **FolderSelector.tsx**: 10 tests (1.5 hours)
 - **ScanResults.tsx**: 12 tests (2 hours)
@@ -320,6 +345,7 @@ Simple presentational components:
 ### Phase 4: Low-Priority Components (2 hours)
 
 #### Test 10-11: Display Components
+
 - **TrelloCardItem.tsx**: 8 tests (1 hour)
 - **VideoLinkCard.tsx**: 8 tests (1 hour)
 
@@ -330,12 +356,14 @@ Simple presentational components:
 ## Test Coverage Targets
 
 ### By Category
+
 - **Hooks**: 90% coverage (critical business logic)
 - **Components**: 80% coverage (user-facing features)
 - **Utils**: 85% coverage (shared functionality)
 - **Services**: 85% coverage (infrastructure)
 
 ### By Priority
+
 - **HIGH**: 90%+ coverage required
 - **MEDIUM**: 80%+ coverage required
 - **LOW**: 70%+ coverage acceptable
@@ -366,6 +394,7 @@ Simple presentational components:
 ### Test Quality Standards
 
 **Every test must:**
+
 - Follow AAA pattern (Arrange-Act-Assert)
 - Have descriptive name explaining scenario
 - Be independent (no shared state)
@@ -375,6 +404,7 @@ Simple presentational components:
 - Clean up after itself
 
 **Mock Strategy:**
+
 - Mock Tauri APIs (`@tauri-apps/*`)
 - Mock external HTTP calls
 - Mock file system operations
@@ -385,6 +415,7 @@ Simple presentational components:
 ## Success Criteria
 
 ### Quantitative
+
 - [ ] All HIGH priority items have ≥15 tests each
 - [ ] All MEDIUM priority items have ≥10 tests each
 - [ ] All LOW priority items have ≥6 tests each
@@ -393,6 +424,7 @@ Simple presentational components:
 - [ ] Zero regressions introduced
 
 ### Qualitative
+
 - [ ] Tests are maintainable and readable
 - [ ] Tests catch real bugs (verify with intentional bugs)
 - [ ] Mocks are realistic and accurate
@@ -403,21 +435,26 @@ Simple presentational components:
 ## Timeline Estimate
 
 ### Phase 1: High-Priority Hooks (6 hours)
+
 - Test 1: useBakerTrelloIntegration (2 hours)
 - Test 2: useScriptFileUpload (2 hours)
 - Test 3: useScriptFormatterState (2 hours, may skip if deprecated)
 
 ### Phase 2: High-Priority Components (4.5 hours)
+
 - Test 4: BatchActions (2 hours)
 - Test 5: ProjectList (2.5 hours)
 
 ### Phase 3: Medium-Priority Items (7 hours)
+
 - Test 6-9: Four items × 1.5-2 hours each
 
 ### Phase 4: Low-Priority Components (2 hours)
+
 - Test 10-11: Two items × 1 hour each
 
 ### Phase 5: Integration & Documentation (2 hours)
+
 - Run full test suite
 - Generate coverage report
 - Document findings
@@ -428,6 +465,7 @@ Simple presentational components:
 ## Risk Mitigation
 
 ### Risks
+
 1. **Existing code has bugs** → Tests will fail
    - Mitigation: Document bugs, create tickets, focus on test quality
 2. **Mocking complexity** → Hard to mock Tauri APIs
@@ -440,12 +478,14 @@ Simple presentational components:
 ## Dependencies
 
 ### Required Tools
+
 - ✅ Vitest (installed)
 - ✅ @testing-library/react (installed)
 - ✅ @testing-library/user-event (installed)
 - ❌ @vitest/coverage-v8 (needs installation)
 
 ### Required Mocks
+
 - ✅ Tauri APIs (patterns exist in current tests)
 - ✅ React Query (patterns exist)
 - ✅ File system operations (patterns exist)
@@ -461,9 +501,9 @@ Simple presentational components:
 ## Appendix A: Test File Template
 
 ```typescript
-import { describe, test, expect, vi, beforeEach } from 'vitest'
-import { renderHook, act } from '@testing-library/react'
 import { useTargetHook } from '@/hooks/useTargetHook'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock external dependencies
 vi.mock('@tauri-apps/plugin-fs', () => ({

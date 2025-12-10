@@ -14,16 +14,22 @@
  * Total: 16 tests
  */
 
+import type { BreadcrumbsFile, BreadcrumbsPreview, ProjectFolder } from '@/types/baker'
+import { ProjectList } from '@components/Baker/ProjectList'
 import { render, screen, within } from '@testing-library/react'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
 import userEvent from '@testing-library/user-event'
 import React from 'react'
-import { ProjectList } from '@components/Baker/ProjectList'
-import type { ProjectFolder, BreadcrumbsFile, BreadcrumbsPreview } from '@/types/baker'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock BreadcrumbsViewerEnhanced component
 vi.mock('@components/BreadcrumbsViewerEnhanced', () => ({
-  BreadcrumbsViewerEnhanced: ({ breadcrumbs, projectPath }: { breadcrumbs: BreadcrumbsFile; projectPath: string }) => (
+  BreadcrumbsViewerEnhanced: ({
+    breadcrumbs,
+    projectPath
+  }: {
+    breadcrumbs: BreadcrumbsFile
+    projectPath: string
+  }) => (
     <div data-testid="breadcrumbs-viewer">
       <div>Project: {breadcrumbs.projectTitle}</div>
       <div>Path: {projectPath}</div>

@@ -7,7 +7,13 @@
  * Following TDD methodology - tests written before implementation.
  */
 
-import { vi } from 'vitest'
+import { ProjectDetailPanel } from '@/components/Baker/ProjectDetailPanel'
+import { BAKER_ANIMATIONS, DURATION } from '@/constants/animations'
+import type { BreadcrumbsFile } from '@/types/baker'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { mockReducedMotion } from '@tests/utils/animation-testing'
+import { beforeEach, describe, expect, it, vi, vi as vitest } from 'vitest'
 
 // Mock matchMedia BEFORE imports (required for Framer Motion)
 vi.hoisted(() => {
@@ -28,14 +34,6 @@ vi.hoisted(() => {
     value: mockMatchMedia
   })
 })
-
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { describe, expect, it, beforeEach, vi as vitest } from 'vitest'
-import { ProjectDetailPanel } from '@/components/Baker/ProjectDetailPanel'
-import { BAKER_ANIMATIONS, DURATION } from '@/constants/animations'
-import { mockReducedMotion } from '@tests/utils/animation-testing'
-import type { BreadcrumbsFile } from '@/types/baker'
 
 // Mock Tauri shell API
 vitest.mock('@tauri-apps/plugin-shell', () => ({

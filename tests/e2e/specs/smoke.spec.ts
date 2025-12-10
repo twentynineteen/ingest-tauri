@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures/app.fixture'
+import { expect, test } from '../fixtures/app.fixture'
 import { setupTauriMocks } from '../fixtures/mocks.fixture'
 
 test.describe('Smoke Tests', () => {
@@ -20,7 +20,7 @@ test.describe('Smoke Tests', () => {
 
   test('no console errors on initial load', async ({ page }) => {
     const errors: string[] = []
-    page.on('console', (msg) => {
+    page.on('console', msg => {
       if (msg.type() === 'error') {
         errors.push(msg.text())
       }
@@ -32,7 +32,7 @@ test.describe('Smoke Tests', () => {
 
     // Filter out expected errors when running outside Tauri context
     const unexpectedErrors = errors.filter(
-      (error) =>
+      error =>
         !error.includes('__TAURI__') &&
         !error.includes('TAURI_INTERNALS') &&
         !error.includes('invoke') &&

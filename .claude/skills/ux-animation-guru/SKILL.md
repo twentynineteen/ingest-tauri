@@ -12,25 +12,30 @@ Transform static UI components into polished, professional experiences through c
 ## Core Philosophy: Apple-Like Animation Principles
 
 ### 1. **Purposeful Motion**
+
 Every animation must have a clear purpose:
+
 - Guide user attention to important changes
 - Provide feedback for user actions
 - Create smooth transitions between states
 - Establish spatial relationships between elements
 
 ### 2. **Seamless Performance**
+
 - 60fps target (use GPU-accelerated properties only: `transform`, `opacity`)
 - Respect `prefers-reduced-motion` for accessibility
 - Keep animations under 600ms (300ms for micro-interactions)
 - Test on lower-end devices
 
 ### 3. **Natural Physics**
+
 - Use easing curves that mimic real-world motion
 - Avoid linear transitions (they feel robotic)
 - Default to `ease-out` for entrances, `ease-in` for exits
 - Use spring physics for interactive elements
 
 ### 4. **Consistency & Reusability**
+
 - All timing/easing values stored in constants
 - Shared animation patterns across components
 - Predictable behavior builds user confidence
@@ -38,6 +43,7 @@ Every animation must have a clear purpose:
 ## When to Use This Skill
 
 Invoke this skill when you want to:
+
 - Add animations to a new or existing component
 - Improve micro-interactions (hover, focus, active states)
 - Implement state transition animations
@@ -49,6 +55,7 @@ Invoke this skill when you want to:
 ## Workflow: TDD Methodology
 
 ### Phase 1: Analysis (Non-Destructive)
+
 1. Read the target file
 2. Identify animation opportunities:
    - State changes (loading → success, collapsed → expanded)
@@ -64,9 +71,11 @@ Invoke this skill when you want to:
    - Implementation complexity (low/medium/high)
 
 ### Phase 2: Test Creation (TDD - Red Phase)
+
 Before writing any animation code:
 
 1. **Create test utilities** (if not exist):
+
    ```typescript
    // tests/utils/animation-testing.ts
    import { render, waitFor } from '@testing-library/react'
@@ -85,6 +94,7 @@ Before writing any animation code:
    ```
 
 2. **Write animation presence tests**:
+
    ```typescript
    describe('ButtonAnimation', () => {
      it('should have hover animation', async () => {
@@ -96,6 +106,7 @@ Before writing any animation code:
    ```
 
 3. **Write animation constant tests**:
+
    ```typescript
    import { BUTTON_ANIMATIONS } from '@/constants/animations'
 
@@ -107,6 +118,7 @@ Before writing any animation code:
    ```
 
 4. **Write animation lifecycle tests**:
+
    ```typescript
    it('should animate state change from loading to success', async () => {
      const { rerender, getByTestId } = render(<Status state="loading" />)
@@ -121,6 +133,7 @@ Before writing any animation code:
    ```
 
 5. **Write accessibility tests**:
+
    ```typescript
    it('should respect prefers-reduced-motion', () => {
      window.matchMedia = vi.fn().mockImplementation(query => ({
@@ -140,6 +153,7 @@ Before writing any animation code:
    ```
 
 ### Phase 3: Constants Definition
+
 Create/update animation constants in `src/constants/animations.ts`:
 
 ```typescript
@@ -218,9 +232,11 @@ export const LIST_ANIMATIONS = {
 ```
 
 ### Phase 4: Implementation (Green Phase)
+
 Implement animations using the test-driven constants:
 
 #### Framer Motion Pattern (Preferred)
+
 ```typescript
 import { motion, useReducedMotion } from 'framer-motion'
 import { BUTTON_ANIMATIONS, DURATION, EASING } from '@/constants/animations'
@@ -249,6 +265,7 @@ export const AnimatedButton: React.FC = ({ children, ...props }) => {
 ```
 
 #### CSS Transition Pattern (Lightweight Alternative)
+
 ```typescript
 import { BUTTON_ANIMATIONS } from '@/constants/animations'
 import { useReducedMotion } from '@/hooks/useReducedMotion'
@@ -274,6 +291,7 @@ export const Button: React.FC = ({ children, ...props }) => {
 ```
 
 ### Phase 5: Verification & Polish
+
 1. Run tests: `npm run test` (all must pass)
 2. Visual QA in browser with DevTools
 3. Test with `prefers-reduced-motion` enabled
@@ -283,9 +301,11 @@ export const Button: React.FC = ({ children, ...props }) => {
 ## Animation Categories & Patterns
 
 ### 1. Micro-Interactions
+
 Small, delightful responses to user actions:
 
 **Hover Effects**:
+
 ```typescript
 <motion.div whileHover={{ scale: 1.02 }} transition={{ duration: 0.2 }}>
   {content}
@@ -293,6 +313,7 @@ Small, delightful responses to user actions:
 ```
 
 **Button Press**:
+
 ```typescript
 <motion.button
   whileTap={{ scale: 0.95 }}
@@ -303,6 +324,7 @@ Small, delightful responses to user actions:
 ```
 
 **Focus States**:
+
 ```typescript
 <motion.input
   whileFocus={{
@@ -314,9 +336,11 @@ Small, delightful responses to user actions:
 ```
 
 ### 2. State Transitions
+
 Smooth changes between component states:
 
 **Loading → Success**:
+
 ```typescript
 <AnimatePresence mode="wait">
   {isLoading ? (
@@ -342,6 +366,7 @@ Smooth changes between component states:
 ```
 
 **Expand/Collapse**:
+
 ```typescript
 <motion.div
   animate={{ height: isExpanded ? 'auto' : 0 }}
@@ -353,9 +378,11 @@ Smooth changes between component states:
 ```
 
 ### 3. List Animations
+
 Staggered entrances and reordering:
 
 **Staggered List Items**:
+
 ```typescript
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -384,6 +411,7 @@ const itemVariants = {
 ### 4. Page/Modal Transitions
 
 **Modal Enter/Exit**:
+
 ```typescript
 <AnimatePresence>
   {isOpen && (
@@ -413,6 +441,7 @@ const itemVariants = {
 ### 5. Progress Indicators
 
 **Smooth Progress Bar**:
+
 ```typescript
 <motion.div
   className="h-2 bg-primary"
@@ -423,6 +452,7 @@ const itemVariants = {
 ```
 
 **Loading Spinner with Spring**:
+
 ```typescript
 <motion.div
   animate={{ rotate: 360 }}
@@ -435,6 +465,7 @@ const itemVariants = {
 ### 6. Scroll-Based Animations
 
 **Fade In on Scroll**:
+
 ```typescript
 import { useInView } from 'framer-motion'
 import { useRef } from 'react'
@@ -455,6 +486,7 @@ const isInView = useInView(ref, { once: true, margin: '-100px' })
 ### 7. Gesture-Based Animations
 
 **Drag and Drop Feedback**:
+
 ```typescript
 <motion.div
   drag
@@ -469,6 +501,7 @@ const isInView = useInView(ref, { once: true, margin: '-100px' })
 ## Accessibility Requirements
 
 ### 1. Respect prefers-reduced-motion
+
 Always implement:
 
 ```typescript
@@ -492,6 +525,7 @@ export const useReducedMotion = () => {
 ```
 
 Usage:
+
 ```typescript
 const shouldReduceMotion = useReducedMotion()
 
@@ -504,6 +538,7 @@ const shouldReduceMotion = useReducedMotion()
 ```
 
 ### 2. Focus Management
+
 Ensure focus is visible during animations:
 
 ```typescript
@@ -516,22 +551,27 @@ Ensure focus is visible during animations:
 ```
 
 ### 3. WCAG 2.2.2 Compliance
+
 For animations longer than 5 seconds, provide pause/stop controls.
 
 ## Performance Optimization
 
 ### GPU-Accelerated Properties Only
+
 Use only these properties for 60fps:
+
 - `transform` (translate, scale, rotate)
 - `opacity`
 - `filter` (use sparingly)
 
 **Avoid**:
+
 - `width`, `height` (triggers layout)
 - `top`, `left` (triggers layout)
 - `margin`, `padding` (triggers layout)
 
 ### Use will-change Sparingly
+
 ```typescript
 <motion.div
   style={{ willChange: 'transform' }}
@@ -542,6 +582,7 @@ Use only these properties for 60fps:
 ```
 
 ### Lazy Load Framer Motion
+
 For components not immediately visible:
 
 ```typescript
@@ -557,6 +598,7 @@ const AnimatedComponent = lazy(() => import('./AnimatedComponent'))
 ## Testing Strategy
 
 ### Unit Tests
+
 Test animation presence and constants:
 
 ```typescript
@@ -580,6 +622,7 @@ describe('AnimatedButton', () => {
 ```
 
 ### Integration Tests
+
 Test animation lifecycle with user interactions:
 
 ```typescript
@@ -602,6 +645,7 @@ describe('StateTransitionAnimation', () => {
 ```
 
 ### Accessibility Tests
+
 ```typescript
 describe('Animation Accessibility', () => {
   it('should disable animations when prefers-reduced-motion is set', () => {
@@ -640,6 +684,7 @@ When this skill completes, you will have:
 Let's say you invoke this skill on `ProjectFileList.tsx`:
 
 ### Analysis Output
+
 ```
 Animation Opportunities Found:
 1. List Items - Staggered entrance (MEDIUM complexity)
@@ -657,10 +702,12 @@ Estimated Implementation: 30 minutes
 ```
 
 ### Tests Created (Red Phase)
+
 - `tests/unit/ProjectFileList.animations.test.tsx`
 - `tests/integration/ProjectFileList.interaction.test.tsx`
 
 ### Constants Added
+
 ```typescript
 export const FILE_LIST_ANIMATIONS = {
   stagger: {
@@ -679,6 +726,7 @@ export const FILE_LIST_ANIMATIONS = {
 ```
 
 ### Implementation (Green Phase)
+
 Component updated with Framer Motion, all tests passing, accessibility verified.
 
 ## Notes

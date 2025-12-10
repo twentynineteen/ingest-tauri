@@ -3,10 +3,14 @@
  * Handles breadcrumbs operations including file I/O
  */
 
-import { renderHook, act } from '@testing-library/react'
-import { describe, test, expect, vi, beforeEach } from 'vitest'
+import { useAppendBreadcrumbs } from '@/hooks/useAppendBreadcrumbs'
+import { useParsedTrelloDescription } from '@/hooks/useParsedTrelloDescription'
 import { useTrelloBreadcrumbs } from '@/hooks/useTrelloBreadcrumbs'
+import { appStore } from '@/store/useAppStore'
 import type { TrelloCard } from '@/utils/TrelloCards'
+import { writeTextFile } from '@tauri-apps/plugin-fs'
+import { act, renderHook } from '@testing-library/react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock dependencies
 vi.mock('@tauri-apps/plugin-fs', () => ({
@@ -26,11 +30,6 @@ vi.mock('@/store/useAppStore', () => ({
     getState: vi.fn()
   }
 }))
-
-import { writeTextFile } from '@tauri-apps/plugin-fs'
-import { useAppendBreadcrumbs } from '@/hooks/useAppendBreadcrumbs'
-import { useParsedTrelloDescription } from '@/hooks/useParsedTrelloDescription'
-import { appStore } from '@/store/useAppStore'
 
 const mockCard: TrelloCard = {
   id: 'card123',
@@ -251,7 +250,9 @@ describe('useTrelloBreadcrumbs', () => {
         await result.current.handleAppendBreadcrumbs()
       })
 
-      expect(alertSpy).toHaveBeenCalledWith('Failed to save breadcrumbs: File write failed')
+      expect(alertSpy).toHaveBeenCalledWith(
+        'Failed to save breadcrumbs: File write failed'
+      )
       expect(consoleErrorSpy).toHaveBeenCalled()
       expect(mockRefetchCard).toHaveBeenCalled() // Should still refresh card
 
@@ -291,9 +292,7 @@ describe('useTrelloBreadcrumbs', () => {
     })
 
     test('handles null credentials', () => {
-      renderHook(() =>
-        useTrelloBreadcrumbs(null, null, mockCard, mockRefetchCard)
-      )
+      renderHook(() => useTrelloBreadcrumbs(null, null, mockCard, mockRefetchCard))
 
       expect(useAppendBreadcrumbs).toHaveBeenCalledWith(null, null)
     })
@@ -368,10 +367,7 @@ describe('useTrelloBreadcrumbs', () => {
           await result.current.handleAppendBreadcrumbs()
         })
 
-        expect(writeTextFile).toHaveBeenCalledWith(
-          expected,
-          expect.any(String)
-        )
+        expect(writeTextFile).toHaveBeenCalledWith(expected, expect.any(String))
       }
     })
   })
@@ -444,10 +440,9 @@ describe('useTrelloBreadcrumbs', () => {
       const { result, rerender } = renderHook<
         { card: TrelloCard | null },
         ReturnType<typeof useTrelloBreadcrumbs>
-      >(
-        ({ card }) => useTrelloBreadcrumbs('api-key', 'token', card, mockRefetchCard),
-        { initialProps: { card: mockCard } }
-      )
+      >(({ card }) => useTrelloBreadcrumbs('api-key', 'token', card, mockRefetchCard), {
+        initialProps: { card: mockCard }
+      })
 
       expect(useParsedTrelloDescription).toHaveBeenCalledWith(mockCard.desc)
 

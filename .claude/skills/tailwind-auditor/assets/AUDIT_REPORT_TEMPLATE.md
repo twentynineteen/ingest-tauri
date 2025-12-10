@@ -1,10 +1,10 @@
 ---
-audit_date: {{TIMESTAMP}}
-scope: {{SCOPE}}
-total_files_scanned: {{TOTAL_FILES}}
-files_with_issues: {{FILES_WITH_ISSUES}}
-total_violations: {{TOTAL_VIOLATIONS}}
-status: {{STATUS}}
+audit_date: { { TIMESTAMP } }
+scope: { { SCOPE } }
+total_files_scanned: { { TOTAL_FILES } }
+files_with_issues: { { FILES_WITH_ISSUES } }
+total_violations: { { TOTAL_VIOLATIONS } }
+status: { { STATUS } }
 ---
 
 # Tailwind CSS Audit Report
@@ -52,11 +52,13 @@ status: {{STATUS}}
 ### Proposed Token Additions
 
 {{#each PROPOSED_TOKENS}}
+
 #### {{name}}
 
 **Rationale**: {{rationale}}
 
 **Proposed Definition**:
+
 ```css
 @theme {
   --color-{{name}}: {{light_value}};
@@ -73,12 +75,14 @@ status: {{STATUS}}
 
 **Usage Examples**:
 {{#each examples}}
+
 - {{this}}
-{{/each}}
+  {{/each}}
 
 **Instances Found**: {{count}}
 
 ---
+
 {{/each}}
 
 ## Files Requiring Refactoring
@@ -86,26 +90,30 @@ status: {{STATUS}}
 ### High Priority (>15 violations)
 
 {{#each HIGH_PRIORITY_FILES}}
+
 - [ ] [{{file_path}}]({{file_path}}) ({{violation_count}} violations)
-{{/each}}
+      {{/each}}
 
 ### Medium Priority (5-15 violations)
 
 {{#each MEDIUM_PRIORITY_FILES}}
+
 - [ ] [{{file_path}}]({{file_path}}) ({{violation_count}} violations)
-{{/each}}
+      {{/each}}
 
 ### Low Priority (<5 violations)
 
 {{#each LOW_PRIORITY_FILES}}
+
 - [ ] [{{file_path}}]({{file_path}}) ({{violation_count}} violations)
-{{/each}}
+      {{/each}}
 
 ---
 
 ## Detailed Findings
 
 {{#each FILES_WITH_VIOLATIONS}}
+
 ### {{file_path}}
 
 **Priority**: {{priority}}
@@ -116,9 +124,10 @@ status: {{STATUS}}
 
 {{#each violations}}
 {{index}}. **Line {{line_number}}**: `{{old_class}}` → `{{new_class}}`
-   - **Context**: {{context}}
-   - **Rationale**: {{rationale}}
-   - **Type**: {{violation_type}}
+
+- **Context**: {{context}}
+- **Rationale**: {{rationale}}
+- **Type**: {{violation_type}}
 
 {{/each}}
 
@@ -126,6 +135,7 @@ status: {{STATUS}}
 {{refactoring_notes}}
 
 ---
+
 {{/each}}
 
 ## Color Usage Analysis
@@ -133,7 +143,8 @@ status: {{STATUS}}
 ### Hardcoded Color Frequency
 
 | Color Utility | Count | Recommended Token | Context |
-|---------------|-------|-------------------|---------|
+| ------------- | ----- | ----------------- | ------- |
+
 {{#each COLOR_FREQUENCY}}
 | `{{utility}}` | {{count}} | `{{recommended}}` | {{context}} |
 {{/each}}
@@ -141,7 +152,8 @@ status: {{STATUS}}
 ### Arbitrary Value Frequency
 
 | Arbitrary Value | Count | Standard Alternative | Keep? |
-|-----------------|-------|---------------------|-------|
+| --------------- | ----- | -------------------- | ----- |
+
 {{#each ARBITRARY_FREQUENCY}}
 | `{{value}}` | {{count}} | `{{alternative}}` | {{keep}} |
 {{/each}}
@@ -154,53 +166,53 @@ status: {{STATUS}}
 
 #### Interactive Elements (Buttons, Links)
 
-| Current Class | New Class | Context |
-|---------------|-----------|---------|
-| `bg-blue-500` | `bg-primary` | Primary action buttons |
-| `bg-blue-600` | `bg-primary` | Primary action buttons (darker) |
-| `hover:bg-blue-600` | `hover:bg-primary/90` | Primary hover state |
-| `bg-red-600` | `bg-destructive` | Delete/remove buttons |
-| `bg-gray-200` | `bg-secondary` | Secondary actions |
+| Current Class       | New Class             | Context                         |
+| ------------------- | --------------------- | ------------------------------- |
+| `bg-blue-500`       | `bg-primary`          | Primary action buttons          |
+| `bg-blue-600`       | `bg-primary`          | Primary action buttons (darker) |
+| `hover:bg-blue-600` | `hover:bg-primary/90` | Primary hover state             |
+| `bg-red-600`        | `bg-destructive`      | Delete/remove buttons           |
+| `bg-gray-200`       | `bg-secondary`        | Secondary actions               |
 
 #### Status Indicators
 
-| Current Class | New Class | Context |
-|---------------|-----------|---------|
-| `text-green-600` | `text-success` | Success messages |
-| `bg-green-100` | `bg-success/10` | Success backgrounds |
-| `text-red-600` | `text-error` / `text-destructive` | Error messages |
-| `bg-red-100` | `bg-error/10` | Error backgrounds |
-| `text-amber-600` | `text-warning` | Warning messages |
-| `bg-yellow-100` | `bg-warning/10` | Warning backgrounds |
-| `text-blue-600` | `text-info` | Info messages |
-| `bg-blue-100` | `bg-info/10` | Info backgrounds |
+| Current Class    | New Class                         | Context             |
+| ---------------- | --------------------------------- | ------------------- |
+| `text-green-600` | `text-success`                    | Success messages    |
+| `bg-green-100`   | `bg-success/10`                   | Success backgrounds |
+| `text-red-600`   | `text-error` / `text-destructive` | Error messages      |
+| `bg-red-100`     | `bg-error/10`                     | Error backgrounds   |
+| `text-amber-600` | `text-warning`                    | Warning messages    |
+| `bg-yellow-100`  | `bg-warning/10`                   | Warning backgrounds |
+| `text-blue-600`  | `text-info`                       | Info messages       |
+| `bg-blue-100`    | `bg-info/10`                      | Info backgrounds    |
 
 #### Text Colors
 
-| Current Class | New Class | Context |
-|---------------|-----------|---------|
-| `text-gray-900` | `text-foreground` | Primary text |
-| `text-black` | `text-foreground` | Primary text |
-| `text-gray-600` | `text-muted-foreground` | Secondary text |
-| `text-gray-500` | `text-muted-foreground/80` | Tertiary text |
-| `text-gray-400` | `text-muted-foreground/50` | Disabled text |
+| Current Class   | New Class                  | Context        |
+| --------------- | -------------------------- | -------------- |
+| `text-gray-900` | `text-foreground`          | Primary text   |
+| `text-black`    | `text-foreground`          | Primary text   |
+| `text-gray-600` | `text-muted-foreground`    | Secondary text |
+| `text-gray-500` | `text-muted-foreground/80` | Tertiary text  |
+| `text-gray-400` | `text-muted-foreground/50` | Disabled text  |
 
 #### Background Colors
 
-| Current Class | New Class | Context |
-|---------------|-----------|---------|
-| `bg-white` | `bg-background` / `bg-card` | Page/card backgrounds |
-| `bg-gray-50` | `bg-background` / `bg-secondary` | Light backgrounds |
-| `bg-gray-100` | `bg-muted` | Subtle backgrounds |
-| `bg-gray-200` | `bg-muted/80` | Slightly darker muted |
+| Current Class | New Class                        | Context               |
+| ------------- | -------------------------------- | --------------------- |
+| `bg-white`    | `bg-background` / `bg-card`      | Page/card backgrounds |
+| `bg-gray-50`  | `bg-background` / `bg-secondary` | Light backgrounds     |
+| `bg-gray-100` | `bg-muted`                       | Subtle backgrounds    |
+| `bg-gray-200` | `bg-muted/80`                    | Slightly darker muted |
 
 #### Border Colors
 
-| Current Class | New Class | Context |
-|---------------|-----------|---------|
+| Current Class     | New Class       | Context         |
+| ----------------- | --------------- | --------------- |
 | `border-gray-300` | `border-border` | Default borders |
-| `border-gray-200` | `border-input` | Input borders |
-| `border-blue-500` | `border-ring` | Focus borders |
+| `border-gray-200` | `border-input`  | Input borders   |
+| `border-blue-500` | `border-ring`   | Focus borders   |
 
 ---
 
@@ -222,20 +234,23 @@ status: {{STATUS}}
 ### Completed Files
 
 {{#each COMPLETED_FILES}}
+
 - [x] [{{file_path}}]({{file_path}}) ({{violation_count}} violations) - Completed {{completion_time}}
-{{/each}}
+      {{/each}}
 
 ### Pending Files
 
 {{#each PENDING_FILES}}
+
 - [ ] [{{file_path}}]({{file_path}}) ({{violation_count}} violations)
-{{/each}}
+      {{/each}}
 
 ### Skipped Files
 
 {{#each SKIPPED_FILES}}
+
 - [~] [{{file_path}}]({{file_path}}) ({{violation_count}} violations) - Skipped: {{skip_reason}}
-{{/each}}
+  {{/each}}
 
 ---
 
@@ -268,6 +283,7 @@ status: {{STATUS}}
 ### Files Requiring Manual Review
 
 {{#each MANUAL_REVIEW_FILES}}
+
 #### {{file_path}}
 
 **Issue**: {{issue_description}}
@@ -275,8 +291,13 @@ status: {{STATUS}}
 **Location**: Line {{line_number}}
 
 **Code**:
+
 ```tsx
-{{code_snippet}}
+{
+  {
+    code_snippet
+  }
+}
 ```
 
 **Reason**: {{review_reason}}
@@ -284,23 +305,27 @@ status: {{STATUS}}
 **Suggested Action**: {{suggested_action}}
 
 ---
+
 {{/each}}
 
 ### Complex Patterns
 
 {{#each COMPLEX_PATTERNS}}
+
 #### {{pattern_name}}
 
 **Description**: {{description}}
 
 **Examples**:
 {{#each examples}}
+
 - {{file}}: Line {{line}} - `{{code}}`
-{{/each}}
+  {{/each}}
 
 **Recommendation**: {{recommendation}}
 
 ---
+
 {{/each}}
 
 ---
@@ -360,22 +385,25 @@ Token Coverage:       +{{IMPROVEMENT_COVERAGE}}%
 #### Core Tokens (Defined)
 
 {{#each CORE_TOKENS}}
+
 - `{{name}}`: {{description}}
   - Light: `hsl({{light_value}})`
   - Dark: `hsl({{dark_value}})`
-{{/each}}
+    {{/each}}
 
 #### Extended Tokens (Proposed)
 
 {{#each EXTENDED_TOKENS}}
+
 - `{{name}}`: {{description}}
   - Light: `hsl({{light_value}})`
   - Dark: `hsl({{dark_value}})`
-{{/each}}
+    {{/each}}
 
 ### Color Contrast Report
 
 {{#each CONTRAST_CHECKS}}
+
 #### {{token_name}}
 
 - **Light Mode**: {{light_contrast}} ({{light_wcag_level}})

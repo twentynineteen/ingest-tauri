@@ -1,7 +1,7 @@
-import { mockIPC } from '@tauri-apps/api/mocks'
 import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
-import type { BreadcrumbsFile, VideoLink, TrelloCard } from '@/types/baker'
+import type { BreadcrumbsFile, TrelloCard, VideoLink } from '@/types/baker'
+import { mockIPC } from '@tauri-apps/api/mocks'
 
 export function setupTauriMocks() {
   // Mock breadcrumbs file storage (in-memory)
@@ -79,7 +79,12 @@ export function setupTauriMocks() {
         }
 
         const videos = breadcrumbs.videoLinks
-        if (fromIndex < 0 || fromIndex >= videos.length || toIndex < 0 || toIndex >= videos.length) {
+        if (
+          fromIndex < 0 ||
+          fromIndex >= videos.length ||
+          toIndex < 0 ||
+          toIndex >= videos.length
+        ) {
           return Promise.reject('Index out of bounds')
         }
 
@@ -99,14 +104,18 @@ export function setupTauriMocks() {
 
         // Migration: If no trelloCards array but trelloCardUrl exists, migrate in-memory
         if (!breadcrumbs.trelloCards && breadcrumbs.trelloCardUrl) {
-          const match = breadcrumbs.trelloCardUrl.match(/trello\.com\/c\/([a-zA-Z0-9]{8,24})/)
+          const match = breadcrumbs.trelloCardUrl.match(
+            /trello\.com\/c\/([a-zA-Z0-9]{8,24})/
+          )
           if (match) {
             const cardId = match[1]
-            return Promise.resolve([{
-              url: breadcrumbs.trelloCardUrl,
-              cardId,
-              title: `Card ${cardId}` // Default title for migrated cards
-            }])
+            return Promise.resolve([
+              {
+                url: breadcrumbs.trelloCardUrl,
+                cardId,
+                title: `Card ${cardId}` // Default title for migrated cards
+              }
+            ])
           }
         }
 
@@ -125,7 +134,7 @@ export function setupTauriMocks() {
         }
 
         // Check for duplicate cardId
-        if (existing.trelloCards?.some((c) => c.cardId === trelloCard.cardId)) {
+        if (existing.trelloCards?.some(c => c.cardId === trelloCard.cardId)) {
           return Promise.reject('This Trello card is already associated with the project')
         }
 
@@ -176,7 +185,7 @@ export function setupTauriMocks() {
         // This will be intercepted by MSW in actual tests
         return fetch(
           `https://api.trello.com/1/cards/${cardId}?key=${apiKey}&token=${apiToken}`
-        ).then((res) => {
+        ).then(res => {
           if (!res.ok) {
             if (res.status === 401) {
               return Promise.reject('Unauthorized: Invalid API credentials')
@@ -186,7 +195,7 @@ export function setupTauriMocks() {
             }
             return Promise.reject(`API error: ${res.status}`)
           }
-          return res.json().then((data) => ({
+          return res.json().then(data => ({
             url: cardUrl,
             cardId,
             title: data.name,
@@ -219,7 +228,7 @@ export function setupTauriMocks() {
         }
 
         // Generate a UUID-like scan ID
-        const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
           const r = (Math.random() * 16) | 0
           const v = c === 'x' ? r : (r & 0x3) | 0x8
           return v.toString(16)
@@ -315,7 +324,11 @@ export function setupTauriMocks() {
             })
             return
           }
-          if (projectPath.includes('permission-denied') || projectPath.includes('restricted') || projectPath.startsWith('/System/')) {
+          if (
+            projectPath.includes('permission-denied') ||
+            projectPath.includes('restricted') ||
+            projectPath.startsWith('/System/')
+          ) {
             failed.push({
               path: projectPath,
               error: 'Permission denied: cannot access directory'

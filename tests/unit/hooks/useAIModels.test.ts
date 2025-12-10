@@ -6,8 +6,8 @@
  * CRITICAL: Must FAIL before implementation (RED phase)
  */
 
-import { describe, it, expect, vi } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
 // Will fail during RED phase - not implemented yet
 // import { useAIModels } from '@hooks/useAIModels'

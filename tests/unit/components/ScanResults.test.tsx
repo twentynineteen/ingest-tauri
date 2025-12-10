@@ -13,11 +13,11 @@
  * Total: 12 tests
  */
 
-import { render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
-import React from 'react'
+import type { ProjectFolder, ScanResult } from '@/types/baker'
 import { ScanResults } from '@components/Baker/ScanResults'
-import type { ScanResult, ProjectFolder } from '@/types/baker'
+import { render, screen } from '@testing-library/react'
+import React from 'react'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 // Mock formatFileSize utility
 vi.mock('@utils/breadcrumbsComparison', () => ({
@@ -215,7 +215,9 @@ describe('ScanResults Component', () => {
 
     test('displays error count', () => {
       // Arrange & Act
-      const { container } = render(<ScanResults scanResult={mockScanResult} isScanning={false} />)
+      const { container } = render(
+        <ScanResults scanResult={mockScanResult} isScanning={false} />
+      )
 
       // Assert - Find the error count element specifically by its warning color class
       const errorSection = container.querySelector('.text-warning')

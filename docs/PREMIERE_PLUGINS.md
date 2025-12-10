@@ -44,6 +44,7 @@ CEP (Common Extensibility Platform) extensions are HTML/JavaScript-based plugins
 **Purpose**: Metadata management panel for Premiere Pro
 
 **Features**:
+
 - View and edit `breadcrumbs.json` metadata directly in timeline
 - Sync with Trello cards and Sprout Video
 - Quick access to project resources
@@ -60,6 +61,7 @@ CEP (Common Extensibility Platform) extensions are HTML/JavaScript-based plugins
 **Purpose**: Premiere Pro extension for streamlined workflows
 
 **Features**:
+
 - Feature 1 (user to specify)
 - Feature 2 (user to specify)
 - Feature 3 (user to specify)
@@ -93,6 +95,7 @@ CEP (Common Extensibility Platform) extensions are HTML/JavaScript-based plugins
 ### Verification
 
 After installation, verify the plugin appears:
+
 - **macOS**: `~/Library/Application Support/Adobe/CEP/extensions/[PluginName]/`
 - **Windows**: `%AppData%\Roaming\Adobe\CEP\extensions\[PluginName]\`
 
@@ -103,16 +106,19 @@ After installation, verify the plugin appears:
 ### macOS
 
 **Requirements**:
+
 - macOS 10.15 (Catalina) or later
 - Premiere Pro CC 2020 or later
 - CEP debug mode enabled (automatic)
 
 **Installation Path**:
+
 ```
 ~/Library/Application Support/Adobe/CEP/extensions/
 ```
 
 **Notes**:
+
 - Bucket automatically removes macOS quarantine attributes
 - Debug mode is enabled automatically for self-signed extensions
 - No additional permissions required
@@ -122,15 +128,18 @@ After installation, verify the plugin appears:
 ### Windows
 
 **Requirements**:
+
 - Windows 10 or later
 - Premiere Pro CC 2020 or later
 
 **Installation Path**:
+
 ```
 C:\Users\<username>\AppData\Roaming\Adobe\CEP\extensions\
 ```
 
 **Notes**:
+
 - No special permissions required
 - Extensions install silently
 
@@ -141,15 +150,18 @@ C:\Users\<username>\AppData\Roaming\Adobe\CEP\extensions\
 ### Plugin Doesn't Appear in Premiere Pro
 
 **Solution 1**: Restart Premiere Pro completely
+
 - Extensions only load at startup
 - Use **Premiere Pro > Quit** (not just close windows)
 
 **Solution 2**: Check debug mode (macOS only)
+
 1. In Bucket, go to Plugin Manager
 2. Click "Enable Debug Mode"
 3. Restart Premiere Pro
 
 **Solution 3**: Verify installation
+
 1. Click "Open Extensions Folder" in Plugin Manager
 2. Confirm plugin directory exists
 3. Check for `CSXS/manifest.xml` file
@@ -159,11 +171,13 @@ C:\Users\<username>\AppData\Roaming\Adobe\CEP\extensions\
 ### Installation Failed Error
 
 **Possible Causes**:
+
 - Premiere Pro is running (close it first)
 - Insufficient disk space
 - Permissions issues (rare)
 
 **Solution**:
+
 1. Close Premiere Pro completely
 2. Free up disk space if needed
 3. Try installation again
@@ -181,6 +195,7 @@ C:\Users\<username>\AppData\Roaming\Adobe\CEP\extensions\
 ### Plugin Shows Old Version
 
 **Solution**: Bucket automatically backs up old versions
+
 1. Uninstall old version (manually delete from extensions folder)
 2. Reinstall from Bucket
 3. Restart Premiere Pro
@@ -194,6 +209,7 @@ C:\Users\<username>\AppData\Roaming\Adobe\CEP\extensions\
 #### 1. Export Your Plugin as ZXP
 
 Use the build script from your plugin project:
+
 ```bash
 npm run package:zxp
 ```
@@ -203,6 +219,7 @@ This creates a signed `.zxp` file (e.g., `MyPlugin_v1.0.0.zxp`)
 #### 2. Add to Bucket Assets
 
 Copy the `.zxp` file to:
+
 ```
 src-tauri/assets/plugins/MyPlugin_v1.0.0.zxp
 ```
@@ -269,11 +286,13 @@ PluginName.zxp
 ### Dependencies
 
 **Rust Crates**:
+
 - `zip` - ZXP extraction (ZXP files are ZIP archives)
 - `dirs` - Cross-platform directory paths
 - `chrono` - Timestamp generation for backups
 
 **System Requirements**:
+
 - No external tools required (pure Rust implementation)
 - No Adobe SDK dependencies
 - Works offline
