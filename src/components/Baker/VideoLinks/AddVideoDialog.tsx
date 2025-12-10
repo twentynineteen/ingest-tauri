@@ -4,6 +4,8 @@
  * Reduced from 21 individual parameters to 6 logical parameter groups
  */
 
+import { AlertCircle, Loader2, Plus, Upload as UploadIcon } from 'lucide-react'
+
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,7 +20,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { AlertCircle, Loader2, Plus, Upload as UploadIcon } from 'lucide-react'
 
 // Type definitions for grouped parameters
 export interface DialogState {
@@ -177,7 +178,7 @@ function UrlEntryContent({
             id="video-url"
             placeholder="https://sproutvideo.com/videos/..."
             value={form.formData.url}
-            onChange={e => form.onFormFieldChange('url', e.target.value)}
+            onChange={(e) => form.onFormFieldChange('url', e.target.value)}
             className="flex-1"
           />
           <Button
@@ -194,7 +195,7 @@ function UrlEntryContent({
           </Button>
         </div>
         {!urlMode.hasApiKey && form.formData.url && (
-          <p className="text-xs text-warning">
+          <p className="text-warning text-xs">
             Sprout Video API key not configured. Go to Settings to add it.
           </p>
         )}
@@ -213,7 +214,7 @@ function UrlEntryContent({
           id="video-title"
           placeholder="Video title"
           value={form.formData.title}
-          onChange={e => form.onFormFieldChange('title', e.target.value)}
+          onChange={(e) => form.onFormFieldChange('title', e.target.value)}
           maxLength={200}
         />
       </div>
@@ -224,7 +225,7 @@ function UrlEntryContent({
           id="sprout-id"
           placeholder="abc123xyz"
           value={form.formData.sproutVideoId}
-          onChange={e => form.onFormFieldChange('sproutVideoId', e.target.value)}
+          onChange={(e) => form.onFormFieldChange('sproutVideoId', e.target.value)}
         />
       </div>
 
@@ -234,7 +235,7 @@ function UrlEntryContent({
           id="thumbnail-url"
           placeholder="https://..."
           value={form.formData.thumbnailUrl}
-          onChange={e => form.onFormFieldChange('thumbnailUrl', e.target.value)}
+          onChange={(e) => form.onFormFieldChange('thumbnailUrl', e.target.value)}
         />
       </div>
 
@@ -242,7 +243,7 @@ function UrlEntryContent({
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <ul className="list-disc pl-4 space-y-1">
+            <ul className="list-disc space-y-1 pl-4">
               {errors.validationErrors.map((err, i) => (
                 <li key={i}>{err}</li>
               ))}
@@ -290,7 +291,7 @@ function UploadContent({
           </Button>
         </div>
         {uploadMode.selectedFile && (
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Selected:{' '}
             <span className="font-medium">
               {uploadMode.selectedFile.split('/').pop()}
@@ -315,9 +316,9 @@ function UploadContent({
               Uploading: {uploadMode.progress}%
             </span>
           </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
+          <div className="bg-secondary h-2 w-full overflow-hidden rounded-full">
             <div
-              className="h-full bg-primary transition-all duration-300"
+              className="bg-primary h-full transition-all duration-300"
               style={{ width: `${uploadMode.progress}%` }}
               role="progressbar"
               aria-valuenow={uploadMode.progress}

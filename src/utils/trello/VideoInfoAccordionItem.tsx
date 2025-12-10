@@ -5,6 +5,7 @@ import {
 } from '@components/ui/accordion'
 import { VideoInfoData } from '@hooks/useVideoInfoBlock'
 import React from 'react'
+
 import KeyValueRow from './KeyValueRow'
 import VideoThumbnail from './VideoThumbnail'
 
@@ -17,7 +18,7 @@ const VideoInfoAccordionItem: React.FC<Props> = ({ data }) => {
     <AccordionItem value="videoinfo">
       <AccordionTrigger className="font-semibold">Video Info</AccordionTrigger>
       <AccordionContent>
-        <div className="space-y-2 text-sm text-muted-foreground">
+        <div className="text-muted-foreground space-y-2 text-sm">
           <KeyValueRow label="Title" value={data.title} />
           <KeyValueRow label="Duration" value={data.duration} />
           <KeyValueRow label="Uploaded" value={data.uploaded} />

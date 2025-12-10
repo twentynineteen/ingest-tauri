@@ -5,9 +5,10 @@
  * Handles localStorage persistence and validation.
  */
 
+import { useCallback, useState } from 'react'
+
 import type { ScanPreferences, UseBakerPreferencesResult } from '@/types/baker'
 import { logger } from '@/utils/logger'
-import { useCallback, useState } from 'react'
 
 const STORAGE_KEY = 'baker-preferences'
 
@@ -77,7 +78,7 @@ export function useBakerPreferences(): UseBakerPreferencesResult {
   )
 
   const updatePreferences = useCallback((newPrefs: Partial<ScanPreferences>) => {
-    setPreferences(currentPrefs => {
+    setPreferences((currentPrefs) => {
       const validatedPrefs = validatePreferences({ ...currentPrefs, ...newPrefs })
       savePreferencesToStorage(validatedPrefs)
       return validatedPrefs

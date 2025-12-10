@@ -1,7 +1,8 @@
-import { logger } from '@/utils/logger'
 import { CACHE } from '@constants/timing'
 import { queryKeys } from '@lib/query-keys'
 import { QueryClient } from '@tanstack/react-query'
+
+import { logger } from '@/utils/logger'
 
 /**
  * Cache Invalidation Service
@@ -88,9 +89,9 @@ export class CacheInvalidationService {
     if (typeof pattern === 'string') {
       // Invalidate queries containing the pattern string
       await this.queryClient.invalidateQueries({
-        predicate: query => {
+        predicate: (query) => {
           return query.queryKey.some(
-            key => typeof key === 'string' && key.includes(pattern)
+            (key) => typeof key === 'string' && key.includes(pattern)
           )
         }
       })
@@ -168,7 +169,7 @@ export class CacheInvalidationService {
     const now = Date.now()
     const queryCache = this.queryClient.getQueryCache()
 
-    queryCache.getAll().forEach(query => {
+    queryCache.getAll().forEach((query) => {
       const queryAge = now - (query.state.dataUpdatedAt || 0)
       if (queryAge > maxAgeMs && query.getObserversCount() === 0) {
         // Remove queries that are old and have no active observers
@@ -186,10 +187,10 @@ export class CacheInvalidationService {
 
     const stats = {
       totalQueries: queries.length,
-      activeQueries: queries.filter(q => q.getObserversCount() > 0).length,
-      staleQueries: queries.filter(q => q.isStale()).length,
-      errorQueries: queries.filter(q => q.state.status === 'error').length,
-      loadingQueries: queries.filter(q => q.state.status === 'pending').length,
+      activeQueries: queries.filter((q) => q.getObserversCount() > 0).length,
+      staleQueries: queries.filter((q) => q.isStale()).length,
+      errorQueries: queries.filter((q) => q.state.status === 'error').length,
+      loadingQueries: queries.filter((q) => q.state.status === 'pending').length,
       cacheSize: this.estimateCacheSize(queries)
     }
 

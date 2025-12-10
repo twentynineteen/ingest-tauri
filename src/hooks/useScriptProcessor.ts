@@ -5,14 +5,16 @@
  * Enhanced with RAG (Retrieval-Augmented Generation)
  */
 
-import type { ProcessedOutput, ProviderConfiguration } from '@/types/scriptFormatter'
-import { logger } from '@/utils/logger'
 import { ModelFactory } from '@services/ai/modelFactory'
 import { invoke } from '@tauri-apps/api/core'
 import { buildRAGPrompt } from '@utils/aiPrompts'
 import { createNamespacedLogger } from '@utils/logger'
 import { streamText } from 'ai'
 import { useRef, useState } from 'react'
+
+import type { ProcessedOutput, ProviderConfiguration } from '@/types/scriptFormatter'
+import { logger } from '@/utils/logger'
+
 import { useOllamaEmbedding } from './useOllamaEmbedding'
 import type { SimilarExample } from './useScriptRetrieval'
 
@@ -86,7 +88,7 @@ async function retrieveSimilarExamples(
     if (examples.length > 0) {
       logger.log(
         'Example details:',
-        examples.map(ex => ({
+        examples.map((ex) => ({
           id: ex.id,
           title: ex.title,
           similarity: ex.similarity,
@@ -126,7 +128,7 @@ function filterEnabledExamples(
     return allExamples.slice(0, 3)
   }
 
-  const filtered = allExamples.filter(ex => enabledIds.has(ex.id))
+  const filtered = allExamples.filter((ex) => enabledIds.has(ex.id))
   logger.log(`Filtered ${allExamples.length} examples to ${filtered.length} enabled`)
   return filtered
 }
@@ -237,8 +239,8 @@ function createProcessedOutput(
   // Convert line breaks to proper HTML paragraphs
   const htmlContent = formattedText
     .split('\n')
-    .filter(line => line.trim().length > 0)
-    .map(line => `<p>${line}</p>`)
+    .filter((line) => line.trim().length > 0)
+    .map((line) => `<p>${line}</p>`)
     .join('\n')
 
   return {
@@ -384,7 +386,7 @@ export function useScriptProcessor(): UseScriptProcessorResult {
         )
         options.onRetry?.(attempt)
         const backoffDelay = Math.pow(2, attempt) * 1000 // 1s, 2s, 4s
-        await new Promise(resolve => setTimeout(resolve, backoffDelay))
+        await new Promise((resolve) => setTimeout(resolve, backoffDelay))
       }
     }
 

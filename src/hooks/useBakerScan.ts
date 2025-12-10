@@ -5,6 +5,10 @@
  * Handles scan initiation, progress tracking, and cancellation.
  */
 
+import { invoke } from '@tauri-apps/api/core'
+import { listen } from '@tauri-apps/api/event'
+import { useCallback, useEffect, useState } from 'react'
+
 import type {
   ScanCompleteEvent,
   ScanErrorEvent,
@@ -13,9 +17,6 @@ import type {
   ScanResult,
   UseBakerScanResult
 } from '@/types/baker'
-import { invoke } from '@tauri-apps/api/core'
-import { listen } from '@tauri-apps/api/event'
-import { useCallback, useEffect, useState } from 'react'
 
 export function useBakerScan(): UseBakerScanResult {
   const [scanResult, setScanResult] = useState<ScanResult | null>(null)
@@ -30,10 +31,10 @@ export function useBakerScan(): UseBakerScanResult {
 
     // Progress event listener
     unlistenPromises.push(
-      listen<ScanProgressEvent>('baker_scan_progress', event => {
+      listen<ScanProgressEvent>('baker_scan_progress', (event) => {
         const progressData = event.payload
         if (currentScanId && progressData.scanId === currentScanId) {
-          setScanResult(prev =>
+          setScanResult((prev) =>
             prev
               ? {
                   ...prev,
@@ -48,7 +49,7 @@ export function useBakerScan(): UseBakerScanResult {
 
     // Completion event listener
     unlistenPromises.push(
-      listen<ScanCompleteEvent>('baker_scan_complete', event => {
+      listen<ScanCompleteEvent>('baker_scan_complete', (event) => {
         const completeData = event.payload
         if (currentScanId && completeData.scanId === currentScanId) {
           setScanResult(completeData.result)
@@ -60,7 +61,7 @@ export function useBakerScan(): UseBakerScanResult {
 
     // Error event listener
     unlistenPromises.push(
-      listen<ScanErrorEvent>('baker_scan_error', event => {
+      listen<ScanErrorEvent>('baker_scan_error', (event) => {
         const errorData = event.payload
         if (currentScanId && errorData.scanId === currentScanId) {
           setError(errorData.error.message)
@@ -73,8 +74,8 @@ export function useBakerScan(): UseBakerScanResult {
     // Clean up listeners on unmount or when currentScanId changes
     return () => {
       Promise.all(unlistenPromises)
-        .then(unlisteners => {
-          unlisteners.forEach(unlisten => {
+        .then((unlisteners) => {
+          unlisteners.forEach((unlisten) => {
             if (unlisten && typeof unlisten === 'function') {
               unlisten()
             }

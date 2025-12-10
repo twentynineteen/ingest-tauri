@@ -4,6 +4,9 @@
  * Reduced from 19 individual parameters to 6 logical parameter groups
  */
 
+import TrelloCardList from '@utils/trello/TrelloCardList'
+import { AlertCircle, Loader2, Plus, Search } from 'lucide-react'
+
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
@@ -18,8 +21,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import TrelloCardList from '@utils/trello/TrelloCardList'
-import { AlertCircle, Loader2, Plus, Search } from 'lucide-react'
 
 // Type definitions for grouped parameters
 export interface DialogState {
@@ -85,7 +86,7 @@ export function AddCardDialog({
           Add Card
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-h-[80vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Trello Card</DialogTitle>
           <DialogDescription>
@@ -97,7 +98,7 @@ export function AddCardDialog({
 
         <Tabs
           value={mode.addMode}
-          onValueChange={v => mode.onAddModeChange(v as 'url' | 'select')}
+          onValueChange={(v) => mode.onAddModeChange(v as 'url' | 'select')}
         >
           {dialog.hasApiCredentials && (
             <TabsList className="grid w-full grid-cols-2">
@@ -136,8 +137,8 @@ function SelectFromBoardContent({
   if (selectMode.isBoardLoading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-        <span className="ml-2 text-sm text-muted-foreground">Loading cards...</span>
+        <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+        <span className="text-muted-foreground ml-2 text-sm">Loading cards...</span>
       </div>
     )
   }
@@ -147,22 +148,22 @@ function SelectFromBoardContent({
       <div className="space-y-2">
         <Label htmlFor="search">Search Cards</Label>
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             id="search"
             placeholder="Search by name or description..."
             value={selectMode.searchTerm}
-            onChange={e => selectMode.onSearchTermChange(e.target.value)}
+            onChange={(e) => selectMode.onSearchTermChange(e.target.value)}
             className="pl-10"
           />
         </div>
       </div>
 
-      <div className="max-h-[400px] overflow-y-auto border rounded-md p-4">
+      <div className="max-h-[400px] overflow-y-auto rounded-md border p-4">
         {common.isFetchingCard ? (
           <div className="flex items-center justify-center py-8">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-            <span className="ml-2 text-sm text-muted-foreground">Adding card...</span>
+            <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+            <span className="text-muted-foreground ml-2 text-sm">Adding card...</span>
           </div>
         ) : (
           <TrelloCardList
@@ -192,9 +193,9 @@ function UrlInputContent({
           id="card-url"
           placeholder="https://trello.com/c/abc12345/card-name"
           value={urlMode.cardUrl}
-          onChange={e => urlMode.onCardUrlChange(e.target.value)}
+          onChange={(e) => urlMode.onCardUrlChange(e.target.value)}
         />
-        <p className="text-xs text-muted-foreground">
+        <p className="text-muted-foreground text-xs">
           {hasApiCredentials
             ? 'Card details will be fetched automatically'
             : 'Enter the full URL from your Trello board'}
@@ -230,7 +231,7 @@ function ErrorDisplay({ errors }: { errors: ErrorState }) {
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <ul className="list-disc pl-4 space-y-1">
+            <ul className="list-disc space-y-1 pl-4">
               {errors.validationErrors.map((err, i) => (
                 <li key={i}>{err}</li>
               ))}

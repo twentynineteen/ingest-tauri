@@ -2,6 +2,7 @@ import { Accordion } from '@components/ui/accordion'
 import { VideoInfoData } from '@hooks/useVideoInfoBlock'
 import { Breadcrumb } from '@utils/types'
 import React from 'react'
+
 import BreadcrumbsAccordionItem from './BreadcrumbsAccordionItem'
 import DescriptionAccordionItem from './DescriptionAccordionItem'
 import VideoInfoAccordionItem from './VideoInfoAccordionItem'

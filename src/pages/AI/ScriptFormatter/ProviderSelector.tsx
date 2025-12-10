@@ -4,9 +4,10 @@
  * Purpose: Select and validate AI provider
  */
 
-import type { AIProvider, ProviderConfiguration } from '@/types/scriptFormatter'
 import { CheckCircle, Loader2, XCircle, Zap } from 'lucide-react'
 import React from 'react'
+
+import type { AIProvider, ProviderConfiguration } from '@/types/scriptFormatter'
 
 interface ProviderSelectorProps {
   providers: AIProvider[]
@@ -26,7 +27,7 @@ export const ProviderSelector: React.FC<ProviderSelectorProps> = ({
   const handleProviderSelect = (providerId: string) => {
     onSelect(providerId)
     // Auto-validate after selection
-    const provider = providers.find(p => p.id === providerId)
+    const provider = providers.find((p) => p.id === providerId)
     if (provider) {
       onValidate(providerId, provider.configuration)
     }
@@ -34,13 +35,13 @@ export const ProviderSelector: React.FC<ProviderSelectorProps> = ({
 
   return (
     <div className="space-y-4">
-      <label className="block text-sm font-medium text-foreground">AI Provider</label>
+      <label className="text-foreground block text-sm font-medium">AI Provider</label>
 
       <div className="space-y-2">
-        {providers.map(provider => (
+        {providers.map((provider) => (
           <div
             key={provider.id}
-            className={`p-4 border rounded-lg cursor-pointer transition-all ${
+            className={`cursor-pointer rounded-lg border p-4 transition-all ${
               activeProvider?.id === provider.id
                 ? 'border-foreground bg-secondary'
                 : 'border-border hover:border-foreground/50'
@@ -49,10 +50,10 @@ export const ProviderSelector: React.FC<ProviderSelectorProps> = ({
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Zap className="h-5 w-5 text-muted-foreground" />
+                <Zap className="text-muted-foreground h-5 w-5" />
                 <div>
-                  <p className="font-medium text-foreground">{provider.displayName}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-foreground font-medium">{provider.displayName}</p>
+                  <p className="text-muted-foreground text-xs">
                     {provider.configuration.serviceUrl}
                   </p>
                 </div>
@@ -61,33 +62,33 @@ export const ProviderSelector: React.FC<ProviderSelectorProps> = ({
               {/* Connection status indicator */}
               <div className="flex items-center gap-2">
                 {isValidating && activeProvider?.id === provider.id ? (
-                  <div className="flex items-center gap-1 text-foreground">
+                  <div className="text-foreground flex items-center gap-1">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     <span className="text-xs">Validating...</span>
                   </div>
                 ) : (
                   <>
                     {provider.status === 'configured' && (
-                      <div className="flex items-center gap-1 text-success">
+                      <div className="text-success flex items-center gap-1">
                         <CheckCircle className="h-4 w-4" />
                         <span className="text-xs">Connected</span>
                       </div>
                     )}
                     {provider.status === 'error' && (
-                      <div className="flex items-center gap-1 text-destructive">
+                      <div className="text-destructive flex items-center gap-1">
                         <XCircle className="h-4 w-4" />
                         <span className="text-xs">Error</span>
                       </div>
                     )}
                     {provider.status === 'not-configured' && (
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-muted-foreground text-xs">
                         Not configured
                       </span>
                     )}
 
                     {/* Show latency if available */}
                     {provider.configuration.lastValidationResult?.latencyMs && (
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-muted-foreground text-xs">
                         ({provider.configuration.lastValidationResult.latencyMs}ms)
                       </span>
                     )}
@@ -101,8 +102,8 @@ export const ProviderSelector: React.FC<ProviderSelectorProps> = ({
 
       {/* Show validation error message */}
       {activeProvider?.configuration.lastValidationResult?.errorMessage && (
-        <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-          <p className="text-sm text-destructive">
+        <div className="bg-destructive/10 border-destructive/20 rounded-lg border p-3">
+          <p className="text-destructive text-sm">
             {activeProvider.configuration.lastValidationResult.errorMessage}
           </p>
         </div>

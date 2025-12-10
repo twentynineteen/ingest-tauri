@@ -1,10 +1,11 @@
-import { logger } from '@/utils/logger'
 import { appStore } from '@store/useAppStore'
 import { useQueryClient } from '@tanstack/react-query'
 import { ask, confirm, open } from '@tauri-apps/plugin-dialog'
 import { readTextFile } from '@tauri-apps/plugin-fs'
 import { TrelloCard as LegacyTrelloCard } from '@utils/TrelloCards'
 import type { Breadcrumb } from '@utils/types'
+
+import { logger } from '@/utils/logger'
 
 function formatBreadcrumbsForHumans(breadcrumbs: Breadcrumb): string {
   const lines = ['PROJECT DETAILS', '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━']
@@ -59,7 +60,7 @@ function formatBreadcrumbsForHumans(breadcrumbs: Breadcrumb): string {
 
     // Group files by camera
     const filesByCamera: Record<number, number> = {}
-    breadcrumbs.files.forEach(file => {
+    breadcrumbs.files.forEach((file) => {
       filesByCamera[file.camera] = (filesByCamera[file.camera] || 0) + 1
     })
 

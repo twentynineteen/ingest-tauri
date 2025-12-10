@@ -23,7 +23,7 @@ export function useBuildProjectMachine() {
     const setupListeners = async () => {
       try {
         // Listen for copy progress events
-        unlistenProgress = await listen<number>('copy_progress', event => {
+        unlistenProgress = await listen<number>('copy_progress', (event) => {
           if (!isMounted) return
           send({ type: 'COPY_PROGRESS', progress: event.payload })
         })

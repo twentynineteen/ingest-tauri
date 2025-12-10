@@ -1,8 +1,9 @@
 // FolderTreeSprout.tsx
-import { logger } from '@/utils/logger'
 import { invoke } from '@tauri-apps/api/core'
 import { GetFoldersResponse, SproutFolder } from '@utils/types'
 import React, { useState } from 'react'
+
+import { logger } from '@/utils/logger'
 
 interface FolderTreeSproutProps {
   folder: SproutFolder
@@ -50,7 +51,7 @@ const FolderTreeSprout: React.FC<FolderTreeSproutProps> = ({
       {/* If expanded and subfolders have been loaded, recursively render them */}
       {expanded && children && (
         <div style={{ paddingLeft: '20px' }}>
-          {children.map(child => (
+          {children.map((child) => (
             <FolderTreeSprout
               key={child.id}
               folder={child}

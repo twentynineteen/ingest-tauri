@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+
 import { logger } from './logger'
 
 // Define an interface for a Trello card (adjust fields as needed)
@@ -83,13 +84,13 @@ export function groupCardsByList(
   lists: TrelloList[]
 ): Record<string, TrelloCard[]> {
   const listMap = new Map<string, string>()
-  lists.forEach(list => {
+  lists.forEach((list) => {
     listMap.set(list.id, list.name)
   })
 
   const grouped: Record<string, TrelloCard[]> = {}
 
-  cards.forEach(card => {
+  cards.forEach((card) => {
     const listName = listMap.get(card.idList) || 'Unknown List'
     if (!grouped[listName]) {
       grouped[listName] = []

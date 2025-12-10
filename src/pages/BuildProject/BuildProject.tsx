@@ -1,4 +1,3 @@
-import { useBreadcrumb, useCameraAutoRemap, useProjectState, useUsername } from '@/hooks'
 import { useTrelloApiKeys } from '@hooks/useApiKeys'
 import { useBuildProjectMachine } from '@hooks/useBuildProjectMachine'
 import { useCreateProjectWithMachine } from '@hooks/useCreateProjectWithMachine'
@@ -6,6 +5,9 @@ import { usePostProjectCompletion } from '@hooks/usePostProjectCompletion'
 import { createNamespacedLogger } from '@utils/logger'
 import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
+
+import { useBreadcrumb, useCameraAutoRemap, useProjectState, useUsername } from '@/hooks'
+
 import { AddFootageStep } from './AddFootageStep'
 import { CreateProjectStep } from './CreateProjectStep'
 import ProgressBar from './ProgressBar'
@@ -119,19 +121,19 @@ const BuildProject: React.FC = () => {
   }, [error])
 
   return (
-    <div className="w-full h-full overflow-y-auto overflow-x-hidden">
+    <div className="h-full w-full overflow-x-hidden overflow-y-auto">
       {/* Project Configuration & File Explorer */}
       <div className="w-full max-w-full pb-4">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-border bg-card/50">
-          <h1 className="text-2xl font-bold text-foreground">Build a Project</h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
+        <div className="border-border bg-card/50 border-b px-6 py-4">
+          <h1 className="text-foreground text-2xl font-bold">Build a Project</h1>
+          <p className="text-muted-foreground mt-0.5 text-xs">
             Configure project settings, select footage files, and create organized folder
             structures
           </p>
         </div>
 
-        <div className="px-6 py-4 space-y-4 max-w-full">
+        <div className="max-w-full space-y-4 px-6 py-4">
           {/* Step 1: Project Configuration */}
           <ProjectConfigurationStep
             showSuccess={showSuccess}
@@ -165,7 +167,7 @@ const BuildProject: React.FC = () => {
         </div>
 
         {/* Progress Bar */}
-        <div className="px-6 mt-4">
+        <div className="mt-4 px-6">
           <ProgressBar
             progress={copyProgress}
             completed={state.matches('showingSuccess') || state.matches('completed')}

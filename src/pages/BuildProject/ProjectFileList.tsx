@@ -28,15 +28,15 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
   // Empty state
   if (files.length === 0) {
     return (
-      <div className="mx-auto max-w-md py-6 px-6">
-        <div className="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-lg p-6 bg-muted/20">
-          <div className="rounded-full bg-muted p-3 mb-3">
-            <Film className="w-6 h-6 text-muted-foreground" />
+      <div className="mx-auto max-w-md px-6 py-6">
+        <div className="border-border bg-muted/20 flex flex-col items-center justify-center rounded-lg border-2 border-dashed p-6">
+          <div className="bg-muted mb-3 rounded-full p-3">
+            <Film className="text-muted-foreground h-6 w-6" />
           </div>
-          <h3 className="text-sm font-semibold text-foreground mb-1">
+          <h3 className="text-foreground mb-1 text-sm font-semibold">
             No files selected yet
           </h3>
-          <p className="text-xs text-muted-foreground text-center">
+          <p className="text-muted-foreground text-center text-xs">
             Click &quot;Select Files&quot; to add footage to your project
           </p>
         </div>
@@ -45,37 +45,37 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
   }
 
   return (
-    <div className="space-y-2 w-full max-w-full">
+    <div className="w-full max-w-full space-y-2">
       {files.map((item, idx) => (
         <div
           key={`${item.file.path}-${idx}`}
-          className="group relative bg-card border border-border rounded-lg p-3 shadow-sm hover:shadow-md transition-shadow duration-200 w-full max-w-full"
+          className="group bg-card border-border relative w-full max-w-full rounded-lg border p-3 shadow-sm transition-shadow duration-200 hover:shadow-md"
           style={{
             animation: `${FILE_LIST_ANIMATION.name} ${FILE_LIST_ANIMATION.duration}ms ${FILE_LIST_ANIMATION.easing} ${idx * FILE_LIST_ANIMATION.staggerDelay}ms both`
           }}
         >
           {/* File Icon and Info */}
-          <div className="flex items-start gap-3 w-full max-w-full min-w-0">
-            <div className="flex-shrink-0 mt-1">
-              <div className="rounded-md bg-primary/10 p-2">
-                <Video className="w-5 h-5 text-primary" />
+          <div className="flex w-full max-w-full min-w-0 items-start gap-3">
+            <div className="mt-1 flex-shrink-0">
+              <div className="bg-primary/10 rounded-md p-2">
+                <Video className="text-primary h-5 w-5" />
               </div>
             </div>
 
             <div
-              className="flex-1 min-w-0 overflow-hidden"
+              className="min-w-0 flex-1 overflow-hidden"
               style={{ maxWidth: '100%', width: 0 }}
             >
               {/* File Name */}
               <h4
-                className="text-sm font-semibold text-foreground mb-1 truncate"
+                className="text-foreground mb-1 truncate text-sm font-semibold"
                 title={item.file.name}
               >
                 {item.file.name}
               </h4>
               {/* File Path */}
               <p
-                className="text-xs text-muted-foreground italic truncate"
+                className="text-muted-foreground truncate text-xs italic"
                 title={item.file.path}
               >
                 {item.file.path}
@@ -83,15 +83,15 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
             </div>
 
             {/* Camera Selector & Delete Button */}
-            <div className="flex items-center gap-2 flex-shrink-0">
+            <div className="flex flex-shrink-0 items-center gap-2">
               {/* Camera Badge/Selector */}
               <select
                 aria-label={`Select camera for ${item.file.name}`}
-                className="text-xs border border-input bg-secondary text-secondary-foreground px-3 py-1.5 rounded-md hover:bg-secondary/80 focus:ring-2 focus:ring-ring focus:outline-none transition-colors cursor-pointer"
+                className="border-input bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-ring cursor-pointer rounded-md border px-3 py-1.5 text-xs transition-colors focus:ring-2 focus:outline-none"
                 value={item.camera}
-                onChange={e => onUpdateCamera(idx, Number(e.target.value))}
+                onChange={(e) => onUpdateCamera(idx, Number(e.target.value))}
               >
-                {Array.from({ length: numCameras }, (_, i) => i + 1).map(cam => (
+                {Array.from({ length: numCameras }, (_, i) => i + 1).map((cam) => (
                   <option key={cam} value={cam}>
                     Camera {cam}
                   </option>
@@ -102,9 +102,9 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
               <button
                 onClick={() => onDeleteFile(idx)}
                 aria-label={`Delete ${item.file.name}`}
-                className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md p-2 transition-colors"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="h-4 w-4" />
               </button>
             </div>
           </div>

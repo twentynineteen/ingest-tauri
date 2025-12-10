@@ -28,12 +28,12 @@ export const BatchActions: React.FC<BatchActionsProps> = ({
   if (totalProjects === 0) return null
 
   return (
-    <div className="bg-card border border-border rounded-xl shadow-sm p-4">
-      <div className="flex items-center gap-2 mb-3">
-        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex-shrink-0">
+    <div className="bg-card border-border rounded-xl border p-4 shadow-sm">
+      <div className="mb-3 flex items-center gap-2">
+        <div className="bg-primary/10 text-primary flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold">
           4
         </div>
-        <h2 className="text-sm font-semibold text-foreground">Batch Actions</h2>
+        <h2 className="text-foreground text-sm font-semibold">Batch Actions</h2>
       </div>
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
@@ -55,12 +55,12 @@ export const BatchActions: React.FC<BatchActionsProps> = ({
         >
           {isUpdating ? (
             <>
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              <RefreshCw className="h-3.5 w-3.5 animate-spin" />
               Updating...
             </>
           ) : (
             <>
-              <CheckCircle className="w-3.5 h-3.5" />
+              <CheckCircle className="h-3.5 w-3.5" />
               Apply Changes
             </>
           )}

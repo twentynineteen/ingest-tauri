@@ -5,16 +5,18 @@
  * Main page for managing AI script example embeddings
  */
 
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useBreadcrumb } from '@/hooks/useBreadcrumb'
-import { useExampleManagement } from '@/hooks/useExampleManagement'
-import type { ExampleCategory, ExampleSource } from '@/types/exampleEmbeddings'
 import { save } from '@tauri-apps/plugin-dialog'
 import { mkdir, writeTextFile } from '@tauri-apps/plugin-fs'
 import { Download, Upload } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
+
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useBreadcrumb } from '@/hooks/useBreadcrumb'
+import { useExampleManagement } from '@/hooks/useExampleManagement'
+import type { ExampleCategory, ExampleSource } from '@/types/exampleEmbeddings'
+
 import { DeleteConfirm } from './DeleteConfirm'
 import { ExampleList } from './ExampleList'
 import { ReplaceDialog } from './ReplaceDialog'
@@ -41,11 +43,13 @@ export function ExampleEmbeddings() {
 
   // Filter examples by source
   const filteredExamples =
-    filterSource === 'all' ? examples : examples.filter(ex => ex.source === filterSource)
+    filterSource === 'all'
+      ? examples
+      : examples.filter((ex) => ex.source === filterSource)
 
   // Count by source
-  const bundledCount = examples.filter(ex => ex.source === 'bundled').length
-  const uploadedCount = examples.filter(ex => ex.source === 'user-uploaded').length
+  const bundledCount = examples.filter((ex) => ex.source === 'bundled').length
+  const uploadedCount = examples.filter((ex) => ex.source === 'user-uploaded').length
 
   // Handle delete
   const handleDeleteClick = (id: string) => {
@@ -125,7 +129,7 @@ export function ExampleEmbeddings() {
 
   // Handle download individual example
   const handleDownloadClick = async (id: string) => {
-    const example = examples.find(ex => ex.id === id)
+    const example = examples.find((ex) => ex.id === id)
     if (!example) return
 
     try {
@@ -210,20 +214,20 @@ export function ExampleEmbeddings() {
     }
   }
 
-  const selectedExample = examples.find(ex => ex.id === selectedExampleId)
+  const selectedExample = examples.find((ex) => ex.id === selectedExampleId)
 
   return (
     <div className="container mx-auto space-y-6 px-6">
       {/* Header */}
-      <div className="w-full pb-4 border-b mb-4 flex items-center justify-between">
+      <div className="mb-4 flex w-full items-center justify-between border-b pb-4">
         <div>
-          <h2 className="text-2xl font-semibold flex flex-row gap-4 items-center">
+          <h2 className="flex flex-row items-center gap-4 text-2xl font-semibold">
             Example Embeddings
           </h2>
-          <p className="mt-2 text-muted-foreground">
+          <p className="text-muted-foreground mt-2">
             Manage script examples for AI-powered autocue formatting.{' '}
           </p>
-          <p className="mt-2 text-muted-foreground">
+          <p className="text-muted-foreground mt-2">
             Upload your own examples or use bundled templates.
           </p>
         </div>
@@ -242,7 +246,7 @@ export function ExampleEmbeddings() {
       {/* Tabs for filtering */}
       <Tabs
         value={filterSource}
-        onValueChange={value => setFilterSource(value as typeof filterSource)}
+        onValueChange={(value) => setFilterSource(value as typeof filterSource)}
       >
         <TabsList>
           <TabsTrigger value="all">All ({examples.length})</TabsTrigger>

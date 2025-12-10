@@ -3,6 +3,7 @@ import { relaunch } from '@tauri-apps/plugin-process'
 import { check } from '@tauri-apps/plugin-updater'
 import { useEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
+
 // The AppRouter component switches the display if the user is not logged in
 // The top level component, Page, acts as the provider for the layout
 // subsequent components are loaded within the page window via the Outlet component.

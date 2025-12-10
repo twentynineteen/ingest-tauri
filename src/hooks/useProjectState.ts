@@ -1,6 +1,7 @@
 import { PROJECT_LIMITS } from '@constants/project'
 import { createNamespacedLogger } from '@utils/logger'
 import { useCallback, useMemo, useState } from 'react'
+
 import { FootageFile } from './useCameraAutoRemap'
 import { selectFiles } from './useFileSelector'
 
@@ -37,7 +38,7 @@ export function useProjectState() {
   // Select and add files to the project
   const handleSelectFiles = useCallback(async () => {
     const newFiles = await selectFiles()
-    setFiles(prev => [...prev, ...newFiles])
+    setFiles((prev) => [...prev, ...newFiles])
   }, [])
 
   // Logic to mark a given file with the camera number
@@ -51,7 +52,7 @@ export function useProjectState() {
         return
       }
 
-      setFiles(currentFiles => {
+      setFiles((currentFiles) => {
         const updatedFiles = currentFiles.map((item, idx) =>
           idx === index ? { ...item, camera } : item
         )
@@ -63,7 +64,7 @@ export function useProjectState() {
 
   // Removes the selected file from the folder tree
   const handleDeleteFile = useCallback((index: number) => {
-    setFiles(prevFiles => {
+    setFiles((prevFiles) => {
       const updatedFiles = prevFiles.filter((_, idx) => idx !== index)
       if (import.meta.env.DEV) {
         logger.log('Updated files:', updatedFiles)

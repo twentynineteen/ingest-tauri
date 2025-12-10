@@ -5,7 +5,6 @@
  * with categorization and before/after value comparison.
  */
 
-import type { DetailedFieldChange, ProjectChangeDetail } from '@/types/baker'
 import {
   AlertCircle,
   ArrowRight,
@@ -22,6 +21,8 @@ import {
 } from 'lucide-react'
 import React, { useState } from 'react'
 
+import type { DetailedFieldChange, ProjectChangeDetail } from '@/types/baker'
+
 interface ProjectChangeDetailViewProps {
   changeDetail: ProjectChangeDetail
   isExpanded?: boolean
@@ -32,34 +33,34 @@ interface ProjectChangeDetailViewProps {
 const getChangeIcon = (type: string) => {
   switch (type) {
     case 'added':
-      return <Plus className="h-3 w-3 text-success" />
+      return <Plus className="text-success h-3 w-3" />
     case 'modified':
-      return <Edit className="h-3 w-3 text-warning" />
+      return <Edit className="text-warning h-3 w-3" />
     case 'removed':
-      return <Minus className="h-3 w-3 text-destructive" />
+      return <Minus className="text-destructive h-3 w-3" />
     default:
-      return <Info className="h-3 w-3 text-muted-foreground" />
+      return <Info className="text-muted-foreground h-3 w-3" />
   }
 }
 
 const getFieldIcon = (field: string) => {
   switch (field) {
     case 'files':
-      return <File className="h-4 w-4 text-info" />
+      return <File className="text-info h-4 w-4" />
     case 'numberOfCameras':
-      return <Camera className="h-4 w-4 text-accent-foreground" />
+      return <Camera className="text-accent-foreground h-4 w-4" />
     case 'projectTitle':
-      return <FolderOpen className="h-4 w-4 text-success" />
+      return <FolderOpen className="text-success h-4 w-4" />
     case 'folderSizeBytes':
-      return <HardDrive className="h-4 w-4 text-muted-foreground" />
+      return <HardDrive className="text-muted-foreground h-4 w-4" />
     case 'createdBy':
     case 'scannedBy':
-      return <User className="h-4 w-4 text-primary" />
+      return <User className="text-primary h-4 w-4" />
     case 'creationDateTime':
     case 'lastModified':
-      return <Clock className="h-4 w-4 text-warning" />
+      return <Clock className="text-warning h-4 w-4" />
     default:
-      return <Info className="h-4 w-4 text-muted-foreground" />
+      return <Info className="text-muted-foreground h-4 w-4" />
   }
 }
 
@@ -84,17 +85,17 @@ const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) 
       : getImpactColor(change.impact)
 
   return (
-    <div className={`border rounded-lg p-3 ${containerClass}`}>
-      <div className="flex items-start justify-between mb-2">
+    <div className={`rounded-lg border p-3 ${containerClass}`}>
+      <div className="mb-2 flex items-start justify-between">
         <div className="flex items-center space-x-2">
           {getFieldIcon(change.field)}
-          <span className="font-medium text-sm">{change.fieldDisplayName}</span>
+          <span className="text-sm font-medium">{change.fieldDisplayName}</span>
           {getChangeIcon(change.type)}
         </div>
         {/* Only show impact badge for actual changes, not unchanged fields */}
         {change.type !== 'unchanged' && (
           <span
-            className={`text-xs px-2 py-1 rounded-full font-medium ${
+            className={`rounded-full px-2 py-1 text-xs font-medium ${
               change.impact === 'high'
                 ? 'bg-destructive/20 text-destructive'
                 : change.impact === 'medium'
@@ -110,7 +111,7 @@ const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) 
       {change.type === 'added' && (
         <div className="text-sm">
           <span className="text-muted-foreground">New value: </span>
-          <span className="font-mono bg-success/20 text-success px-2 py-1 rounded">
+          <span className="bg-success/20 text-success rounded px-2 py-1 font-mono">
             {change.formattedNewValue}
           </span>
         </div>
@@ -119,26 +120,26 @@ const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) 
       {change.type === 'removed' && (
         <div className="text-sm">
           <span className="text-muted-foreground">Removed value: </span>
-          <span className="font-mono bg-destructive/20 text-destructive px-2 py-1 rounded line-through">
+          <span className="bg-destructive/20 text-destructive rounded px-2 py-1 font-mono line-through">
             {change.formattedOldValue}
           </span>
         </div>
       )}
 
       {change.type === 'modified' && (
-        <div className="text-sm space-y-1">
+        <div className="space-y-1 text-sm">
           <div className="flex items-center space-x-2">
             <span className="text-muted-foreground flex-shrink-0">From:</span>
-            <span className="font-mono bg-destructive/20 px-2 py-1 rounded text-destructive line-through">
+            <span className="bg-destructive/20 text-destructive rounded px-2 py-1 font-mono line-through">
               {change.formattedOldValue}
             </span>
           </div>
           <div className="flex items-center space-x-2">
-            <ArrowRight className="h-3 w-3 text-muted-foreground/50 flex-shrink-0 ml-8" />
+            <ArrowRight className="text-muted-foreground/50 ml-8 h-3 w-3 flex-shrink-0" />
           </div>
           <div className="flex items-center space-x-2">
             <span className="text-muted-foreground flex-shrink-0">To:</span>
-            <span className="font-mono bg-success/20 px-2 py-1 rounded text-success ml-4">
+            <span className="bg-success/20 text-success ml-4 rounded px-2 py-1 font-mono">
               {change.formattedNewValue}
             </span>
           </div>
@@ -148,7 +149,7 @@ const FieldChangeItem: React.FC<{ change: DetailedFieldChange }> = ({ change }) 
       {change.type === 'unchanged' && (
         <div className="text-sm">
           <span className="text-muted-foreground">Current value: </span>
-          <span className="font-mono bg-muted px-2 py-1 rounded text-foreground">
+          <span className="bg-muted text-foreground rounded px-2 py-1 font-mono">
             {change.formattedOldValue}
           </span>
         </div>
@@ -168,15 +169,15 @@ const CategorySection: React.FC<{
   if (changes.length === 0) return null
 
   return (
-    <div className="border rounded-lg overflow-hidden">
+    <div className="overflow-hidden rounded-lg border">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className={`w-full px-4 py-3 flex items-center justify-between ${colorClass} hover:opacity-80 transition-opacity`}
+        className={`flex w-full items-center justify-between px-4 py-3 ${colorClass} transition-opacity hover:opacity-80`}
       >
         <div className="flex items-center space-x-2">
           {icon}
           <span className="font-medium">{title}</span>
-          <span className="bg-white bg-opacity-80 px-2 py-1 rounded-full text-xs font-semibold">
+          <span className="bg-opacity-80 rounded-full bg-white px-2 py-1 text-xs font-semibold">
             {changes.length}
           </span>
         </div>
@@ -188,7 +189,7 @@ const CategorySection: React.FC<{
       </button>
 
       {isExpanded && (
-        <div className="p-4 space-y-3 bg-card">
+        <div className="bg-card space-y-3 p-4">
           {changes.map((change, index) => (
             <FieldChangeItem key={`${change.field}-${index}`} change={change} />
           ))}
@@ -206,8 +207,8 @@ export const ProjectChangeDetailView: React.FC<ProjectChangeDetailViewProps> = (
 }) => {
   if (!changeDetail.hasChanges) {
     return (
-      <div className="border rounded-lg p-4 bg-success/10 border-success/20">
-        <div className="flex items-center space-x-2 text-success">
+      <div className="bg-success/10 border-success/20 rounded-lg border p-4">
+        <div className="text-success flex items-center space-x-2">
           <Info className="h-4 w-4" />
           <span className="font-medium">{changeDetail.projectName}</span>
           <span>- No changes required</span>
@@ -217,20 +218,20 @@ export const ProjectChangeDetailView: React.FC<ProjectChangeDetailViewProps> = (
   }
 
   return (
-    <div className="border rounded-lg overflow-hidden">
+    <div className="overflow-hidden rounded-lg border">
       {/* Project Header */}
-      <div className="bg-muted px-4 py-3 border-b border-border">
+      <div className="bg-muted border-border border-b px-4 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <FolderOpen className="h-4 w-4 text-muted-foreground" />
-            <span className="font-medium text-foreground">
+            <FolderOpen className="text-muted-foreground h-4 w-4" />
+            <span className="text-foreground font-medium">
               {changeDetail.projectName}
             </span>
             {changeDetail.summary.contentChanges > 0 && (
-              <AlertCircle className="h-4 w-4 text-warning" />
+              <AlertCircle className="text-warning h-4 w-4" />
             )}
           </div>
-          <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+          <div className="text-muted-foreground flex items-center space-x-2 text-sm">
             <span>{changeDetail.summary.totalChanges} changes</span>
             {onToggleExpanded && (
               <button onClick={onToggleExpanded} className="text-info hover:text-info/80">
@@ -241,19 +242,19 @@ export const ProjectChangeDetailView: React.FC<ProjectChangeDetailViewProps> = (
         </div>
 
         {/* Summary Pills */}
-        <div className="flex items-center space-x-2 mt-2">
+        <div className="mt-2 flex items-center space-x-2">
           {changeDetail.summary.contentChanges > 0 && (
-            <span className="bg-destructive/20 text-destructive px-2 py-1 rounded-full text-xs font-medium">
+            <span className="bg-destructive/20 text-destructive rounded-full px-2 py-1 text-xs font-medium">
               {changeDetail.summary.contentChanges} content
             </span>
           )}
           {changeDetail.summary.metadataChanges > 0 && (
-            <span className="bg-warning/20 text-warning px-2 py-1 rounded-full text-xs font-medium">
+            <span className="bg-warning/20 text-warning rounded-full px-2 py-1 text-xs font-medium">
               {changeDetail.summary.metadataChanges} metadata
             </span>
           )}
           {changeDetail.summary.maintenanceChanges > 0 && showMaintenanceChanges && (
-            <span className="bg-muted text-foreground px-2 py-1 rounded-full text-xs font-medium">
+            <span className="bg-muted text-foreground rounded-full px-2 py-1 text-xs font-medium">
               {changeDetail.summary.maintenanceChanges} maintenance
             </span>
           )}
@@ -262,7 +263,7 @@ export const ProjectChangeDetailView: React.FC<ProjectChangeDetailViewProps> = (
 
       {/* Detailed Changes */}
       {isExpanded && (
-        <div className="p-4 space-y-4">
+        <div className="space-y-4 p-4">
           <CategorySection
             title="Content Changes"
             changes={changeDetail.changeCategories.content}

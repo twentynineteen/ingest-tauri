@@ -4,6 +4,7 @@ import { useIsMobile } from '@components/hooks/use-mobile'
 import { cn } from '@components/lib/utils'
 import { TooltipProvider } from '@components/ui/tooltip'
 import * as React from 'react'
+
 import { SidebarContext } from '../use-sidebar'
 
 const SIDEBAR_COOKIE_NAME = 'sidebar_state'
@@ -56,7 +57,7 @@ export const SidebarProvider = React.forwardRef<
 
     // Helper to toggle the sidebar.
     const toggleSidebar = React.useCallback(() => {
-      return isMobile ? setOpenMobile(open => !open) : setOpen(open => !open)
+      return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open)
     }, [isMobile, setOpen, setOpenMobile])
 
     // Adds a keyboard shortcut to toggle the sidebar.
@@ -101,7 +102,7 @@ export const SidebarProvider = React.forwardRef<
               } as React.CSSProperties
             }
             className={cn(
-              'group/sidebar-wrapper flex min-h-svh w-full has-data-[variant=inset]:bg-sidebar',
+              'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full',
               className
             )}
             ref={ref}

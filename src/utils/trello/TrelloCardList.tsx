@@ -7,6 +7,7 @@ import {
   AccordionTrigger
 } from '@components/ui/accordion'
 import React, { useState } from 'react'
+
 import { logger } from '../logger'
 import { TrelloCard } from '../TrelloCards'
 
@@ -62,11 +63,11 @@ const TrelloCardList: React.FC<TrelloCardListProps> = ({ grouped, onSelect }) =>
             {listName} ({cards.length})
           </AccordionTrigger>
           <AccordionContent>
-            <ul className="list-disc ml-5 space-y-1">
-              {cards.map(card => (
+            <ul className="ml-5 list-disc space-y-1">
+              {cards.map((card) => (
                 <li
                   key={card.id}
-                  className="hover:bg-accent px-3 py-1 rounded transition-colors cursor-pointer"
+                  className="hover:bg-accent cursor-pointer rounded px-3 py-1 transition-colors"
                   onClick={() => onSelect({ id: card.id, name: card.name })}
                 >
                   {card.name}

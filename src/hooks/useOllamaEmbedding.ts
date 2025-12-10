@@ -4,9 +4,10 @@
  * Purpose: Generate embeddings using Ollama's nomic-embed-text model
  */
 
-import { logger } from '@/utils/logger'
 import { createNamespacedLogger } from '@utils/logger'
 import { useEffect, useState } from 'react'
+
+import { logger } from '@/utils/logger'
 
 const logger = createNamespacedLogger('useOllamaEmbedding')
 
@@ -65,11 +66,11 @@ export function useOllamaEmbedding(): UseOllamaEmbeddingResult {
 
         logger.log(
           'Available models:',
-          models.map(m => m.name)
+          models.map((m) => m.name)
         )
 
         // Check if nomic-embed-text is installed
-        const hasEmbeddingModel = models.some(m => m.name.includes(EMBEDDING_MODEL))
+        const hasEmbeddingModel = models.some((m) => m.name.includes(EMBEDDING_MODEL))
 
         if (!hasEmbeddingModel) {
           throw new Error(

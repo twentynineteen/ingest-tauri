@@ -6,13 +6,14 @@
  * It loads the board ID from storage/app store and provides a setter to update it.
  */
 
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+
 import { CACHE } from '@/constants/timing'
 import { queryKeys } from '@/lib/query-keys'
 import { useAppStore } from '@/store/useAppStore'
 import { TrelloBoard } from '@/types/media'
 import { loadApiKeys, saveApiKeys } from '@/utils/storage'
 import { validateBoardAccess } from '@/utils/trelloBoardValidation'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 // Default board ID (original hardcoded value)
 const DEFAULT_BOARD_ID = '55a504d70bed2bd21008dc5a'
@@ -31,8 +32,8 @@ interface UseTrelloBoardIdReturn {
  */
 export function useTrelloBoardId(): UseTrelloBoardIdReturn {
   const queryClient = useQueryClient()
-  const storeBoardId = useAppStore(state => state.trelloBoardId)
-  const setStoreBoardId = useAppStore(state => state.setTrelloBoardId)
+  const storeBoardId = useAppStore((state) => state.trelloBoardId)
+  const setStoreBoardId = useAppStore((state) => state.setTrelloBoardId)
 
   // Load board ID from storage
   const { data: apiKeys, isLoading } = useQuery({
@@ -57,7 +58,7 @@ export function useTrelloBoardId(): UseTrelloBoardIdReturn {
 
       return updatedKeys
     },
-    onSuccess: updatedKeys => {
+    onSuccess: (updatedKeys) => {
       // Update query cache
       queryClient.setQueryData(queryKeys.settings.apiKeys(), updatedKeys)
     }

@@ -14,6 +14,7 @@
 
 import { confirm } from '@tauri-apps/plugin-dialog'
 import { exists, remove } from '@tauri-apps/plugin-fs'
+
 import { FootageFile } from './useCameraAutoRemap'
 
 interface ValidationResult {

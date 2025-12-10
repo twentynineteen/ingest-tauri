@@ -12,8 +12,9 @@
  * Lines: ~70
  */
 
-import { logger } from '@/utils/logger'
 import { invoke } from '@tauri-apps/api/core'
+
+import { logger } from '@/utils/logger'
 
 interface PremiereParams {
   projectFolder: string

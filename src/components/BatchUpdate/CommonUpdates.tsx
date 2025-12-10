@@ -23,13 +23,13 @@ export const CommonUpdates: React.FC<CommonUpdatesProps> = ({ summary }) => {
   if (!hasAnyCommonChanges) return null
 
   return (
-    <div className="border rounded-lg p-4">
-      <h4 className="font-medium text-foreground mb-3">Common Updates</h4>
+    <div className="rounded-lg border p-4">
+      <h4 className="text-foreground mb-3 font-medium">Common Updates</h4>
       <div className="space-y-2 text-sm">
         {commonChanges.folderSizeCalculated > 0 && (
           <div className="flex items-center justify-between">
-            <div className="flex items-center text-foreground">
-              <HardDrive className="h-4 w-4 mr-2" />
+            <div className="text-foreground flex items-center">
+              <HardDrive className="mr-2 h-4 w-4" />
               Folder sizes will be calculated
             </div>
             <span className="text-muted-foreground">
@@ -39,8 +39,8 @@ export const CommonUpdates: React.FC<CommonUpdatesProps> = ({ summary }) => {
         )}
         {commonChanges.filesUpdated > 0 && (
           <div className="flex items-center justify-between">
-            <div className="flex items-center text-foreground">
-              <Edit className="h-4 w-4 mr-2" />
+            <div className="text-foreground flex items-center">
+              <Edit className="mr-2 h-4 w-4" />
               File lists will be updated
             </div>
             <span className="text-muted-foreground">
@@ -50,8 +50,8 @@ export const CommonUpdates: React.FC<CommonUpdatesProps> = ({ summary }) => {
         )}
         {commonChanges.timestampsUpdated > 0 && (
           <div className="flex items-center justify-between">
-            <div className="flex items-center text-foreground">
-              <Clock className="h-4 w-4 mr-2" />
+            <div className="text-foreground flex items-center">
+              <Clock className="mr-2 h-4 w-4" />
               Last modified timestamps will be updated
             </div>
             <span className="text-muted-foreground">
@@ -61,8 +61,8 @@ export const CommonUpdates: React.FC<CommonUpdatesProps> = ({ summary }) => {
         )}
         {commonChanges.createdByUpdated > 0 && (
           <div className="flex items-center justify-between">
-            <div className="flex items-center text-foreground">
-              <User className="h-4 w-4 mr-2" />
+            <div className="text-foreground flex items-center">
+              <User className="mr-2 h-4 w-4" />
               "Created by" fields will be updated
             </div>
             <span className="text-muted-foreground">

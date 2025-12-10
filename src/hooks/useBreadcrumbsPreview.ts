@@ -5,14 +5,15 @@
  * Generates previews of changes Baker will make to breadcrumbs files.
  */
 
-import type { BreadcrumbsFile, BreadcrumbsPreview, ProjectFolder } from '@/types/baker'
-import { logger } from '@/utils/logger'
 import { invoke } from '@tauri-apps/api/core'
 import {
   compareBreadcrumbsMeaningful,
   generateBreadcrumbsPreview
 } from '@utils/breadcrumbsComparison'
 import { useCallback, useState } from 'react'
+
+import type { BreadcrumbsFile, BreadcrumbsPreview, ProjectFolder } from '@/types/baker'
+import { logger } from '@/utils/logger'
 
 interface UseBreadcrumbsPreviewResult {
   // State
@@ -114,7 +115,7 @@ export function useBreadcrumbsPreview(): UseBreadcrumbsPreviewResult {
 
           // Update the diff to reflect folder size changes
           const existingChange = preview.diff.changes.find(
-            c => c.field === 'folderSizeBytes'
+            (c) => c.field === 'folderSizeBytes'
           )
 
           if (existingChange) {
@@ -166,7 +167,7 @@ export function useBreadcrumbsPreview(): UseBreadcrumbsPreviewResult {
           logger.warn(`Failed to calculate folder size for ${projectPath}:`, sizeError)
         }
 
-        setPreviews(prev => new Map(prev.set(projectPath, preview)))
+        setPreviews((prev) => new Map(prev.set(projectPath, preview)))
         return preview
       } catch (previewError) {
         const errorMessage =
@@ -189,7 +190,7 @@ export function useBreadcrumbsPreview(): UseBreadcrumbsPreviewResult {
 
       try {
         // Generate previews in parallel for better performance
-        const previewPromises = projects.map(async project => {
+        const previewPromises = projects.map(async (project) => {
           const preview = await generatePreview(project.path, project)
           if (preview) {
             return [project.path, preview] as const
@@ -199,7 +200,7 @@ export function useBreadcrumbsPreview(): UseBreadcrumbsPreviewResult {
 
         const results = await Promise.all(previewPromises)
 
-        results.forEach(result => {
+        results.forEach((result) => {
           if (result) {
             newPreviews.set(result[0], result[1])
           }

@@ -27,7 +27,7 @@ ${embed_code}
 `
 
   return (
-    <pre className="text-xs whitespace-pre-wrap font-mono text-muted-foreground">
+    <pre className="text-muted-foreground font-mono text-xs whitespace-pre-wrap">
       {formattedBlock}
     </pre>
   )

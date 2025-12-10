@@ -4,6 +4,8 @@
  * Displays success state after a successful upload.
  */
 
+import { CheckCircle } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import {
   DialogDescription,
@@ -11,7 +13,6 @@ import {
   DialogHeader,
   DialogTitle
 } from '@/components/ui/dialog'
-import { CheckCircle } from 'lucide-react'
 
 interface UploadSuccessViewProps {
   uploadedTitle: string
@@ -28,7 +29,7 @@ export function UploadSuccessView({
     <>
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2">
-          <CheckCircle className="h-5 w-5 text-success" />
+          <CheckCircle className="text-success h-5 w-5" />
           Upload Successful!
         </DialogTitle>
         <DialogDescription>
@@ -37,17 +38,17 @@ export function UploadSuccessView({
       </DialogHeader>
 
       <div className="space-y-4 py-4">
-        <div className="rounded-md border border-success/20 bg-success/10 p-4">
-          <p className="text-sm font-medium text-success">Uploaded Example</p>
-          <p className="text-lg font-semibold text-success mt-1">{uploadedTitle}</p>
+        <div className="border-success/20 bg-success/10 rounded-md border p-4">
+          <p className="text-success text-sm font-medium">Uploaded Example</p>
+          <p className="text-success mt-1 text-lg font-semibold">{uploadedTitle}</p>
         </div>
 
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">✓ Example added to the database</p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">✓ Example added to the database</p>
+          <p className="text-muted-foreground text-sm">
             ✓ Available for AI-powered script formatting
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             ✓ List will update automatically when you close this dialog
           </p>
         </div>

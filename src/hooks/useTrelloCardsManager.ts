@@ -4,10 +4,12 @@
  * Extracted to reduce component complexity (DEBT-002)
  */
 
-import type { TrelloCard } from '@/types/baker'
-import { logger } from '@/utils/logger'
 import { extractTrelloCardId, validateTrelloCard } from '@utils/validation'
 import { useMemo, useState } from 'react'
+
+import type { TrelloCard } from '@/types/baker'
+import { logger } from '@/utils/logger'
+
 import { useBreadcrumbsTrelloCards } from './useBreadcrumbsTrelloCards'
 import { useFuzzySearch } from './useFuzzySearch'
 import { useTrelloBoard } from './useTrelloBoard'
@@ -29,7 +31,7 @@ function validateCardCanBeAdded(
   if (trelloCards.length >= 10) {
     return 'Maximum of 10 Trello cards per project reached'
   }
-  if (trelloCards.some(card => card.cardId === cardId)) {
+  if (trelloCards.some((card) => card.cardId === cardId)) {
     return 'This Trello card is already associated with the project'
   }
   return null
@@ -72,7 +74,7 @@ export function useTrelloCardsManager({
   // Flatten all cards for search
   const allCards = useMemo(() => {
     const cards: Array<{ id: string; name: string; desc?: string }> = []
-    Object.values(grouped).forEach(cardList => {
+    Object.values(grouped).forEach((cardList) => {
       cards.push(...cardList)
     })
     return cards
@@ -95,9 +97,9 @@ export function useTrelloCardsManager({
     }
 
     const result: Record<string, Array<{ id: string; name: string; desc?: string }>> = {}
-    filteredCards.forEach(card => {
+    filteredCards.forEach((card) => {
       Object.entries(grouped).forEach(([listName, cards]) => {
-        if (cards.some(c => c.id === card.id)) {
+        if (cards.some((c) => c.id === card.id)) {
           if (!result[listName]) {
             result[listName] = []
           }

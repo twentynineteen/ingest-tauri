@@ -31,12 +31,12 @@ export function calculateBatchUpdateSummary(
   selectedProjects: string[],
   previews: BreadcrumbsPreview[]
 ): BatchUpdateSummary {
-  const projectsWithChanges = previews.filter(p => {
+  const projectsWithChanges = previews.filter((p) => {
     const meaningfulDiff = p.meaningfulDiff || p.diff
     return meaningfulDiff.hasChanges
   }).length
 
-  const projectsWithoutChanges = previews.filter(p => {
+  const projectsWithoutChanges = previews.filter((p) => {
     const meaningfulDiff = p.meaningfulDiff || p.diff
     return !meaningfulDiff.hasChanges
   }).length
@@ -54,25 +54,25 @@ export function calculateBatchUpdateSummary(
   )
 
   const commonChanges = {
-    folderSizeCalculated: previews.filter(p => {
+    folderSizeCalculated: previews.filter((p) => {
       const meaningfulDiff = p.meaningfulDiff || p.diff
       return meaningfulDiff.changes.some(
-        c => c.field === 'folderSizeBytes' && c.type === 'added'
+        (c) => c.field === 'folderSizeBytes' && c.type === 'added'
       )
     }).length,
-    filesUpdated: previews.filter(p => {
+    filesUpdated: previews.filter((p) => {
       const meaningfulDiff = p.meaningfulDiff || p.diff
       return meaningfulDiff.changes.some(
-        c => c.field === 'files' && c.type === 'modified'
+        (c) => c.field === 'files' && c.type === 'modified'
       )
     }).length,
-    timestampsUpdated: previews.filter(p =>
-      p.diff.changes.some(c => c.field === 'lastModified')
+    timestampsUpdated: previews.filter((p) =>
+      p.diff.changes.some((c) => c.field === 'lastModified')
     ).length,
-    createdByUpdated: previews.filter(p => {
+    createdByUpdated: previews.filter((p) => {
       const meaningfulDiff = p.meaningfulDiff || p.diff
       return meaningfulDiff.changes.some(
-        c => c.field === 'createdBy' && c.type === 'modified'
+        (c) => c.field === 'createdBy' && c.type === 'modified'
       )
     }).length
   }

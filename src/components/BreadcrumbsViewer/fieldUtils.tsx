@@ -3,10 +3,11 @@
  * Extracted from BreadcrumbsViewerEnhanced.tsx (DEBT-002)
  */
 
-import type { FieldChange } from '@/types/baker'
 import { formatFieldValue } from '@utils/breadcrumbsComparison'
 import { Edit, Minus, Plus } from 'lucide-react'
 import React from 'react'
+
+import type { FieldChange } from '@/types/baker'
 
 export const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 B'
@@ -19,11 +20,11 @@ export const formatFileSize = (bytes: number): string => {
 export const getChangeIcon = (type: string): React.ReactNode => {
   switch (type) {
     case 'added':
-      return <Plus className="h-3 w-3 text-success" />
+      return <Plus className="text-success h-3 w-3" />
     case 'modified':
-      return <Edit className="h-3 w-3 text-warning" />
+      return <Edit className="text-warning h-3 w-3" />
     case 'removed':
-      return <Minus className="h-3 w-3 text-destructive" />
+      return <Minus className="text-destructive h-3 w-3" />
     default:
       return null
   }
@@ -54,8 +55,8 @@ export const Field: React.FC<FieldProps> = ({ label, value, icon, change }) => {
   const changeIcon = change ? getChangeIcon(change.type) : null
 
   return (
-    <div className={`p-2 border rounded ${changeColor}`}>
-      <label className="flex items-center text-xs font-medium text-muted-foreground">
+    <div className={`rounded border p-2 ${changeColor}`}>
+      <label className="text-muted-foreground flex items-center text-xs font-medium">
         {changeIcon && <span className="mr-1">{changeIcon}</span>}
         {icon && <span className="mr-1">{icon}</span>}
         {label}

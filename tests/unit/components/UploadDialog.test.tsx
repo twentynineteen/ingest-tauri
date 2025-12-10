@@ -5,7 +5,26 @@
 
 import { UploadDialog } from '@/pages/AI/ExampleEmbeddings/UploadDialog'
 import { render, screen } from '@testing-library/react'
+import React from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+// Mock framer-motion to avoid animation issues in tests
+vi.mock('framer-motion', () => ({
+  motion: new Proxy(
+    {},
+    {
+      get: (_, prop) => {
+        const Component = React.forwardRef<any, any>((props, ref) => {
+          const { children, ...rest } = props
+          return React.createElement(prop as string, { ...rest, ref }, children)
+        })
+        Component.displayName = `motion.${String(prop)}`
+        return Component
+      }
+    }
+  ),
+  AnimatePresence: ({ children }: any) => children
+}))
 
 // Mock the hooks
 vi.mock('@/hooks/useDocxParser', () => ({

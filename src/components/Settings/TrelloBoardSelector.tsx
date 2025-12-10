@@ -79,7 +79,7 @@ export function TrelloBoardSelector({
             <SelectValue placeholder="Error loading boards" />
           </SelectTrigger>
         </Select>
-        <p className="mt-1 text-sm text-destructive">
+        <p className="text-destructive mt-1 text-sm">
           Failed to load boards. Please check your API credentials.
         </p>
       </div>
@@ -100,13 +100,13 @@ export function TrelloBoardSelector({
             <SelectValue placeholder="No boards found" />
           </SelectTrigger>
         </Select>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="text-muted-foreground mt-1 text-sm">
           No boards found. Create your first board on{' '}
           <a
             href="https://trello.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="underline hover:text-primary"
+            className="hover:text-primary underline"
           >
             Trello
           </a>
@@ -135,7 +135,7 @@ export function TrelloBoardSelector({
         <SelectContent className="max-h-[400px]">
           {/* Show warning if current board is inaccessible */}
           {boardStatus === 'inaccessible' && value && (
-            <div className="px-2 py-1.5 text-sm text-muted-foreground">
+            <div className="text-muted-foreground px-2 py-1.5 text-sm">
               <span className="text-destructive">⚠️</span> Selected board is no longer
               accessible
             </div>
@@ -160,7 +160,7 @@ export function TrelloBoardSelector({
       </Select>
 
       {/* Help text */}
-      <p className="mt-1 text-xs text-muted-foreground">
+      <p className="text-muted-foreground mt-1 text-xs">
         Select the board where your project cards are managed
       </p>
     </div>

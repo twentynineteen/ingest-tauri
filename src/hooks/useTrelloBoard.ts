@@ -1,4 +1,3 @@
-import { logger } from '@/utils/logger'
 import { CACHE } from '@constants/timing'
 import { queryKeys } from '@lib/query-keys'
 import { createQueryError, createQueryOptions, shouldRetry } from '@lib/query-utils'
@@ -11,6 +10,8 @@ import {
   TrelloCard
 } from '@utils/TrelloCards'
 import { useMemo } from 'react'
+
+import { logger } from '@/utils/logger'
 
 interface TrelloBoardData {
   grouped: Record<string, TrelloCard[]>

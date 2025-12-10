@@ -4,12 +4,13 @@
  * Handles folder selection and scan initiation for Baker.
  */
 
-import { logger } from '@/utils/logger'
 import { Button } from '@components/ui/button'
 import { Input } from '@components/ui/input'
 import { open } from '@tauri-apps/plugin-dialog'
 import { FolderOpen, Play, RefreshCw, Square } from 'lucide-react'
 import React, { useCallback } from 'react'
+
+import { logger } from '@/utils/logger'
 
 interface FolderSelectorProps {
   selectedFolder: string
@@ -49,14 +50,14 @@ export const FolderSelector: React.FC<FolderSelectorProps> = ({
   }, [onFolderChange])
 
   return (
-    <div className="bg-card border border-border rounded-xl shadow-sm p-4">
-      <div className="flex items-center gap-2 mb-3">
-        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex-shrink-0">
+    <div className="bg-card border-border rounded-xl border p-4 shadow-sm">
+      <div className="mb-3 flex items-center gap-2">
+        <div className="bg-primary/10 text-primary flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold">
           1
         </div>
         <div className="flex-1">
-          <h2 className="text-sm font-semibold text-foreground">Select Folder to Scan</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">
+          <h2 className="text-foreground text-sm font-semibold">Select Folder to Scan</h2>
+          <p className="text-muted-foreground mt-0.5 text-xs">
             Choose a root directory to scan for BuildProject-compatible folders
           </p>
         </div>
@@ -77,7 +78,7 @@ export const FolderSelector: React.FC<FolderSelectorProps> = ({
             disabled={disabled || isScanning}
             className="gap-1.5"
           >
-            <FolderOpen className="w-3.5 h-3.5" />
+            <FolderOpen className="h-3.5 w-3.5" />
             Browse
           </Button>
         </div>
@@ -91,12 +92,12 @@ export const FolderSelector: React.FC<FolderSelectorProps> = ({
           >
             {isScanning ? (
               <>
-                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                <RefreshCw className="h-3.5 w-3.5 animate-spin" />
                 Scanning...
               </>
             ) : (
               <>
-                <Play className="w-3.5 h-3.5" />
+                <Play className="h-3.5 w-3.5" />
                 Start Scan
               </>
             )}
@@ -107,9 +108,9 @@ export const FolderSelector: React.FC<FolderSelectorProps> = ({
               onClick={onCancelScan}
               variant="outline"
               size="sm"
-              className="gap-1.5 hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30"
+              className="hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 gap-1.5"
             >
-              <Square className="w-3.5 h-3.5" />
+              <Square className="h-3.5 w-3.5" />
               Cancel
             </Button>
           )}

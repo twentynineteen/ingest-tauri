@@ -4,7 +4,6 @@
  * Displays the contents of a breadcrumbs.json file in a readable format.
  */
 
-import type { BreadcrumbsViewerProps } from '@/types/baker'
 import { formatBreadcrumbDateSimple } from '@utils/breadcrumbsComparison'
 import {
   Calendar,
@@ -17,6 +16,9 @@ import {
   User
 } from 'lucide-react'
 import React from 'react'
+
+import type { BreadcrumbsViewerProps } from '@/types/baker'
+
 import { Button } from './ui/button'
 
 export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
@@ -37,20 +39,20 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
   }
 
   return (
-    <div className="bg-muted rounded-lg p-4 space-y-4 text-sm">
+    <div className="bg-muted space-y-4 rounded-lg p-4 text-sm">
       <div className="border-b pb-2">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="font-semibold text-foreground flex items-center">
-              <File className="h-4 w-4 mr-2" />
+            <h4 className="text-foreground flex items-center font-semibold">
+              <File className="mr-2 h-4 w-4" />
               Breadcrumbs.json
               {previewMode && (
-                <span className="ml-2 text-xs bg-info/10 text-info px-2 py-1 rounded">
+                <span className="bg-info/10 text-info ml-2 rounded px-2 py-1 text-xs">
                   Preview Mode
                 </span>
               )}
             </h4>
-            <p className="text-xs text-muted-foreground mt-1">{projectPath}</p>
+            <p className="text-muted-foreground mt-1 text-xs">{projectPath}</p>
           </div>
           {onTogglePreview && (
             <Button
@@ -61,12 +63,12 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
             >
               {previewMode ? (
                 <>
-                  <EyeOff className="h-4 w-4 mr-1" />
+                  <EyeOff className="mr-1 h-4 w-4" />
                   Hide Preview
                 </>
               ) : (
                 <>
-                  <Eye className="h-4 w-4 mr-1" />
+                  <Eye className="mr-1 h-4 w-4" />
                   Preview Changes
                 </>
               )}
@@ -78,14 +80,14 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
       {/* Project Info */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-muted-foreground">
+          <label className="text-muted-foreground block text-xs font-medium">
             Project Title
           </label>
           <p className="text-foreground">{breadcrumbs.projectTitle}</p>
         </div>
         <div>
-          <label className="flex items-center text-xs font-medium text-muted-foreground">
-            <Camera className="h-3 w-3 mr-1" />
+          <label className="text-muted-foreground flex items-center text-xs font-medium">
+            <Camera className="mr-1 h-3 w-3" />
             Cameras
           </label>
           <p className="text-foreground">{breadcrumbs.numberOfCameras}</p>
@@ -95,15 +97,15 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
       {/* Creation Info */}
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="flex items-center text-xs font-medium text-muted-foreground">
-            <User className="h-3 w-3 mr-1" />
+          <label className="text-muted-foreground flex items-center text-xs font-medium">
+            <User className="mr-1 h-3 w-3" />
             Created By
           </label>
           <p className="text-foreground">{breadcrumbs.createdBy}</p>
         </div>
         <div>
-          <label className="flex items-center text-xs font-medium text-muted-foreground">
-            <Calendar className="h-3 w-3 mr-1" />
+          <label className="text-muted-foreground flex items-center text-xs font-medium">
+            <Calendar className="mr-1 h-3 w-3" />
             Created
           </label>
           <p className="text-foreground">{formatDate(breadcrumbs.creationDateTime)}</p>
@@ -112,8 +114,8 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
 
       {/* Folder Size */}
       <div>
-        <label className="flex items-center text-xs font-medium text-muted-foreground">
-          <HardDrive className="h-3 w-3 mr-1" />
+        <label className="text-muted-foreground flex items-center text-xs font-medium">
+          <HardDrive className="mr-1 h-3 w-3" />
           Folder Size
         </label>
         <p className="text-foreground">
@@ -128,7 +130,7 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
         <div className="grid grid-cols-2 gap-4">
           {breadcrumbs.lastModified && (
             <div>
-              <label className="block text-xs font-medium text-muted-foreground">
+              <label className="text-muted-foreground block text-xs font-medium">
                 Last Modified
               </label>
               <p className="text-foreground">{formatDate(breadcrumbs.lastModified)}</p>
@@ -136,7 +138,7 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
           )}
           {breadcrumbs.scannedBy && (
             <div>
-              <label className="block text-xs font-medium text-muted-foreground">
+              <label className="text-muted-foreground block text-xs font-medium">
                 Scanned By
               </label>
               <p className="text-foreground">{breadcrumbs.scannedBy}</p>
@@ -147,31 +149,31 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
 
       {/* Parent Folder */}
       <div>
-        <label className="flex items-center text-xs font-medium text-muted-foreground">
-          <FolderOpen className="h-3 w-3 mr-1" />
+        <label className="text-muted-foreground flex items-center text-xs font-medium">
+          <FolderOpen className="mr-1 h-3 w-3" />
           Parent Folder
         </label>
-        <p className="text-foreground text-xs truncate">{breadcrumbs.parentFolder}</p>
+        <p className="text-foreground truncate text-xs">{breadcrumbs.parentFolder}</p>
       </div>
 
       {/* Files List */}
       {breadcrumbs.files && breadcrumbs.files.length > 0 && (
         <div>
-          <label className="block text-xs font-medium text-muted-foreground mb-2">
+          <label className="text-muted-foreground mb-2 block text-xs font-medium">
             Files ({breadcrumbs.files.length})
           </label>
-          <div className="max-h-32 overflow-y-auto space-y-1">
+          <div className="max-h-32 space-y-1 overflow-y-auto">
             {breadcrumbs.files.map((file, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between bg-background rounded p-2"
+                className="bg-background flex items-center justify-between rounded p-2"
               >
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium truncate">{file.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{file.path}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-medium">{file.name}</p>
+                  <p className="text-muted-foreground truncate text-xs">{file.path}</p>
                 </div>
-                <div className="flex items-center text-xs text-muted-foreground">
-                  <Camera className="h-3 w-3 mr-1" />
+                <div className="text-muted-foreground flex items-center text-xs">
+                  <Camera className="mr-1 h-3 w-3" />
                   {file.camera}
                 </div>
               </div>
@@ -181,8 +183,8 @@ export const BreadcrumbsViewer: React.FC<BreadcrumbsViewerProps> = ({
       )}
 
       {(!breadcrumbs.files || breadcrumbs.files.length === 0) && (
-        <div className="text-center py-4 text-muted-foreground">
-          <File className="h-8 w-8 mx-auto mb-2 opacity-50" />
+        <div className="text-muted-foreground py-4 text-center">
+          <File className="mx-auto mb-2 h-8 w-8 opacity-50" />
           <p className="text-xs">No files recorded in breadcrumbs</p>
         </div>
       )}

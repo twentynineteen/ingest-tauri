@@ -5,6 +5,7 @@
 
 import type { TrelloCard } from '@utils/TrelloCards'
 import { useMemo } from 'react'
+
 import { useFuzzySearch } from './useFuzzySearch'
 
 /**
@@ -37,10 +38,10 @@ export function useTrelloBoardSearch(
     const result: Record<string, TrelloCard[]> = {}
 
     // Match filtered cards back to their original lists
-    filteredCards.forEach(card => {
+    filteredCards.forEach((card) => {
       // Find which list this card belongs to
       Object.entries(grouped).forEach(([listName, cards]) => {
-        if (cards.some(c => c.id === card.id)) {
+        if (cards.some((c) => c.id === card.id)) {
           if (!result[listName]) {
             result[listName] = []
           }

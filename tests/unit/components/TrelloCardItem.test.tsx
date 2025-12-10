@@ -37,6 +37,24 @@ vi.mock('@/utils/logger', () => ({
   }
 }))
 
+// Mock framer-motion to avoid animation issues in tests
+vi.mock('framer-motion', () => ({
+  motion: new Proxy(
+    {},
+    {
+      get: (_, prop) => {
+        const Component = React.forwardRef<any, any>((props, ref) => {
+          const { children, ...rest } = props
+          return React.createElement(prop as string, { ...rest, ref }, children)
+        })
+        Component.displayName = `motion.${String(prop)}`
+        return Component
+      }
+    }
+  ),
+  AnimatePresence: ({ children }: any) => children
+}))
+
 describe('TrelloCardItem Component', () => {
   // Mock functions for callbacks
   let mockOnRemove: ReturnType<typeof vi.fn>
@@ -52,6 +70,15 @@ describe('TrelloCardItem Component', () => {
     lastFetched: new Date().toISOString() // Current time
   }
 
+  // Helper to render TrelloCardItem in a proper table structure
+  const renderInTable = (component: React.ReactElement) => {
+    return render(
+      <table>
+        <tbody>{component}</tbody>
+      </table>
+    )
+  }
+
   beforeEach(() => {
     vi.clearAllMocks()
     mockOnRemove = vi.fn()
@@ -65,7 +92,7 @@ describe('TrelloCardItem Component', () => {
   describe('Rendering', () => {
     test('renders card with all information', () => {
       // Arrange & Act
-      render(
+      renderInTable(
         <TrelloCardItem
           trelloCard={baseTrelloCard}
           onRemove={mockOnRemove}
@@ -76,9 +103,9 @@ describe('TrelloCardItem Component', () => {
       // Assert
       expect(screen.getByText('Test Project - Video Edit')).toBeInTheDocument()
       expect(screen.getByText(/ID: abc123/i)).toBeInTheDocument()
-      expect(screen.getByText(/Board: Production Board/i)).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /open in trello/i })).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: /remove card/i })).toBeInTheDocument()
+      expect(screen.getByText('Production Board')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /open/i })).toBeInTheDocument()
+      expect(screen.getByTitle(/remove card/i)).toBeInTheDocument()
     })
 
     test('renders without board name when not provided', () => {
@@ -89,7 +116,7 @@ describe('TrelloCardItem Component', () => {
       }
 
       // Act
-      render(
+      renderInTable(
         <TrelloCardItem
           trelloCard={cardWithoutBoard}
           onRemove={mockOnRemove}
@@ -99,7 +126,7 @@ describe('TrelloCardItem Component', () => {
 
       // Assert
       expect(screen.getByText('Test Project - Video Edit')).toBeInTheDocument()
-      expect(screen.queryByText(/Board:/i)).not.toBeInTheDocument()
+      expect(screen.getByText('Unknown')).toBeInTheDocument()
     })
   })
 
@@ -116,7 +143,7 @@ describe('TrelloCardItem Component', () => {
       }
 
       // Act
-      render(
+      renderInTable(
         <TrelloCardItem
           trelloCard={todayCard}
           onRemove={mockOnRemove}
@@ -125,7 +152,7 @@ describe('TrelloCardItem Component', () => {
       )
 
       // Assert
-      expect(screen.getByText(/Last updated: today/i)).toBeInTheDocument()
+      expect(screen.getByText('today')).toBeInTheDocument()
     })
 
     test('displays "X days ago" for recent dates', () => {
@@ -139,7 +166,7 @@ describe('TrelloCardItem Component', () => {
       }
 
       // Act
-      render(
+      renderInTable(
         <TrelloCardItem
           trelloCard={recentCard}
           onRemove={mockOnRemove}
@@ -148,7 +175,7 @@ describe('TrelloCardItem Component', () => {
       )
 
       // Assert
-      expect(screen.getByText(/Last updated: 3 days ago/i)).toBeInTheDocument()
+      expect(screen.getByText('3 days ago')).toBeInTheDocument()
     })
 
     test('does not display last updated when lastFetched is null', () => {
@@ -159,7 +186,7 @@ describe('TrelloCardItem Component', () => {
       }
 
       // Act
-      render(
+      renderInTable(
         <TrelloCardItem
           trelloCard={cardWithoutDate}
           onRemove={mockOnRemove}
@@ -168,7 +195,7 @@ describe('TrelloCardItem Component', () => {
       )
 
       // Assert
-      expect(screen.queryByText(/Last updated:/i)).not.toBeInTheDocument()
+      expect(screen.getByText('Never')).toBeInTheDocument()
     })
   })
 
@@ -177,10 +204,10 @@ describe('TrelloCardItem Component', () => {
   // =================================================================
 
   describe('Actions', () => {
-    test('opens Trello URL when "Open in Trello" clicked', async () => {
+    test('opens Trello URL when "Open" button clicked', async () => {
       // Arrange
       const user = userEvent.setup()
-      render(
+      renderInTable(
         <TrelloCardItem
           trelloCard={baseTrelloCard}
           onRemove={mockOnRemove}
@@ -189,7 +216,7 @@ describe('TrelloCardItem Component', () => {
       )
 
       // Act
-      await user.click(screen.getByRole('button', { name: /open in trello/i }))
+      await user.click(screen.getByRole('button', { name: /open/i }))
 
       // Assert
       expect(openUrl).toHaveBeenCalledWith('https://trello.com/c/abc123')
@@ -198,7 +225,7 @@ describe('TrelloCardItem Component', () => {
     test('triggers onRemove when remove button clicked', async () => {
       // Arrange
       const user = userEvent.setup()
-      render(
+      renderInTable(
         <TrelloCardItem
           trelloCard={baseTrelloCard}
           onRemove={mockOnRemove}
@@ -207,7 +234,7 @@ describe('TrelloCardItem Component', () => {
       )
 
       // Act
-      await user.click(screen.getByRole('button', { name: /remove card/i }))
+      await user.click(screen.getByTitle(/remove card/i))
 
       // Assert
       expect(mockOnRemove).toHaveBeenCalledTimes(1)
@@ -230,7 +257,7 @@ describe('TrelloCardItem Component', () => {
       }
 
       // Act
-      const { container } = render(
+      const { container } = renderInTable(
         <TrelloCardItem
           trelloCard={staleCard}
           onRemove={mockOnRemove}
@@ -239,7 +266,7 @@ describe('TrelloCardItem Component', () => {
       )
 
       // Assert
-      expect(screen.getByText(/\(stale\)/i)).toBeInTheDocument()
+      expect(screen.getByText('Stale')).toBeInTheDocument()
       // Check for warning color class indicating stale state
       const staleText = container.querySelector('.text-warning')
       expect(staleText).toBeInTheDocument()

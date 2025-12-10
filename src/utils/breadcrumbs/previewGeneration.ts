@@ -5,6 +5,7 @@
  */
 
 import type { BreadcrumbsFile, BreadcrumbsPreview } from '@/types/baker'
+
 import { compareBreadcrumbs, compareBreadcrumbsMeaningful } from './comparison'
 import { debugComparison } from './debug'
 import { generateProjectChangeDetail } from './fieldCategorization'
