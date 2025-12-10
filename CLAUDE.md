@@ -11,32 +11,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Development
 
 ```bash
-npm run dev:tauri          # Start Tauri dev mode with devtools (primary dev command)
-npm run dev                # Start Vite dev server only
-npm run preview            # Preview production build
+bun run dev:tauri          # Start Tauri dev mode with devtools (primary dev command)
+bun run dev                # Start Vite dev server only
+bun run preview            # Preview production build
 ```
 
 ### Building
 
 ```bash
-npm run build:tauri        # Build complete desktop app (creates DMG in /target/build/dmg)
-npm run build              # Build frontend only
+bun run build:tauri        # Build complete desktop app (creates DMG in /target/build/dmg)
+bun run build              # Build frontend only
 ```
 
 ### Code Quality (Run Before Committing)
 
 ```bash
-npm run eslint:fix         # Fix linting issues automatically
-npm run prettier:fix       # Format code automatically
-npm run test               # Run Vitest test suite (migrating from Jest)
+bun run eslint:fix         # Fix linting issues automatically
+bun run prettier:fix       # Format code automatically
+bun run test               # Run Vitest test suite
 ```
 
 ### Dependency Management
 
 ```bash
-bun install                # Primary package manager for development
+bun install                # Install dependencies (standard package manager)
 bun update                 # Update dependencies to latest versions
-npm audit                  # Security vulnerability scanning
+bun audit                  # Security vulnerability scanning
 bunx depcheck              # Detect unused dependencies
 ```
 
@@ -183,7 +183,7 @@ All file operations go through Tauri backend with progress tracking. Key pattern
 ## Development Notes
 
 - **Main Branch**: `release` (use for PRs)
-- **Package Manager**: Bun (primary) + npm (audit compatibility, maintains dual lock files)
+- **Package Manager**: Bun (used for all development and CI, replaces npm entirely)
 - **Platform**: Cross-platform desktop app, primary development on macOS
 - **Security**: Uses argon2 for password hashing, JWT for auth, Tauri stronghold for secure storage
 
