@@ -285,4 +285,4 @@ useEffect(() => {
 3. ✅ Fixed ref reset logic - now properly resets when state is idle
 4. ✅ Fixed SuccessSection visibility - removed loading check
 5. ✅ Removed excessive logging - removed debug console.logs
-6. ✅ All tests passing - verified with npm test
+6. ✅ All tests passing - verified with bun test

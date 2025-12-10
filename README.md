@@ -69,7 +69,7 @@ Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScri
 
 ### Prerequisites
 
-- Node.js (npm) or Bun
+- Bun (package manager)
 - Rust (for development)
 - **Ollama** (for AI Script Formatter feature) - see [Ollama Setup](#ollama-setup) below
 
@@ -86,14 +86,12 @@ Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScri
 
    ```bash
    bun install
-   # or
-   npm install
    ```
 
 3. Build the application:
 
    ```bash
-   npm run build:tauri
+   bun run build:tauri
    ```
 
 4. On macOS, open the DMG file in `/target/build/dmg` and copy the app to your Applications folder.
@@ -103,7 +101,7 @@ Bucket is a powerful desktop application built with Tauri (Rust + React/TypeScri
 To run in development mode:
 
 ```bash
-npm run dev:tauri
+bun run dev:tauri
 ```
 
 
