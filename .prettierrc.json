@@ -3,20 +3,5 @@
   "singleQuote": true,
   "trailingComma": "none",
   "printWidth": 90,
-  "plugins": [
-    "@ianvs/prettier-plugin-sort-imports",
-    "prettier-plugin-tailwindcss"
-  ],
-  "importOrder": [
-    "^react$",
-    "^react-dom$",
-    "<THIRD_PARTY_MODULES>",
-    "^@/(.*)$",
-    "^@components/(.*)$",
-    "^@hooks/(.*)$",
-    "^@utils/(.*)$",
-    "^@constants/(.*)$",
-    "^@store/(.*)$",
-    "^[./]"
-  ]
+  "plugins": ["prettier-plugin-tailwindcss"]
 }
