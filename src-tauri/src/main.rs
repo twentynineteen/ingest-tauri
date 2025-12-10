@@ -86,7 +86,14 @@ fn main() {
             get_all_examples_with_metadata,
             upload_example,
             replace_example,
-            delete_example
+            delete_example,
+            // Premiere Pro Plugin Management
+            get_available_plugins,
+            install_plugin,
+            check_plugin_installed,
+            get_cep_directory,
+            enable_cep_debug_mode,
+            open_cep_folder
         ])
         .run(tauri::generate_context!())
         .expect("error while running Tauri application");

@@ -12,7 +12,14 @@ import {
 import { useAuth } from '@hooks/useAuth'
 import { useUpdateManager } from '@hooks/useUpdateManager'
 import { useUsername } from '@hooks/useUsername'
-import { Clapperboard, FileText, HardDriveUpload, Save, Settings } from 'lucide-react'
+import {
+  Clapperboard,
+  FileText,
+  HardDriveUpload,
+  Puzzle,
+  Save,
+  Settings
+} from 'lucide-react'
 import * as React from 'react'
 
 // This is sample data. User data is located just before function return statement
@@ -39,11 +46,6 @@ const data = {
           title: 'Baker',
           url: '/ingest/baker'
         }
-        // {
-        //   title: 'History',
-        //   // url: '/ingest/history'
-        //   url: '#'
-        // }
       ]
     },
     {
@@ -80,15 +82,18 @@ const data = {
           title: 'Trello',
           url: '/upload/trello'
         }
-        // {
-        //   title: 'Otter',
-        //   // url: '/upload/otter'
-        //   url: '#'
-        // },
-        // {
-        //   title: 'Settings',
-        //   url: '#'
-        // }
+      ]
+    },
+    {
+      title: 'Premiere Plugins',
+      url: '/premiere/premiere-plugins',
+      icon: Puzzle,
+      isActive: false,
+      items: [
+        {
+          title: 'Premiere Plugin Manager',
+          url: '/premiere/premiere-plugins'
+        }
       ]
     },
     {
@@ -101,10 +106,6 @@ const data = {
           title: 'General',
           url: '/settings/general'
         }
-        // {
-        //   title: 'Connected apps',
-        //   url: '/settings/connected-apps'
-        // }
       ]
     }
   ]

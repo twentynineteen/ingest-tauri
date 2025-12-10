@@ -514,6 +514,7 @@ ProjectFolder/
 
 ## Additional Documentation
 
+- **[PREMIERE_PLUGINS.md](./PREMIERE_PLUGINS.md)** - Install and manage Premiere Pro CEP extensions
 - **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Detailed system architecture and design decisions
 - **[API_COMMANDS.md](./API_COMMANDS.md)** - Complete Tauri command reference
 - **[CLAUDE.md](../CLAUDE.md)** - Instructions for Claude Code when working with this codebase

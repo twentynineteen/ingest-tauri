@@ -13,6 +13,7 @@ import {
   useTrelloCardDetails,
   useVideoInfoBlock
 } from '@/hooks'
+import { useTrelloBoards } from '@/hooks/useTrelloBoards'
 import { logger } from '@/utils/logger'
 import {
   useCardDetailsSync,
@@ -35,6 +36,11 @@ export function useUploadTrello() {
   // DEBT-014: Use configurable board ID
   const { boardId } = useTrelloBoardId()
   const { grouped, isLoading: isBoardLoading, apiKey, token } = useTrelloBoard(boardId)
+
+  // Fetch all boards to get the selected board's name
+  const { boards } = useTrelloBoards()
+  const selectedBoard = boards.find(board => board.id === boardId)
+  const boardName = selectedBoard?.name || 'Small Projects'
 
   // Flatten all cards for search
   const allCards = useMemo(() => {
@@ -186,6 +192,7 @@ export function useUploadTrello() {
     selectedCardDetails,
     members,
     uploadedVideo,
+    boardName,
     // Parsed description data
     mainDescription,
     breadcrumbsData,

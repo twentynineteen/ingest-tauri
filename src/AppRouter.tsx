@@ -17,6 +17,7 @@ import BuildProject from './pages/BuildProject/BuildProject'
 import ConnectedApps from './pages/ConnectedApps'
 import IngestHistory from './pages/IngestHistory'
 import Posterframe from './pages/Posterframe'
+import PremierePluginManager from './pages/PremierePluginManager/PremierePluginManager'
 import Settings from './pages/Settings'
 import UploadOtter from './pages/UploadOtter'
 import UploadSprout from './pages/UploadSprout'
@@ -123,7 +124,10 @@ export const AppRouter: React.FC = () => {
               <Route path="baker" element={<Baker />} />
             </Route>
             <Route path="ai-tools">
-              <Route index element={<Navigate to="/ai-tools/script-formatter" replace />} />
+              <Route
+                index
+                element={<Navigate to="/ai-tools/script-formatter" replace />}
+              />
               <Route path="script-formatter" element={<ScriptFormatter />} />
               <Route path="example-embeddings" element={<ExampleEmbeddings />} />
             </Route>
@@ -133,6 +137,13 @@ export const AppRouter: React.FC = () => {
               <Route path="posterframe" element={<Posterframe />} />
               <Route path="trello" element={<UploadTrello />} />
               <Route path="otter" element={<UploadOtter />} />
+            </Route>
+            <Route path="premiere">
+              <Route
+                index
+                element={<Navigate to="/premiere/premiere-plugins" replace />}
+              />
+              <Route path="premiere-plugins" element={<PremierePluginManager />} />
             </Route>
             <Route path="settings">
               <Route index element={<Navigate to="/settings/general" replace />} />
