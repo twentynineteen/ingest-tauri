@@ -1,32 +1,32 @@
 // Modern Feature Grid Layout
 // Copy and customize this layout for your Next.js pages
 
-import React from 'react'
+import React from 'react';
 
 interface Feature {
-  icon: React.ReactNode
-  title: string
-  description: string
+  icon: React.ReactNode;
+  title: string;
+  description: string;
 }
 
 interface FeatureGridProps {
-  title?: string
-  subtitle?: string
-  features: Feature[]
-  columns?: 2 | 3 | 4
+  title?: string;
+  subtitle?: string;
+  features: Feature[];
+  columns?: 2 | 3 | 4;
 }
 
 export const FeatureGrid: React.FC<FeatureGridProps> = ({
   title,
   subtitle,
   features,
-  columns = 3
+  columns = 3,
 }) => {
   const gridCols = {
     2: 'md:grid-cols-2',
     3: 'md:grid-cols-2 lg:grid-cols-3',
-    4: 'md:grid-cols-2 lg:grid-cols-4'
-  }
+    4: 'md:grid-cols-2 lg:grid-cols-4',
+  };
 
   return (
     <section className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
@@ -39,7 +39,9 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({
               </h2>
             )}
             {subtitle && (
-              <p className="text-xl text-slate-600 max-w-3xl mx-auto">{subtitle}</p>
+              <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+                {subtitle}
+              </p>
             )}
           </div>
         )}
@@ -57,14 +59,16 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({
               <h3 className="text-xl font-semibold text-slate-900 mb-2">
                 {feature.title}
               </h3>
-              <p className="text-slate-600 leading-relaxed">{feature.description}</p>
+              <p className="text-slate-600 leading-relaxed">
+                {feature.description}
+              </p>
             </div>
           ))}
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
 // Example usage with icons:
 // import { Zap, Shield, Smartphone, Globe, Clock, Users } from 'lucide-react';

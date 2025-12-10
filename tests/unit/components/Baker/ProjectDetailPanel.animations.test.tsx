@@ -10,6 +10,7 @@
 import { ProjectDetailPanel } from '@/components/Baker/ProjectDetailPanel'
 import { BAKER_ANIMATIONS, DURATION } from '@/constants/animations'
 import type { BreadcrumbsFile } from '@/types/baker'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockReducedMotion } from '@tests/utils/animation-testing'
@@ -39,6 +40,17 @@ vi.hoisted(() => {
 vitest.mock('@tauri-apps/plugin-shell', () => ({
   open: vitest.fn()
 }))
+
+// Helper to render with QueryClient
+function renderWithQueryClient(ui: React.ReactElement) {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false, gcTime: 0 },
+      mutations: { retry: false }
+    }
+  })
+  return render(<QueryClientProvider client={queryClient}>{ui}</QueryClientProvider>)
+}
 
 describe('ProjectDetailPanel Animations', () => {
   // Mock breadcrumbs data
@@ -74,7 +86,7 @@ describe('ProjectDetailPanel Animations', () => {
 
   describe('Panel Entrance Animation', () => {
     it('should animate on mount when project is selected', () => {
-      render(<ProjectDetailPanel {...defaultProps} />)
+      renderWithQueryClient(<ProjectDetailPanel {...defaultProps} />)
 
       expect(screen.getByText('Test Project')).toBeInTheDocument()
     })
@@ -105,10 +117,24 @@ describe('ProjectDetailPanel Animations', () => {
 
   describe('Panel Exit Animation', () => {
     it('should animate when project is deselected', () => {
-      const { rerender } = render(<ProjectDetailPanel {...defaultProps} />)
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: { retry: false, gcTime: 0 },
+          mutations: { retry: false }
+        }
+      })
+      const { rerender } = render(
+        <QueryClientProvider client={queryClient}>
+          <ProjectDetailPanel {...defaultProps} />
+        </QueryClientProvider>
+      )
 
       // Deselect project
-      rerender(<ProjectDetailPanel {...defaultProps} selectedProject={null} />)
+      rerender(
+        <QueryClientProvider client={queryClient}>
+          <ProjectDetailPanel {...defaultProps} selectedProject={null} />
+        </QueryClientProvider>
+      )
 
       expect(screen.getByText('Select a project to view details')).toBeInTheDocument()
     })
@@ -133,12 +159,12 @@ describe('ProjectDetailPanel Animations', () => {
 
   describe('Navigation Tab Animations', () => {
     it('should render all navigation tabs', () => {
-      render(<ProjectDetailPanel {...defaultProps} />)
+      renderWithQueryClient(<ProjectDetailPanel {...defaultProps} />)
 
-      expect(screen.getByText(/Overview/)).toBeInTheDocument()
-      expect(screen.getByText(/Files \(3\)/)).toBeInTheDocument()
-      expect(screen.getByText(/Videos/)).toBeInTheDocument()
-      expect(screen.getByText(/Trello/)).toBeInTheDocument()
+      expect(screen.getAllByText(/Overview/)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/Files \(3\)/)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/Videos/)[0]).toBeInTheDocument()
+      expect(screen.getAllByText(/Trello/)[0]).toBeInTheDocument()
     })
 
     it('should use navTab animation constants', () => {
@@ -149,9 +175,9 @@ describe('ProjectDetailPanel Animations', () => {
 
     it('should have hover animation on tabs', async () => {
       const user = userEvent.setup()
-      render(<ProjectDetailPanel {...defaultProps} />)
+      renderWithQueryClient(<ProjectDetailPanel {...defaultProps} />)
 
-      const overviewTab = screen.getByText(/Overview/).closest('button')!
+      const overviewTab = screen.getAllByText(/Overview/)[0].closest('button')!
       await user.hover(overviewTab)
 
       // Button should be in the DOM and hoverable
@@ -160,9 +186,9 @@ describe('ProjectDetailPanel Animations', () => {
 
     it('should trigger smooth scroll on tab click', async () => {
       const user = userEvent.setup()
-      render(<ProjectDetailPanel {...defaultProps} />)
+      renderWithQueryClient(<ProjectDetailPanel {...defaultProps} />)
 
-      const filesTab = screen.getByText(/Files \(3\)/).closest('button')!
+      const filesTab = screen.getAllByText(/Files \(3\)/)[0].closest('button')!
       await user.click(filesTab)
 
       // Scroll should be triggered (smooth behavior)
@@ -173,7 +199,7 @@ describe('ProjectDetailPanel Animations', () => {
 
   describe('File List Item Animations', () => {
     it('should render all files', () => {
-      render(<ProjectDetailPanel {...defaultProps} />)
+      renderWithQueryClient(<ProjectDetailPanel {...defaultProps} />)
 
       expect(screen.getByText('file1.mp4')).toBeInTheDocument()
       expect(screen.getByText('file2.mp4')).toBeInTheDocument()
@@ -187,21 +213,23 @@ describe('ProjectDetailPanel Animations', () => {
     })
 
     it('should have hover transition on file items', () => {
-      render(<ProjectDetailPanel {...defaultProps} />)
+      renderWithQueryClient(<ProjectDetailPanel {...defaultProps} />)
 
-      const firstFile = screen.getByText('file1.mp4').closest('div')!
-      expect(firstFile.className).toContain('transition-colors')
+      // Find the parent container div (not the inner text div)
+      const firstFileContainer = screen.getByText('file1.mp4').closest('.border')!
+      expect(firstFileContainer.className).toContain('transition-colors')
     })
 
     it('should show hover state on mouse enter', async () => {
       const user = userEvent.setup()
-      render(<ProjectDetailPanel {...defaultProps} />)
+      renderWithQueryClient(<ProjectDetailPanel {...defaultProps} />)
 
-      const firstFile = screen.getByText('file1.mp4').closest('div')!
-      await user.hover(firstFile)
+      // Find the parent container div (not the inner text div)
+      const firstFileContainer = screen.getByText('file1.mp4').closest('.border')!
+      await user.hover(firstFileContainer)
 
       await waitFor(() => {
-        expect(firstFile.className).toContain('hover:bg-accent/50')
+        expect(firstFileContainer.className).toContain('hover:bg-accent/50')
       })
     })
   })
@@ -264,13 +292,13 @@ describe('ProjectDetailPanel Animations', () => {
 
   describe('Empty State', () => {
     it('should show empty state when no project selected', () => {
-      render(<ProjectDetailPanel {...defaultProps} selectedProject={null} />)
+      renderWithQueryClient(<ProjectDetailPanel {...defaultProps} selectedProject={null} />)
 
       expect(screen.getByText('Select a project to view details')).toBeInTheDocument()
     })
 
     it('should show empty state icon', () => {
-      const { container } = render(
+      const { container } = renderWithQueryClient(
         <ProjectDetailPanel {...defaultProps} selectedProject={null} />
       )
 
@@ -280,7 +308,7 @@ describe('ProjectDetailPanel Animations', () => {
     })
 
     it('should not animate empty state (static placeholder)', () => {
-      render(<ProjectDetailPanel {...defaultProps} selectedProject={null} />)
+      renderWithQueryClient(<ProjectDetailPanel {...defaultProps} selectedProject={null} />)
 
       const emptyMessage = screen.getByText('Select a project to view details')
       expect(emptyMessage).toBeInTheDocument()
@@ -290,7 +318,17 @@ describe('ProjectDetailPanel Animations', () => {
 
   describe('Content Transition', () => {
     it('should animate content when switching projects', () => {
-      const { rerender } = render(<ProjectDetailPanel {...defaultProps} />)
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: { retry: false, gcTime: 0 },
+          mutations: { retry: false }
+        }
+      })
+      const { rerender } = render(
+        <QueryClientProvider client={queryClient}>
+          <ProjectDetailPanel {...defaultProps} />
+        </QueryClientProvider>
+      )
 
       // Switch to different project with different breadcrumbs
       const newBreadcrumbs = {
@@ -300,18 +338,20 @@ describe('ProjectDetailPanel Animations', () => {
       }
 
       rerender(
-        <ProjectDetailPanel
-          {...defaultProps}
-          selectedProject="/path/to/new-project"
-          breadcrumbs={newBreadcrumbs}
-        />
+        <QueryClientProvider client={queryClient}>
+          <ProjectDetailPanel
+            {...defaultProps}
+            selectedProject="/path/to/new-project"
+            breadcrumbs={newBreadcrumbs}
+          />
+        </QueryClientProvider>
       )
 
       expect(screen.getByText('New Project')).toBeInTheDocument()
     })
 
     it('should maintain smooth scroll position during transitions', async () => {
-      render(<ProjectDetailPanel {...defaultProps} />)
+      renderWithQueryClient(<ProjectDetailPanel {...defaultProps} />)
 
       // Scroll container should have smooth scroll behavior
       const scrollContainer = document.querySelector('[ref]')
@@ -323,7 +363,7 @@ describe('ProjectDetailPanel Animations', () => {
     it('should respect prefers-reduced-motion for panel transition', () => {
       mockReducedMotion(true)
 
-      render(<ProjectDetailPanel {...defaultProps} />)
+      renderWithQueryClient(<ProjectDetailPanel {...defaultProps} />)
 
       expect(screen.getByText('Test Project')).toBeInTheDocument()
     })
@@ -332,9 +372,9 @@ describe('ProjectDetailPanel Animations', () => {
       mockReducedMotion(true)
       const user = userEvent.setup()
 
-      render(<ProjectDetailPanel {...defaultProps} />)
+      renderWithQueryClient(<ProjectDetailPanel {...defaultProps} />)
 
-      const overviewTab = screen.getByText(/Overview/).closest('button')!
+      const overviewTab = screen.getAllByText(/Overview/)[0].closest('button')!
       await user.hover(overviewTab)
 
       // Functionality should remain intact
@@ -343,9 +383,9 @@ describe('ProjectDetailPanel Animations', () => {
 
     it('should maintain focus visibility during animations', async () => {
       const user = userEvent.setup()
-      render(<ProjectDetailPanel {...defaultProps} />)
+      renderWithQueryClient(<ProjectDetailPanel {...defaultProps} />)
 
-      const overviewTab = screen.getByText(/Overview/).closest('button')!
+      const overviewTab = screen.getAllByText(/Overview/)[0].closest('button')!
       await user.tab() // Focus first interactive element
 
       // Focus should be visible
@@ -385,30 +425,44 @@ describe('ProjectDetailPanel Animations', () => {
 
   describe('Integration - Project Switching', () => {
     it('should handle rapid project switches gracefully', () => {
-      const { rerender } = render(<ProjectDetailPanel {...defaultProps} />)
+      const queryClient = new QueryClient({
+        defaultOptions: {
+          queries: { retry: false, gcTime: 0 },
+          mutations: { retry: false }
+        }
+      })
+      const { rerender } = render(
+        <QueryClientProvider client={queryClient}>
+          <ProjectDetailPanel {...defaultProps} />
+        </QueryClientProvider>
+      )
 
       // Rapidly switch between projects
       rerender(
-        <ProjectDetailPanel
-          {...defaultProps}
-          selectedProject="/path/to/project-b"
-          breadcrumbs={{ ...mockBreadcrumbs, projectTitle: 'Project B' }}
-        />
+        <QueryClientProvider client={queryClient}>
+          <ProjectDetailPanel
+            {...defaultProps}
+            selectedProject="/path/to/project-b"
+            breadcrumbs={{ ...mockBreadcrumbs, projectTitle: 'Project B' }}
+          />
+        </QueryClientProvider>
       )
 
       rerender(
-        <ProjectDetailPanel
-          {...defaultProps}
-          selectedProject="/path/to/project-c"
-          breadcrumbs={{ ...mockBreadcrumbs, projectTitle: 'Project C' }}
-        />
+        <QueryClientProvider client={queryClient}>
+          <ProjectDetailPanel
+            {...defaultProps}
+            selectedProject="/path/to/project-c"
+            breadcrumbs={{ ...mockBreadcrumbs, projectTitle: 'Project C' }}
+          />
+        </QueryClientProvider>
       )
 
       expect(screen.getByText('Project C')).toBeInTheDocument()
     })
 
     it('should maintain scroll position when possible', async () => {
-      render(<ProjectDetailPanel {...defaultProps} />)
+      renderWithQueryClient(<ProjectDetailPanel {...defaultProps} />)
 
       // Verify scrollable container exists
       const scrollContainer = document.querySelector('.overflow-y-auto')

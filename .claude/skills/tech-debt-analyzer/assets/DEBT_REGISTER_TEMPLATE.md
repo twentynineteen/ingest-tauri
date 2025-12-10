@@ -26,7 +26,6 @@
 **Created:** [YYYY-MM-DD]
 
 **Location:**
-
 - File(s): `path/to/file.ts`
 - Component/Module: [Name]
 
@@ -34,7 +33,6 @@
 [Detailed description of the technical debt issue]
 
 **Impact:**
-
 - **Business Impact:** [How does this affect users, features, or business goals?]
 - **Technical Impact:** [How does this affect code quality, maintainability, or performance?]
 - **Risk:** [What could go wrong if left unaddressed?]
@@ -51,7 +49,6 @@
 [Why this severity level? Why fix this now vs later?]
 
 **Dependencies:**
-
 - Blocks: [List items this blocks]
 - Blocked By: [List items blocking this]
 - Related: [List related debt items]
@@ -63,7 +60,6 @@
 **Target Resolution:** [YYYY-MM-DD or Sprint/Quarter]
 
 **Notes:**
-
 - [Any additional context, discussion, or updates]
 
 ---
@@ -98,7 +94,6 @@
 ## Debt Trends
 
 ### By Category
-
 - Code Quality: X items
 - Architecture: X items
 - Test: X items
@@ -110,14 +105,12 @@
 - Design: X items
 
 ### By Severity
-
 - Critical: X items
 - High: X items
 - Medium: X items
 - Low: X items
 
 ### Aging
-
 - < 1 month: X items
 - 1-3 months: X items
 - 3-6 months: X items
@@ -139,7 +132,6 @@
 ### When to Add Items
 
 Add technical debt items when:
-
 - Taking a shortcut to meet a deadline
 - Discovering code smells during development
 - Identifying architectural improvements
@@ -150,7 +142,6 @@ Add technical debt items when:
 ### How to Prioritize
 
 Use this framework:
-
 1. **Critical:** Security issues, production blockers, data loss risks
 2. **High:** Blocks features, significant performance issues, high-churn areas
 3. **Medium:** Quality issues, missing tests, outdated dependencies

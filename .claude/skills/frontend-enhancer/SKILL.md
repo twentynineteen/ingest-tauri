@@ -12,7 +12,6 @@ The Frontend Enhancer skill transforms Next.js applications into visually stunni
 ## When to Use This Skill
 
 Invoke this skill when:
-
 - Improving the visual appearance of an existing application
 - Creating new UI components with modern styling
 - Selecting color schemes and design themes
@@ -29,7 +28,6 @@ Invoke this skill when:
 Use pre-built, production-ready React components with multiple variants and states:
 
 **Button Component** (`assets/button-variants.tsx`):
-
 - Variants: primary, secondary, outline, ghost, danger
 - Sizes: sm, md, lg
 - Loading states with animated spinner
@@ -37,14 +35,12 @@ Use pre-built, production-ready React components with multiple variants and stat
 - Accessibility features built-in
 
 **Card Component** (`assets/card-variants.tsx`):
-
 - Variants: default, bordered, elevated, interactive
 - Subcomponents: CardHeader, CardTitle, CardDescription, CardContent, CardFooter
 - Hover effects and transitions
 - Flexible padding options
 
 **Input Components** (`assets/input-variants.tsx`):
-
 - Text inputs with validation states
 - Textarea component
 - Left/right icon support
@@ -53,7 +49,6 @@ Use pre-built, production-ready React components with multiple variants and stat
 - Full accessibility support
 
 **Implementation workflow:**
-
 1. Copy the desired component file from `assets/` to your project's components directory
 2. Ensure the `cn` utility function exists (see `assets/utils-cn.ts`)
 3. Customize colors, spacing, or variants to match your brand
@@ -64,7 +59,6 @@ Use pre-built, production-ready React components with multiple variants and stat
 Use pre-designed, responsive layout patterns for common page sections:
 
 **Hero Section** (`assets/layout-hero-section.tsx`):
-
 - Three variants: centered, split, minimal
 - Support for CTAs (primary and secondary)
 - Optional background gradients
@@ -72,7 +66,6 @@ Use pre-designed, responsive layout patterns for common page sections:
 - Built-in animations
 
 **Feature Grid** (`assets/layout-feature-grid.tsx`):
-
 - Configurable columns (2, 3, or 4)
 - Icon integration
 - Staggered animations
@@ -80,7 +73,6 @@ Use pre-designed, responsive layout patterns for common page sections:
 - Fully responsive
 
 **Implementation workflow:**
-
 1. Copy the layout component from `assets/` to your components directory
 2. Customize the props and content to match your needs
 3. Integrate with your existing pages
@@ -91,7 +83,6 @@ Use pre-designed, responsive layout patterns for common page sections:
 Reference comprehensive design principles for consistent, professional interfaces:
 
 **Design Principles** (`references/design_principles.md`):
-
 - Visual hierarchy best practices
 - Spacing and rhythm guidelines
 - Typography recommendations
@@ -102,7 +93,6 @@ Reference comprehensive design principles for consistent, professional interface
 - Common layout patterns
 
 **When to reference:**
-
 - Starting a new design
 - Making decisions about visual hierarchy
 - Ensuring accessibility compliance
@@ -117,7 +107,6 @@ Read `references/design_principles.md` to understand best practices, then apply 
 Access professionally curated color schemes optimized for modern web applications:
 
 **Available Palettes** (`references/color_palettes.md`):
-
 1. **Corporate Blue** - Professional, trustworthy (business apps, SaaS)
 2. **Vibrant Purple** - Creative, modern (creative tools, portfolios)
 3. **Minimalist Gray** - Clean, sophisticated (minimalist designs)
@@ -126,7 +115,6 @@ Access professionally curated color schemes optimized for modern web application
 6. **Dark Mode** - Modern, eye-friendly (developer tools, dashboards)
 
 Each palette includes:
-
 - Primary and secondary colors
 - Accent colors
 - Background and surface colors
@@ -135,13 +123,11 @@ Each palette includes:
 - Border colors
 
 **Implementation options:**
-
 1. **Tailwind CSS**: Add colors to `tailwind.config.js` (examples provided)
 2. **CSS Variables**: Use custom properties in global CSS (examples provided)
 3. **Inline styles**: Reference hex codes directly in components
 
 **Selection workflow:**
-
 1. Review `references/color_palettes.md` to see all available palettes
 2. Consider your application's purpose and brand identity
 3. Choose a palette that matches your goals
@@ -153,7 +139,6 @@ Each palette includes:
 Add smooth, professional animations using pre-built CSS classes and keyframes:
 
 **Animation Library** (`assets/animations.css`):
-
 - Fade animations (fadeIn, fadeOut, fadeInUp, fadeInDown)
 - Slide animations (slideInLeft, slideInRight)
 - Scale animations (scaleIn, scaleOut)
@@ -166,14 +151,12 @@ Add smooth, professional animations using pre-built CSS classes and keyframes:
 All animations respect `prefers-reduced-motion` for accessibility compliance.
 
 **Implementation workflow:**
-
 1. Copy `assets/animations.css` to your global CSS file (or create a separate animations file)
 2. Apply utility classes like `animate-fade-in-up`, `hover-lift`, etc.
 3. Use stagger classes for sequential animations in lists
 4. Customize duration and easing if needed
 
 **Best practices:**
-
 - Keep animations subtle (200-300ms for micro-interactions)
 - Use animations to guide user attention
 - Avoid excessive motion that distracts
@@ -184,7 +167,6 @@ All animations respect `prefers-reduced-motion` for accessibility compliance.
 Follow this systematic approach when enhancing a frontend application:
 
 ### Step 1: Assess Current State
-
 - Identify areas lacking visual polish
 - Note inconsistent styling patterns
 - Check responsive behavior
@@ -192,28 +174,24 @@ Follow this systematic approach when enhancing a frontend application:
 - Evaluate color scheme and typography
 
 ### Step 2: Select Design Direction
-
 - Choose a color palette from `references/color_palettes.md`
 - Review design principles in `references/design_principles.md`
 - Decide on component variants and styles
 - Plan layout improvements
 
 ### Step 3: Implement Foundation
-
 - Set up the `cn` utility function (`assets/utils-cn.ts`)
 - Configure chosen color palette (Tailwind or CSS variables)
 - Add animation CSS (`assets/animations.css`) to global styles
 - Ensure consistent spacing scale
 
 ### Step 4: Apply Components
-
 - Replace basic elements with enhanced components from `assets/`
 - Implement layout templates for key pages
 - Apply consistent styling across the application
 - Add animations and transitions
 
 ### Step 5: Refine and Polish
-
 - Test responsiveness across device sizes
 - Verify accessibility (keyboard navigation, contrast, screen readers)
 - Ensure consistent hover/focus states
@@ -221,7 +199,6 @@ Follow this systematic approach when enhancing a frontend application:
 - Test with `prefers-reduced-motion`
 
 ### Step 6: Final Review
-
 - Check visual hierarchy on all pages
 - Verify color consistency
 - Test all interactive states
@@ -239,7 +216,7 @@ Most components require the `cn` utility function for class name merging. To set
    ```
 3. Import in components:
    ```typescript
-   import { cn } from '@/lib/utils'
+   import { cn } from '@/lib/utils';
    ```
 
 ## Responsive Design Strategy
@@ -283,12 +260,10 @@ To adapt components and templates to your brand:
 This skill includes:
 
 ### references/
-
 - `color_palettes.md` - Six professionally designed color schemes with implementation examples
 - `design_principles.md` - Comprehensive design guidelines covering visual hierarchy, typography, accessibility, and common patterns
 
 ### assets/
-
 - `button-variants.tsx` - Modern button component with 5 variants and 3 sizes
 - `card-variants.tsx` - Flexible card component with subcomponents
 - `input-variants.tsx` - Input and textarea components with validation states
@@ -311,7 +286,6 @@ This skill includes:
 ## Common Use Cases
 
 ### Enhancing an Existing App
-
 1. Select a color palette and implement it
 2. Replace basic buttons/inputs with enhanced components
 3. Add subtle animations to improve feedback
@@ -319,7 +293,6 @@ This skill includes:
 5. Ensure responsive behavior across devices
 
 ### Building a Landing Page
-
 1. Use hero section layout as the focal point
 2. Add feature grid to showcase key features
 3. Implement consistent button styles for CTAs
@@ -327,7 +300,6 @@ This skill includes:
 5. Test responsiveness thoroughly
 
 ### Creating a Dashboard
-
 1. Use card components for data sections
 2. Implement consistent spacing and hierarchy
 3. Choose a professional color palette
@@ -335,7 +307,6 @@ This skill includes:
 5. Ensure touch-friendly controls on mobile
 
 ### Redesigning Forms
-
 1. Replace inputs with enhanced input components
 2. Add clear error and validation states
 3. Ensure proper label associations

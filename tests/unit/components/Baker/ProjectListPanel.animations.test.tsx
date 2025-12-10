@@ -149,7 +149,8 @@ describe('ProjectListPanel Animations', () => {
 
     it('should have transition-colors class for smooth background change', () => {
       render(<ProjectListPanel {...defaultProps} />)
-      const firstProject = screen.getByText('Project A').closest('div')
+      // Find the parent container div (with border-b class), not the inner text div
+      const firstProject = screen.getByText('Project A').closest('.border-b')
 
       expect(firstProject?.className).toContain('transition-colors')
     })
@@ -158,7 +159,8 @@ describe('ProjectListPanel Animations', () => {
       const user = userEvent.setup()
       render(<ProjectListPanel {...defaultProps} />)
 
-      const firstProject = screen.getByText('Project A').closest('div')!
+      // Find the parent container div (with border-b class), not the inner text div
+      const firstProject = screen.getByText('Project A').closest('.border-b')!
       await user.hover(firstProject)
 
       // Should have hover classes applied
@@ -177,7 +179,8 @@ describe('ProjectListPanel Animations', () => {
         <ProjectListPanel {...defaultProps} selectedProject="/path/to/project-a" />
       )
 
-      const selectedProject = screen.getByText('Project A').closest('div')
+      // Find the parent container div (with border-b class), not the inner text div
+      const selectedProject = screen.getByText('Project A').closest('.border-b')
       expect(selectedProject?.className).toContain('bg-accent')
     })
 
@@ -195,8 +198,9 @@ describe('ProjectListPanel Animations', () => {
         <ProjectListPanel {...defaultProps} selectedProject="/path/to/project-b" />
       )
 
-      const projectA = screen.getByText('Project A').closest('div')
-      const projectB = screen.getByText('Project B').closest('div')
+      // Find the parent container divs (with border-b class), not the inner text divs
+      const projectA = screen.getByText('Project A').closest('.border-b')
+      const projectB = screen.getByText('Project B').closest('.border-b')
 
       // Both should have transition classes
       expect(projectA?.className).toContain('transition-colors')
@@ -243,8 +247,8 @@ describe('ProjectListPanel Animations', () => {
     it('should render status badges for each project', () => {
       render(<ProjectListPanel {...defaultProps} />)
 
-      // Check for various badge types
-      expect(screen.getByText('Valid')).toBeInTheDocument()
+      // Check for various badge types (use getAllByText since multiple projects can be "Valid")
+      expect(screen.getAllByText('Valid').length).toBeGreaterThan(0)
       expect(screen.getByText('Stale')).toBeInTheDocument()
       expect(screen.getByText('Invalid')).toBeInTheDocument()
     })
@@ -355,7 +359,7 @@ describe('ProjectListPanel Animations', () => {
         <ProjectListPanel {...defaultProps} onProjectClick={onProjectClick} />
       )
 
-      const firstProject = screen.getByText('Project A').closest('div')!
+      const firstProject = screen.getByText('Project A').closest('.border-b')!
       await user.click(firstProject)
 
       // Rerender with updated selection
@@ -367,7 +371,9 @@ describe('ProjectListPanel Animations', () => {
         />
       )
 
-      expect(firstProject.className).toContain('bg-accent')
+      // Re-query the element after rerender to get updated className
+      const updatedFirstProject = screen.getByText('Project A').closest('.border-b')!
+      expect(updatedFirstProject.className).toContain('bg-accent')
     })
   })
 })

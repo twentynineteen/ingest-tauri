@@ -8,8 +8,8 @@ stages:
   - deploy
 
 variables:
-  NODE_ENV: 'production'
-  NPM_CONFIG_CACHE: '$CI_PROJECT_DIR/.npm'
+  NODE_ENV: "production"
+  NPM_CONFIG_CACHE: "$CI_PROJECT_DIR/.npm"
 
 cache:
   key:

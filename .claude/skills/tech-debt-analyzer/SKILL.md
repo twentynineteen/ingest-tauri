@@ -24,7 +24,6 @@ python3 scripts/detect_code_smells.py src --output markdown
 ```
 
 The script analyzes:
-
 - **Large Files:** Files exceeding 500 lines
 - **Complex Functions:** High cyclomatic complexity (>10) or long functions (>50 lines)
 - **Debt Markers:** TODO, FIXME, HACK, XXX, BUG comments
@@ -35,7 +34,6 @@ The script analyzes:
 - **Magic Numbers:** Hardcoded numeric values
 
 **Output Example:**
-
 ```
 # Technical Debt Analysis Report
 
@@ -64,14 +62,12 @@ python3 scripts/analyze_dependencies.py package.json
 ```
 
 The script identifies:
-
 - **Deprecated Packages:** Known deprecated libraries (request, tslint, etc.)
 - **Duplicate Functionality:** Multiple packages serving same purpose
 - **Version Issues:** Overly loose or strict version constraints
 - **Security Concerns:** Known vulnerable packages (requires audit data)
 
 **Output Example:**
-
 ```
 # Dependency Analysis Report
 
@@ -97,35 +93,30 @@ Complement automated analysis with manual review for issues that require human j
 #### Review Focus Areas
 
 **Architectural Debt:**
-
 - Tight coupling between components
 - Missing abstractions
 - Poor separation of concerns
 - Circular dependencies
 
 **Test Debt:**
-
 - Missing test coverage for critical paths
 - Fragile tests coupled to implementation
 - No integration or E2E tests
 - Slow test execution
 
 **Documentation Debt:**
-
 - Missing README or setup instructions
 - No architecture documentation
 - Outdated API docs
 - Missing ADRs for major decisions
 
 **Performance Debt:**
-
 - N+1 query problems
 - Inefficient algorithms
 - Memory leaks
 - Large bundle sizes
 
 **Security Debt:**
-
 - Missing input validation
 - No authentication/authorization
 - SQL injection vulnerabilities
@@ -155,28 +146,24 @@ Refer to `references/debt_categories.md` for comprehensive details on:
 Assign severity based on impact and urgency:
 
 **Critical:**
-
 - Security vulnerabilities
 - Production-breaking issues
 - Data loss risks
 - **Action:** Immediate fix required
 
 **High:**
-
 - Significant performance problems
 - Architectural issues blocking features
 - High-risk untested code
 - **Action:** Fix within current/next sprint
 
 **Medium:**
-
 - Code quality issues in frequently changed files
 - Missing documentation
 - Outdated dependencies (non-security)
 - **Action:** Address within quarter
 
 **Low:**
-
 - Minor code smells
 - Optimization opportunities
 - Nice-to-have improvements
@@ -185,10 +172,10 @@ Assign severity based on impact and urgency:
 #### Priority Matrix
 
 | Impact / Effort | Low Effort | Medium Effort | High Effort |
-| --------------- | ---------- | ------------- | ----------- |
-| High Impact     | Do First   | Do Second     | Plan & Do   |
-| Medium Impact   | Do Second  | Plan & Do     | Consider    |
-| Low Impact      | Quick Win  | Consider      | Avoid       |
+|----------------|-----------|---------------|-------------|
+| High Impact    | Do First  | Do Second     | Plan & Do   |
+| Medium Impact  | Do Second | Plan & Do     | Consider    |
+| Low Impact     | Quick Win | Consider      | Avoid       |
 
 ### 4. Document Findings
 
@@ -201,7 +188,6 @@ Use the provided template to maintain a debt register:
 **Template Location:** `assets/DEBT_REGISTER_TEMPLATE.md`
 
 **Structure:**
-
 ```markdown
 ## DEBT-001: Complex UserService with 847 lines
 
@@ -214,14 +200,12 @@ UserService has grown to 847 lines with multiple responsibilities
 including authentication, profile management, and notification handling.
 
 **Impact:**
-
 - Business: Slows down feature development by 30%
 - Technical: Difficult to test, high bug rate
 - Risk: Changes frequently break unrelated functionality
 
 **Proposed Solution:**
 Split into separate services:
-
 - AuthenticationService
 - UserProfileService
 - NotificationService
@@ -232,7 +216,6 @@ Split into separate services:
 ```
 
 **Register Sections:**
-
 1. **Active Debt Items:** Current technical debt needing attention
 2. **Resolved Items:** Historical record of fixed debt
 3. **Won't Fix Items:** Debt accepted as acceptable trade-off
@@ -246,7 +229,6 @@ Document major technical decisions using ADRs to prevent future debt.
 **Template Location:** `assets/ADR_TEMPLATE.md`
 
 **When to Create ADRs:**
-
 - Choosing frameworks or libraries
 - Architectural changes
 - Major refactoring decisions
@@ -254,7 +236,6 @@ Document major technical decisions using ADRs to prevent future debt.
 - Performance optimization strategies
 
 **Example:**
-
 ```markdown
 # ADR-003: Migrate from Moment.js to date-fns
 
@@ -262,16 +243,13 @@ Document major technical decisions using ADRs to prevent future debt.
 **Date:** 2024-01-15
 
 ## Context
-
 Moment.js is deprecated and increases bundle size by 67KB.
 Team needs a modern date library with tree-shaking support.
 
 ## Decision
-
 Migrate to date-fns for date manipulation.
 
 ## Consequences
-
 - Positive: Reduce bundle by 60KB, modern API, active maintenance
 - Negative: Migration effort, learning curve for team
 - Technical Debt: None - this resolves existing dependency debt
@@ -291,7 +269,6 @@ Create actionable plans to address technical debt.
 #### Time Allocation
 
 **Recommended Allocation:**
-
 - 20% of sprint capacity for technical debt
 - Alternating sprints: feature sprint / debt sprint
 - Dedicated quarterly "tech health" sprint
@@ -301,7 +278,6 @@ Create actionable plans to address technical debt.
 Monitor debt reduction over time:
 
 **Metrics to Track:**
-
 - Total debt items (trend down)
 - Debt by severity (critical should be 0)
 - Debt age (old debt is concerning)
@@ -315,7 +291,6 @@ Implement practices to minimize new technical debt.
 #### Code Review Checklist
 
 Before approving PRs, verify:
-
 - [ ] No code smells introduced (complexity, size, nesting)
 - [ ] Tests added/updated with adequate coverage
 - [ ] Documentation updated (README, comments, ADRs)
@@ -327,7 +302,6 @@ Before approving PRs, verify:
 #### Automated Prevention
 
 **Linting and Formatting:**
-
 ```json
 {
   "rules": {
@@ -341,7 +315,6 @@ Before approving PRs, verify:
 ```
 
 **Required Checks:**
-
 - TypeScript strict mode enabled
 - Minimum test coverage threshold (80%)
 - No high-severity security vulnerabilities
@@ -350,18 +323,15 @@ Before approving PRs, verify:
 #### Regular Maintenance
 
 **Weekly:**
-
 - Review and triage TODO/FIXME comments
 - Update debt register with new findings
 
 **Monthly:**
-
 - Dependency updates (security patches)
 - Debt register review
 - Plan fixes for high-priority items
 
 **Quarterly:**
-
 - Full codebase debt analysis
 - Architecture review
 - Major dependency updates
@@ -409,13 +379,11 @@ Follow this workflow based on the situation:
 **Purpose:** Automated code quality analysis
 
 **Usage:**
-
 ```bash
 python3 scripts/detect_code_smells.py [src-dir] [--output json|markdown]
 ```
 
 **Detects:**
-
 - Large files (>500 lines)
 - Complex functions (complexity >10)
 - Technical debt markers (TODO, FIXME, HACK)
@@ -432,16 +400,14 @@ python3 scripts/detect_code_smells.py [src-dir] [--output json|markdown]
 **Purpose:** Dependency health analysis
 
 **Usage:**
-
 ```bash
 python3 scripts/analyze_dependencies.py [package.json-path]
 ```
 
 **Detects:**
-
 - Deprecated packages (request, tslint, node-sass, etc.)
 - Duplicate functionality (multiple date libs, http clients, etc.)
-- Unsafe version constraints (\*, latest)
+- Unsafe version constraints (*, latest)
 - Overly strict versions (exact versions without ^ or ~)
 
 **Output:** Markdown report with recommendations
@@ -451,7 +417,6 @@ python3 scripts/analyze_dependencies.py [package.json-path]
 ### debt_categories.md
 
 Comprehensive guide to technical debt types with:
-
 - 9 major debt categories
 - Indicators and examples for each
 - Impact assessment criteria
@@ -460,7 +425,6 @@ Comprehensive guide to technical debt types with:
 - Prevention strategies
 
 **Load this reference when:**
-
 - Need detailed examples of specific debt types
 - Assessing severity and impact
 - Understanding root causes
@@ -471,7 +435,6 @@ Comprehensive guide to technical debt types with:
 ### DEBT_REGISTER_TEMPLATE.md
 
 Complete technical debt register template including:
-
 - Debt item structure
 - Status tracking
 - Impact assessment format
@@ -479,7 +442,6 @@ Complete technical debt register template including:
 - Review schedule
 
 **Use this template to:**
-
 - Start a new debt register
 - Standardize debt documentation
 - Track debt across team/project
@@ -487,7 +449,6 @@ Complete technical debt register template including:
 ### ADR_TEMPLATE.md
 
 Architecture Decision Record template including:
-
 - Context and problem statement
 - Options considered
 - Decision rationale
@@ -495,7 +456,6 @@ Architecture Decision Record template including:
 - Implementation plan
 
 **Use this template to:**
-
 - Document major technical decisions
 - Prevent future "why did we do this?" questions
 - Track technical debt incurred by decisions
@@ -539,7 +499,6 @@ Architecture Decision Record template including:
 Complete workflow from analysis to resolution:
 
 **Week 1: Analysis**
-
 ```bash
 # Run automated analysis
 python3 scripts/detect_code_smells.py src --output markdown > debt_analysis.md
@@ -552,7 +511,6 @@ python3 scripts/analyze_dependencies.py package.json >> debt_analysis.md
 ```
 
 **Week 1-2: Documentation**
-
 ```bash
 # Create debt register from template
 cp assets/DEBT_REGISTER_TEMPLATE.md TECHNICAL_DEBT.md
@@ -565,7 +523,6 @@ cp assets/DEBT_REGISTER_TEMPLATE.md TECHNICAL_DEBT.md
 ```
 
 **Week 2: Prioritization**
-
 ```
 # Team review session
 # - Review all high/critical items
@@ -575,7 +532,6 @@ cp assets/DEBT_REGISTER_TEMPLATE.md TECHNICAL_DEBT.md
 ```
 
 **Weeks 3-6: Remediation**
-
 ```
 # Sprint work
 # - Fix 2-3 debt items per sprint
@@ -585,7 +541,6 @@ cp assets/DEBT_REGISTER_TEMPLATE.md TECHNICAL_DEBT.md
 ```
 
 **Monthly: Review**
-
 ```
 # Trend analysis
 # - Total debt (should decrease)
@@ -603,25 +558,21 @@ cp assets/DEBT_REGISTER_TEMPLATE.md TECHNICAL_DEBT.md
 Track these metrics to measure debt reduction effectiveness:
 
 **Quantity Metrics:**
-
 - Total debt items (trending down)
 - Debt by severity (zero critical)
 - Debt items per 1000 LOC
 
 **Quality Metrics:**
-
 - Test coverage (trending up)
 - Cyclomatic complexity (trending down)
 - Average file/function size (stable or decreasing)
 
 **Velocity Metrics:**
-
 - Debt items resolved per sprint
 - New debt items per sprint (should be low)
 - Time to resolve (should decrease)
 
 **Business Metrics:**
-
 - Bug rate (should decrease)
 - Feature delivery speed (should increase)
 - Developer satisfaction (should increase)

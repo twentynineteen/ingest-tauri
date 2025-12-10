@@ -153,14 +153,13 @@ describe('ScanResults Component', () => {
       // Arrange & Act
       render(<ScanResults scanResult={mockScanResult} isScanning={false} />)
 
-      // Assert
+      // Assert - Check for compact inline stats labels
       expect(screen.queryByText('Scanning in progress...')).not.toBeInTheDocument()
-      expect(screen.getByText('Folders Scanned')).toBeInTheDocument()
-      expect(screen.getByText('Valid Projects')).toBeInTheDocument()
-      expect(screen.getByText('Valid Breadcrumbs')).toBeInTheDocument()
-      expect(screen.getByText('Invalid Breadcrumbs')).toBeInTheDocument()
-      expect(screen.getByText('Total Size')).toBeInTheDocument()
-      expect(screen.getByText('Errors')).toBeInTheDocument()
+      expect(screen.getByText('Scanned:')).toBeInTheDocument()
+      expect(screen.getByText('Projects:')).toBeInTheDocument()
+      expect(screen.getByText('Breadcrumbs:')).toBeInTheDocument()
+      expect(screen.getByText('Size:')).toBeInTheDocument()
+      expect(screen.getByText('Errors:')).toBeInTheDocument()
     })
   })
 
@@ -206,29 +205,29 @@ describe('ScanResults Component', () => {
       // Arrange & Act
       render(<ScanResults scanResult={mockScanResult} isScanning={false} />)
 
-      // Assert
+      // Assert - Check for compact inline format
       expect(screen.getByText('100')).toBeInTheDocument()
-      expect(screen.getByText('Folders Scanned')).toBeInTheDocument()
+      expect(screen.getByText('Scanned:')).toBeInTheDocument()
     })
 
     test('displays valid projects count', () => {
       // Arrange & Act
       render(<ScanResults scanResult={mockScanResult} isScanning={false} />)
 
-      // Assert
+      // Assert - Check for compact inline format with success color
       const validProjectsElement = screen.getByText('3')
       expect(validProjectsElement).toBeInTheDocument()
       expect(validProjectsElement).toHaveClass('text-success')
-      expect(screen.getByText('Valid Projects')).toBeInTheDocument()
+      expect(screen.getByText('Projects:')).toBeInTheDocument()
     })
 
     test('displays total folder size formatted', () => {
       // Arrange & Act
       render(<ScanResults scanResult={mockScanResult} isScanning={false} />)
 
-      // Assert
+      // Assert - Check for compact inline format
       expect(screen.getByText('5.00 GB')).toBeInTheDocument()
-      expect(screen.getByText('Total Size')).toBeInTheDocument()
+      expect(screen.getByText('Size:')).toBeInTheDocument()
     })
 
     test('displays error count', () => {
@@ -237,11 +236,12 @@ describe('ScanResults Component', () => {
         <ScanResults scanResult={mockScanResult} isScanning={false} />
       )
 
-      // Assert - Find the error count element specifically by its warning color class
-      const errorSection = container.querySelector('.text-warning')
-      expect(errorSection).toBeInTheDocument()
-      expect(errorSection?.textContent).toBe('2')
-      expect(screen.getByText('Errors')).toBeInTheDocument()
+      // Assert - Find the error count element by its destructive color class
+      // The errors section shows scanResult.errors.length which is 2 in mockScanResult
+      const errorElements = container.querySelectorAll('.text-destructive')
+      const errorCountElement = Array.from(errorElements).find((el) => el.textContent === '2')
+      expect(errorCountElement).toBeInTheDocument()
+      expect(screen.getByText('Errors:')).toBeInTheDocument()
     })
   })
 
@@ -258,19 +258,22 @@ describe('ScanResults Component', () => {
       // mockProjects has 2 valid breadcrumbs (project1 and project2)
       const validBreadcrumbsCount = screen.getAllByText('2')[0] // First "2" in the grid
       expect(validBreadcrumbsCount).toBeInTheDocument()
-      expect(screen.getByText('Valid Breadcrumbs')).toBeInTheDocument()
+      expect(screen.getByText('Breadcrumbs:')).toBeInTheDocument()
     })
 
     test('correctly calculates invalid breadcrumbs count', () => {
       // Arrange & Act
-      render(<ScanResults scanResult={mockScanResult} isScanning={false} />)
+      const { container } = render(<ScanResults scanResult={mockScanResult} isScanning={false} />)
 
       // Assert - Should count projects with invalidBreadcrumbs = true
       // mockProjects has 1 invalid breadcrumbs (project4)
-      const invalidBreadcrumbsElement = screen.getByText('1')
+      // Find the specific element in the breadcrumbs section showing invalid count
+      const invalidBreadcrumbsElements = container.querySelectorAll('.text-destructive')
+      const invalidBreadcrumbsElement = Array.from(invalidBreadcrumbsElements).find(
+        (el) => el.textContent === '1'
+      )
       expect(invalidBreadcrumbsElement).toBeInTheDocument()
-      expect(invalidBreadcrumbsElement).toHaveClass('text-destructive')
-      expect(screen.getByText('Invalid Breadcrumbs')).toBeInTheDocument()
+      expect(screen.getByText('Breadcrumbs:')).toBeInTheDocument()
     })
 
     test('handles scan results with no errors', () => {
@@ -283,10 +286,8 @@ describe('ScanResults Component', () => {
       // Act
       render(<ScanResults scanResult={noErrorsResult} isScanning={false} />)
 
-      // Assert
-      const errorCountElement = screen.getByText('0')
-      expect(errorCountElement).toBeInTheDocument()
-      expect(screen.getByText('Errors')).toBeInTheDocument()
+      // Assert - When there are no errors, the Errors section is not rendered at all
+      expect(screen.queryByText('Errors:')).not.toBeInTheDocument()
     })
   })
 })
