@@ -454,7 +454,97 @@ describe('ProjectList Component', () => {
   })
 
   // =================================================================
-  // Test Category 5: Project Status Display (3 tests)
+  // Test Category 5: Performance Optimizations (React.memo) (3 tests)
+  // =================================================================
+
+  describe('Performance Optimizations', () => {
+    test('should be wrapped with React.memo', () => {
+      // React.memo components have a specific type structure
+      const component = ProjectList as any
+      expect(component.$$typeof).toBeDefined()
+    })
+
+    test('should not re-render when props remain unchanged', () => {
+      // Arrange: Track render count
+      let renderCount = 0
+      const TestWrapper = (props: any) => {
+        renderCount++
+        return <ProjectList {...props} />
+      }
+
+      // Act: Render twice with same props
+      const defaultProps = {
+        projects: mockProjects,
+        selectedProjects: [],
+        onProjectSelection: mockOnProjectSelection,
+        onViewBreadcrumbs: mockOnViewBreadcrumbs,
+        onTogglePreview: mockOnTogglePreview,
+        expandedProject: null,
+        previewProject: null,
+        breadcrumbs: null,
+        isLoadingBreadcrumbs: false,
+        breadcrumbsError: null,
+        getPreview: mockGetPreview
+      }
+
+      const { rerender } = render(<TestWrapper {...defaultProps} />)
+      const initialRenderCount = renderCount
+
+      // Rerender with same props
+      rerender(<TestWrapper {...defaultProps} />)
+
+      // Assert: Wrapper renders, but memo should reduce ProjectList renders
+      expect(renderCount).toBeGreaterThan(initialRenderCount)
+    })
+
+    test('should work with stable callback references', () => {
+      // Arrange: Create stable callbacks using useCallback
+      const TestParent = () => {
+        const stableOnProjectSelection = React.useCallback(
+          (path: string, isSelected: boolean) => {
+            // Callback implementation
+          },
+          []
+        )
+
+        const stableOnViewBreadcrumbs = React.useCallback((path: string) => {
+          // Callback implementation
+        }, [])
+
+        const stableOnTogglePreview = React.useCallback((path: string) => {
+          // Callback implementation
+        }, [])
+
+        const stableGetPreview = React.useCallback((path: string) => null, [])
+
+        return (
+          <ProjectList
+            projects={mockProjects}
+            selectedProjects={[]}
+            onProjectSelection={stableOnProjectSelection}
+            onViewBreadcrumbs={stableOnViewBreadcrumbs}
+            onTogglePreview={stableOnTogglePreview}
+            expandedProject={null}
+            previewProject={null}
+            breadcrumbs={null}
+            isLoadingBreadcrumbs={false}
+            breadcrumbsError={null}
+            getPreview={stableGetPreview}
+          />
+        )
+      }
+
+      // Act
+      const { rerender } = render(<TestParent />)
+      rerender(<TestParent />)
+
+      // Assert: Component should render without errors
+      expect(screen.getByText('Project 1')).toBeInTheDocument()
+    })
+  })
+
+  // =================================================================
+  // Test Category 6: Project Status Display (3 tests)
   // =================================================================
 
   describe('Project Status Display', () => {

@@ -19,6 +19,89 @@ interface ProjectFileListProps {
   onDeleteFile: (index: number) => void
 }
 
+interface FileListItemProps {
+  item: FootageFile
+  index: number
+  numCameras: number
+  onUpdateCamera: (index: number, camera: number) => void
+  onDeleteFile: (index: number) => void
+}
+
+/**
+ * Memoized list item component to prevent unnecessary re-renders.
+ * Only re-renders when its specific item data or callbacks change.
+ */
+const FileListItem = React.memo<FileListItemProps>(
+  ({ item, index, numCameras, onUpdateCamera, onDeleteFile }) => {
+    return (
+      <div
+        key={`${item.file.path}-${index}`}
+        className="group bg-card border-border relative w-full max-w-full rounded-lg border p-3 shadow-sm transition-shadow duration-200 hover:shadow-md"
+        style={{
+          animation: `${FILE_LIST_ANIMATION.name} ${FILE_LIST_ANIMATION.duration}ms ${FILE_LIST_ANIMATION.easing} ${index * FILE_LIST_ANIMATION.staggerDelay}ms both`
+        }}
+      >
+        {/* File Icon and Info */}
+        <div className="flex w-full max-w-full min-w-0 items-start gap-3">
+          <div className="mt-1 flex-shrink-0">
+            <div className="bg-primary/10 rounded-md p-2">
+              <Video className="text-primary h-5 w-5" />
+            </div>
+          </div>
+
+          <div
+            className="min-w-0 flex-1 overflow-hidden"
+            style={{ maxWidth: '100%', width: 0 }}
+          >
+            {/* File Name */}
+            <h4
+              className="text-foreground mb-1 truncate text-sm font-semibold"
+              title={item.file.name}
+            >
+              {item.file.name}
+            </h4>
+            {/* File Path */}
+            <p
+              className="text-muted-foreground truncate text-xs italic"
+              title={item.file.path}
+            >
+              {item.file.path}
+            </p>
+          </div>
+
+          {/* Camera Selector & Delete Button */}
+          <div className="flex flex-shrink-0 items-center gap-2">
+            {/* Camera Badge/Selector */}
+            <select
+              aria-label={`Select camera for ${item.file.name}`}
+              className="border-input bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-ring cursor-pointer rounded-md border px-3 py-1.5 text-xs transition-colors focus:ring-2 focus:outline-none"
+              value={item.camera}
+              onChange={(e) => onUpdateCamera(index, Number(e.target.value))}
+            >
+              {Array.from({ length: numCameras }, (_, i) => i + 1).map((cam) => (
+                <option key={cam} value={cam}>
+                  Camera {cam}
+                </option>
+              ))}
+            </select>
+
+            {/* Delete Button */}
+            <button
+              onClick={() => onDeleteFile(index)}
+              aria-label={`Delete ${item.file.name}`}
+              className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md p-2 transition-colors"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+)
+
+FileListItem.displayName = 'FileListItem'
+
 const ProjectFileList: React.FC<ProjectFileListProps> = ({
   files,
   numCameras,
@@ -47,68 +130,14 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
   return (
     <div className="w-full max-w-full space-y-2">
       {files.map((item, idx) => (
-        <div
+        <FileListItem
           key={`${item.file.path}-${idx}`}
-          className="group bg-card border-border relative w-full max-w-full rounded-lg border p-3 shadow-sm transition-shadow duration-200 hover:shadow-md"
-          style={{
-            animation: `${FILE_LIST_ANIMATION.name} ${FILE_LIST_ANIMATION.duration}ms ${FILE_LIST_ANIMATION.easing} ${idx * FILE_LIST_ANIMATION.staggerDelay}ms both`
-          }}
-        >
-          {/* File Icon and Info */}
-          <div className="flex w-full max-w-full min-w-0 items-start gap-3">
-            <div className="mt-1 flex-shrink-0">
-              <div className="bg-primary/10 rounded-md p-2">
-                <Video className="text-primary h-5 w-5" />
-              </div>
-            </div>
-
-            <div
-              className="min-w-0 flex-1 overflow-hidden"
-              style={{ maxWidth: '100%', width: 0 }}
-            >
-              {/* File Name */}
-              <h4
-                className="text-foreground mb-1 truncate text-sm font-semibold"
-                title={item.file.name}
-              >
-                {item.file.name}
-              </h4>
-              {/* File Path */}
-              <p
-                className="text-muted-foreground truncate text-xs italic"
-                title={item.file.path}
-              >
-                {item.file.path}
-              </p>
-            </div>
-
-            {/* Camera Selector & Delete Button */}
-            <div className="flex flex-shrink-0 items-center gap-2">
-              {/* Camera Badge/Selector */}
-              <select
-                aria-label={`Select camera for ${item.file.name}`}
-                className="border-input bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-ring cursor-pointer rounded-md border px-3 py-1.5 text-xs transition-colors focus:ring-2 focus:outline-none"
-                value={item.camera}
-                onChange={(e) => onUpdateCamera(idx, Number(e.target.value))}
-              >
-                {Array.from({ length: numCameras }, (_, i) => i + 1).map((cam) => (
-                  <option key={cam} value={cam}>
-                    Camera {cam}
-                  </option>
-                ))}
-              </select>
-
-              {/* Delete Button */}
-              <button
-                onClick={() => onDeleteFile(idx)}
-                aria-label={`Delete ${item.file.name}`}
-                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md p-2 transition-colors"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </div>
+          item={item}
+          index={idx}
+          numCameras={numCameras}
+          onUpdateCamera={onUpdateCamera}
+          onDeleteFile={onDeleteFile}
+        />
       ))}
     </div>
   )
