@@ -176,6 +176,19 @@ const mockTauriApis = () => {
     appLocalDataDir: vi.fn().mockResolvedValue('/mock/app/local-data')
   }))
 
+  // Mock window API for useWindowState and useSystemTheme hooks
+  vi.mock('@tauri-apps/api/window', () => ({
+    getCurrentWindow: vi.fn(() => ({
+      setPosition: vi.fn().mockResolvedValue(undefined),
+      setSize: vi.fn().mockResolvedValue(undefined),
+      outerPosition: vi.fn().mockResolvedValue({ x: 100, y: 100 }),
+      outerSize: vi.fn().mockResolvedValue({ width: 800, height: 600 }),
+      onResized: vi.fn().mockResolvedValue(vi.fn()),
+      onMoved: vi.fn().mockResolvedValue(vi.fn()),
+      onThemeChanged: vi.fn().mockResolvedValue(vi.fn())
+    }))
+  }))
+
   // Don't globally mock @tauri-apps/api/core here, because:
   // 1. Contract tests use mockIPC() from @tauri-apps/api/mocks which handles invoke()
   // 2. Unit tests that need invoke() mocking should do it locally with vi.mock()
@@ -184,6 +197,16 @@ const mockTauriApis = () => {
 
 // Mock browser APIs
 const mockBrowserApis = () => {
+  // Configure React Testing Library act() environment for React 18
+  ;(global as any).IS_REACT_ACT_ENVIRONMENT = true
+
+  // Mock Tauri window internals for getCurrentWindow()
+  ;(window as any).__TAURI_INTERNALS__ = {
+    metadata: {
+      currentWindow: { label: 'main' }
+    }
+  }
+
   // Mock ResizeObserver for react-virtual compatibility
   global.ResizeObserver = class ResizeObserver {
     observe = vi.fn()

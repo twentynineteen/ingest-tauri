@@ -184,14 +184,18 @@ describe('useBreadcrumbsPreview', () => {
       const { result } = renderHook(() => useBreadcrumbsPreview())
       const project = createMockProject()
 
-      // Mock slow operation
-      mockInvoke.mockImplementation(
-        async () =>
-          new Promise((resolve) => setTimeout(() => resolve([]), 100))
-      )
+      // Mock slow operation with controlled resolution
+      let resolveInvoke: (value: any) => void
+      const slowPromise = new Promise((resolve) => {
+        resolveInvoke = resolve
+      })
 
-      const previewPromise = act(async () => {
-        return result.current.generatePreview(project.path, project)
+      mockInvoke.mockImplementation(async () => slowPromise)
+
+      // Start the preview generation without awaiting
+      let previewPromise: Promise<any>
+      act(() => {
+        previewPromise = result.current.generatePreview(project.path, project)
       })
 
       // Should be generating
@@ -199,12 +203,14 @@ describe('useBreadcrumbsPreview', () => {
         expect(result.current.isGenerating).toBe(true)
       })
 
-      await previewPromise
+      // Resolve the mock and wait for completion
+      await act(async () => {
+        resolveInvoke!([])
+        await previewPromise!
+      })
 
       // Should finish generating
-      await waitFor(() => {
-        expect(result.current.isGenerating).toBe(false)
-      })
+      expect(result.current.isGenerating).toBe(false)
     })
 
     it('should calculate folder size and update preview', async () => {
@@ -247,7 +253,10 @@ describe('useBreadcrumbsPreview', () => {
       const { result } = renderHook(() => useBreadcrumbsPreview())
       const project = createMockProject()
 
-      mockInvoke.mockRejectedValue(new Error('Scan failed'))
+      // Mock generateBreadcrumbsPreview to throw an error (the outer catch block)
+      mockGeneratePreview.mockImplementation(() => {
+        throw new Error('Preview generation failed')
+      })
 
       let preview: BreadcrumbsPreview | null = null
       await act(async () => {
@@ -310,18 +319,12 @@ describe('useBreadcrumbsPreview', () => {
         createMockProject({ path: '/test/project3' })
       ]
 
-      // Make second project fail
-      mockInvoke.mockImplementation(async (command: string, args?: any) => {
-        if (args?.projectPath === '/test/project2') {
+      // Mock generateBreadcrumbsPreview to fail for project2
+      mockGeneratePreview.mockImplementation((_current, path) => {
+        if (path === '/test/project2') {
           throw new Error('Project 2 failed')
         }
-        if (command === 'baker_scan_current_files') {
-          return []
-        }
-        if (command === 'get_folder_size') {
-          return 1024000
-        }
-        return null
+        return createMockPreview()
       })
 
       let previews: Map<string, BreadcrumbsPreview> = new Map()
@@ -340,24 +343,33 @@ describe('useBreadcrumbsPreview', () => {
       const { result } = renderHook(() => useBreadcrumbsPreview())
       const projects = [createMockProject()]
 
-      mockInvoke.mockImplementation(
-        async () =>
-          new Promise((resolve) => setTimeout(() => resolve([]), 100))
-      )
-
-      const batchPromise = act(async () => {
-        return result.current.generateBatchPreviews(projects)
+      // Mock slow operation with controlled resolution
+      let resolveInvoke: (value: any) => void
+      const slowPromise = new Promise((resolve) => {
+        resolveInvoke = resolve
       })
 
+      mockInvoke.mockImplementation(async () => slowPromise)
+
+      // Start the batch operation without awaiting
+      let batchPromise: Promise<any>
+      act(() => {
+        batchPromise = result.current.generateBatchPreviews(projects)
+      })
+
+      // Should be generating
       await waitFor(() => {
         expect(result.current.isGenerating).toBe(true)
       })
 
-      await batchPromise
-
-      await waitFor(() => {
-        expect(result.current.isGenerating).toBe(false)
+      // Resolve the mock and wait for completion
+      await act(async () => {
+        resolveInvoke!([])
+        await batchPromise!
       })
+
+      // Should finish generating
+      expect(result.current.isGenerating).toBe(false)
     })
 
     it('should handle empty project list', async () => {
@@ -533,7 +545,10 @@ describe('useBreadcrumbsPreview', () => {
       const { result } = renderHook(() => useBreadcrumbsPreview())
       const project = createMockProject()
 
-      mockInvoke.mockRejectedValue(new Error('Permission denied'))
+      // Mock generateBreadcrumbsPreview to throw to trigger the outer error handler
+      mockGeneratePreview.mockImplementation(() => {
+        throw new Error('Permission denied')
+      })
 
       await act(async () => {
         await result.current.generatePreview(project.path, project)
@@ -552,34 +567,34 @@ describe('useBreadcrumbsPreview', () => {
       ]
 
       let callCount = 0
-      mockInvoke.mockImplementation(async (command: string, args?: any) => {
+      // Mock generateBreadcrumbsPreview to fail for project2
+      mockGeneratePreview.mockImplementation((_current, path) => {
         callCount++
-        // Fail on project2
-        if (args?.projectPath === '/test/project2' && command === 'baker_scan_current_files') {
-          throw new Error('Scan failed')
+        if (path === '/test/project2') {
+          throw new Error('Preview generation failed for project2')
         }
-        if (command === 'baker_scan_current_files') {
-          return []
-        }
-        if (command === 'get_folder_size') {
-          return 1024000
-        }
-        return null
+        return createMockPreview()
       })
 
       await act(async () => {
         await result.current.generateBatchPreviews(projects)
       })
 
-      // Should complete with 2 successful previews
+      // Should complete with 2 successful previews (project1 and project3)
       expect(result.current.previews.size).toBe(2)
+      expect(result.current.previews.has('/test/project1')).toBe(true)
+      expect(result.current.previews.has('/test/project2')).toBe(false)
+      expect(result.current.previews.has('/test/project3')).toBe(true)
     })
 
     it('should handle batch errors gracefully', async () => {
       const { result } = renderHook(() => useBreadcrumbsPreview())
       const projects = [createMockProject()]
 
-      mockInvoke.mockRejectedValue(new Error('Catastrophic failure'))
+      // Mock generateBreadcrumbsPreview to throw for all projects
+      mockGeneratePreview.mockImplementation(() => {
+        throw new Error('Catastrophic failure')
+      })
 
       let previews: Map<string, BreadcrumbsPreview> = new Map()
       await act(async () => {
@@ -587,7 +602,9 @@ describe('useBreadcrumbsPreview', () => {
       })
 
       expect(previews.size).toBe(0)
-      expect(result.current.error).toContain('Failed to generate batch previews')
+      // Error message comes from individual generatePreview, not batch handler
+      expect(result.current.error).toContain('Failed to generate preview')
+      expect(result.current.error).toContain('Catastrophic failure')
     })
   })
 
