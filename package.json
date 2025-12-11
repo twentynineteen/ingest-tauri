@@ -1,6 +1,6 @@
 {
   "name": "bucket",
-  "version": "0.9.7",
+  "version": "0.10.0",
   "description": "A desktop video editing workflow application that streamlines video ingest, project creation, and integrates with professional video production tools.",
   "author": "Dan Mills",
   "type": "module",
@@ -25,7 +25,10 @@
     "test:e2e": "playwright test --config tests/e2e/playwright.config.ts",
     "test:e2e:headed": "playwright test --config tests/e2e/playwright.config.ts --headed",
     "test:e2e:debug": "playwright test --config tests/e2e/playwright.config.ts --debug",
-    "test:e2e:report": "playwright show-report playwright-report"
+    "test:e2e:report": "playwright show-report playwright-report",
+    "version:patch": "node scripts/bump-version.js patch",
+    "version:minor": "node scripts/bump-version.js minor",
+    "version:major": "node scripts/bump-version.js major"
   },
   "license": "UNLICENSED",
   "devDependencies": {

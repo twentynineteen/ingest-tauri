@@ -3,8 +3,6 @@ import { render } from '@testing-library/react'
 import React from 'react'
 import { vi } from 'vitest'
 
-import App from '../../../App'
-
 // Mock next-themes before importing App to avoid matchMedia errors
 vi.mock('next-themes', () => ({
   ThemeProvider: ({ children }: { children: React.ReactNode }) => children,
@@ -14,6 +12,8 @@ vi.mock('next-themes', () => ({
     themes: ['light', 'dark']
   })
 }))
+
+import App from '../../../App'
 
 it('renders without crashing', () => {
   const div = document.createElement('div') // Create a new div element for the container

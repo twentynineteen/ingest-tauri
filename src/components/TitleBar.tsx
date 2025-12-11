@@ -1,11 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 export function TitleBar() {
-  const [isMacOS, setIsMacOS] = useState(false)
-
-  useEffect(() => {
-    setIsMacOS(navigator.platform.includes('Mac'))
-  }, [])
+  // Initialize directly - no need for useEffect since navigator is synchronous
+  const [isMacOS] = useState(() => navigator.platform.includes('Mac'))
 
   // Only render on macOS with overlay titlebar
   if (!isMacOS) return null

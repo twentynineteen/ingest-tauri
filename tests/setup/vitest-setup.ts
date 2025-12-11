@@ -124,6 +124,23 @@ vi.mock('framer-motion', () => {
   }
 })
 
+// Mock Tauri window API globally (must be before other mocks)
+// This creates a reusable mock window object that all hooks can use
+const createMockWindow = () => ({
+  setPosition: vi.fn().mockResolvedValue(undefined),
+  setSize: vi.fn().mockResolvedValue(undefined),
+  outerPosition: vi.fn().mockResolvedValue({ x: 0, y: 0 }),
+  outerSize: vi.fn().mockResolvedValue({ width: 1280, height: 720 }),
+  onResized: vi.fn().mockResolvedValue(vi.fn()),
+  onMoved: vi.fn().mockResolvedValue(vi.fn()),
+  theme: vi.fn().mockResolvedValue('light'),
+  onThemeChanged: vi.fn().mockResolvedValue(vi.fn())
+})
+
+vi.mock('@tauri-apps/api/window', () => ({
+  getCurrentWindow: vi.fn(() => createMockWindow())
+}))
+
 // Mock Tauri APIs
 const mockTauriApis = () => {
   // Note: We don't mock @tauri-apps/api/core here because mockIPC() from
@@ -175,6 +192,9 @@ const mockTauriApis = () => {
     appCacheDir: vi.fn().mockResolvedValue('/mock/app/cache'),
     appLocalDataDir: vi.fn().mockResolvedValue('/mock/app/local-data')
   }))
+
+  // Note: @tauri-apps/api/window is mocked globally at the top of this file
+  // (outside this function) to ensure it's hoisted properly by vitest
 
   // Don't globally mock @tauri-apps/api/core here, because:
   // 1. Contract tests use mockIPC() from @tauri-apps/api/mocks which handles invoke()

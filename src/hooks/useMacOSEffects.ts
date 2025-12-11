@@ -62,8 +62,8 @@ export function useMacOSEffects({
           state: 'active',
           radius: 0
         })
-      } catch (error) {
-        console.warn('Failed to apply macOS effects:', error)
+      } catch {
+        // Silently fail if effects can't be applied
       }
     }
 
@@ -77,8 +77,8 @@ export function useMacOSEffects({
         try {
           const window = getCurrentWindow()
           await window.clearEffects()
-        } catch (error) {
-          console.warn('Failed to clear macOS effects:', error)
+        } catch {
+          // Silently fail if effects can't be cleared
         }
       }
       removeEffects()
