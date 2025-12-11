@@ -15,7 +15,7 @@ interface ThemeColorSwatchProps {
 export function ThemeColorSwatch({ colors, className = '' }: ThemeColorSwatchProps) {
   return (
     <div
-      className={`flex h-4 w-20 overflow-hidden rounded border border-border ${className}`}
+      className={`flex h-6 overflow-hidden rounded border border-border ${className}`}
       role="presentation"
       aria-hidden="true"
     >
