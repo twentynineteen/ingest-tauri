@@ -49,9 +49,9 @@ export const THEMES: Record<ThemeId, ThemeMetadata> = {
       background: '0 0% 50%',
       foreground: '0 0% 50%',
       primary: '0 0% 50%',
-      accent: '0 0% 50%',
+      accent: '0 0% 50%'
     },
-    isDark: false,
+    isDark: false
   },
   light: {
     id: 'light',
@@ -62,9 +62,9 @@ export const THEMES: Record<ThemeId, ThemeMetadata> = {
       background: '0 0% 100%',
       foreground: '224 71.4% 4.1%',
       primary: '220.9 39.3% 11%',
-      accent: '220 14.3% 95.9%',
+      accent: '220 14.3% 95.9%'
     },
-    isDark: false,
+    isDark: false
   },
   dark: {
     id: 'dark',
@@ -75,9 +75,9 @@ export const THEMES: Record<ThemeId, ThemeMetadata> = {
       background: '224 71.4% 4.1%',
       foreground: '210 20% 98%',
       primary: '210 20% 98%',
-      accent: '215 27.9% 16.9%',
+      accent: '215 27.9% 16.9%'
     },
-    isDark: true,
+    isDark: true
   },
   dracula: {
     id: 'dracula',
@@ -88,10 +88,10 @@ export const THEMES: Record<ThemeId, ThemeMetadata> = {
       background: '231 15% 18%', // #282a36
       foreground: '60 30% 96%', // #f8f8f2
       primary: '265 89% 78%', // #bd93f9 (purple)
-      accent: '326 100% 74%', // #ff79c6 (pink)
+      accent: '326 100% 74%' // #ff79c6 (pink)
     },
     author: 'Zeno Rocha',
-    isDark: true,
+    isDark: true
   },
   'tokyo-night': {
     id: 'tokyo-night',
@@ -102,10 +102,10 @@ export const THEMES: Record<ThemeId, ThemeMetadata> = {
       background: '219 28% 13%', // #1a1b26
       foreground: '220 16% 78%', // #c0caf5
       primary: '187 71% 68%', // #7dcfff (cyan)
-      accent: '217 92% 76%', // #7aa2f7 (blue)
+      accent: '217 92% 76%' // #7aa2f7 (blue)
     },
     author: 'enkia',
-    isDark: true,
+    isDark: true
   },
   'catppuccin-latte': {
     id: 'catppuccin-latte',
@@ -116,10 +116,10 @@ export const THEMES: Record<ThemeId, ThemeMetadata> = {
       background: '220 23% 95%', // #eff1f5
       foreground: '234 16% 35%', // #4c4f69
       primary: '220 91% 54%', // #1e66f5 (blue)
-      accent: '266 85% 58%', // #7287fd (lavender)
+      accent: '266 85% 58%' // #7287fd (lavender)
     },
     author: 'Catppuccin',
-    isDark: false,
+    isDark: false
   },
   'catppuccin-frappe': {
     id: 'catppuccin-frappe',
@@ -130,10 +130,10 @@ export const THEMES: Record<ThemeId, ThemeMetadata> = {
       background: '229 19% 23%', // #303446
       foreground: '227 70% 87%', // #c6d0f5
       primary: '222 74% 74%', // #8caaee (blue)
-      accent: '239 68% 86%', // #babbf1 (lavender)
+      accent: '239 68% 86%' // #babbf1 (lavender)
     },
     author: 'Catppuccin',
-    isDark: true,
+    isDark: true
   },
   'catppuccin-macchiato': {
     id: 'catppuccin-macchiato',
@@ -144,10 +144,10 @@ export const THEMES: Record<ThemeId, ThemeMetadata> = {
       background: '232 23% 18%', // #24273a
       foreground: '227 68% 88%', // #cad3f5
       primary: '220 78% 75%', // #8aadf4 (blue)
-      accent: '238 71% 87%', // #b7bdf8 (lavender)
+      accent: '238 71% 87%' // #b7bdf8 (lavender)
     },
     author: 'Catppuccin',
-    isDark: true,
+    isDark: true
   },
   'catppuccin-mocha': {
     id: 'catppuccin-mocha',
@@ -158,11 +158,11 @@ export const THEMES: Record<ThemeId, ThemeMetadata> = {
       background: '240 21% 15%', // #1e1e2e
       foreground: '226 64% 88%', // #cdd6f4
       primary: '217 92% 76%', // #89b4fa (blue)
-      accent: '238 67% 86%', // #b4befe (lavender)
+      accent: '238 67% 86%' // #b4befe (lavender)
     },
     author: 'Catppuccin',
-    isDark: true,
-  },
+    isDark: true
+  }
 }
 
 /**
@@ -177,7 +177,7 @@ export const getAllThemeIds = (): ThemeId[] => [
   'catppuccin-latte',
   'catppuccin-frappe',
   'catppuccin-macchiato',
-  'catppuccin-mocha',
+  'catppuccin-mocha'
 ]
 
 /**
@@ -213,11 +213,11 @@ export const getGroupedThemes = (): ThemeGroup[] => {
   return [
     {
       label: 'System',
-      themes: [THEMES.system],
+      themes: [THEMES.system]
     },
     {
       label: 'Light Themes',
-      themes: [THEMES.light, THEMES['catppuccin-latte']],
+      themes: [THEMES.light, THEMES['catppuccin-latte']]
     },
     {
       label: 'Dark Themes',
@@ -227,8 +227,8 @@ export const getGroupedThemes = (): ThemeGroup[] => {
         THEMES['tokyo-night'],
         THEMES['catppuccin-frappe'],
         THEMES['catppuccin-macchiato'],
-        THEMES['catppuccin-mocha'],
-      ],
-    },
+        THEMES['catppuccin-mocha']
+      ]
+    }
   ]
 }

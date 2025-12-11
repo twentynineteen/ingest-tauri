@@ -15,7 +15,7 @@ export function migrateLegacyTheme(legacyThemeId: string): ThemeId {
   const migrations: Record<string, ThemeId> = {
     light: 'light',
     dark: 'dark',
-    system: 'system',
+    system: 'system'
   }
 
   return (migrations[legacyThemeId] as ThemeId) || 'system'
@@ -33,7 +33,7 @@ export function isValidThemeId(themeId: string): themeId is ThemeId {
     'catppuccin-latte',
     'catppuccin-frappe',
     'catppuccin-macchiato',
-    'catppuccin-mocha',
+    'catppuccin-mocha'
   ]
 
   return validThemes.includes(themeId as ThemeId)

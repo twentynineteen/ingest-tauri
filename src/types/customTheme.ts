@@ -68,8 +68,10 @@ export const CustomThemeSchema = z.object({
   isDark: z.boolean(),
   colors: z.record(
     z.string(),
-    z.string().regex(/^\d+\s+\d+%\s+\d+%$/, 'Must be valid HSL format (e.g., "220 13% 91%")')
-  ),
+    z
+      .string()
+      .regex(/^\d+\s+\d+%\s+\d+%$/, 'Must be valid HSL format (e.g., "220 13% 91%")')
+  )
 })
 
 /**
@@ -84,18 +86,18 @@ export function validateCustomTheme(data: unknown): {
     const validated = CustomThemeSchema.parse(data)
     return {
       success: true,
-      theme: validated as CustomThemeDefinition,
+      theme: validated as CustomThemeDefinition
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        error: error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', '),
+        error: error.errors.map((e) => `${e.path.join('.')}: ${e.message}`).join(', ')
       }
     }
     return {
       success: false,
-      error: 'Unknown validation error',
+      error: 'Unknown validation error'
     }
   }
 }

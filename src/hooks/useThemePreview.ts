@@ -13,7 +13,10 @@ interface UseThemePreviewOptions {
   debounceMs?: number
 }
 
-export function useThemePreview({ activeTheme, debounceMs = 150 }: UseThemePreviewOptions) {
+export function useThemePreview({
+  activeTheme,
+  debounceMs = 150
+}: UseThemePreviewOptions) {
   const previewTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const isPreviewingRef = useRef(false)
 
@@ -109,6 +112,6 @@ export function useThemePreview({ activeTheme, debounceMs = 150 }: UseThemePrevi
 
   return {
     startPreview,
-    stopPreview,
+    stopPreview
   }
 }

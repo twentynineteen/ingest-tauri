@@ -21,20 +21,21 @@ const REQUIRED_VARIABLES: CSSVariableName[] = [
   'muted-foreground',
   'accent',
   'accent-foreground',
-  'border',
+  'border'
 ]
 
 /**
  * Validate that a custom theme has all required CSS variables
  */
-export function validateThemeCompleteness(
-  theme: CustomThemeDefinition
-): { valid: boolean; missing: string[] } {
+export function validateThemeCompleteness(theme: CustomThemeDefinition): {
+  valid: boolean
+  missing: string[]
+} {
   const missing = REQUIRED_VARIABLES.filter((varName) => !theme.colors[varName])
 
   return {
     valid: missing.length === 0,
-    missing,
+    missing
   }
 }
 
@@ -66,7 +67,7 @@ export function loadCustomTheme(theme: CustomThemeDefinition): {
   if (!validation.valid) {
     return {
       success: false,
-      error: `Theme is missing required variables: ${validation.missing.join(', ')}`,
+      error: `Theme is missing required variables: ${validation.missing.join(', ')}`
     }
   }
 
@@ -88,7 +89,7 @@ export function loadCustomTheme(theme: CustomThemeDefinition): {
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Failed to load theme',
+      error: error instanceof Error ? error.message : 'Failed to load theme'
     }
   }
 }

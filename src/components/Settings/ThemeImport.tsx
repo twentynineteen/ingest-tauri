@@ -28,11 +28,17 @@ export function ThemeImport() {
       <p className="text-muted-foreground mb-3 text-sm">
         Import custom theme JSON files to add your own color schemes.
       </p>
-      <Button onClick={handleImportClick} disabled={isImporting} variant="outline" size="sm">
+      <Button
+        onClick={handleImportClick}
+        disabled={isImporting}
+        variant="outline"
+        size="sm"
+      >
         {isImporting ? 'Importing...' : 'Import Theme'}
       </Button>
       <p className="text-muted-foreground mt-2 text-xs">
-        Feature coming soon. Custom themes will be saved locally and persist across sessions.
+        Feature coming soon. Custom themes will be saved locally and persist across
+        sessions.
       </p>
     </div>
   )
