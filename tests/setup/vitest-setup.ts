@@ -193,8 +193,18 @@ const mockTauriApis = () => {
     appLocalDataDir: vi.fn().mockResolvedValue('/mock/app/local-data')
   }))
 
-  // Note: @tauri-apps/api/window is mocked globally at the top of this file
-  // (outside this function) to ensure it's hoisted properly by vitest
+  // Mock window API for useWindowState and useSystemTheme hooks
+  vi.mock('@tauri-apps/api/window', () => ({
+    getCurrentWindow: vi.fn(() => ({
+      setPosition: vi.fn().mockResolvedValue(undefined),
+      setSize: vi.fn().mockResolvedValue(undefined),
+      outerPosition: vi.fn().mockResolvedValue({ x: 100, y: 100 }),
+      outerSize: vi.fn().mockResolvedValue({ width: 800, height: 600 }),
+      onResized: vi.fn().mockResolvedValue(vi.fn()),
+      onMoved: vi.fn().mockResolvedValue(vi.fn()),
+      onThemeChanged: vi.fn().mockResolvedValue(vi.fn())
+    }))
+  }))
 
   // Don't globally mock @tauri-apps/api/core here, because:
   // 1. Contract tests use mockIPC() from @tauri-apps/api/mocks which handles invoke()
@@ -204,11 +214,38 @@ const mockTauriApis = () => {
 
 // Mock browser APIs
 const mockBrowserApis = () => {
-  // Mock ResizeObserver
-  global.ResizeObserver = vi.fn().mockImplementation(() => ({
-    observe: vi.fn(),
-    unobserve: vi.fn(),
-    disconnect: vi.fn()
+  // Configure React Testing Library act() environment for React 18
+  ;(global as any).IS_REACT_ACT_ENVIRONMENT = true
+
+  // Mock Tauri window internals for getCurrentWindow() and invoke
+  ;(window as any).__TAURI_INTERNALS__ = {
+    metadata: {
+      currentWindow: { label: 'main' }
+    },
+    invoke: vi.fn().mockResolvedValue(undefined)
+  }
+
+  // Mock ResizeObserver for react-virtual compatibility
+  global.ResizeObserver = class ResizeObserver {
+    observe = vi.fn()
+    unobserve = vi.fn()
+    disconnect = vi.fn()
+    constructor(_callback: ResizeObserverCallback) {
+      // Constructor required for react-virtual
+    }
+  }
+
+  // Mock getBoundingClientRect for virtual scrolling in tests
+  Element.prototype.getBoundingClientRect = vi.fn(() => ({
+    width: 800,
+    height: 600,
+    top: 0,
+    left: 0,
+    bottom: 600,
+    right: 800,
+    x: 0,
+    y: 0,
+    toJSON: () => {}
   }))
 
   // Mock TextEncoder/TextDecoder for Node.js environment

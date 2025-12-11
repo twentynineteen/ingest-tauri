@@ -27,7 +27,7 @@ interface ProjectListProps {
   trelloApiToken?: string
 }
 
-export const ProjectList: React.FC<ProjectListProps> = ({
+const ProjectListComponent: React.FC<ProjectListProps> = ({
   projects,
   selectedProjects,
   onProjectSelection,
@@ -169,3 +169,7 @@ export const ProjectList: React.FC<ProjectListProps> = ({
     </div>
   )
 }
+
+// Wrap with React.memo for performance optimization (Phase 1.2)
+// Prevents unnecessary re-renders when props haven't changed
+export const ProjectList = React.memo(ProjectListComponent)

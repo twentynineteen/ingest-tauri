@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import process from 'node:process'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
@@ -5,8 +6,6 @@ import monacoEditorPluginModule from 'vite-plugin-monaco-editor'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
 const monacoEditorPlugin = (monacoEditorPluginModule as any).default
-
-/// <reference types="vitest" />
 
 const host = process.env.TAURI_DEV_HOST
 

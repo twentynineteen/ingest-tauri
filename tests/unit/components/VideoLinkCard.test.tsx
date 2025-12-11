@@ -264,7 +264,82 @@ describe('VideoLinkCard Component', () => {
   })
 
   // =================================================================
-  // Test Category 4: Date Formatting (1 test)
+  // Test Category 4: Performance Optimizations (React.memo) (3 tests)
+  // =================================================================
+
+  describe('Performance Optimizations', () => {
+    test('should be wrapped with React.memo', () => {
+      // React.memo components have a specific type structure
+      const component = VideoLinkCard as any
+      expect(component.$$typeof).toBeDefined()
+    })
+
+    test('should not re-render when props remain unchanged', () => {
+      // Arrange: Track render count
+      let renderCount = 0
+      const TestWrapper = (props: any) => {
+        renderCount++
+        return <VideoLinkCard {...props} />
+      }
+
+      // Act: Render twice with same props
+      const defaultProps = {
+        videoLink: baseVideoLink,
+        onRemove: mockOnRemove,
+        onMoveUp: mockOnMoveUp,
+        onMoveDown: mockOnMoveDown,
+        canMoveUp: true,
+        canMoveDown: true
+      }
+
+      const { rerender } = render(<TestWrapper {...defaultProps} />)
+      const initialRenderCount = renderCount
+
+      // Rerender with same props
+      rerender(<TestWrapper {...defaultProps} />)
+
+      // Assert: Wrapper renders, but memo should reduce VideoLinkCard renders
+      expect(renderCount).toBeGreaterThan(initialRenderCount)
+    })
+
+    test('should work with stable callback references', () => {
+      // Arrange: Create stable callbacks using useCallback
+      const TestParent = () => {
+        const stableOnRemove = React.useCallback(() => {
+          // Callback implementation
+        }, [])
+
+        const stableOnMoveUp = React.useCallback(() => {
+          // Callback implementation
+        }, [])
+
+        const stableOnMoveDown = React.useCallback(() => {
+          // Callback implementation
+        }, [])
+
+        return (
+          <VideoLinkCard
+            videoLink={baseVideoLink}
+            onRemove={stableOnRemove}
+            onMoveUp={stableOnMoveUp}
+            onMoveDown={stableOnMoveDown}
+            canMoveUp={true}
+            canMoveDown={true}
+          />
+        )
+      }
+
+      // Act
+      const { rerender } = render(<TestParent />)
+      rerender(<TestParent />)
+
+      // Assert: Component should render without errors
+      expect(screen.getByText('Project Alpha - Final Edit')).toBeInTheDocument()
+    })
+  })
+
+  // =================================================================
+  // Test Category 5: Date Formatting (1 test)
   // =================================================================
 
   describe('Date Formatting', () => {

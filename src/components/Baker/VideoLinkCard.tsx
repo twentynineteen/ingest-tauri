@@ -5,6 +5,7 @@
 
 import { openUrl } from '@tauri-apps/plugin-opener'
 import { ChevronDown, ChevronUp, ExternalLink, Trash2, Video } from 'lucide-react'
+import React from 'react'
 
 import { Button } from '@/components/ui/button'
 import type { VideoLink } from '@/types/baker'
@@ -19,7 +20,7 @@ interface VideoLinkCardProps {
   canMoveDown: boolean
 }
 
-export function VideoLinkCard({
+function VideoLinkCardComponent({
   videoLink,
   onRemove,
   onMoveUp,
@@ -130,3 +131,7 @@ export function VideoLinkCard({
     </div>
   )
 }
+
+// Wrap with React.memo for performance optimization (Phase 1.3)
+// Prevents unnecessary re-renders when props haven't changed
+export const VideoLinkCard = React.memo(VideoLinkCardComponent)

@@ -59,10 +59,14 @@ vi.mock('@hooks/useLiveBreadcrumbsReader', () => ({
 
 vi.mock('@hooks/useBreadcrumbsPreview', () => ({
   useBreadcrumbsPreview: vi.fn(() => ({
+    previews: new Map(),
+    isGenerating: false,
+    error: null,
     generatePreview: vi.fn(),
     generateBatchPreviews: vi.fn(),
     clearPreviews: vi.fn(),
-    getPreview: vi.fn()
+    getPreview: vi.fn(),
+    hasPreview: vi.fn()
   }))
 }))
 

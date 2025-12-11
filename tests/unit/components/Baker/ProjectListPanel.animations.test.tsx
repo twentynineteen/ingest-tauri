@@ -152,7 +152,8 @@ describe('ProjectListPanel Animations', () => {
       // Find the parent container div (with border-b class), not the inner text div
       const firstProject = screen.getByText('Project A').closest('.border-b')
 
-      expect(firstProject?.className).toContain('transition-colors')
+      // Phase 6: Now uses transition-[transform,background-color] for both transform and color transitions
+      expect(firstProject?.className).toContain('transition-[transform,background-color]')
     })
 
     it('should apply hover styles on mouse enter', async () => {
@@ -202,9 +203,9 @@ describe('ProjectListPanel Animations', () => {
       const projectA = screen.getByText('Project A').closest('.border-b')
       const projectB = screen.getByText('Project B').closest('.border-b')
 
-      // Both should have transition classes
-      expect(projectA?.className).toContain('transition-colors')
-      expect(projectB?.className).toContain('transition-colors')
+      // Both should have transition classes (Phase 6: updated to use transition-[transform,background-color])
+      expect(projectA?.className).toContain('transition-[transform,background-color]')
+      expect(projectB?.className).toContain('transition-[transform,background-color]')
     })
   })
 
