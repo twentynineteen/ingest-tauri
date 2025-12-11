@@ -150,18 +150,29 @@ const ProjectListPanelComponent: React.FC<ProjectListPanelProps> = ({
       </div>
     )
 
-    // For virtual scrolling, use regular divs; otherwise use motion.div with animations
+    // For virtual scrolling, use regular divs with CSS hover; otherwise use motion.div with entrance animations
     if (useVirtualScroll) {
       return (
         <div
           key={project.path}
           style={virtualStyle}
           className={cn(
-            'border-border cursor-pointer border-b p-3 transition-colors',
-            'hover:bg-accent/50',
+            'border-border cursor-pointer border-b p-3',
+            // Transition properties (Phase 6: CSS-based animations - transform and colors)
+            'transition-[transform,background-color] duration-150 ease-out',
+            // Hover effects (Phase 6: CSS transforms instead of Framer Motion)
+            'hover:scale-[1.005] hover:bg-accent/50',
+            // Performance hint for transforms
+            'will-change-transform',
+            // Accessibility: Focus styles for keyboard navigation
+            'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
+            // Selected state
             isSelected && 'bg-accent'
           )}
           onClick={() => onProjectClick(project.path)}
+          tabIndex={0}
+          role="button"
+          aria-pressed={isSelected}
         >
           {content}
         </div>
@@ -173,25 +184,19 @@ const ProjectListPanelComponent: React.FC<ProjectListPanelProps> = ({
         key={project.path}
         variants={shouldAnimate ? BAKER_ANIMATIONS.projectList.item : undefined}
         className={cn(
-          'border-border cursor-pointer border-b p-3 transition-colors',
-          'hover:bg-accent/50',
+          'border-border cursor-pointer border-b p-3',
+          // Phase 6: Replace Framer Motion whileHover with CSS transforms
+          'transition-[transform,background-color] duration-150 ease-out',
+          'hover:scale-[1.005] hover:bg-accent/50',
+          'will-change-transform',
+          // Accessibility: Focus styles
+          'focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2',
           isSelected && 'bg-accent'
         )}
         onClick={() => onProjectClick(project.path)}
-        whileHover={
-          shouldReduceMotion
-            ? undefined
-            : {
-                scale: BAKER_ANIMATIONS.projectRow.hover.scale
-              }
-        }
-        transition={
-          shouldReduceMotion
-            ? undefined
-            : {
-                duration: BAKER_ANIMATIONS.projectRow.hover.duration / 1000
-              }
-        }
+        tabIndex={0}
+        role="button"
+        aria-pressed={isSelected}
       >
         {content}
       </motion.div>

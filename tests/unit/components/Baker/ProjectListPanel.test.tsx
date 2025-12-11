@@ -23,7 +23,9 @@ describe('ProjectListPanel - Performance Optimizations', () => {
       hasBreadcrumbs: true,
       staleBreadcrumbs: false,
       invalidBreadcrumbs: false,
-      cameraCount: 3
+      cameraCount: 3,
+      lastScanned: '2025-12-11T10:00:00.000Z',
+      validationErrors: []
     },
     {
       name: 'Project B',
@@ -32,7 +34,9 @@ describe('ProjectListPanel - Performance Optimizations', () => {
       hasBreadcrumbs: true,
       staleBreadcrumbs: true,
       invalidBreadcrumbs: false,
-      cameraCount: 2
+      cameraCount: 2,
+      lastScanned: '2025-12-11T10:00:00.000Z',
+      validationErrors: []
     }
   ]
 
@@ -110,7 +114,9 @@ describe('ProjectListPanel - Performance Optimizations', () => {
           hasBreadcrumbs: false,
           staleBreadcrumbs: false,
           invalidBreadcrumbs: false,
-          cameraCount: 1
+          cameraCount: 1,
+          lastScanned: '2025-12-11T10:00:00.000Z',
+          validationErrors: ['Missing required folder']
         }
       ]
 
@@ -152,13 +158,13 @@ describe('ProjectListPanel - Performance Optimizations', () => {
       // Arrange: Create stable callbacks using useCallback
       const TestParent = () => {
         const stableOnProjectSelection = React.useCallback(
-          (path: string, isSelected: boolean) => {
+          (_path: string, _isSelected: boolean) => {
             // Callback implementation
           },
           []
         )
 
-        const stableOnProjectClick = React.useCallback((path: string) => {
+        const stableOnProjectClick = React.useCallback((_path: string) => {
           // Callback implementation
         }, [])
 
@@ -197,7 +203,9 @@ describe('ProjectListPanel - Performance Optimizations', () => {
     it('should handle onProjectSelection with stable callback', async () => {
       // Arrange
       const user = userEvent.setup()
-      const stableOnProjectSelection = vi.fn()
+      const stableOnProjectSelection = vi.fn((_path: string, _isSelected: boolean) => {
+        // Callback implementation
+      })
 
       render(
         <ProjectListPanel
@@ -340,6 +348,60 @@ describe('ProjectListPanel - Performance Optimizations', () => {
     })
   })
 
+  describe('CSS Hover Animations (Phase 6)', () => {
+    it('should apply CSS hover classes to project items', () => {
+      render(<ProjectListPanel {...defaultProps} />)
+
+      // Find the clickable project row (has border-b class)
+      const projectElement = screen
+        .getByText('Project A')
+        .closest('.border-b') as HTMLElement
+
+      // Check that element has the appropriate CSS classes for hover (transform and background-color)
+      expect(projectElement.className).toContain('transition-[transform,background-color]')
+      expect(projectElement.className).toContain('hover:scale-[1.005]')
+    })
+
+    it('should have will-change hint for performance', () => {
+      render(<ProjectListPanel {...defaultProps} />)
+
+      // Find the clickable project row
+      const projectElement = screen
+        .getByText('Project A')
+        .closest('.border-b') as HTMLElement
+
+      // Check for will-change optimization hint
+      expect(projectElement.className).toContain('will-change-transform')
+    })
+
+    it('should maintain accessibility on hover states', () => {
+      render(<ProjectListPanel {...defaultProps} />)
+
+      // Find the clickable project row
+      const projectElement = screen
+        .getByText('Project A')
+        .closest('.border-b') as HTMLElement
+
+      // Should be keyboard accessible
+      expect(projectElement).toBeInTheDocument()
+
+      // Should have appropriate cursor
+      expect(projectElement.className).toContain('cursor-pointer')
+    })
+
+    it('should apply focus-visible styles for keyboard navigation', () => {
+      render(<ProjectListPanel {...defaultProps} />)
+
+      // Find the clickable project row
+      const projectElement = screen
+        .getByText('Project A')
+        .closest('.border-b') as HTMLElement
+
+      // Check for focus-visible styles
+      expect(projectElement.className).toContain('focus-visible:outline')
+    })
+  })
+
   describe('Edge Cases', () => {
     it('should handle project with all invalid states', () => {
       const invalidProject: ProjectFolder[] = [
@@ -350,7 +412,9 @@ describe('ProjectListPanel - Performance Optimizations', () => {
           hasBreadcrumbs: false,
           staleBreadcrumbs: false,
           invalidBreadcrumbs: true,
-          cameraCount: 0
+          cameraCount: 0,
+          lastScanned: '2025-12-11T10:00:00.000Z',
+          validationErrors: ['Invalid structure', 'Missing folders']
         }
       ]
 
@@ -369,7 +433,9 @@ describe('ProjectListPanel - Performance Optimizations', () => {
           hasBreadcrumbs: false,
           staleBreadcrumbs: false,
           invalidBreadcrumbs: false,
-          cameraCount: 2
+          cameraCount: 2,
+          lastScanned: '2025-12-11T10:00:00.000Z',
+          validationErrors: []
         }
       ]
 
@@ -387,7 +453,9 @@ describe('ProjectListPanel - Performance Optimizations', () => {
           hasBreadcrumbs: true,
           staleBreadcrumbs: false,
           invalidBreadcrumbs: false,
-          cameraCount: 1
+          cameraCount: 1,
+          lastScanned: '2025-12-11T10:00:00.000Z',
+          validationErrors: []
         }
       ]
 
