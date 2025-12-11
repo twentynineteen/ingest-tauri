@@ -1,8 +1,12 @@
 // components/BuildProject/ProjectFileList.tsx
 
 import { FILE_LIST_ANIMATION } from '@constants/animations'
+import { useVirtualizer } from '@tanstack/react-virtual'
 import { Film, Trash2, Video } from 'lucide-react'
 import React from 'react'
+
+// Threshold for enabling virtual scrolling (performance optimization for large lists)
+const VIRTUAL_SCROLLING_THRESHOLD = 50
 
 interface FootageFile {
   file: {
@@ -108,6 +112,22 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
   onUpdateCamera,
   onDeleteFile
 }) => {
+  const parentRef = React.useRef<HTMLDivElement>(null)
+
+  // Determine if we should use virtual scrolling based on list size
+  const useVirtualScroll = files.length >= VIRTUAL_SCROLLING_THRESHOLD
+
+  // Initialize virtualizer for large lists
+  const virtualizer = useVirtualizer({
+    count: files.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 80, // Estimated height of each item in pixels
+    overscan: 5, // Render 5 extra items outside viewport for smooth scrolling
+    enabled: useVirtualScroll,
+    // Provide initial measurements for test environment
+    initialRect: { width: 800, height: 600 }
+  })
+
   // Empty state
   if (files.length === 0) {
     return (
@@ -127,6 +147,54 @@ const ProjectFileList: React.FC<ProjectFileListProps> = ({
     )
   }
 
+  // Render with virtual scrolling for large lists (50+ items)
+  if (useVirtualScroll) {
+    const items = virtualizer.getVirtualItems()
+
+    return (
+      <div
+        ref={parentRef}
+        className="w-full max-w-full overflow-auto"
+        style={{ height: '600px' }}
+        data-virtual-container
+      >
+        <div
+          style={{
+            height: `${virtualizer.getTotalSize()}px`,
+            width: '100%',
+            position: 'relative'
+          }}
+        >
+          {items.map((virtualItem) => {
+            const item = files[virtualItem.index]
+            return (
+              <div
+                key={virtualItem.key}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  transform: `translateY(${virtualItem.start}px)`,
+                  marginBottom: '8px'
+                }}
+              >
+                <FileListItem
+                  item={item}
+                  index={virtualItem.index}
+                  numCameras={numCameras}
+                  onUpdateCamera={onUpdateCamera}
+                  onDeleteFile={onDeleteFile}
+                />
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
+
+  // Render normally for small lists (< 50 items) with animations
   return (
     <div className="w-full max-w-full space-y-2">
       {files.map((item, idx) => (
