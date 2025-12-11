@@ -124,6 +124,23 @@ vi.mock('framer-motion', () => {
   }
 })
 
+// Mock Tauri window API globally (must be before other mocks)
+// This creates a reusable mock window object that all hooks can use
+const createMockWindow = () => ({
+  setPosition: vi.fn().mockResolvedValue(undefined),
+  setSize: vi.fn().mockResolvedValue(undefined),
+  outerPosition: vi.fn().mockResolvedValue({ x: 0, y: 0 }),
+  outerSize: vi.fn().mockResolvedValue({ width: 1280, height: 720 }),
+  onResized: vi.fn().mockResolvedValue(vi.fn()),
+  onMoved: vi.fn().mockResolvedValue(vi.fn()),
+  theme: vi.fn().mockResolvedValue('light'),
+  onThemeChanged: vi.fn().mockResolvedValue(vi.fn())
+})
+
+vi.mock('@tauri-apps/api/window', () => ({
+  getCurrentWindow: vi.fn(() => createMockWindow())
+}))
+
 // Mock Tauri APIs
 const mockTauriApis = () => {
   // Note: We don't mock @tauri-apps/api/core here because mockIPC() from
