@@ -15,6 +15,18 @@ export interface AppFixtures {
  */
 export const test = base.extend<AppFixtures>({
   appReady: async ({ page }, use) => {
+    // Collect console errors for debugging
+    const errors: string[] = []
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        errors.push(msg.text())
+      }
+    })
+
+    page.on('pageerror', error => {
+      errors.push(`Page error: ${error.message}`)
+    })
+
     // Navigate to the app
     await page.goto('/')
 
@@ -22,12 +34,21 @@ export const test = base.extend<AppFixtures>({
     // This waits for React to mount and any initial data fetching
     await page.waitForLoadState('networkidle')
 
-    // Wait for the main app container to be visible
-    // Adjust selector based on your app's structure
-    await page.waitForSelector('[data-testid="app-root"], #root', {
-      state: 'visible',
-      timeout: 30000
-    })
+    // Wait for React to render content into #root
+    // The #root div should have child elements once React mounts
+    try {
+      await page.waitForFunction(
+        () => {
+          const root = document.getElementById('root')
+          return root !== null && root.children.length > 0
+        },
+        { timeout: 10000 }
+      )
+    } catch (e) {
+      // If React fails to mount, log console errors
+      console.error('React failed to mount. Console errors:', errors)
+      throw e
+    }
 
     await use(page)
   }

@@ -186,5 +186,5 @@ camera-count-fixes.md
 /security-reports/
 
 # Playwright test results
-/test-results/
-/playwright-report/
+/test-results/*
+/playwright-report/*
