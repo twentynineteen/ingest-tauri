@@ -34,8 +34,8 @@ export function useWindowState() {
         const state: WindowState = JSON.parse(saved)
         await window.setPosition({ x: state.x, y: state.y })
         await window.setSize({ width: state.width, height: state.height })
-      } catch (error) {
-        console.warn('Failed to restore window state:', error)
+      } catch {
+        // Silently fail if window state can't be restored
       }
     }
 
@@ -55,8 +55,8 @@ export function useWindowState() {
         }
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state))
-      } catch (error) {
-        console.warn('Failed to save window state:', error)
+      } catch {
+        // Silently fail if window state can't be saved
       }
     }
 

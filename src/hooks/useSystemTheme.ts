@@ -32,8 +32,8 @@ export function useSystemTheme() {
       try {
         const currentTheme = await window.theme()
         setTheme(currentTheme)
-      } catch (error) {
-        console.warn('Failed to get window theme:', error)
+      } catch {
+        // Silently fail if theme can't be retrieved
       }
     }
 
