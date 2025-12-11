@@ -21,8 +21,8 @@ export function TitleBar() {
     >
       {/* Custom title bar content */}
       <div
-        className="flex items-center gap-2 text-sm font-medium text-foreground/70"
-        style={{ WebkitAppRegion: 'no-drag' }}
+        className="flex items-center gap-2 text-sm font-medium text-foreground/70 pl-2"
+        style={{ WebkitAppRegion: 'no-drag', marginTop: '-12px' }}
       >
         <span>Bucket</span>
       </div>
@@ -31,10 +31,7 @@ export function TitleBar() {
       <div className="flex-1" />
 
       {/* Optional: Custom controls can be added here */}
-      <div
-        className="flex items-center gap-2"
-        style={{ WebkitAppRegion: 'no-drag' }}
-      >
+      <div className="flex items-center gap-2" style={{ WebkitAppRegion: 'no-drag' }}>
         {/* Add custom controls here if needed */}
       </div>
     </div>
