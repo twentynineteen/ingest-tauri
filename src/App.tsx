@@ -74,7 +74,22 @@ const App: React.FC = () => {
   useWindowState()
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      themes={[
+        'system',
+        'light',
+        'dark',
+        'dracula',
+        'catppuccin-latte',
+        'catppuccin-frappe',
+        'catppuccin-macchiato',
+        'catppuccin-mocha',
+      ]}
+      enableSystem
+      storageKey="theme"
+    >
       <QueryClientProvider client={queryClient}>
         <QueryErrorBoundary>
           <AuthProvider>
