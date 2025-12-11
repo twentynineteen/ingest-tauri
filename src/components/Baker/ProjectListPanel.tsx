@@ -31,7 +31,7 @@ interface ProjectListPanelProps {
   onProjectClick: (projectPath: string) => void
 }
 
-export const ProjectListPanel: React.FC<ProjectListPanelProps> = ({
+const ProjectListPanelComponent: React.FC<ProjectListPanelProps> = ({
   projects,
   selectedProjects,
   selectedProject,
@@ -173,3 +173,7 @@ export const ProjectListPanel: React.FC<ProjectListPanelProps> = ({
     </div>
   )
 }
+
+// Wrap with React.memo for performance optimization (Phase 1.1)
+// Prevents unnecessary re-renders when props haven't changed
+export const ProjectListPanel = React.memo(ProjectListPanelComponent)
