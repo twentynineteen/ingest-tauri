@@ -118,24 +118,10 @@ describe('Baker Scan Workflow Integration', () => {
   test('should complete full scan workflow successfully', async () => {
     const { invoke } = await import('@tauri-apps/api/core')
 
-    // Mock invoke to return scan ID for start, and result for status polling
-    let pollCount = 0
+    // Mock invoke to return scan ID for start
     vi.mocked(invoke).mockImplementation((command: string) => {
       if (command === 'baker_start_scan') {
         return Promise.resolve('test-scan-id')
-      }
-      if (command === 'baker_get_scan_status') {
-        pollCount++
-        // First few polls return in-progress status
-        if (pollCount < 3) {
-          return Promise.resolve({
-            ...mockCompleteScanResult,
-            endTime: undefined, // Still scanning
-            validProjects: pollCount
-          })
-        }
-        // Final poll returns complete status
-        return Promise.resolve(mockCompleteScanResult)
       }
       return Promise.resolve(undefined)
     })
@@ -159,15 +145,21 @@ describe('Baker Scan Workflow Integration', () => {
       options: mockScanOptions
     })
 
-    // Wait for scan to complete via polling
-    await waitFor(
-      () => {
-        expect(result.current.isScanning).toBe(false)
-      },
-      { timeout: 3000 }
-    )
+    // Simulate completion event
+    const completeHandler = eventHandlers.get('baker_scan_complete')
+    expect(completeHandler).toBeDefined()
+
+    await act(async () => {
+      completeHandler!({
+        payload: {
+          scanId: 'test-scan-id',
+          result: mockCompleteScanResult
+        } as ScanCompleteEvent
+      })
+    })
 
     // Verify final state
+    expect(result.current.isScanning).toBe(false)
     expect(result.current.scanResult).toBeDefined()
     expect(result.current.scanResult?.endTime).toBeDefined()
     expect(result.current.scanResult?.validProjects).toBe(2)
@@ -185,20 +177,6 @@ describe('Baker Scan Workflow Integration', () => {
       }
       if (command === 'baker_cancel_scan') {
         return Promise.resolve(undefined)
-      }
-      if (command === 'baker_get_scan_status') {
-        // Return in-progress status (no endTime)
-        return Promise.resolve({
-          startTime: '2025-01-01T00:00:00Z',
-          rootPath: '/deep/directory',
-          totalFolders: 50,
-          totalFolderSize: 512000,
-          validProjects: 1,
-          updatedBreadcrumbs: 0,
-          createdBreadcrumbs: 0,
-          errors: [],
-          projects: []
-        })
       }
       return Promise.resolve(undefined)
     })
@@ -232,10 +210,6 @@ describe('Baker Scan Workflow Integration', () => {
       if (command === 'baker_start_scan') {
         return Promise.resolve('discovery-test-scan-id')
       }
-      if (command === 'baker_get_scan_status') {
-        // Return complete result with all projects
-        return Promise.resolve(mockCompleteScanResult)
-      }
       return Promise.resolve(undefined)
     })
 
@@ -246,13 +220,18 @@ describe('Baker Scan Workflow Integration', () => {
       await result.current.startScan('/test/path', mockScanOptions)
     })
 
-    // Wait for completion
-    await waitFor(
-      () => {
-        expect(result.current.isScanning).toBe(false)
-      },
-      { timeout: 3000 }
-    )
+    // Simulate completion event with all projects
+    const completeHandler = eventHandlers.get('baker_scan_complete')
+    expect(completeHandler).toBeDefined()
+
+    await act(async () => {
+      completeHandler!({
+        payload: {
+          scanId: 'discovery-test-scan-id',
+          result: mockCompleteScanResult
+        } as ScanCompleteEvent
+      })
+    })
 
     // Verify project discovery
     const scanResult = result.current.scanResult
@@ -292,19 +271,6 @@ describe('Baker Scan Workflow Integration', () => {
       if (command === 'baker_start_scan') {
         return Promise.resolve('progress-test-scan-id')
       }
-      if (command === 'baker_get_scan_status') {
-        return Promise.resolve({
-          startTime: '2025-01-01T00:00:00Z',
-          rootPath: '/test/path',
-          totalFolders: 50,
-          totalFolderSize: 512000,
-          validProjects: 1,
-          updatedBreadcrumbs: 0,
-          createdBreadcrumbs: 0,
-          errors: [],
-          projects: []
-        })
-      }
       return Promise.resolve(undefined)
     })
 
@@ -324,12 +290,42 @@ describe('Baker Scan Workflow Integration', () => {
     const progressHandler = eventHandlers.get('baker_scan_progress')
     expect(progressHandler).toBeDefined()
 
-    // Verify initial scan result from status poll
-    await waitFor(() => {
-      expect(result.current.scanResult).toBeDefined()
-      expect(result.current.scanResult?.totalFolders).toBe(50)
-      expect(result.current.scanResult?.validProjects).toBe(1)
+    // Simulate a progress event (need to set initial scanResult first)
+    await act(async () => {
+      // First set a base scan result via completion event
+      const completeHandler = eventHandlers.get('baker_scan_complete')
+      completeHandler!({
+        payload: {
+          scanId: 'progress-test-scan-id',
+          result: {
+            startTime: '2025-01-01T00:00:00Z',
+            rootPath: '/test/path',
+            totalFolders: 0,
+            totalFolderSize: 0,
+            validProjects: 0,
+            updatedBreadcrumbs: 0,
+            createdBreadcrumbs: 0,
+            errors: [],
+            projects: []
+          }
+        } as ScanCompleteEvent
+      })
     })
+
+    // Now simulate progress update
+    await act(async () => {
+      progressHandler!({
+        payload: {
+          scanId: 'progress-test-scan-id',
+          totalFolders: 50,
+          projectsFound: 1
+        }
+      })
+    })
+
+    // Verify scan result was updated by progress event
+    expect(result.current.scanResult?.totalFolders).toBe(50)
+    expect(result.current.scanResult?.validProjects).toBe(1)
   })
 
   test('should handle scan completion event', async () => {
@@ -490,9 +486,6 @@ describe('Baker Scan Workflow Integration', () => {
       if (command === 'baker_start_scan') {
         return Promise.resolve('stale-test-scan-id')
       }
-      if (command === 'baker_get_scan_status') {
-        return Promise.resolve(staleResult)
-      }
       return Promise.resolve(undefined)
     })
 
@@ -503,13 +496,18 @@ describe('Baker Scan Workflow Integration', () => {
       await result.current.startScan('/test/path', mockScanOptions)
     })
 
-    // Wait for completion
-    await waitFor(
-      () => {
-        expect(result.current.isScanning).toBe(false)
-      },
-      { timeout: 3000 }
-    )
+    // Simulate completion event with stale breadcrumbs data
+    const completeHandler = eventHandlers.get('baker_scan_complete')
+    expect(completeHandler).toBeDefined()
+
+    await act(async () => {
+      completeHandler!({
+        payload: {
+          scanId: 'stale-test-scan-id',
+          result: staleResult
+        } as ScanCompleteEvent
+      })
+    })
 
     // Verify stale breadcrumbs detection
     const staleProject = result.current.scanResult?.projects.find(
@@ -530,9 +528,6 @@ describe('Baker Scan Workflow Integration', () => {
       if (command === 'baker_start_scan') {
         return Promise.resolve('clear-test-scan-id')
       }
-      if (command === 'baker_get_scan_status') {
-        return Promise.resolve(mockCompleteScanResult)
-      }
       return Promise.resolve(undefined)
     })
 
@@ -543,12 +538,18 @@ describe('Baker Scan Workflow Integration', () => {
       await result.current.startScan('/test/path', mockScanOptions)
     })
 
-    await waitFor(
-      () => {
-        expect(result.current.isScanning).toBe(false)
-      },
-      { timeout: 3000 }
-    )
+    // Simulate completion event
+    const completeHandler = eventHandlers.get('baker_scan_complete')
+    expect(completeHandler).toBeDefined()
+
+    await act(async () => {
+      completeHandler!({
+        payload: {
+          scanId: 'clear-test-scan-id',
+          result: mockCompleteScanResult
+        } as ScanCompleteEvent
+      })
+    })
 
     // Verify we have results
     expect(result.current.scanResult).toBeDefined()

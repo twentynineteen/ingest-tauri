@@ -217,11 +217,12 @@ const mockBrowserApis = () => {
   // Configure React Testing Library act() environment for React 18
   ;(global as any).IS_REACT_ACT_ENVIRONMENT = true
 
-  // Mock Tauri window internals for getCurrentWindow()
+  // Mock Tauri window internals for getCurrentWindow() and invoke
   ;(window as any).__TAURI_INTERNALS__ = {
     metadata: {
       currentWindow: { label: 'main' }
-    }
+    },
+    invoke: vi.fn().mockResolvedValue(undefined)
   }
 
   // Mock ResizeObserver for react-virtual compatibility
