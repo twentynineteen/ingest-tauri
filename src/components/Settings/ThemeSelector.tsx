@@ -10,12 +10,12 @@
  * - Visual card layout with checkmark for selected theme
  */
 
-import { Label } from '@/components/ui/label'
 import { ThemeColorSwatch } from '@/components/Settings/ThemeColorSwatch'
+import { Label } from '@/components/ui/label'
 import { getGroupedThemes } from '@/constants/themes'
 import { useThemePreview } from '@/hooks/useThemePreview'
-import { useTheme } from 'next-themes'
 import { Check } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import React from 'react'
 
 export interface ThemeSelectorProps {
@@ -33,7 +33,7 @@ export function ThemeSelector({ label = 'Theme', className }: ThemeSelectorProps
   const [mounted, setMounted] = React.useState(false)
   const groupedThemes = React.useMemo(() => getGroupedThemes(), [])
   const { startPreview, stopPreview } = useThemePreview({
-    activeTheme: theme || 'system',
+    activeTheme: theme || 'system'
   })
 
   // Avoid hydration mismatch
@@ -44,17 +44,10 @@ export function ThemeSelector({ label = 'Theme', className }: ThemeSelectorProps
   if (!mounted) {
     return (
       <div className={className}>
-        {label && (
-          <Label className="mb-3 block">
-            {label}
-          </Label>
-        )}
+        {label && <Label className="mb-3 block">{label}</Label>}
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
-            <div
-              key={i}
-              className="bg-muted h-24 animate-pulse rounded-lg"
-            />
+            <div key={i} className="bg-muted h-24 animate-pulse rounded-lg" />
           ))}
         </div>
       </div>
@@ -63,11 +56,12 @@ export function ThemeSelector({ label = 'Theme', className }: ThemeSelectorProps
 
   return (
     <div className={className}>
-      {label && (
-        <Label className="mb-3 block">
-          {label}
-        </Label>
-      )}
+      {label && <Label className="mb-3 block">{label}</Label>}
+      {/* Help text */}
+      <p className="text-muted-foreground mt-4 text-xs">
+        Hover over themes to preview them. Changes are saved automatically.
+      </p>
+      <br />
 
       {/* Render grouped themes */}
       <div className="space-y-6">
@@ -110,9 +104,7 @@ export function ThemeSelector({ label = 'Theme', className }: ThemeSelectorProps
 
                     {/* Theme info */}
                     <div className="flex flex-col gap-1">
-                      <span className="text-sm font-medium">
-                        {themeMetadata.name}
-                      </span>
+                      <span className="text-sm font-medium">{themeMetadata.name}</span>
                       <span className="text-muted-foreground text-xs leading-tight">
                         {themeMetadata.description}
                       </span>
@@ -124,11 +116,6 @@ export function ThemeSelector({ label = 'Theme', className }: ThemeSelectorProps
           </div>
         ))}
       </div>
-
-      {/* Help text */}
-      <p className="text-muted-foreground mt-4 text-xs">
-        Hover over themes to preview them. Changes are saved automatically.
-      </p>
     </div>
   )
 }

@@ -52,7 +52,7 @@ describe('ThemeSelector', () => {
     })
   })
 
-  it('displays all 8 theme options as cards', async () => {
+  it('displays all 9 theme options as cards', async () => {
     renderThemeSelector()
 
     // All themes should be visible without clicking (no dropdown)
@@ -61,6 +61,7 @@ describe('ThemeSelector', () => {
       expect(screen.getByRole('button', { name: /select light theme/i })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /select dark theme/i })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /select dracula theme/i })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /select tokyo night theme/i })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /select catppuccin latte theme/i })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /select catppuccin frappé theme/i })).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /select catppuccin macchiato theme/i })).toBeInTheDocument()
@@ -88,7 +89,7 @@ describe('ThemeSelector', () => {
     // Color swatches are rendered (check by looking for presentation role)
     await waitFor(() => {
       const swatches = screen.getAllByRole('presentation', { hidden: true })
-      expect(swatches.length).toBe(8) // One per theme
+      expect(swatches.length).toBe(9) // One per theme
     })
   })
 
@@ -133,7 +134,7 @@ describe('ThemeSelector', () => {
     // All theme cards should be visible (no loading state with mocked theme)
     await waitFor(() => {
       const themeButtons = screen.getAllByRole('button', { name: /select .* theme/i })
-      expect(themeButtons.length).toBe(8)
+      expect(themeButtons.length).toBe(9)
     })
   })
 

@@ -257,6 +257,48 @@
     --sidebar-ring: var(--ring);
   }
 
+  /* Tokyo Night - Deep blue dark theme inspired by Tokyo at night */
+  .tokyo-night {
+    --background: 219 28% 13%; /* #1a1b26 */
+    --foreground: 220 16% 78%; /* #c0caf5 */
+    --card: 220 23% 17%; /* #24283b */
+    --card-foreground: 220 16% 78%;
+    --popover: 219 28% 13%;
+    --popover-foreground: 220 16% 78%;
+    --primary: 187 71% 68%; /* #7dcfff cyan */
+    --primary-foreground: 219 28% 13%;
+    --secondary: 221 39% 26%; /* #3b4261 */
+    --secondary-foreground: 220 16% 78%;
+    --muted: 221 39% 26%;
+    --muted-foreground: 221 17% 56%; /* #787c99 */
+    --accent: 217 92% 76%; /* #7aa2f7 blue */
+    --accent-foreground: 219 28% 13%;
+    --destructive: 0 100% 67%; /* #f7768e red */
+    --destructive-foreground: 220 16% 78%;
+    --success: 158 64% 52%; /* #9ece6a green */
+    --success-foreground: 219 28% 13%;
+    --warning: 41 88% 61%; /* #e0af68 yellow */
+    --warning-foreground: 219 28% 13%;
+    --info: 187 71% 68%; /* #7dcfff cyan */
+    --info-foreground: 219 28% 13%;
+    --border: 221 39% 26%;
+    --input: 221 39% 26%;
+    --ring: 187 71% 68%;
+    --chart-1: 187 71% 68%; /* cyan */
+    --chart-2: 217 92% 76%; /* blue */
+    --chart-3: 267 84% 81%; /* purple */
+    --chart-4: 158 64% 52%; /* green */
+    --chart-5: 41 88% 61%; /* yellow */
+    --sidebar-background: var(--card);
+    --sidebar-foreground: var(--card-foreground);
+    --sidebar-primary: var(--primary);
+    --sidebar-primary-foreground: var(--primary-foreground);
+    --sidebar-accent: var(--accent);
+    --sidebar-accent-foreground: var(--accent-foreground);
+    --sidebar-border: var(--border);
+    --sidebar-ring: var(--ring);
+  }
+
   /* Catppuccin Latte - Warm light theme with soft pastel colors */
   .catppuccin-latte {
     --background: 220 23% 95%; /* #eff1f5 */

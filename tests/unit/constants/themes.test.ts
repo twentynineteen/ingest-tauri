@@ -16,14 +16,15 @@ import { describe, expect, it } from 'vitest'
 
 describe('themes constants', () => {
   describe('THEMES registry', () => {
-    it('contains all 8 themes', () => {
+    it('contains all 9 themes', () => {
       const themeIds = Object.keys(THEMES)
-      expect(themeIds).toHaveLength(8)
+      expect(themeIds).toHaveLength(9)
       expect(themeIds).toEqual([
         'system',
         'light',
         'dark',
         'dracula',
+        'tokyo-night',
         'catppuccin-latte',
         'catppuccin-frappe',
         'catppuccin-macchiato',
@@ -53,6 +54,7 @@ describe('themes constants', () => {
       expect(THEMES.light.category).toBe('light')
       expect(THEMES.dark.category).toBe('dark')
       expect(THEMES.dracula.category).toBe('dark')
+      expect(THEMES['tokyo-night'].category).toBe('dark')
       expect(THEMES['catppuccin-latte'].category).toBe('light')
       expect(THEMES['catppuccin-frappe'].category).toBe('dark')
       expect(THEMES['catppuccin-macchiato'].category).toBe('dark')
@@ -64,6 +66,7 @@ describe('themes constants', () => {
       expect(THEMES.light.isDark).toBe(false)
       expect(THEMES.dark.isDark).toBe(true)
       expect(THEMES.dracula.isDark).toBe(true)
+      expect(THEMES['tokyo-night'].isDark).toBe(true)
       expect(THEMES['catppuccin-latte'].isDark).toBe(false)
       expect(THEMES['catppuccin-frappe'].isDark).toBe(true)
       expect(THEMES['catppuccin-macchiato'].isDark).toBe(true)
@@ -72,6 +75,7 @@ describe('themes constants', () => {
 
     it('includes author credits for third-party themes', () => {
       expect(THEMES.dracula.author).toBe('Zeno Rocha')
+      expect(THEMES['tokyo-night'].author).toBe('enkia')
       expect(THEMES['catppuccin-latte'].author).toBe('Catppuccin')
       expect(THEMES['catppuccin-frappe'].author).toBe('Catppuccin')
       expect(THEMES['catppuccin-macchiato'].author).toBe('Catppuccin')
@@ -87,6 +91,7 @@ describe('themes constants', () => {
         'light',
         'dark',
         'dracula',
+        'tokyo-night',
         'catppuccin-latte',
         'catppuccin-frappe',
         'catppuccin-macchiato',
@@ -136,12 +141,13 @@ describe('themes constants', () => {
       expect(lightThemes.map((t) => t.id)).toEqual(['light', 'catppuccin-latte'])
     })
 
-    it('returns 5 dark themes', () => {
+    it('returns 6 dark themes', () => {
       const darkThemes = getThemesByCategory('dark')
-      expect(darkThemes).toHaveLength(5)
+      expect(darkThemes).toHaveLength(6)
       expect(darkThemes.map((t) => t.id)).toEqual([
         'dark',
         'dracula',
+        'tokyo-night',
         'catppuccin-frappe',
         'catppuccin-macchiato',
         'catppuccin-mocha',
@@ -200,10 +206,11 @@ describe('themes constants', () => {
     it('groups dark themes correctly', () => {
       const groups = getGroupedThemes()
       const darkGroup = groups[2]
-      expect(darkGroup.themes).toHaveLength(5)
+      expect(darkGroup.themes).toHaveLength(6)
       expect(darkGroup.themes.map((t) => t.id)).toEqual([
         'dark',
         'dracula',
+        'tokyo-night',
         'catppuccin-frappe',
         'catppuccin-macchiato',
         'catppuccin-mocha',

@@ -122,8 +122,8 @@ const CUSTOM_THEMES_KEY = 'bucket-custom-themes'
 export function saveCustomThemesToStorage(themes: CustomThemeDefinition[]): void {
   try {
     localStorage.setItem(CUSTOM_THEMES_KEY, JSON.stringify(themes))
-  } catch (error) {
-    console.error('Failed to save custom themes to localStorage:', error)
+  } catch {
+    // Silently fail - localStorage may be unavailable
   }
 }
 
@@ -137,8 +137,8 @@ export function loadCustomThemesFromStorage(): CustomThemeDefinition[] {
 
     const parsed = JSON.parse(stored)
     return Array.isArray(parsed) ? parsed : []
-  } catch (error) {
-    console.error('Failed to load custom themes from localStorage:', error)
+  } catch {
+    // Return empty array if parsing fails or localStorage is unavailable
     return []
   }
 }

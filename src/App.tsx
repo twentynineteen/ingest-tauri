@@ -82,6 +82,7 @@ const App: React.FC = () => {
         'light',
         'dark',
         'dracula',
+        'tokyo-night',
         'catppuccin-latte',
         'catppuccin-frappe',
         'catppuccin-macchiato',

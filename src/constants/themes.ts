@@ -11,6 +11,7 @@ export type ThemeId =
   | 'light'
   | 'dark'
   | 'dracula'
+  | 'tokyo-night'
   | 'catppuccin-latte'
   | 'catppuccin-frappe'
   | 'catppuccin-macchiato'
@@ -92,6 +93,20 @@ export const THEMES: Record<ThemeId, ThemeMetadata> = {
     author: 'Zeno Rocha',
     isDark: true,
   },
+  'tokyo-night': {
+    id: 'tokyo-night',
+    name: 'Tokyo Night',
+    description: 'Deep blue dark theme inspired by Tokyo at night',
+    category: 'dark',
+    colorSwatch: {
+      background: '219 28% 13%', // #1a1b26
+      foreground: '220 16% 78%', // #c0caf5
+      primary: '187 71% 68%', // #7dcfff (cyan)
+      accent: '217 92% 76%', // #7aa2f7 (blue)
+    },
+    author: 'enkia',
+    isDark: true,
+  },
   'catppuccin-latte': {
     id: 'catppuccin-latte',
     name: 'Catppuccin Latte',
@@ -158,6 +173,7 @@ export const getAllThemeIds = (): ThemeId[] => [
   'light',
   'dark',
   'dracula',
+  'tokyo-night',
   'catppuccin-latte',
   'catppuccin-frappe',
   'catppuccin-macchiato',
@@ -208,6 +224,7 @@ export const getGroupedThemes = (): ThemeGroup[] => {
       themes: [
         THEMES.dark,
         THEMES.dracula,
+        THEMES['tokyo-night'],
         THEMES['catppuccin-frappe'],
         THEMES['catppuccin-macchiato'],
         THEMES['catppuccin-mocha'],
