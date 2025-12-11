@@ -1,4 +1,5 @@
 import { TrelloBoardSelector } from '@components/Settings/TrelloBoardSelector'
+import { ThemeSelector } from '@components/Settings/ThemeSelector'
 import { Button } from '@components/ui/button'
 import { CACHE } from '@constants/timing'
 import { useAIProvider } from '@hooks/useAIProvider'
@@ -202,6 +203,17 @@ const Settings: React.FC = () => {
       <h2 className="mb-6 px-4 text-2xl font-semibold">Settings</h2>
 
       <div className="mx-4 space-y-8 px-4">
+        {/* Appearance Section */}
+        <section className="border-border space-y-4 rounded-lg border p-6">
+          <div className="border-b pb-2">
+            <h3 className="text-foreground text-lg font-semibold">Appearance</h3>
+            <p className="text-muted-foreground text-sm">
+              Customize the visual theme and color scheme
+            </p>
+          </div>
+          <ThemeSelector />
+        </section>
+
         {/* AI Models Section */}
         <section className="border-border space-y-4 rounded-lg border p-6">
           <div className="border-b pb-2">
