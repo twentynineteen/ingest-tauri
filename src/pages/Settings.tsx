@@ -1,5 +1,11 @@
 import { TrelloBoardSelector } from '@components/Settings/TrelloBoardSelector'
 import { ThemeSelector } from '@components/Settings/ThemeSelector'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from '@components/ui/accordion'
 import { Button } from '@components/ui/button'
 import { CACHE } from '@constants/timing'
 import { useAIProvider } from '@hooks/useAIProvider'
@@ -13,12 +19,28 @@ import { open } from '@tauri-apps/plugin-shell'
 import ApiKeyInput from '@utils/ApiKeyInput'
 import { ApiKeys, loadApiKeys, saveApiKeys } from '@utils/storage'
 import { CheckCircle, Loader2, XCircle } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useLocation } from 'react-router-dom'
 
 import { logger } from '@/utils/logger'
 
 const Settings: React.FC = () => {
   const queryClient = useQueryClient()
+  const location = useLocation()
+
+  // Scroll to section when hash changes
+  useEffect(() => {
+    if (location.hash) {
+      const elementId = location.hash.slice(1) // Remove the '#'
+      const element = document.getElementById(elementId)
+      if (element) {
+        // Small delay to ensure the page is rendered
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 100)
+      }
+    }
+  }, [location.hash])
 
   // Local state for form inputs (separate from cached data)
   const [localApiKeys, setLocalApiKeys] = useState<Partial<ApiKeys>>({})
@@ -203,19 +225,8 @@ const Settings: React.FC = () => {
       <h2 className="mb-6 px-4 text-2xl font-semibold">Settings</h2>
 
       <div className="mx-4 space-y-8 px-4">
-        {/* Appearance Section */}
-        <section className="border-border space-y-4 rounded-lg border p-6">
-          <div className="border-b pb-2">
-            <h3 className="text-foreground text-lg font-semibold">Appearance</h3>
-            <p className="text-muted-foreground text-sm">
-              Customize the visual theme and color scheme
-            </p>
-          </div>
-          <ThemeSelector />
-        </section>
-
         {/* AI Models Section */}
-        <section className="border-border space-y-4 rounded-lg border p-6">
+        <section id="ai-models" className="border-border space-y-4 rounded-lg border p-6">
           <div className="border-b pb-2">
             <h3 className="text-foreground text-lg font-semibold">AI Models</h3>
             <p className="text-muted-foreground text-sm">
@@ -273,8 +284,97 @@ const Settings: React.FC = () => {
           </div>
         </section>
 
+        {/* Appearance Section */}
+        <section
+          id="appearance"
+          className="border-border space-y-4 rounded-lg border p-6"
+        >
+          <div className="border-b pb-2">
+            <h3 className="text-foreground text-lg font-semibold">Appearance</h3>
+            <p className="text-muted-foreground text-sm">
+              Customize the visual theme and color scheme
+            </p>
+          </div>
+          <Accordion type="single" collapsible>
+            <AccordionItem value="theme" className="border-b-0">
+              <AccordionTrigger className="hover:no-underline">
+                Theme Selection
+              </AccordionTrigger>
+              <AccordionContent>
+                <ThemeSelector label="" />
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </section>
+
+        {/* Backgrounds Section */}
+        <section
+          id="backgrounds"
+          className="border-border space-y-4 rounded-lg border p-6"
+        >
+          <div className="border-b pb-2">
+            <h3 className="text-foreground text-lg font-semibold">Backgrounds</h3>
+            <p className="text-muted-foreground text-sm">
+              Set default folder for background assets
+            </p>
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium">
+              Default Background Folder
+            </label>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleSelectDefaultBackgroundFolder}
+                className="rounded border px-3 py-1"
+              >
+                Choose Folder
+              </Button>
+              <Button
+                onClick={handleSaveDefaultBackground}
+                className="rounded border px-3 py-1"
+              >
+                Save
+              </Button>
+            </div>
+            {defaultBackgroundFolder && (
+              <p className="text-muted-foreground mt-1 text-sm">
+                {defaultBackgroundFolder}
+              </p>
+            )}
+          </div>
+        </section>
+
+        {/* SproutVideo Section */}
+        <section
+          id="sproutvideo"
+          className="border-border space-y-4 rounded-lg border p-6"
+        >
+          <div className="border-b pb-2">
+            <h3 className="text-foreground text-lg font-semibold">SproutVideo</h3>
+            <p className="text-muted-foreground text-sm">
+              Configure SproutVideo API for video hosting
+            </p>
+          </div>
+          <div>
+            <label
+              htmlFor="sprout-video-api-key-input"
+              className="mb-2 block text-sm font-medium"
+            >
+              SproutVideo API Key
+            </label>
+            <ApiKeyInput
+              id="sprout-video-api-key-input"
+              apiKey={localApiKeys.sproutVideo || ''}
+              setApiKey={(newKey: string) =>
+                setLocalApiKeys({ ...localApiKeys, sproutVideo: newKey })
+              }
+              onSave={handleSaveSproutKey}
+            />
+          </div>
+        </section>
+
         {/* Trello Section */}
-        <section className="border-border space-y-4 rounded-lg border p-6">
+        <section id="trello" className="border-border space-y-4 rounded-lg border p-6">
           <div className="border-b pb-2">
             <h3 className="text-foreground text-lg font-semibold">Trello</h3>
             <p className="text-muted-foreground text-sm">
@@ -331,66 +431,6 @@ const Settings: React.FC = () => {
             label="Trello Board"
             placeholder="Select a board"
           />
-        </section>
-
-        {/* SproutVideo Section */}
-        <section className="border-border space-y-4 rounded-lg border p-6">
-          <div className="border-b pb-2">
-            <h3 className="text-foreground text-lg font-semibold">SproutVideo</h3>
-            <p className="text-muted-foreground text-sm">
-              Configure SproutVideo API for video hosting
-            </p>
-          </div>
-          <div>
-            <label
-              htmlFor="sprout-video-api-key-input"
-              className="mb-2 block text-sm font-medium"
-            >
-              SproutVideo API Key
-            </label>
-            <ApiKeyInput
-              id="sprout-video-api-key-input"
-              apiKey={localApiKeys.sproutVideo || ''}
-              setApiKey={(newKey: string) =>
-                setLocalApiKeys({ ...localApiKeys, sproutVideo: newKey })
-              }
-              onSave={handleSaveSproutKey}
-            />
-          </div>
-        </section>
-
-        {/* Backgrounds Section */}
-        <section className="border-border space-y-4 rounded-lg border p-6">
-          <div className="border-b pb-2">
-            <h3 className="text-foreground text-lg font-semibold">Backgrounds</h3>
-            <p className="text-muted-foreground text-sm">
-              Set default folder for background assets
-            </p>
-          </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium">
-              Default Background Folder
-            </label>
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={handleSelectDefaultBackgroundFolder}
-                className="rounded border px-3 py-1"
-              >
-                Choose Folder
-              </Button>
-              <Button
-                onClick={handleSaveDefaultBackground}
-                className="rounded border px-3 py-1"
-              >
-                Save
-              </Button>
-            </div>
-            {defaultBackgroundFolder && (
-              <p className="text-muted-foreground mt-1 text-sm">
-                {defaultBackgroundFolder}
-              </p>
-            )}
-          </div>
         </section>
       </div>
     </div>

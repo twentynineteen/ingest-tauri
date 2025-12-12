@@ -104,8 +104,24 @@ const data = {
       isActive: false,
       items: [
         {
-          title: 'General',
-          url: '/settings/general'
+          title: 'AI Models',
+          url: '/settings/general#ai-models'
+        },
+        {
+          title: 'Appearance',
+          url: '/settings/general#appearance'
+        },
+        {
+          title: 'Backgrounds',
+          url: '/settings/general#backgrounds'
+        },
+        {
+          title: 'SproutVideo',
+          url: '/settings/general#sproutvideo'
+        },
+        {
+          title: 'Trello',
+          url: '/settings/general#trello'
         }
       ]
     }

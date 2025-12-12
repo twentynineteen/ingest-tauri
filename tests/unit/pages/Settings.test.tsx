@@ -12,6 +12,7 @@ import * as storage from '@/utils/storage'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { MemoryRouter } from 'react-router-dom'
 
 // Mock Tauri APIs
 vi.mock('@tauri-apps/plugin-dialog', () => ({
@@ -41,7 +42,7 @@ vi.mock('@/hooks/useAIProvider', () => ({
 
 // Mock app store
 vi.mock('@/store/useAppStore', () => ({
-  useAppStore: vi.fn(selector => {
+  useAppStore: vi.fn((selector) => {
     const mockState = {
       defaultBackgroundFolder: '',
       setDefaultBackgroundFolder: vi.fn(),
@@ -77,9 +78,11 @@ describe('Settings Page', () => {
 
   const renderSettings = () => {
     return render(
-      <QueryClientProvider client={queryClient}>
-        <Settings />
-      </QueryClientProvider>
+      <MemoryRouter>
+        <QueryClientProvider client={queryClient}>
+          <Settings />
+        </QueryClientProvider>
+      </MemoryRouter>
     )
   }
 
