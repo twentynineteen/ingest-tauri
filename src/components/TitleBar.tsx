@@ -9,7 +9,7 @@ export function TitleBar() {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 h-14 z-50 flex items-center px-4 bg-background/95 backdrop-blur-sm border-b border-border/50"
+      className="fixed top-0 left-0 right-0 h-14 z-50 flex items-center px-4 bg-background border-b border-border/50"
       style={{
         WebkitAppRegion: 'drag',
         paddingLeft: '80px'
