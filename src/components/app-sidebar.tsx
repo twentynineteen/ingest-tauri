@@ -9,6 +9,7 @@ import {
   SidebarHeader,
   SidebarRail
 } from '@components/ui/sidebar'
+import { UpdateDialog } from '@components/UpdateDialog'
 import { useAuth } from '@hooks/useAuth'
 import { useMacOSEffects } from '@hooks/useMacOSEffects'
 import { useUpdateManager } from '@hooks/useUpdateManager'
@@ -120,13 +121,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   useMacOSEffects({ effects: ['Sidebar'] })
 
   // Create the update manager hook instance.
-  const updateManager = useUpdateManager()
+  const { dialogState, onUpdate, onCancel, mutate } = useUpdateManager()
 
   // Callback for when the update button is clicked.
   const onUpdateClicked = React.useCallback(() => {
     // Set `onUserClick` to true to show feedback when no update is available.
-    updateManager.mutate({ onUserClick: true })
-  }, [updateManager])
+    mutate({ onUserClick: true })
+  }, [mutate])
 
   const user = {
     name: username || 'Unknown User',
@@ -134,23 +135,29 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }
 
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
-      </SidebarHeader>
-      <SidebarContent>
-        <NavMain items={data.navMain} />
-      </SidebarContent>
-      <SidebarFooter>
-        <ThemeToggle />
-        <NavUser
-          user={user}
-          onLogout={logout}
-          onUpdateClicked={onUpdateClicked}
-          // isLoading={updateManager.isPending}
-        />
-      </SidebarFooter>
-      <SidebarRail />
-    </Sidebar>
+    <>
+      <Sidebar collapsible="icon" {...props}>
+        <SidebarHeader>
+          <TeamSwitcher teams={data.teams} />
+        </SidebarHeader>
+        <SidebarContent>
+          <NavMain items={data.navMain} />
+        </SidebarContent>
+        <SidebarFooter>
+          <ThemeToggle />
+          <NavUser user={user} onLogout={logout} onUpdateClicked={onUpdateClicked} />
+        </SidebarFooter>
+        <SidebarRail />
+      </Sidebar>
+
+      <UpdateDialog
+        open={dialogState.open}
+        currentVersion={dialogState.currentVersion}
+        latestVersion={dialogState.latestVersion}
+        releaseNotes={dialogState.releaseNotes}
+        onUpdate={onUpdate}
+        onCancel={onCancel}
+      />
+    </>
   )
 }
