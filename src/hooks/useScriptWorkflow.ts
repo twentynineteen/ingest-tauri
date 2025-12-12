@@ -211,6 +211,17 @@ export function useScriptWorkflow() {
     setCurrentStep('upload')
   }, [uploadHook, processingHook, reviewHook])
 
+  // Wrapper for handleFormatScript that provides the document text automatically
+  const handleFormatScript = useCallback(() => {
+    if (!uploadHook.document?.textContent) {
+      log.warn('Cannot format script: no document text available')
+      return
+    }
+    log.info('Starting format script with document text')
+    setCurrentStep('processing')
+    processingHook.handleFormatScript(uploadHook.document.textContent)
+  }, [uploadHook.document, processingHook])
+
   return {
     // Current state
     currentStep,
@@ -251,7 +262,7 @@ export function useScriptWorkflow() {
     availableProviders: processingHook.availableProviders,
     setSelectedModelId: processingHook.setSelectedModelId,
     handleProviderValidate: processingHook.handleProviderValidate,
-    handleFormatScript: processingHook.handleFormatScript,
+    handleFormatScript,
     handleExampleToggle: processingHook.handleExampleToggle,
     switchProvider: processingHook.switchProvider,
     cancelProcessing: processingHook.cancelProcessing,

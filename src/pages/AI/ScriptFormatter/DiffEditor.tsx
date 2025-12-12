@@ -6,7 +6,8 @@
 
 import Editor from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
-import React, { useEffect, useRef, useState } from 'react'
+import { useTheme } from 'next-themes'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 // Monaco is bundled locally via vite-plugin-monaco-editor
 // The plugin automatically configures workers for Tauri environment
@@ -19,10 +20,20 @@ interface DiffEditorProps {
   height?: string
 }
 
+// Light themes that should use vs-light Monaco theme
+const LIGHT_THEMES = ['light', 'catppuccin-latte']
+
 export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChange }) => {
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [isEditorReady, setIsEditorReady] = useState(false)
+  const { resolvedTheme } = useTheme()
+
+  // Determine Monaco editor theme based on app theme
+  const monacoTheme = useMemo(() => {
+    if (!resolvedTheme) return 'vs-dark'
+    return LIGHT_THEMES.includes(resolvedTheme) ? 'vs-light' : 'vs-dark'
+  }, [resolvedTheme])
 
   const handleEditorChange = (value: string | undefined) => {
     if (value !== undefined) {
@@ -113,7 +124,7 @@ export const DiffEditor: React.FC<DiffEditorProps> = ({ modified, onModifiedChan
               nonBasicASCII: false
             }
           }}
-          theme="vs-light"
+          theme={monacoTheme}
         />
       </div>
     </div>
