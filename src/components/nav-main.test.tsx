@@ -129,7 +129,9 @@ describe('NavMain', () => {
     })
 
     it('should render menu item without icon', () => {
-      const items = [createMockItem({ title: 'No Icon', url: '/no-icon', icon: undefined })]
+      const items = [
+        createMockItem({ title: 'No Icon', url: '/no-icon', icon: undefined })
+      ]
 
       renderNavMain(items)
 
@@ -137,7 +139,9 @@ describe('NavMain', () => {
     })
 
     it('should render menu item with icon', () => {
-      const items = [createMockItem({ title: 'With Icon', url: '/with-icon', icon: Home })]
+      const items = [
+        createMockItem({ title: 'With Icon', url: '/with-icon', icon: Home })
+      ]
 
       renderNavMain(items)
 
@@ -151,8 +155,7 @@ describe('NavMain', () => {
   // Sub-items (Children) Tests
   // ==========================================
   describe('Sub-items Rendering', () => {
-    it('should render sub-items when item has items array', async () => {
-      const user = userEvent.setup()
+    it('should render sub-items when item has items array', () => {
       const items = [
         createMockItem({
           title: 'Settings',
@@ -286,9 +289,7 @@ describe('NavMain', () => {
           title: 'Settings',
           url: '/settings',
           isActive: true,
-          items: [
-            { title: 'General', url: '/settings/general' }
-          ]
+          items: [{ title: 'General', url: '/settings/general' }]
         })
       ]
 
