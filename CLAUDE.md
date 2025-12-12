@@ -124,6 +124,59 @@ All file operations go through Tauri backend with progress tracking. Key pattern
 
 ### Recent Features
 
+#### Phase 009: Multi-Theme System (Current - Branch: update/performance)
+
+- **Status**: Implementation Complete
+- **Summary**: Comprehensive theme customization system with 8 themes, live preview, and extensible architecture
+- **Key Features**:
+  - **8 Themes Available**: System, Light, Dark, Dracula, Catppuccin Latte, Frappé, Macchiato, Mocha
+  - **Settings Integration**: Dedicated Appearance section in Settings → General
+  - **Live Preview**: Hover over themes to preview instantly without applying
+  - **Color Swatches**: Visual 4-color preview for each theme
+  - **Auto-Save**: Theme selection persists automatically to localStorage
+  - **Sidebar Quick Toggle**: Fast light/dark switching with "Customize" link to Settings
+  - **Custom Theme Architecture**: Foundation for user-imported JSON themes (future)
+  - **Fully Tested**: 29 unit tests covering components, utilities, and constants
+- **Components**:
+  - [ThemeSelector.tsx](src/components/Settings/ThemeSelector.tsx) - Main theme dropdown with live preview
+  - [ThemeColorSwatch.tsx](src/components/Settings/ThemeColorSwatch.tsx) - 4-color preview component
+  - [ThemeImport.tsx](src/components/Settings/ThemeImport.tsx) - Custom theme import stub
+  - [theme-toggle.tsx](src/components/theme-toggle.tsx) - Enhanced sidebar toggle
+- **Hooks**: [useThemePreview.ts](src/hooks/useThemePreview.ts) - Live preview with debouncing
+- **Constants**: [themes.ts](src/constants/themes.ts) - Complete theme registry and metadata
+- **Utilities**:
+  - [themeMapper.ts](src/utils/themeMapper.ts) - Legacy migration (backward compatible)
+  - [themeLoader.ts](src/utils/themeLoader.ts) - Dynamic custom theme loading (future)
+- **Types**: [customTheme.ts](src/types/customTheme.ts) - Custom theme definitions with Zod validation
+- **Styling**: [index.css](src/index.css) - CSS variables for all 8 themes (~200 lines added)
+- **Configuration**: [App.tsx](src/App.tsx) - ThemeProvider with all theme IDs registered
+- **Documentation**:
+  - [theme-customization.md](docs/theme-customization.md) - User guide
+  - [theme-architecture.md](docs/theme-architecture.md) - Developer documentation
+- **Tests**: 29 passing tests across themes.test.ts, themeMapper.test.ts, ThemeSelector.test.tsx, ThemeColorSwatch.test.tsx
+- **Backward Compatibility**: Fully compatible with existing light/dark theme preferences
+
+#### Phase 008: Native macOS Window Styling (Branch: 008-macos-window-styling)
+
+- **Status**: Implementation Complete
+- **Summary**: Transform window appearance to match native macOS applications with platform-specific styling
+- **Key Features**:
+  - Transparent title bar with overlay mode
+  - Native macOS traffic light controls positioned at (20, 20)
+  - Sidebar vibrancy effects (blur/translucency) using native 'Sidebar' material
+  - Custom title bar component with draggable regions
+  - System theme integration (automatic light/dark mode switching)
+  - Window state persistence (position and size across sessions)
+  - Advanced macOS integration (window tabbing, standard click behavior)
+  - Graceful fallback on Windows/Linux platforms
+- **Components**: [TitleBar.tsx](src/components/TitleBar.tsx)
+- **Hooks**: [useMacOSEffects.ts](src/hooks/useMacOSEffects.ts), [useSystemTheme.ts](src/hooks/useSystemTheme.ts), [useWindowState.ts](src/hooks/useWindowState.ts)
+- **Configuration**: [tauri.conf.json](src-tauri/tauri.conf.json) with `titleBarStyle: "Overlay"`, `transparent: true`, `trafficLightPosition`
+- **Documentation**: [macos-window-styling.md](docs/macos-window-styling.md), [macos-window-styling-plan.md](macos-window-styling-plan.md)
+- **Platform**: macOS only (graceful fallback on other platforms)
+- **App Store**: Not compatible (uses `macOSPrivateApi: true` for transparency)
+- **Phases Implemented**: All 5 phases (transparent title bar, vibrancy, custom overlay, theme integration, advanced polish)
+
 #### Phase 007: AI Script Example Embedding Management (Branch: 007-frontend-script-example)
 
 - **Status**: Implementation Complete

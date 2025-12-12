@@ -6,8 +6,10 @@ import { BrowserRouter as Router } from 'react-router-dom'
 
 import AppRouter from './AppRouter'
 import { QueryErrorBoundary } from './components/ErrorBoundary'
+import { TitleBar } from './components/TitleBar'
 import { CACHE, getBackoffDelay, RETRY } from './constants/timing'
 import { AuthProvider } from './context/AuthProvider'
+import { useWindowState } from './hooks/useWindowState'
 import { initializePerformanceMonitor } from './lib/performance-monitor'
 import { initializePrefetchManager } from './lib/prefetch-strategies'
 import { initializeCacheService } from './services/cache-invalidation'
@@ -68,12 +70,32 @@ prefetchManager.prefetchAppStartupData().catch((error) => {
 })
 
 const App: React.FC = () => {
+  // Persist window position and size across sessions
+  useWindowState()
+
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      themes={[
+        'system',
+        'light',
+        'dark',
+        'dracula',
+        'tokyo-night',
+        'catppuccin-latte',
+        'catppuccin-frappe',
+        'catppuccin-macchiato',
+        'catppuccin-mocha'
+      ]}
+      enableSystem
+      storageKey="theme"
+    >
       <QueryClientProvider client={queryClient}>
         <QueryErrorBoundary>
           <AuthProvider>
             <Router>
+              <TitleBar />
               <AppRouter />
             </Router>
           </AuthProvider>

@@ -141,35 +141,70 @@ export const mockScanResult: ScanResult = {
  */
 export async function setupTauriMocks(page: Page): Promise<void> {
   await page.addInitScript(() => {
-    // Create mock __TAURI__ object if it doesn't exist
+    // Create mock Tauri objects IMMEDIATELY before any scripts run
+    // Tauri v2 uses __TAURI_INTERNALS__ for the main API
     if (typeof window !== 'undefined') {
       const tauriWindow = window as {
-        __TAURI__?: {
+        __TAURI__?: unknown
+        __TAURI_INTERNALS__?: {
           invoke: (cmd: string, args?: unknown) => Promise<unknown>
-        }
-      }
-
-      tauriWindow.__TAURI__ = {
-        invoke: async (cmd: string, args?: unknown) => {
-          // Return mock data based on command
-          switch (cmd) {
-            case 'get_version':
-              return '0.9.3'
-            case 'check_auth':
-              return { authenticated: true, user: 'test@example.com' }
-            case 'get_preferences':
-              return {
-                defaultPath: '/Users/test',
-                theme: 'system'
-              }
-            default:
-              // Log unhandled commands for debugging
-              // eslint-disable-next-line no-console
-              console.warn(`[E2E Mock] Unhandled Tauri command: ${cmd}`, args)
-              return null
+          metadata: {
+            windows: Array<{ label: string }>
+            currentWindow: { label: string }
           }
         }
       }
+
+      const mockInvoke = async (cmd: string, args?: unknown) => {
+        // Return mock data based on command
+        switch (cmd) {
+          case 'get_version':
+            return '0.9.3'
+          case 'check_auth':
+            return { authenticated: true, user: 'test@example.com' }
+          case 'get_preferences':
+            return {
+              defaultPath: '/Users/test',
+              theme: 'system'
+            }
+          case 'tauri':
+            // Handle nested Tauri API calls
+            if (args && typeof args === 'object' && 'cmd' in args) {
+              const innerCmd = (args as { cmd: string }).cmd
+              switch (innerCmd) {
+                case 'plugin:path|app_data_dir':
+                case 'plugin:path|resolve_directory':
+                  return '/tmp/bucket-test/data'
+                case 'plugin:path|app_dir':
+                  return '/tmp/bucket-test/app'
+                case 'plugin:path|resource_dir':
+                  return '/tmp/bucket-test/resources'
+                default:
+                  // eslint-disable-next-line no-console
+                  console.warn(`[E2E Mock] Unhandled nested Tauri command: ${innerCmd}`)
+                  return null
+              }
+            }
+            return null
+          default:
+            // Log unhandled commands for debugging
+            // eslint-disable-next-line no-console
+            console.warn(`[E2E Mock] Unhandled Tauri command: ${cmd}`, args)
+            return null
+        }
+      }
+
+      // Tauri v2 uses __TAURI_INTERNALS__
+      tauriWindow.__TAURI_INTERNALS__ = {
+        invoke: mockInvoke,
+        metadata: {
+          windows: [{ label: 'main' }],
+          currentWindow: { label: 'main' }
+        }
+      }
+
+      // Also set __TAURI__ for backwards compatibility
+      tauriWindow.__TAURI__ = tauriWindow.__TAURI_INTERNALS__
     }
   })
 }

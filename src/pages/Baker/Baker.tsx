@@ -8,6 +8,7 @@
 import { BakerPreferences } from '@components/Baker/BakerPreferences'
 import { BatchActions } from '@components/Baker/BatchActions'
 import { FolderSelector } from '@components/Baker/FolderSelector'
+import { PreviewProgress } from '@components/Baker/PreviewProgress'
 import { ProjectDetailPanel } from '@components/Baker/ProjectDetailPanel'
 import { ProjectListPanel } from '@components/Baker/ProjectListPanel'
 import { ScanResults } from '@components/Baker/ScanResults'
@@ -56,8 +57,14 @@ const BakerPageContent: React.FC = () => {
     readLiveBreadcrumbs,
     clearBreadcrumbs
   } = useLiveBreadcrumbsReader()
-  const { generatePreview, generateBatchPreviews, clearPreviews, getPreview } =
-    useBreadcrumbsPreview()
+  const {
+    generatePreview,
+    generateBatchPreviews,
+    clearPreviews,
+    getPreview,
+    previews,
+    isGenerating
+  } = useBreadcrumbsPreview()
 
   // Trello integration - now properly separated
   const boardId = '55a504d70bed2bd21008dc5a'
@@ -274,6 +281,15 @@ const BakerPageContent: React.FC = () => {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* Preview Progress Indicator */}
+          {scanResult?.projects && (
+            <PreviewProgress
+              current={previews.size}
+              total={selectedProjects.length}
+              isGenerating={isGenerating}
+            />
           )}
 
           {/* Batch Actions */}

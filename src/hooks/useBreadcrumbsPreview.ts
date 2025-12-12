@@ -3,6 +3,11 @@
  *
  * Custom hook for managing breadcrumbs preview functionality.
  * Generates previews of changes Baker will make to breadcrumbs files.
+ *
+ * Features:
+ * - Concurrency control to prevent system overload (max 5 concurrent operations)
+ * - Progress tracking for batch operations
+ * - Error handling and graceful fallbacks
  */
 
 import { invoke } from '@tauri-apps/api/core'
@@ -10,10 +15,14 @@ import {
   compareBreadcrumbsMeaningful,
   generateBreadcrumbsPreview
 } from '@utils/breadcrumbsComparison'
-import { useCallback, useState } from 'react'
+import pLimit from 'p-limit'
+import { useCallback, useMemo, useState } from 'react'
 
 import type { BreadcrumbsFile, BreadcrumbsPreview, ProjectFolder } from '@/types/baker'
 import { logger } from '@/utils/logger'
+
+// Concurrency limit for batch operations to prevent system overload
+const CONCURRENCY_LIMIT = 5
 
 interface UseBreadcrumbsPreviewResult {
   // State
@@ -40,6 +49,9 @@ export function useBreadcrumbsPreview(): UseBreadcrumbsPreviewResult {
   const [previews, setPreviews] = useState<Map<string, BreadcrumbsPreview>>(new Map())
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Create concurrency limiter (memoized to prevent recreation on each render)
+  const limit = useMemo(() => pLimit(CONCURRENCY_LIMIT), [])
 
   const generatePreview = useCallback(
     async (
@@ -189,14 +201,19 @@ export function useBreadcrumbsPreview(): UseBreadcrumbsPreviewResult {
       const newPreviews = new Map<string, BreadcrumbsPreview>()
 
       try {
-        // Generate previews in parallel for better performance
-        const previewPromises = projects.map(async (project) => {
-          const preview = await generatePreview(project.path, project)
-          if (preview) {
-            return [project.path, preview] as const
-          }
-          return null
-        })
+        // Generate previews with concurrency control to prevent system overload
+        // Uses p-limit to ensure max CONCURRENCY_LIMIT operations run simultaneously
+        const previewPromises = projects.map((project) =>
+          limit(async () => {
+            const preview = await generatePreview(project.path, project)
+            if (preview) {
+              // Update previews incrementally as each completes (for progress tracking)
+              setPreviews((prev) => new Map(prev.set(project.path, preview)))
+              return [project.path, preview] as const
+            }
+            return null
+          })
+        )
 
         const results = await Promise.all(previewPromises)
 
@@ -206,6 +223,7 @@ export function useBreadcrumbsPreview(): UseBreadcrumbsPreviewResult {
           }
         })
 
+        // Final update with all previews
         setPreviews(newPreviews)
         return newPreviews
       } catch (batchError) {
@@ -217,7 +235,7 @@ export function useBreadcrumbsPreview(): UseBreadcrumbsPreviewResult {
         setIsGenerating(false)
       }
     },
-    [generatePreview]
+    [generatePreview, limit]
   )
 
   const clearPreviews = useCallback(() => {

@@ -8,30 +8,48 @@ import type { BreadcrumbsDiff, BreadcrumbsFile, FieldChange } from '@/types/bake
 
 /**
  * Deep equality check for any value type
+ * Optimized with fast-paths for common cases
  */
 function deepEqual(a: unknown, b: unknown): boolean {
+  // Fast-path: Identical references (includes primitives and same object)
   if (a === b) return true
 
+  // Fast-path: null/undefined
   if (a == null || b == null) return a === b
 
+  // Fast-path: Different types
   if (typeof a !== typeof b) return false
 
+  // Fast-path: Primitives (string, number, boolean, symbol, bigint)
+  // If we reach here and type is not 'object' or 'function', they're different primitives
+  if (typeof a !== 'object' && typeof a !== 'function') return false
+
+  // Deep comparison for objects and arrays
   if (typeof a === 'object') {
+    // Fast-path: Array type mismatch
     if (Array.isArray(a) !== Array.isArray(b)) return false
 
     if (Array.isArray(a)) {
+      // Fast-path: Different array lengths
       if (a.length !== (b as unknown[]).length) return false
+      // Recursive array comparison
       return a.every((item, index) => deepEqual(item, (b as unknown[])[index]))
     }
 
+    // Object comparison with optimizations
     const keysA = Object.keys(a)
     const keysB = Object.keys(b)
 
+    // Fast-path: Different number of keys
     if (keysA.length !== keysB.length) return false
 
-    return keysA.every((key) => deepEqual(a[key], b[key]))
+    // Recursive object comparison
+    return keysA.every((key) =>
+      deepEqual((a as Record<string, unknown>)[key], (b as Record<string, unknown>)[key])
+    )
   }
 
+  // Functions and other types are not equal if not identical
   return false
 }
 

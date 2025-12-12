@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
   "productName": "Bucket",
-  "version": "0.9.7",
+  "version": "0.10.0",
   "identifier": "com.bucket-app.dev",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -9,7 +9,6 @@
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
-
   "app": {
     "macOSPrivateApi": true,
     "withGlobalTauri": true,
@@ -19,7 +18,17 @@
         "width": 1200,
         "height": 800,
         "resizable": true,
-        "dragDropEnabled": true
+        "dragDropEnabled": true,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "decorations": true,
+        "transparent": true,
+        "trafficLightPosition": {
+          "x": 20,
+          "y": 20
+        },
+        "acceptFirstMouse": false,
+        "tabbingIdentifier": "bucket-app"
       }
     ],
     "security": {
@@ -31,7 +40,11 @@
     "dialog": null,
     "deep-link": {
       "desktop": {
-        "schemes": ["bucket", "myapp", "Bucket"]
+        "schemes": [
+          "bucket",
+          "myapp",
+          "Bucket"
+        ]
       }
     },
     "fs": null,
