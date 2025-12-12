@@ -4,8 +4,9 @@
  */
 
 import { useWindowState } from '@/hooks/useWindowState'
-import { renderHook, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { LogicalPosition, LogicalSize } from '@tauri-apps/api/window'
+import { renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock Tauri window API
 const mockSetPosition = vi.fn()
@@ -15,16 +16,35 @@ const mockOuterSize = vi.fn()
 const mockOnResized = vi.fn()
 const mockOnMoved = vi.fn()
 
-vi.mock('@tauri-apps/api/window', () => ({
-  getCurrentWindow: () => ({
-    setPosition: mockSetPosition,
-    setSize: mockSetSize,
-    outerPosition: mockOuterPosition,
-    outerSize: mockOuterSize,
-    onResized: mockOnResized,
-    onMoved: mockOnMoved
-  })
-}))
+vi.mock('@tauri-apps/api/window', () => {
+  // Mock LogicalPosition and LogicalSize classes - must be defined inside the factory
+  class MockLogicalPosition {
+    constructor(
+      public x: number,
+      public y: number
+    ) {}
+  }
+
+  class MockLogicalSize {
+    constructor(
+      public width: number,
+      public height: number
+    ) {}
+  }
+
+  return {
+    getCurrentWindow: () => ({
+      setPosition: mockSetPosition,
+      setSize: mockSetSize,
+      outerPosition: mockOuterPosition,
+      outerSize: mockOuterSize,
+      onResized: mockOnResized,
+      onMoved: mockOnMoved
+    }),
+    LogicalPosition: MockLogicalPosition,
+    LogicalSize: MockLogicalSize
+  }
+})
 
 describe('useWindowState', () => {
   const STORAGE_KEY = 'bucket-window-state'
@@ -81,8 +101,8 @@ describe('useWindowState', () => {
       await vi.runAllTimersAsync()
 
       expect(mockLocalStorage.getItem).toHaveBeenCalledWith(STORAGE_KEY)
-      expect(mockSetPosition).toHaveBeenCalledWith({ x: 50, y: 50 })
-      expect(mockSetSize).toHaveBeenCalledWith({ width: 1024, height: 768 })
+      expect(mockSetPosition).toHaveBeenCalledWith(new LogicalPosition(50, 50))
+      expect(mockSetSize).toHaveBeenCalledWith(new LogicalSize(1024, 768))
     })
 
     it('should not restore if no saved state exists', async () => {
@@ -357,7 +377,7 @@ describe('useWindowState', () => {
 
       await vi.runAllTimersAsync()
 
-      expect(mockSetPosition).toHaveBeenCalledWith({ x: 0, y: 0 })
+      expect(mockSetPosition).toHaveBeenCalledWith(new LogicalPosition(0, 0))
     })
 
     it('should handle negative position values', async () => {
@@ -374,7 +394,7 @@ describe('useWindowState', () => {
 
       await vi.runAllTimersAsync()
 
-      expect(mockSetPosition).toHaveBeenCalledWith({ x: -100, y: -50 })
+      expect(mockSetPosition).toHaveBeenCalledWith(new LogicalPosition(-100, -50))
     })
 
     it('should handle very large window dimensions', async () => {
