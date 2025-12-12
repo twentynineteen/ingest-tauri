@@ -69,7 +69,7 @@ function VideoLinkCardComponent({
             size="icon"
             onClick={onMoveUp}
             disabled={!canMoveUp}
-            className="bg-background/90 h-7 w-7 backdrop-blur-sm"
+            className="bg-background h-7 w-7"
             title="Move up"
           >
             <ChevronUp className="h-3.5 w-3.5" />
@@ -79,7 +79,7 @@ function VideoLinkCardComponent({
             size="icon"
             onClick={onMoveDown}
             disabled={!canMoveDown}
-            className="bg-background/90 h-7 w-7 backdrop-blur-sm"
+            className="bg-background h-7 w-7"
             title="Move down"
           >
             <ChevronDown className="h-3.5 w-3.5" />
@@ -88,7 +88,7 @@ function VideoLinkCardComponent({
             variant="secondary"
             size="icon"
             onClick={onRemove}
-            className="bg-destructive/90 text-destructive-foreground hover:bg-destructive h-7 w-7 backdrop-blur-sm"
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90 h-7 w-7"
             title="Remove video"
           >
             <Trash2 className="h-3.5 w-3.5" />

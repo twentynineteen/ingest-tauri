@@ -9,26 +9,27 @@ export function TitleBar() {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 h-14 z-50 flex items-center px-4 bg-background/95 backdrop-blur-sm border-b border-border/50"
+      className="fixed top-0 left-0 right-0 h-14 z-50 flex items-center px-4 bg-background border-b border-border/50"
       style={{
-        WebkitAppRegion: 'drag',
-        paddingLeft: '80px'
+        paddingLeft: '80px',
+        willChange: 'transform'
       }}
       data-tauri-drag-region
     >
       {/* Custom title bar content */}
       <div
         className="flex items-center gap-2 text-sm font-medium text-foreground/70 pl-2"
-        style={{ WebkitAppRegion: 'no-drag', marginTop: '-12px' }}
+        style={{ marginTop: '-12px' }}
+        data-tauri-drag-region
       >
-        <span>Bucket</span>
+        <span data-tauri-drag-region>Bucket</span>
       </div>
 
       {/* Spacer */}
-      <div className="flex-1" />
+      <div className="flex-1" data-tauri-drag-region />
 
       {/* Optional: Custom controls can be added here */}
-      <div className="flex items-center gap-2" style={{ WebkitAppRegion: 'no-drag' }}>
+      <div className="flex items-center gap-2" data-tauri-drag-region>
         {/* Add custom controls here if needed */}
       </div>
     </div>

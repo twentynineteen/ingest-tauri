@@ -521,6 +521,44 @@ describe('SidebarRail Component', () => {
       expect(rail).toHaveClass('absolute')
     })
   })
+
+  describe('Performance Optimizations', () => {
+    test('should not use transition-all for better drag performance', () => {
+      render(
+        <SidebarProvider>
+          <Sidebar>
+            <SidebarRail />
+          </Sidebar>
+        </SidebarProvider>
+      )
+
+      const rail = screen.getByLabelText('Toggle Sidebar')
+
+      // transition-all is expensive - should use specific properties instead
+      expect(rail.className).not.toContain('transition-all')
+    })
+
+    test('should use specific transition properties', () => {
+      render(
+        <SidebarProvider>
+          <Sidebar>
+            <SidebarRail />
+          </Sidebar>
+        </SidebarProvider>
+      )
+
+      const rail = screen.getByLabelText('Toggle Sidebar')
+
+      // Should use transition-opacity or other specific transitions, not transition-all
+      // This test verifies we're not using the expensive transition-all
+      const hasSpecificTransition =
+        rail.className.includes('transition-opacity') ||
+        rail.className.includes('transition-transform') ||
+        !rail.className.includes('transition')
+
+      expect(hasSpecificTransition).toBe(true)
+    })
+  })
 })
 
 describe('SidebarInset Component', () => {
