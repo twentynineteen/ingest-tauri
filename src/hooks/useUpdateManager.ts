@@ -8,6 +8,7 @@ import { openUrl } from '@tauri-apps/plugin-opener'
 import { relaunch } from '@tauri-apps/plugin-process'
 import { check } from '@tauri-apps/plugin-updater'
 import { createNamespacedLogger } from '@utils/logger'
+import { useState } from 'react'
 
 import { logger } from '@/utils/logger'
 
@@ -19,11 +20,38 @@ interface UpdateManagerOptions {
   onUserClick: boolean
 }
 
+interface UpdateDialogState {
+  open: boolean
+  currentVersion: string
+  latestVersion: string
+  releaseNotes: string
+}
+
+const initialDialogState: UpdateDialogState = {
+  open: false,
+  currentVersion: '',
+  latestVersion: '',
+  releaseNotes: ''
+}
+
 /**
  * Hook for managing application updates with GitHub releases integration
+ *
+ * Returns dialog state for rendering UpdateDialog component, along with
+ * handlers for update confirmation and cancellation.
  */
 export function useUpdateManager() {
   const { refetch: checkVersion } = useVersionCheck()
+  const [dialogState, setDialogState] = useState<UpdateDialogState>(initialDialogState)
+
+  const closeDialog = () => {
+    setDialogState(initialDialogState)
+  }
+
+  const handleUpdate = async () => {
+    closeDialog()
+    await performUpdate()
+  }
 
   const mutationFn = async (options: UpdateManagerOptions): Promise<void> => {
     const { onUserClick } = options
@@ -59,20 +87,13 @@ export function useUpdateManager() {
       const versionData = versionResult.data
 
       if (versionData?.updateAvailable) {
-        // Show update confirmation dialog
-        const userConfirmed = await ask(
-          `Update from ${versionData.currentVersion} to ${versionData.latestVersion} is available!\\n\\nRelease notes: ${versionData.releaseNotes}`,
-          {
-            title: 'Update Available',
-            kind: 'info',
-            okLabel: 'Update',
-            cancelLabel: 'Cancel'
-          }
-        )
-
-        if (userConfirmed) {
-          await performUpdate()
-        }
+        // Show custom UpdateDialog with scrollable release notes
+        setDialogState({
+          open: true,
+          currentVersion: versionData.currentVersion,
+          latestVersion: versionData.latestVersion,
+          releaseNotes: versionData.releaseNotes
+        })
       } else if (onUserClick) {
         // Show current version info when no update is available
         await message(`You are on the latest version ${versionData?.currentVersion}.`, {
@@ -94,9 +115,17 @@ export function useUpdateManager() {
     }
   }
 
-  return useMutation<void, Error, UpdateManagerOptions>({
+  const mutation = useMutation<void, Error, UpdateManagerOptions>({
     mutationFn
   })
+
+  return {
+    ...mutation,
+    // Dialog state and handlers for UpdateDialog component
+    dialogState,
+    onUpdate: handleUpdate,
+    onCancel: closeDialog
+  }
 }
 
 /**
