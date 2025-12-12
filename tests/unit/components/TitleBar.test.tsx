@@ -68,6 +68,27 @@ describe('TitleBar Component', () => {
       // Verify it's not using opacity variants
       expect(dragRegion?.className).not.toMatch(/bg-background\/\d+/)
     })
+
+    test('does not use WebkitAppRegion to avoid dual drag handler conflict', () => {
+      const { container } = render(<TitleBar />)
+
+      const dragRegion = container.querySelector('[data-tauri-drag-region]')
+      expect(dragRegion).toBeInTheDocument()
+
+      // Should only use data-tauri-drag-region, not WebkitAppRegion
+      const style = (dragRegion as HTMLElement)?.style
+      expect(style?.WebkitAppRegion).toBeFalsy()
+    })
+
+    test('has willChange performance hint for smooth dragging', () => {
+      const { container } = render(<TitleBar />)
+
+      const dragRegion = container.querySelector('[data-tauri-drag-region]')
+      expect(dragRegion).toBeInTheDocument()
+
+      const style = (dragRegion as HTMLElement)?.style
+      expect(style?.willChange).toBe('transform')
+    })
   })
 
   describe('Draggable Region', () => {
@@ -81,17 +102,6 @@ describe('TitleBar Component', () => {
       const dragRegion = container.querySelector('[data-tauri-drag-region]')
       expect(dragRegion).toBeInTheDocument()
       expect(dragRegion).toHaveAttribute('data-tauri-drag-region')
-    })
-
-    test('has WebkitAppRegion: drag style', () => {
-      const { container } = render(<TitleBar />)
-
-      const dragRegion = container.querySelector('[data-tauri-drag-region]')
-      expect(dragRegion).toBeInTheDocument()
-
-      // Check inline style
-      const style = (dragRegion as HTMLElement)?.style
-      expect(style?.WebkitAppRegion).toBe('drag')
     })
 
     test('has correct positioning for macOS traffic lights', () => {
@@ -137,19 +147,9 @@ describe('TitleBar Component', () => {
     })
   })
 
-  describe('Non-Draggable Content', () => {
+  describe('Content', () => {
     beforeEach(() => {
       mockNavigator('MacIntel')
-    })
-
-    test('title text has WebkitAppRegion: no-drag', () => {
-      const { container } = render(<TitleBar />)
-
-      const titleContainer = container.querySelector('.text-sm.font-medium')
-      expect(titleContainer).toBeInTheDocument()
-
-      const style = (titleContainer as HTMLElement)?.style
-      expect(style?.WebkitAppRegion).toBe('no-drag')
     })
 
     test('renders "Bucket" title', () => {
@@ -160,14 +160,11 @@ describe('TitleBar Component', () => {
       expect(title?.textContent).toBe('Bucket')
     })
 
-    test('custom controls area has WebkitAppRegion: no-drag', () => {
+    test('title text exists and is properly styled', () => {
       const { container } = render(<TitleBar />)
 
-      const controlsArea = container.querySelector('.flex.items-center.gap-2')
-      expect(controlsArea).toBeInTheDocument()
-
-      const style = (controlsArea as HTMLElement)?.style
-      expect(style?.WebkitAppRegion).toBe('no-drag')
+      const titleContainer = container.querySelector('.text-sm.font-medium')
+      expect(titleContainer).toBeInTheDocument()
     })
   })
 

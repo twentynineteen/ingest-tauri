@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { getCurrentWindow } from '@tauri-apps/api/window'
+import { getCurrentWindow, LogicalPosition, LogicalSize } from '@tauri-apps/api/window'
 
 interface WindowState {
   x: number
@@ -14,7 +14,7 @@ const THROTTLE_MS = 500 // Maximum 1 save per 500ms during window movement
 /**
  * Creates a throttled version of a function that only executes at most once per wait period
  */
-function throttle<T extends (...args: any[]) => void>(
+function throttle<T extends (...args: unknown[]) => void>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
@@ -66,8 +66,8 @@ export function useWindowState() {
         if (!saved) return
 
         const state: WindowState = JSON.parse(saved)
-        await window.setPosition({ x: state.x, y: state.y })
-        await window.setSize({ width: state.width, height: state.height })
+        await window.setPosition(new LogicalPosition(state.x, state.y))
+        await window.setSize(new LogicalSize(state.width, state.height))
       } catch {
         // Silently fail if window state can't be restored
       }
