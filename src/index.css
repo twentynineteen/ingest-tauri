@@ -501,9 +501,20 @@
   -webkit-app-region: no-drag;
 }
 
+/* Performance optimization for window dragging */
+[data-tauri-drag-region] {
+  will-change: transform;
+  transform: translateZ(0); /* Force GPU acceleration */
+}
+
 /* Smooth theme transitions */
 html {
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
+}
+
+/* Disable transitions during window drag for better performance */
+html:active {
+  transition: none;
 }

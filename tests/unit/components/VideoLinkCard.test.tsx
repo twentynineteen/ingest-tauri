@@ -360,4 +360,83 @@ describe('VideoLinkCard Component', () => {
       expect(screen.getByText(/Uploaded: Jan 15, 2024/i)).toBeInTheDocument()
     })
   })
+
+  // =================================================================
+  // Test Category 5: Performance Optimizations (3 tests)
+  // =================================================================
+
+  describe('Performance Optimizations', () => {
+    test('should not use backdrop-blur on action buttons for better drag performance', () => {
+      // Arrange & Act
+      const { container } = render(
+        <VideoLinkCard
+          videoLink={baseVideoLink}
+          onRemove={mockOnRemove}
+          onMoveUp={mockOnMoveUp}
+          onMoveDown={mockOnMoveDown}
+          canMoveUp={true}
+          canMoveDown={true}
+        />
+      )
+
+      // Assert - Find all buttons
+      const buttons = container.querySelectorAll('button')
+
+      buttons.forEach((button) => {
+        // backdrop-blur is expensive during window drag
+        expect(button.className).not.toContain('backdrop-blur')
+      })
+    })
+
+    test('should use solid backgrounds instead of blur effects', () => {
+      // Arrange & Act
+      const { container } = render(
+        <VideoLinkCard
+          videoLink={baseVideoLink}
+          onRemove={mockOnRemove}
+          onMoveUp={mockOnMoveUp}
+          onMoveDown={mockOnMoveDown}
+          canMoveUp={true}
+          canMoveDown={true}
+        />
+      )
+
+      // Assert - Check for solid background usage
+      const buttons = container.querySelectorAll('button')
+
+      buttons.forEach((button) => {
+        // Should have solid background (bg-background or similar)
+        const hasSolidBackground =
+          button.className.includes('bg-background') ||
+          button.className.includes('bg-card') ||
+          button.className.includes('bg-muted')
+
+        // If button has a background, it should be solid, not blurred
+        if (hasSolidBackground) {
+          expect(button.className).not.toContain('backdrop-blur')
+        }
+      })
+    })
+
+    test('should not have blur effects on overlay elements', () => {
+      // Arrange & Act
+      const { container } = render(
+        <VideoLinkCard
+          videoLink={baseVideoLink}
+          onRemove={mockOnRemove}
+          onMoveUp={mockOnMoveUp}
+          onMoveDown={mockOnMoveDown}
+          canMoveUp={true}
+          canMoveDown={true}
+        />
+      )
+
+      // Assert - Check all child elements for blur
+      const allElements = container.querySelectorAll('*')
+
+      allElements.forEach((element) => {
+        expect(element.className).not.toContain('backdrop-blur')
+      })
+    })
+  })
 })

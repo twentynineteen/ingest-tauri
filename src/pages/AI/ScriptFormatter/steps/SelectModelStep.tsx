@@ -3,6 +3,7 @@
  * Step 2: AI Provider and Model Selection
  */
 
+import { Button } from '@components/ui/button'
 import { Database, Sparkles } from 'lucide-react'
 import React from 'react'
 
@@ -155,17 +156,10 @@ export const SelectModelStep: React.FC<SelectModelStepProps> = ({
 
       {/* Format button */}
       {selectedModelId && activeProvider?.status === 'configured' && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.preventDefault()
-            onFormatScript()
-          }}
-          className="bg-foreground text-background hover:bg-foreground/90 mb-3 flex w-full items-center justify-center gap-2 rounded-lg px-6 py-3"
-        >
-          <Sparkles className="h-5 w-5" />
+        <Button onClick={onFormatScript} className="mb-3 w-full" size="lg">
+          <Sparkles className="mr-2 h-5 w-5" />
           Format Script with AI
-        </button>
+        </Button>
       )}
     </div>
   )

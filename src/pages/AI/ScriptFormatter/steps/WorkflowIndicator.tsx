@@ -25,12 +25,16 @@ export const WorkflowIndicator: React.FC<WorkflowIndicatorProps> = ({ currentSte
         <div
           key={step}
           className={`flex items-center ${
-            currentStep === step ? 'font-medium text-black' : 'text-muted-foreground/50'
+            currentStep === step
+              ? 'text-foreground font-medium'
+              : 'text-muted-foreground/50'
           }`}
         >
           <div
             className={`flex h-8 w-8 items-center justify-center rounded-full ${
-              currentStep === step ? 'bg-black text-white' : 'bg-muted'
+              currentStep === step
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-muted text-muted-foreground'
             }`}
           >
             {idx + 1}
