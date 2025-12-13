@@ -59,7 +59,7 @@
     "createUpdaterArtifacts": true,
     "resources": {
       "assets/*": "resources/",
-      "assets/plugins/*": "resources/plugins/",
+      "assets/plugins/*": "plugins/",
       "resources/embeddings/*": "embeddings/"
     },
     "active": true,
