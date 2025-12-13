@@ -212,7 +212,7 @@ export const THEMES: Record<ThemeId, ThemeMetadata> = {
   'one-light': {
     id: 'one-light',
     name: 'One Light',
-    description: 'Atom editor\'s popular warm light theme',
+    description: "Atom editor's popular warm light theme",
     category: 'light',
     colorSwatch: {
       background: '230 15% 97%', // #fafafa
